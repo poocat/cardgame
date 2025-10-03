@@ -53,12 +53,12 @@ export type ChoiceDef = {
   min: number;
   /** Use to indicate the maximum number of options the player may select from the given options. */
   max: number;
-  /** Use to determine which player must make the choice. If not included, will default to the player taking the action. */
-  getChoosingPlayer?: (args: {
+  /** Use to determine which players must make the choice. If not included, will default to only the player taking the action. */
+  getChoosingPlayers?: (args: {
     gameState: GameState;
     currentDecisions: Decisions;
     context: ActionContext;
-  }) => Id;
+  }) => Id[];
   /** Use to retrieve the values to choose between from the game state. */
   getValues: (args: {
     gameState: GameState;

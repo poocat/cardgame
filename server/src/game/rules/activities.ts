@@ -27,6 +27,13 @@ import { Decisions } from "@server/game/utils/Decisions";
 import { GameState } from "@server/game/utils/GameState";
 import { ActionContext, ChoiceDef, IMutator } from "@server/types";
 
+/******************************************************************************
+ * A reusable "null choice". Signals to the state machine that the game state
+ * should be passed back through the state machine.
+ *
+ * Note, any choice that has a `max` value of 0 will be interpreted as a "null
+ * choice".
+ ******************************************************************************/
 const NULL_CHOICE: ChoiceData = {
   name: "",
   type: "arbitrary",
@@ -38,36 +45,50 @@ const NULL_CHOICE: ChoiceData = {
 
 /******************************************************************************
  * Feeds the current game state, and all the currently made decisions, into the
- * callbacks defined for the relevant card, to yield a single choice that can
- * be delivered to a player.
+ * callbacks defined for the relevant card, to yield a series of choices for
+ * the given choice definition.
+ *
+ * Multiple choices might be generated if the choice definition yields multiple
+ * choosing players, in which case, the choice is duplicated amongst those
+ * players.
+ *
+ * Zero choices might be generated if the choice definition yields no viable
+ * choosing players.
  ******************************************************************************/
-function createActionChoice(args: {
+function createActionChoices(args: {
   choiceDef: ChoiceDef;
   gameState: GameState;
   currentDecisions: Decisions;
   actionContext: ActionContext;
-}): ChoiceData {
-  let choosingPlayerId = args.actionContext.playerTakingActionId;
-  if (args.choiceDef.getChoosingPlayer) {
-    choosingPlayerId = args.choiceDef.getChoosingPlayer({
+}): ChoiceData[] {
+  const choosingPlayerIds: Id[] = [];
+  if (!args.choiceDef.getChoosingPlayers) {
+    // By default, the choosing player is the one taking the action.
+    choosingPlayerIds.push(args.actionContext.playerTakingActionId);
+  } else {
+    choosingPlayerIds.push(
+      ...args.choiceDef.getChoosingPlayers({
+        gameState: args.gameState,
+        currentDecisions: args.currentDecisions,
+        context: args.actionContext,
+      }),
+    );
+  }
+  return choosingPlayerIds.map((playerId) => {
+    const values = args.choiceDef.getValues({
       gameState: args.gameState,
       currentDecisions: args.currentDecisions,
-      context: args.actionContext,
+      context: { ...args.actionContext, choosingPlayerId: playerId },
     });
-  }
-  const values = args.choiceDef.getValues({
-    gameState: args.gameState,
-    currentDecisions: args.currentDecisions,
-    context: { ...args.actionContext, choosingPlayerId: choosingPlayerId },
+    return {
+      name: args.choiceDef.name,
+      type: args.choiceDef.type,
+      min: args.choiceDef.min,
+      max: args.choiceDef.max,
+      choosingPlayerId: playerId,
+      values,
+    };
   });
-  return {
-    name: args.choiceDef.name,
-    type: args.choiceDef.type,
-    min: args.choiceDef.min,
-    max: args.choiceDef.max,
-    choosingPlayerId: choosingPlayerId,
-    values,
-  };
 }
 
 /******************************************************************************
@@ -141,8 +162,12 @@ function createChoosingActionChoice(args: {
 
 /******************************************************************************
  * Generates choices for a "takingAction" activity.
+ *
+ * If returns an empty array, then no viable choosing players could be found.
+ * Ideally this wouldn't happen, as it implies that the action is not possible
+ * given the current game state...
  ******************************************************************************/
-function createTakingActionchoices(args: {
+function createTakingActionChoices(args: {
   playerData: PlayerData;
   gameState: GameState;
   actionData: ActionData;
@@ -157,13 +182,8 @@ function createTakingActionchoices(args: {
     // In those cases, send a special choice to signal the state machine.
     return { currentChoice: NULL_CHOICE, nextChoices: [] };
   }
-  // The first choice must be "independent".
   const firstChoiceDef = actionDef.sequence.choices[0];
-  // The rest are "dependent", because they may depend on decisions made for previous choices.
-  const nextChoices: NextChoiceData[] = actionDef.sequence.choices
-    .slice(1)
-    .map((_, i) => ({ type: "dependent", index: i + 1 }));
-  const nextCurrentChoice = createActionChoice({
+  const firstChoices = createActionChoices({
     choiceDef: firstChoiceDef,
     gameState: args.gameState,
     currentDecisions: new Decisions(args.decisions),
@@ -172,7 +192,21 @@ function createTakingActionchoices(args: {
       playerTakingActionId: args.playerData.id,
     },
   });
-  return { currentChoice: nextCurrentChoice, nextChoices };
+  // The rest of the choices are "dependent", because they may depend on
+  // decisions made for previous choices.
+  const dependentChoices: NextChoiceData[] = actionDef.sequence.choices
+    .slice(1)
+    .map((_, i) => ({ type: "dependent", index: i + 1 }));
+  // If no viable players for first choice, send a null current choice and move
+  // on.
+  if (firstChoices.length < 1) {
+    return { currentChoice: NULL_CHOICE, nextChoices: dependentChoices };
+  }
+  const nextChoices: NextChoiceData[] = firstChoices
+    .slice(1)
+    .map((choice) => ({ type: "independent", choice }));
+  nextChoices.push(...dependentChoices);
+  return { currentChoice: firstChoices[0], nextChoices };
 }
 
 /******************************************************************************
@@ -264,17 +298,18 @@ export const createNextActivity: ActivityTypeMap<
       return activity;
     } else if (actionIds.length === 1) {
       const actionData = gameState.getActionById({ actionId: actionIds[0] });
+      const choices = createTakingActionChoices({
+        playerData,
+        gameState,
+        actionData,
+        decisions: currentDecisions,
+      });
       const activity: ActivityData = {
         type: "takingAction",
         playerTakingActionId: playerData.id,
         actionId: actionIds[0],
         previousDecisions: [],
-        ...createTakingActionchoices({
-          playerData,
-          gameState,
-          actionData,
-          decisions: currentDecisions,
-        }),
+        ...choices,
       };
       return activity;
     }
@@ -282,7 +317,6 @@ export const createNextActivity: ActivityTypeMap<
       `Expected one value selected for one choice; found ${actionIds.length} values and ${currentDecisions.length} decisions.`,
     );
   },
-
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Every "taking action" activity should be followed by a "choosing action"
    * activity.
@@ -354,7 +388,7 @@ export const continueActivity: ActivityTypeMap<
           `No choice for action '${action.id}' at index ${nextChoice.index}`,
         );
       }
-      const nextCurrentChoice = createActionChoice({
+      const nextActionChoices = createActionChoices({
         choiceDef,
         gameState: gameState,
         currentDecisions: new Decisions(currentDecisions),
@@ -363,7 +397,12 @@ export const continueActivity: ActivityTypeMap<
           playerTakingActionId: currentActivity.playerTakingActionId,
         },
       });
-      next.currentChoice = nextCurrentChoice;
+      next.currentChoice = nextActionChoices[0] ?? NULL_CHOICE;
+      const remaining: NextChoiceData[] = nextActionChoices.map((choice) => ({
+        type: "independent",
+        choice,
+      }));
+      next.nextChoices = [...remaining, ...next.nextChoices];
     } else {
       next.currentChoice = nextChoice.choice;
     }

@@ -1,4 +1,4 @@
-import { ChoiceValue, Decision } from "@common/types";
+import { ChoiceValue, Decision, Id } from "@common/types";
 
 /******************************************************************************
  * ### Decisions
@@ -7,17 +7,34 @@ import { ChoiceValue, Decision } from "@common/types";
  * choice name.
  ******************************************************************************/
 export class Decisions {
-	private decisions: Decision[];
+  private decisions: Decision[];
 
-	constructor(choicesMade: Decision[]) {
-		this.decisions = choicesMade;
-	}
+  constructor(decisions: Decision[]) {
+    this.decisions = decisions;
+  }
 
-	get(name: string): ChoiceValue[] {
-		const values: ChoiceValue[] = [];
-		this.decisions
-			.filter((c) => c.name === name)
-			.forEach((c) => values.push(...c.values));
-		return values;
-	}
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Use to get all the decisions made for the given name. If a player ID is
+   * given, will only include decisions made by that player.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  get(name: string, playerId?: Id): ChoiceValue[] {
+    let decisions = this.decisions.filter((d) => d.name === name);
+    if (playerId) {
+      decisions = decisions.filter((d) => d.playerId === playerId);
+    }
+    const values: ChoiceValue[] = [];
+    decisions.forEach((d) => values.push(...d.values));
+    return values;
+  }
+
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Use to get the set of IDs of players who have made choices for the given
+   * name.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  getPlayerIds(name: string): Id[] {
+    const players = new Set(
+      this.decisions.filter((d) => d.name === name).map((d) => d.playerId),
+    );
+    return [...players];
+  }
 }

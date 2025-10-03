@@ -32,7 +32,7 @@ export const CARDS: CardDef[] = [
           },
         },
       },
-      discard: {},
+      // discard: {},
     },
   },
   {
@@ -155,6 +155,68 @@ export const CARDS: CardDef[] = [
                 location: { type: "onCard", cardId: chosenCardId },
               });
             }
+          },
+        },
+      },
+    },
+  },
+  ////////////////////////////////////////////////////////////////////////////////
+  {
+    name: "Example that Involves All Players",
+    type: "producer",
+    actions: {
+      play: {},
+      ability: {
+        instructions:
+          "Each player may move up to 1 of their chips from their reserve to one of their consumers in play.",
+        sequence: {
+          choices: [
+            {
+              name: "targetChip",
+              type: "chipId",
+              instructions: "Choose one of the chips in your reserve.",
+              min: 0,
+              max: 1,
+              getChoosingPlayers: ({ gameState }) =>
+                gameState.players
+                  .filter((p) => {
+                    // TODO!!! Conditions for being able to make this choice.
+                    return true;
+                  })
+                  .map((p) => p.id),
+              getValues: ({ gameState, context }) => {
+                return gameState
+                  .getPlayerChipsInReserve({
+                    playerId: context.choosingPlayerId,
+                  })
+                  .map((c) => c.id);
+              },
+            },
+            {
+              name: "targetConsumer",
+              type: "cardId",
+              instructions: "Choose which consumer to move the chip to.",
+              min: 1,
+              max: 1,
+              getChoosingPlayers: ({ currentDecisions }) =>
+                currentDecisions.getPlayerIds("targetChip"),
+              getValues: ({ gameState, context }) =>
+                gameState
+                  .getPlayerCardsInPlay({ playerId: context.choosingPlayerId })
+                  .filter((c) => c.type === "consumer")
+                  .map((c) => c.id),
+            },
+          ],
+          affect: ({ decisions, mutator }) => {
+            decisions.getPlayerIds("targetChip").forEach((playerId) => {
+              const chipIds = decisions.get("targetChip", playerId);
+              decisions.get("targetCard", playerId).forEach((cardId) => {
+                mutator.moveChips({
+                  ids: chipIds,
+                  location: { type: "onCard", cardId: cardId },
+                });
+              });
+            });
           },
         },
       },

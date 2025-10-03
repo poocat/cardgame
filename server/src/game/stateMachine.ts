@@ -23,7 +23,9 @@ export function makeDecision(args: {
 }): GameData {
   // Validate the decision.
   if (args.gameData.activity.currentChoice.min > args.decision.values.length) {
-    throw new Error(`Invalid decision for current choice: ${args.decision}`);
+    throw new Error(
+      `Invalid decision for current choice: ${JSON.stringify(args.decision)}`,
+    );
   }
 
   let currentGameState = new GameState(args.gameData);

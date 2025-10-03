@@ -120,7 +120,7 @@ export type NextChoiceData =
   | { type: "dependent"; index: number }
   | { type: "independent"; choice: ChoiceData };
 
-export type Decision = { name: string; values: ChoiceValue[] };
+export type Decision = { name: string; playerId: Id; values: ChoiceValue[] };
 
 const activityTypes = [
   "drawingCards",

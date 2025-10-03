@@ -59,7 +59,7 @@ export class GameState {
 	getActionById(args: { actionId: Id }): DeepReadonly<ActionData> {
 		const match = this.gameData.actions.find((a) => a.id === args.actionId);
 		if (!match) {
-			throw new Error(`Action ${args.actionId} not in game.`);
+			throw new Error(`Action '${args.actionId}' not in game.`);
 		}
 		return match;
 	}
