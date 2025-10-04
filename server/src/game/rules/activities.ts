@@ -215,13 +215,14 @@ function createTakingActionChoices(args: {
  * Generates the activity that should follow the conclusion of an activity of
  * the given type, and applies it to the game data via the given mutator.
  ******************************************************************************/
-export const createNextActivity: ActivityTypeMap<
+export const activityTypeNextActivity: ActivityTypeMap<
   (args: {
     playerData: PlayerData;
     /** This game state should have already been mutated by the effects of the given activity. */
     gameState: GameState;
     currentDecisions: Decision[];
-  }) => ActivityData
+    mutator: IMutator;
+  }) => void
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * In most cases, after a "drawing cards" activity, move directly to
@@ -230,7 +231,7 @@ export const createNextActivity: ActivityTypeMap<
    * However, at the beginning of the game, repeat the "drawing cards" activity
    * until the entire opening hand is drawn.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  drawingCards: ({ playerData, gameState }) => {
+  drawingCards: ({ playerData, gameState, mutator }) => {
     const cardsInHand = gameState.getPlayerCardsInHand({
       playerId: playerData.id,
     });
@@ -243,29 +244,31 @@ export const createNextActivity: ActivityTypeMap<
       cardsInDeck.length > 0
     ) {
       // If it's the player's first turn, repeat the "drawingCards" activity until hand is the right size.
-      const activity: ActivityData = {
-        type: "drawingCards",
-        currentChoice: createDrawingCardsChoice({
-          playerId: playerData.id,
-          gameState,
-        }),
-        nextChoices: [],
-        previousDecisions: [],
-      };
-      return activity;
+      mutator.setActivity({
+        activity: {
+          type: "drawingCards",
+          currentChoice: createDrawingCardsChoice({
+            playerId: playerData.id,
+            gameState,
+          }),
+          nextChoices: [],
+          previousDecisions: [],
+        }
+      });
     } else {
       // Otherwise, move on to the "choosingAction" activity.
-      const activity: ActivityData = {
-        type: "choosingAction",
-        playerChoosingActionId: playerData.id,
-        currentChoice: createChoosingActionChoice({
-          playerId: playerData.id,
-          gameState,
-        }),
-        nextChoices: [],
-        previousDecisions: [],
-      };
-      return activity;
+      mutator.setActivity({
+        activity: {
+          type: "choosingAction",
+          playerChoosingActionId: playerData.id,
+          currentChoice: createChoosingActionChoice({
+            playerId: playerData.id,
+            gameState,
+          }),
+          nextChoices: [],
+          previousDecisions: [],
+        }
+      });
     }
   },
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -277,7 +280,7 @@ export const createNextActivity: ActivityTypeMap<
    * If one value is chosen, it is the action that should be taken, and thus,
    * the action definition must be used to generate the next set of choices.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  choosingAction: ({ playerData, gameState, currentDecisions }) => {
+  choosingAction: ({ playerData, gameState, currentDecisions, mutator }) => {
     const actionIds = currentDecisions[0].values ?? [];
     if (actionIds.length === 0) {
       // If nothing was chosen, then it's time to pass the turn.
@@ -286,16 +289,18 @@ export const createNextActivity: ActivityTypeMap<
       );
       const nextPlayerIndex = (playerIndex + 1) % gameState.players.length;
       const nextPlayerData = gameState.players[nextPlayerIndex];
-      const activity: ActivityData = {
-        type: "drawingCards",
-        currentChoice: createDrawingCardsChoice({
-          playerId: nextPlayerData.id,
-          gameState,
-        }),
-        nextChoices: [],
-        previousDecisions: [],
-      };
-      return activity;
+      mutator.passTurn({ from: playerData.id, to: nextPlayerData.id });
+      mutator.setActivity({
+        activity: {
+          type: "drawingCards",
+          currentChoice: createDrawingCardsChoice({
+            playerId: nextPlayerData.id,
+            gameState,
+          }),
+          nextChoices: [],
+          previousDecisions: [],
+        }
+      });
     } else if (actionIds.length === 1) {
       const actionData = gameState.getActionById({ actionId: actionIds[0] });
       const choices = createTakingActionChoices({
@@ -304,35 +309,38 @@ export const createNextActivity: ActivityTypeMap<
         actionData,
         decisions: currentDecisions,
       });
-      const activity: ActivityData = {
-        type: "takingAction",
-        playerTakingActionId: playerData.id,
-        actionId: actionIds[0],
-        previousDecisions: [],
-        ...choices,
-      };
-      return activity;
+      mutator.setActivity({
+        activity: {
+          type: "takingAction",
+          playerTakingActionId: playerData.id,
+          actionId: actionIds[0],
+          previousDecisions: [],
+          ...choices,
+        }
+      });
+    } else {
+      throw new Error(
+        `Expected one value selected for one choice; found ${actionIds.length} values and ${currentDecisions.length} decisions.`,
+      );
     }
-    throw new Error(
-      `Expected one value selected for one choice; found ${actionIds.length} values and ${currentDecisions.length} decisions.`,
-    );
   },
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Every "taking action" activity should be followed by a "choosing action"
    * activity.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  takingAction: ({ playerData, gameState }) => {
-    const activity: ActivityData = {
-      type: "choosingAction",
-      playerChoosingActionId: playerData.id,
-      currentChoice: createChoosingActionChoice({
-        playerId: playerData.id,
-        gameState,
-      }),
-      nextChoices: [],
-      previousDecisions: [],
-    };
-    return activity;
+  takingAction: ({ playerData, gameState, mutator }) => {
+    mutator.setActivity({
+      activity: {
+        type: "choosingAction",
+        playerChoosingActionId: playerData.id,
+        currentChoice: createChoosingActionChoice({
+          playerId: playerData.id,
+          gameState,
+        }),
+        nextChoices: [],
+        previousDecisions: [],
+      }
+    });
   },
 };
 
@@ -342,7 +350,7 @@ export const createNextActivity: ActivityTypeMap<
  * If an activity requires more than one choice, it will need to be
  * "continued".
  ******************************************************************************/
-export const continueActivity: ActivityTypeMap<
+export const activityTypeContinuedActivity: ActivityTypeMap<
   (args: {
     gameState: GameState;
     currentActivity: ActivityData;
@@ -447,6 +455,8 @@ export const activityTypeEffects: ActivityTypeMap<
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   takingAction: ({ gameState, currentActivity, currentDecisions, mutator }) => {
     if (!(currentActivity.type === "takingAction")) {
+      // Should never get here, but necessary for typescript to believe that
+      // `actionId` is in `currentActivity`.
       throw new Error(
         `Expected 'takingAction' activity, found '${currentActivity.type}'`,
       );
@@ -515,7 +525,8 @@ export const activityTypeTriggeredEffects: ActivityTypeMap<
    *
    * E.g.:
    * - "dead" "consumer" cards are discarded
-   * - chips that are no longer on any card must be returned to the "reserve"
+   * - chips that were located on cards that left play need to return to the
+   * "reserve"
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   takingAction: ({ current, next, mutator }) => {
     const cardsInPlay = current.getAllCardsInPlay();
@@ -541,26 +552,3 @@ export const activityTypeTriggeredEffects: ActivityTypeMap<
     }
   },
 };
-
-/******************************************************************************
- * Use when ready to set the activity for the next choices.
- *
- * Detects whether or not it is time to pass the turn to another player.
- ******************************************************************************/
-export function activityChangeEffects(args: {
-  nextActivity: ActivityData;
-  playerTakingTurn: PlayerData;
-  mutator: IMutator;
-}) {
-  if (
-    args.nextActivity.type === "drawingCards" &&
-    args.nextActivity.currentChoice.choosingPlayerId !==
-    args.playerTakingTurn.id
-  ) {
-    args.mutator.passTurn({
-      from: args.playerTakingTurn.id,
-      to: args.nextActivity.currentChoice.choosingPlayerId,
-    });
-  }
-  args.mutator.setActivity({ activity: args.nextActivity });
-}

@@ -1,10 +1,9 @@
 import { Decision, GameData } from "@common/types";
 import {
-  activityChangeEffects,
+  activityTypeContinuedActivity,
   activityTypeEffects,
+  activityTypeNextActivity,
   activityTypeTriggeredEffects,
-  continueActivity,
-  createNextActivity,
 } from "@server/game/rules/activities";
 import { GameState, Next } from "@server/game/utils";
 
@@ -21,11 +20,23 @@ export function makeDecision(args: {
   gameData: GameData;
   decision: Decision;
 }): GameData {
+  /**
+   * TODO!!!
+   * It's possible for the activity to stick you with an impossible choice, e.g.
+   * when the minimum required number of values is greater than the number of
+   * values available. Need to figure out how to catch this and fall back.
+   */
+
   // Validate the decision.
   if (args.gameData.activity.currentChoice.min > args.decision.values.length) {
     throw new Error(
-      `Invalid decision for current choice: ${JSON.stringify(args.decision)}`,
+      `Invalid decision for current choice; not enough values: ${JSON.stringify(args.decision)}`,
     );
+  }
+  if (args.gameData.activity.currentChoice.choosingPlayerId !== args.decision.playerId) {
+    throw new Error(
+      `Invalid decision for current choice; wrong player: ${args.decision.playerId}`
+    )
   }
 
   let currentGameState = new GameState(args.gameData);
@@ -41,7 +52,7 @@ export function makeDecision(args: {
   if (currentActivity.nextChoices.length > 0) {
     // If the current activity needs more choices to be made, continue the activity.
     next.mutatorQueue.setActivity({
-      activity: continueActivity[currentActivity.type]({
+      activity: activityTypeContinuedActivity[currentActivity.type]({
         gameState: currentGameState,
         currentActivity,
         currentDecisions,
@@ -57,6 +68,7 @@ export function makeDecision(args: {
         currentActivity: currentActivity,
         currentDecisions,
         mutator: next.mutatorQueue,
+        // logger: logger, // Something to think about...
       });
       let nextGameState = next.dequeueMutations();
       // Fire triggers for this activity, based on changes to the game state.
@@ -67,22 +79,18 @@ export function makeDecision(args: {
       });
       nextGameState = next.dequeueMutations();
       // Generate and apply the next activity using the updated game state.
-      const nextActivity = createNextActivity[currentActivity.type]({
+      activityTypeNextActivity[currentActivity.type]({
         playerData: playerTakingTurn,
         gameState: nextGameState,
         currentDecisions,
-      });
-      activityChangeEffects({
-        nextActivity,
-        playerTakingTurn,
         mutator: next.mutatorQueue,
       });
       currentGameState = next.dequeueMutations();
+      currentActivity = next.activity;
+      currentDecisions = [];
       // If the next activity has no choices to be made, repeat the process with
       // the updated game state, activity, decisions.
-      currentActivity = nextActivity;
-      currentDecisions = [];
-    } while (next.activityIsInstantaneous());
+    } while (currentActivity.currentChoice.max === 0);
   }
   return next.finish();
 }

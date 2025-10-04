@@ -15,32 +15,8 @@ export class Next {
     this.mutatorQueue = new MutatorQueue();
   }
 
-  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Set the activity for the next game state.
-   *
-   * Will interpret the difference between the current and given activities to
-   * determine whether or not the turn needs to be passed.
-   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  setActivity(activity: ActivityData): GameState {
-    if (
-      activity.type === "drawingCards" &&
-      activity.currentChoice.choosingPlayerId !==
-      this.gameData.playerTakingTurnId
-    ) {
-      this.gameData.playerTakingTurnId =
-        activity.currentChoice.choosingPlayerId;
-    }
-    this.gameData.activity = activity;
-    return new GameState(this.gameData);
-  }
-
-  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Indicates that the next activity has no choices to be made.
-   *
-   * Should precipitate another pass through the game state machine.
-   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  activityIsInstantaneous(): boolean {
-    return this.gameData.activity.currentChoice.max === 0;
+  get activity(): ActivityData {
+    return this.gameData.activity;
   }
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -51,6 +27,7 @@ export class Next {
     this.mutatorQueue.apply(new Mutator(this.gameData));
     return new GameState(this.gameData);
   }
+
 
   finish(): GameData {
     return this.gameData;
