@@ -61,7 +61,14 @@ export function makeDecision(args: {
     next.dequeueMutations();
   } else {
     // Otherwise, use the decisions made to affect the game state.
+    let loopCount = 0;
     do {
+      if (loopCount++ >= 10) {
+        // Canary in a coal mine...
+        throw new Error(
+          `State machine looped too many times (${loopCount}) times on a single decision: ${JSON.stringify(args.decision)}`
+        )
+      }
       // Apply all the effects for the decisions made for this activity.
       activityTypeEffects[currentActivity.type]({
         gameState: currentGameState,
