@@ -1,7 +1,7 @@
 import { ActionData, ActionTypeMap } from "@common/types";
 import { cardTypePlayChecks } from "@server/game/rules/cards";
 import { GameState } from "@server/game/utils/GameState";
-import { ActionContext, CheckResult, IMutator } from "@server/types";
+import { CheckResult } from "@server/types";
 
 /******************************************************************************
  * ### Action Checks by Type
@@ -75,42 +75,5 @@ export const actionTypeChecks: ActionTypeMap<
     } else {
       return { ok: true };
     }
-  },
-};
-
-/******************************************************************************
- * ### Automatic Effects by Action Type
- *
- * Effects that should take place per action type, regardless of the
- * implementation of the action on the card, once the action is completed.
- ******************************************************************************/
-export const actionTypeDefaultEffects: ActionTypeMap<
-  (args: { context: ActionContext; mutator: IMutator }) => void
-> = {
-  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * "Play" actions should result in moving the card into play.
-   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  play: (args) => {
-    args.mutator.moveCard({
-      id: args.context.cardId,
-      location: { type: "inPlay", exhausted: false },
-    });
-  },
-
-  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * "Ability" actions should exhaust the card.
-   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  ability: (args) => {
-    args.mutator.exhaustCard({ id: args.context.cardId, value: true });
-  },
-
-  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * "Discard" actions should move the card out of play.
-   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  discard: (args) => {
-    args.mutator.moveCard({
-      id: args.context.cardId,
-      location: { type: "inDiscard" },
-    });
   },
 };
