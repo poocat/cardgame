@@ -123,7 +123,7 @@ function createChoosingActionChoice(args: {
   // Filtering through every action seems dumb, but...
   const values = args.gameState.actions
     .filter((a) => {
-      if (a.card.ownerPlayerId === args.playerId) {
+      if (a.card.ownerPlayerId !== args.playerId) {
         return false;
       }
       const typeCheckResult = actionTypeChecks[a.type]({
