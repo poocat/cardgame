@@ -20,13 +20,6 @@ export function makeDecision(args: {
 	gameData: GameData;
 	decision: Decision;
 }): GameData {
-	/**
-	 * TODO!!!
-	 * It's possible for the activity to stick you with an impossible choice, e.g.
-	 * when the minimum required number of values is greater than the number of
-	 * values available. Need to figure out how to catch this and fall back.
-	 */
-
 	// Validate the decision.
 	if (args.gameData.activity.currentChoice.min > args.decision.values.length) {
 		throw new Error(
@@ -39,6 +32,18 @@ export function makeDecision(args: {
 	) {
 		throw new Error(
 			`Invalid decision for current choice; wrong player: ${args.decision.playerId}`,
+		);
+	}
+	if (
+		args.decision.values.some(
+			(v) => !args.gameData.activity.currentChoice.values.includes(v),
+		)
+	) {
+		const diff = args.decision.values.filter(
+			(v) => !args.gameData.activity.currentChoice.values.includes(v),
+		);
+		throw new Error(
+			`Invalid value(s) for current choice; decision includes values that were not part of the choice: ${diff}`,
 		);
 	}
 
@@ -69,7 +74,7 @@ export function makeDecision(args: {
 			if (loopCount++ >= 10) {
 				// Canary in a coal mine...
 				throw new Error(
-					`State machine looped too many times (${loopCount}) times on a single decision: ${JSON.stringify(args.decision)}`,
+					`State machine looped too many times (${loopCount}) on a single decision: ${JSON.stringify(args.decision)}`,
 				);
 			}
 			// Apply all the effects for the decisions made for this activity.
@@ -95,6 +100,13 @@ export function makeDecision(args: {
 				currentDecisions,
 				mutator: next.mutatorQueue,
 			});
+			/**
+			 * TODO!!!
+			 * It's possible for the activity to stick a player with an impossible
+			 * choice, e.g. when the minimum required number of values is greater than
+			 * the number of values available. Need to figure out how to catch this
+			 * and roll back.
+			 */
 			currentGameState = next.dequeueMutations();
 			currentActivity = next.activity;
 			currentDecisions = [];
