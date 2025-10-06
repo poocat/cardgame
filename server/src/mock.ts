@@ -22,7 +22,7 @@ export function createMockGameData(): GameData {
 				name: c.name,
 				type: c.type,
 				location: { type: "inDeck" },
-				ownerPlayerId: id,
+				ownerId: id,
 			}));
 			cards.push(...playerCards);
 		});
@@ -49,7 +49,7 @@ export function createMockGameData(): GameData {
 				actions.push({
 					id: `${c.id} ${actionType}`,
 					type: actionType as ActionType,
-					card: { name: c.name, id: c.id, ownerPlayerId: c.ownerPlayerId },
+					card: { name: c.name, id: c.id, ownerId: c.ownerId },
 				});
 			});
 		});
@@ -68,7 +68,7 @@ export function createMockGameData(): GameData {
 				name: "cardToDraw",
 				type: "cardId",
 				values: mockCards
-					.filter((c) => c.ownerPlayerId === mockPlayers[0].id)
+					.filter((c) => c.ownerId === mockPlayers[0].id)
 					.map((c) => c.id)
 					.slice(0, 1),
 				min: 1,

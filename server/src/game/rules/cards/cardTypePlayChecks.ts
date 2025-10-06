@@ -21,7 +21,7 @@ export const cardTypePlayChecks: CardTypeMap<
 			(c) =>
 				c.location.type === "inPlay" &&
 				c.type === "producer" &&
-				c.ownerPlayerId == cardData.ownerPlayerId,
+				c.ownerId == cardData.ownerId,
 		);
 		if (producersInPlay.length >= CONFIG.MAX_NUM_PRODUCERS_IN_PLAY) {
 			return {

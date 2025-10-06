@@ -113,7 +113,7 @@ export function createChoosingActionChoice(args: {
 	const values = args.gameState.actions
 		.filter((a) => {
 			// Cannot take an action from another player's card.
-			if (a.card.ownerPlayerId !== args.playerId) {
+			if (a.card.ownerId !== args.playerId) {
 				return false;
 			}
 			const typeCheckResult = actionTypeChecks[a.type]({

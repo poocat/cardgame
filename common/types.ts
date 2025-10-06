@@ -31,7 +31,7 @@ export type ActionData = _DiscriminatedUnionFromArray<
   },
   {
     id: Id;
-    card: { id: Id; name: string, ownerPlayerId: Id };
+    card: { id: Id; name: string; ownerId: Id };
   }
 >;
 
@@ -77,7 +77,7 @@ export type CardData = _DiscriminatedUnionFromArray<
   {
     id: Id;
     name: string;
-    ownerPlayerId: Id;
+    ownerId: Id;
     location: CardLocationData;
   }
 >;

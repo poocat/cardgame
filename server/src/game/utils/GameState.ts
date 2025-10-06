@@ -79,21 +79,21 @@ export class GameState {
 	getPlayerCardsInHand(args: { playerId: Id }): DeepReadonly<CardData>[] {
 		return this.gameData.cards.filter(
 			(card) =>
-				card.ownerPlayerId === args.playerId && card.location.type === "inHand",
+				card.ownerId === args.playerId && card.location.type === "inHand",
 		);
 	}
 
 	getPlayerCardsInPlay(args: { playerId: Id }): DeepReadonly<CardData>[] {
 		return this.gameData.cards.filter(
 			(card) =>
-				card.ownerPlayerId === args.playerId && card.location.type === "inPlay",
+				card.ownerId === args.playerId && card.location.type === "inPlay",
 		);
 	}
 
 	getPlayerCardsInDeck(args: { playerId: Id }): DeepReadonly<CardData>[] {
 		return this.gameData.cards.filter(
 			(card) =>
-				card.ownerPlayerId === args.playerId && card.location.type === "inDeck",
+				card.ownerId === args.playerId && card.location.type === "inDeck",
 		);
 	}
 
