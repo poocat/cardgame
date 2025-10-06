@@ -6,6 +6,7 @@ import {
 	activityTypeTriggeredEffects,
 } from "@server/game/rules/activities";
 import { GameState, Next } from "@server/game/utils";
+import { triggeredEffects } from "@server/game/rules/cards/triggeredEffects";
 
 /******************************************************************************
  * ### Main Game "Loop"
@@ -88,6 +89,13 @@ export function makeDecision(args: {
 			let nextGameState = next.dequeueMutations();
 			// Fire triggers for this activity, based on changes to the game state.
 			activityTypeTriggeredEffects[currentActivity.type]({
+				current: currentGameState,
+				next: nextGameState,
+				mutator: next.mutatorQueue,
+			});
+			nextGameState = next.dequeueMutations();
+			// Look for any custom triggers on cards in play and fire.
+			triggeredEffects({
 				current: currentGameState,
 				next: nextGameState,
 				mutator: next.mutatorQueue,

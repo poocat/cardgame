@@ -94,9 +94,24 @@ export type ActionDef = {
 	sequence?: SequenceDef;
 };
 
+export type TriggerDef = {
+	instructions: string;
+	affect: (args: {
+		current: GameState;
+		next: GameState;
+		context: {
+			/** The card with the trigger. */
+			cardId: Id;
+		};
+		mutator: IMutator;
+	}) => void;
+};
+
 export type CardDef = {
 	/** The unique name of the card. Will be copied into the game state, and used to correlate cards in the game with their definitions. */
 	name: string;
 	type: CardType;
 	actions: Partial<ActionTypeMap<ActionDef>>;
+	/** Each card can have a single, custom triggered effect. The trigger is only active while the card is in play. */
+	trigger?: TriggerDef;
 };

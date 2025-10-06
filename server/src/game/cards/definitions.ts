@@ -235,4 +235,110 @@ export const CARDS: CardDef[] = [
 			},
 		},
 	},
+	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Producers don't need chips on them to remain alive after the conclusion of
+	 * an activity. To make an exception, set up a trigger.
+	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	{
+		name: "Example Producer that Can Die",
+		type: "producer",
+		actions: {
+			play: {
+				instructions: "Bring into play with up to 1 chip from your reserve.",
+				sequence: {
+					choices: [
+						{
+							name: "targetChips",
+							type: "chipId",
+							instructions: "Choose up to 1 of the chips in your reserve.",
+							min: 0,
+							max: 1,
+							getValues: ({ gameState, context }) => {
+								return gameState
+									.getPlayerChipsInReserve({
+										playerId: context.choosingPlayerId,
+									})
+									.map((c) => c.id);
+							},
+						},
+					],
+					affect: ({ decisions, mutator, context }) => {
+						mutator.moveChips({
+							ids: decisions.get("targetChips"),
+							location: { type: "onCard", cardId: context.cardId },
+						});
+					},
+				},
+			},
+			ability: {
+				instructions:
+					"Move one chip from this card to one of your other consumers in play.",
+				sequence: {
+					check: ({ gameState, context }) => {
+						const candidates = gameState
+							.getPlayerCardsInPlay({ playerId: context.playerTakingActionId })
+							.some((c) => c.type === "consumer" && c.id !== context.cardId);
+						if (candidates) {
+							return { ok: true };
+						} else {
+							return {
+								ok: false,
+								reasons: ["No other consumers in play."],
+							};
+						}
+					},
+					choices: [
+						{
+							type: "cardId",
+							name: "targetCard",
+							instructions: "Choose one of your consumer cards.",
+							min: 1,
+							max: 1,
+							getValues: ({ gameState, context }) => {
+								return gameState
+									.getPlayerCardsInPlay({ playerId: context.choosingPlayerId })
+									.filter(
+										(c) => c.type === "consumer" && c.id !== context.cardId,
+									)
+									.map((c) => c.id);
+							},
+						},
+						{
+							type: "chipId",
+							name: "targetChips",
+							instructions: "Choose a chip from this card.",
+							min: 1,
+							max: 1,
+							getValues: ({ gameState, context }) => {
+								return gameState
+									.getChipsOnCard({ cardId: context.cardId })
+									.map((c) => c.id);
+							},
+						},
+					],
+					affect: ({ decisions, mutator }) => {
+						const chosenCardId = decisions.get("targetCard")[0];
+						if (chosenCardId) {
+							mutator.moveChips({
+								ids: decisions.get("targetChips"),
+								location: { type: "onCard", cardId: chosenCardId },
+							});
+						}
+					},
+				},
+			},
+		},
+		trigger: {
+			instructions:
+				"Whenever the last chip is removed from this card, discard it.",
+			affect: ({ next, context, mutator }) => {
+				if (next.getChipsOnCard({ cardId: context.cardId }).length < 1) {
+					mutator.moveCard({
+						id: context.cardId,
+						location: { type: "inDiscard" },
+					});
+				}
+			},
+		},
+	},
 ];
