@@ -12,7 +12,7 @@ export function triggeredEffects(args: {
 	next: GameState;
 	mutator: IMutator;
 }): void {
-	args.current.getAllCardsInPlay().forEach((c) => {
+	args.current.getCards({ locationTypes: ["inPlay"] }).forEach((c) => {
 		const cardDef = getCardDefinition(c.name);
 		if (cardDef.trigger) {
 			cardDef.trigger.affect({

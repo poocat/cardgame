@@ -30,7 +30,11 @@ export const activityTypeTriggeredEffects: ActivityTypeMap<
 	drawingCards: ({ next, mutator }) => {
 		const playerTakingTurn = next.getPlayerTakingTurn();
 		next
-			.getPlayerCardsInPlay({ playerId: playerTakingTurn.id })
+			.getCards({
+				playerIds: [playerTakingTurn.id],
+				locationTypes: ["inPlay"],
+				exhausted: true,
+			})
 			.forEach((c) => mutator.exhaustCard({ id: c.id, value: false }));
 	},
 
@@ -49,7 +53,7 @@ export const activityTypeTriggeredEffects: ActivityTypeMap<
 	 * "reserve"
 	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	takingAction: ({ current, next, mutator }) => {
-		const cardsInPlay = current.getAllCardsInPlay();
+		const cardsInPlay = current.getCards({ locationTypes: ["inPlay"] });
 		// Trigger effects based on card type.
 		cardsInPlay.forEach((cardData) =>
 			cardTypeTriggeredEffects[cardData.type]({

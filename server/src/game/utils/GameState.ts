@@ -1,6 +1,8 @@
 import {
 	ActionData,
 	CardData,
+	CardLocationType,
+	CardType,
 	ChipData,
 	GameData,
 	Id,
@@ -72,29 +74,49 @@ export class GameState {
 		return match;
 	}
 
-	getAllCardsInPlay(): DeepReadonly<CardData[]> {
-		return this.gameData.cards.filter((c) => c.location.type === "inPlay");
-	}
-
-	getPlayerCardsInHand(args: { playerId: Id }): DeepReadonly<CardData>[] {
-		return this.gameData.cards.filter(
-			(card) =>
-				card.ownerId === args.playerId && card.location.type === "inHand",
-		);
-	}
-
-	getPlayerCardsInPlay(args: { playerId: Id }): DeepReadonly<CardData>[] {
-		return this.gameData.cards.filter(
-			(card) =>
-				card.ownerId === args.playerId && card.location.type === "inPlay",
-		);
-	}
-
-	getPlayerCardsInDeck(args: { playerId: Id }): DeepReadonly<CardData>[] {
-		return this.gameData.cards.filter(
-			(card) =>
-				card.ownerId === args.playerId && card.location.type === "inDeck",
-		);
+	getCards(args: {
+		playerIds?: Id[];
+		types?: CardType[];
+		locationTypes?: CardLocationType[];
+		exhausted?: boolean;
+		minChips?: number;
+		maxChips?: number;
+		excludeIds?: Id[];
+	}): DeepReadonly<CardData[]> {
+		return this.gameData.cards.filter((c) => {
+			// Easiest checks first.
+			if (
+				args.exhausted !== undefined &&
+				c.location.type === "inPlay" &&
+				c.location.exhausted !== args.exhausted
+			) {
+				return false;
+			}
+			if (args.types !== undefined && !args.types.includes(c.type)) {
+				return false;
+			}
+			if (
+				args.locationTypes !== undefined &&
+				!args.locationTypes.includes(c.location.type)
+			) {
+				return false;
+			}
+			if (args.playerIds !== undefined && !args.playerIds.includes(c.ownerId)) {
+				return false;
+			}
+			if (args.excludeIds !== undefined && args.excludeIds.includes(c.id)) {
+				return false;
+			}
+			if (args.minChips !== undefined || args.maxChips !== undefined) {
+				const min = args.minChips ?? 0;
+				const max = args.maxChips ?? 9999;
+				const numChipsOnCard = this.getChipsOnCard({ cardId: c.id }).length;
+				if (numChipsOnCard < min || numChipsOnCard > max) {
+					return false;
+				}
+			}
+			return true;
+		});
 	}
 
 	getPlayerChipsInReserve(args: { playerId: Id }): DeepReadonly<ChipData[]> {

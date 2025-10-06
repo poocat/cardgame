@@ -56,16 +56,12 @@ export const CARDS: CardDef[] = [
 				instructions: "Bring into play with 1 chip from one of your producers.",
 				sequence: {
 					check: ({ gameState, context }) => {
-						const candidates = gameState
-							.getPlayerCardsInPlay({
-								playerId: context.playerTakingActionId,
-							})
-							.some(
-								(c) =>
-									c.type === "producer" &&
-									gameState.getChipsOnCard({ cardId: c.id }).length > 0,
-							);
-						if (candidates) {
+						const candidates = gameState.getCards({
+							playerIds: [context.playerTakingActionId],
+							types: ["producer"],
+							minChips: 1,
+						});
+						if (candidates.length > 0) {
 							return { ok: true };
 						} else {
 							return {
@@ -84,10 +80,10 @@ export const CARDS: CardDef[] = [
 							max: 1,
 							getValues: ({ gameState, context }) => {
 								const producersInPlayIds = gameState
-									.getPlayerCardsInPlay({
-										playerId: context.choosingPlayerId,
+									.getCards({
+										playerIds: [context.choosingPlayerId],
+										types: ["producer"],
 									})
-									.filter((c) => c.type === "producer")
 									.map((c) => c.id);
 								return gameState.chips
 									.filter(
@@ -112,10 +108,12 @@ export const CARDS: CardDef[] = [
 					"Move one chip from this card to one of your producers in play.",
 				sequence: {
 					check: ({ gameState, context }) => {
-						const candidates = gameState
-							.getPlayerCardsInPlay({ playerId: context.playerTakingActionId })
-							.some((c) => c.type === "producer");
-						if (candidates) {
+						const candidates = gameState.getCards({
+							playerIds: [context.playerTakingActionId],
+							types: ["producer"],
+							locationTypes: ["inPlay"],
+						});
+						if (candidates.length > 0) {
 							return { ok: true };
 						} else {
 							return {
@@ -133,8 +131,11 @@ export const CARDS: CardDef[] = [
 							max: 1,
 							getValues: ({ gameState, context }) => {
 								return gameState
-									.getPlayerCardsInPlay({ playerId: context.choosingPlayerId })
-									.filter((c) => c.type === "producer")
+									.getCards({
+										playerIds: [context.choosingPlayerId],
+										locationTypes: ["inPlay"],
+										types: ["producer"],
+									})
 									.map((c) => c.id);
 							},
 						},
@@ -189,9 +190,11 @@ export const CARDS: CardDef[] = [
 										const chipsInReserve = gameState.getPlayerChipsInReserve({
 											playerId: p.id,
 										});
-										const consumersInPlay = gameState
-											.getPlayerCardsInPlay({ playerId: p.id })
-											.filter((c) => c.type === "consumer");
+										const consumersInPlay = gameState.getCards({
+											playerIds: [p.id],
+											locationTypes: ["inPlay"],
+											types: ["consumer"],
+										});
 										return (
 											chipsInReserve.length > 0 && consumersInPlay.length > 0
 										);
@@ -215,8 +218,11 @@ export const CARDS: CardDef[] = [
 								currentDecisions.getPlayerIds("targetChip"),
 							getValues: ({ gameState, context }) =>
 								gameState
-									.getPlayerCardsInPlay({ playerId: context.choosingPlayerId })
-									.filter((c) => c.type === "consumer")
+									.getCards({
+										playerIds: [context.choosingPlayerId],
+										locationTypes: ["inPlay"],
+										types: ["consumer"],
+									})
 									.map((c) => c.id),
 						},
 					],
@@ -275,10 +281,13 @@ export const CARDS: CardDef[] = [
 					"Move one chip from this card to one of your other consumers in play.",
 				sequence: {
 					check: ({ gameState, context }) => {
-						const candidates = gameState
-							.getPlayerCardsInPlay({ playerId: context.playerTakingActionId })
-							.some((c) => c.type === "consumer" && c.id !== context.cardId);
-						if (candidates) {
+						const candidates = gameState.getCards({
+							playerIds: [context.playerTakingActionId],
+							locationTypes: ["inPlay"],
+							types: ["consumer"],
+							excludeIds: [context.cardId],
+						});
+						if (candidates.length > 0) {
 							return { ok: true };
 						} else {
 							return {
@@ -296,10 +305,12 @@ export const CARDS: CardDef[] = [
 							max: 1,
 							getValues: ({ gameState, context }) => {
 								return gameState
-									.getPlayerCardsInPlay({ playerId: context.choosingPlayerId })
-									.filter(
-										(c) => c.type === "consumer" && c.id !== context.cardId,
-									)
+									.getCards({
+										playerIds: [context.playerTakingActionId],
+										locationTypes: ["inPlay"],
+										types: ["consumer"],
+										excludeIds: [context.cardId],
+									})
 									.map((c) => c.id);
 							},
 						},

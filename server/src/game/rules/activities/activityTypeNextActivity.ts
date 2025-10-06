@@ -31,11 +31,13 @@ export const activityTypeNextActivity: ActivityTypeMap<
 	 * until the entire opening hand is drawn.
 	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	drawingCards: ({ playerData, gameState, mutator }) => {
-		const cardsInHand = gameState.getPlayerCardsInHand({
-			playerId: playerData.id,
+		const cardsInHand = gameState.getCards({
+			playerIds: [playerData.id],
+			locationTypes: ["inHand"],
 		});
-		const cardsInDeck = gameState.getPlayerCardsInDeck({
-			playerId: playerData.id,
+		const cardsInDeck = gameState.getCards({
+			playerIds: [playerData.id],
+			locationTypes: ["inDeck"],
 		});
 		if (
 			playerData.turnCount === 0 &&

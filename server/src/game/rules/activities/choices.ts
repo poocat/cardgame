@@ -88,7 +88,7 @@ export function createDrawingCardsChoice(args: {
 	gameState: GameState;
 }): ChoiceData {
 	const values = args.gameState
-		.getPlayerCardsInDeck({ playerId: args.playerId })
+		.getCards({ playerIds: [args.playerId], locationTypes: ["inDeck"] })
 		.slice(0, 1)
 		.map((c) => c.id);
 	return {
