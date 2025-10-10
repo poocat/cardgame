@@ -6,7 +6,7 @@
     "scripts": {
         "test": "ts-node -r tsconfig-paths/register src/test.ts"
     },
-    "author": "",
+    "author": "Steven Lewis",
     "dependencies": {
         "ts-node": "^10.9.2"
     },

@@ -1,12 +1,12 @@
 # card-game
 
-A "minimal" implementation of a strategy-based card game.
+A simple, strategy-based card game, without thematic elements.
 
 ## Description
 
-The object of the game is to be the first player to accumulate a certain number of chips onto a certain type of card that is in play.
+The object of the game is to be the first player to accumulate a certain number of "chips" onto a certain type of card that is in play.
 
-On any given turn, players draw from their decks to make hands, then take actions from their cards to affect the game state. The possible effects include:
+On a player's turn, they first draw cards from their decks into to their hands, then take any number of available actions from their cards to affect the game state. The possible effects include:
 - Moving cards to different locations 
   - E.g. to/from the player's deck, hand, play area, or discard area
 - Changing a card's "exhausted" state
@@ -35,12 +35,16 @@ There are different types of actions available on cards:
 
 # Dev
 
-- Server
-  - Install dependencies
+- Prerequisites
+  - Install Node (e.g. [download](https://nodejs.org/en/download/) an installer...)
+    - At the time of this writing, Node was on version 22.
+    
+- Server `/server`
+  - To install dependencies:
     ```
     npm install
     ```
-  - To run a (jank) test on the state machine:
+  - To run a (jank) test on the state machine using js runtime:
     ```
     npm run test
     ```

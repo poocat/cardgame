@@ -1,6 +1,6 @@
 /**
- * An incredibly clumsy first test, where players automatically choose the first
- * values in the list for each choice.
+ * An incredibly clumsy first test, where players choose values randomly for
+ * each choice.
  */
 import { GameData } from "@common/types";
 import { makeDecision } from "@server/game/stateMachine";
@@ -18,6 +18,12 @@ function shuffle(array: any[]) {
 		];
 	}
 	return copy;
+}
+
+function logGameData(gameData: GameData) {
+	// Extract states that are not interesting.
+	const { actions, ...rest } = gameData;
+	console.log(JSON.stringify(rest, null, 2));
 }
 
 const mockGame = (initialGameData: GameData, numChoices: number) => {
@@ -47,12 +53,12 @@ const mockGame = (initialGameData: GameData, numChoices: number) => {
 			console.log(
 				`Final game state ---------------------------------------------`,
 			);
-			console.log(JSON.stringify(gameData, null, 2));
+			logGameData(gameData);
 			throw error;
 		}
 	}
 	console.log(`Final game state ---------------------------------------------`);
-	console.log(JSON.stringify(gameData, null, 2));
+	logGameData(gameData);
 };
 
 mockGame(createMockGameData(), 100);
