@@ -1,0 +1,22 @@
+{
+    "Comment Header 1": {
+        "scope": "javascript,typescript",
+        "prefix": "chead1",
+        "body": [
+            "/******************************************************************************",
+            " * ### $0",
+            " ******************************************************************************/"
+        ],
+        "description": "Use only from first column in line."
+    },
+    "Comment Header 2": {
+        "scope": "javascript,typescript",
+        "prefix": "chead2",
+        "body": [
+            "/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ",
+            " * $0",
+            " ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */"
+        ],
+        "description": "Use only when indented 2 spaces."
+    }
+}
