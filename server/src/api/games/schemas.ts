@@ -1,43 +1,39 @@
 import * as z from "zod";
 
 export const gameIdSchema = z.string();
-export type GameId = z.infer<typeof gameIdSchema>;
 
 export const playerIdSchema = z.string();
-export type PlayerId = z.infer<typeof gameIdSchema>;
 
 export const timestampSchema = z.date();
-export type Timestamp = z.infer<typeof timestampSchema>;
 
-export const gamesGetAllResponseSchema = z.object({
+export const gamesGetAllResponseSchema = z.strictObject({
 	games: z.array(
-		z.object({ gameId: gameIdSchema, updatedAt: timestampSchema }),
+		z.strictObject({ gameId: gameIdSchema, updatedAt: timestampSchema }),
 	),
 });
-export type GamesGetAllResponse = z.infer<typeof gamesGetAllResponseSchema>;
+
+export const gamesGetOneParamsSchema = z.strictObject({
+	id: gameIdSchema,
+});
 
 export const gamesGetOneQuerySchema = z.object({
-	playerId: playerIdSchema,
+	playerId: z.optional(playerIdSchema),
 });
-export type GamesGetOneQuery = z.infer<typeof gamesGetOneQuerySchema>;
 
-export const gamesGetOneResponseSchema = z.object({
+export const gamesGetOneResponseSchema = z.strictObject({
 	gameId: gameIdSchema,
 	updatedAt: timestampSchema,
-	data: z.record(z.string(), z.any()), // TODO!!! The API should always transform game data.
+	data: z.record(z.string(), z.any()), // TODO!!!
 });
-export type GamesGetOneResponse = z.infer<typeof gamesGetOneResponseSchema>;
 
-export const gamesPatchBodySchema = z.object({
-	decision: z.object({
+export const gamesPatchBodySchema = z.strictObject({
+	decision: z.strictObject({
 		playerId: playerIdSchema,
 		name: z.string(),
 		values: z.array(z.string()),
 	}),
 });
-export type GamesPatchBody = z.infer<typeof gamesPatchBodySchema>;
 
-export const gamesPostResponseSchema = z.object({
+export const gamesPostResponseSchema = z.strictObject({
 	gameId: gameIdSchema,
 });
-export type GamesPostResponse = z.infer<typeof gamesPostResponseSchema>;

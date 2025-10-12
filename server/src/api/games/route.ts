@@ -1,21 +1,19 @@
-import { Request, Response, Router, json as jsonHandler } from "express";
+import { Router, json as jsonHandler } from "express";
 import { makeDecision } from "@server/game/stateMachine";
 import { createMockGameData } from "@server/mock";
 import {
-	GameId,
-	GamesGetAllResponse,
-	GamesGetOneQuery,
-	GamesGetOneResponse,
-	GamesPatchBody,
+	gamesGetAllResponseSchema,
+	gamesGetOneParamsSchema,
+	gamesGetOneQuerySchema,
+	gamesGetOneResponseSchema,
 	gamesPatchBodySchema,
-	GamesPostResponse,
+	gamesPostResponseSchema,
 } from "@server/api/games/schemas";
 import { GameData } from "@common/types";
+import { handlers } from "../handlers";
 
 export const games = Router();
 games.use(jsonHandler());
-
-type ErrorResponse = { message: string };
 
 // Database mockery
 type GameDbDocument = {
@@ -33,8 +31,11 @@ const mockGamesDb: GameDbDocument[] = [];
  ******************************************************************************/
 games.post(
 	"/",
-	async (_: Request, res: Response<GamesPostResponse | ErrorResponse>) => {
-		try {
+	...handlers({
+		schemas: {
+			responseBody: gamesPostResponseSchema,
+		},
+		handler: async (_, res, next) => {
 			const now = new Date().toISOString();
 			const gameDocument: GameDbDocument = {
 				_id: now,
@@ -43,11 +44,9 @@ games.post(
 				data: createMockGameData(),
 			};
 			mockGamesDb.push(gameDocument);
-			res.status(200).send({ gameId: gameDocument._id });
-		} catch (error) {
-			res.status(400).send({ message: `${error}` });
-		}
-	},
+			res.status(200).json({ gameId: gameDocument._id });
+		},
+	}),
 );
 
 /******************************************************************************
@@ -57,17 +56,18 @@ games.post(
  ******************************************************************************/
 games.get(
 	"/",
-	async (_: Request, res: Response<GamesGetAllResponse | ErrorResponse>) => {
-		try {
+	...handlers({
+		schemas: {
+			responseBody: gamesGetAllResponseSchema,
+		},
+		handler: async (_, res) => {
 			const games = mockGamesDb.map((g) => ({
 				gameId: g._id,
 				updatedAt: new Date(g.updatedAt),
 			}));
-			res.status(200).send({ games });
-		} catch (error) {
-			res.status(500).send({ message: `${error}` });
-		}
-	},
+			res.status(200).json({ games });
+		},
+	}),
 );
 
 /******************************************************************************
@@ -81,11 +81,13 @@ games.get(
  ******************************************************************************/
 games.get(
 	"/:id",
-	async (
-		req: Request<{ id: GameId }, undefined, undefined, GamesGetOneQuery>,
-		res: Response<GamesGetOneResponse | ErrorResponse>,
-	) => {
-		try {
+	...handlers({
+		schemas: {
+			requestParams: gamesGetOneParamsSchema,
+			requestQuery: gamesGetOneQuerySchema,
+			responseBody: gamesGetOneResponseSchema,
+		},
+		handler: async (req, res) => {
 			/**
 			 * TODO!!!
 			 * Use the player ID to get a "digest" of the game. The digest will:
@@ -93,9 +95,10 @@ games.get(
 			 *   play as another player)
 			 * - redact values that the player shouldn't be able to see
 			 */
+			// console.log(req.query.playerId);
 			const game = mockGamesDb.find((g) => g._id === req.params.id);
 			if (game) {
-				res.set("Last-Updated-At", game.updatedAt);
+				res.set("x-last-updated-At", game.updatedAt);
 				res.status(200).send({
 					gameId: game._id,
 					updatedAt: new Date(game.updatedAt),
@@ -104,10 +107,8 @@ games.get(
 			} else {
 				res.status(404).send({ message: `game ${req.params.id} not found` });
 			}
-		} catch (error) {
-			res.status(500).send({ message: `${error}` });
-		}
-	},
+		},
+	}),
 );
 
 /******************************************************************************
@@ -115,18 +116,22 @@ games.get(
  *
  * Used by the client app to poll the server for updates to the game state.
  ******************************************************************************/
-games.head("/:id", async (req: Request<{ id: GameId }>, res: Response) => {
-	try {
-		const game = mockGamesDb.find((g) => g._id === req.params.id);
-		if (game) {
-			res.set("Last-Updated-At", game.updatedAt).status(204).end();
-		} else {
-			res.status(404).send({ message: `game ${req.params.id} not found` });
-		}
-	} catch (error) {
-		res.status(500).send({ message: `${error}` });
-	}
-});
+games.head(
+	"/:id",
+	...handlers({
+		schemas: {
+			requestParams: gamesGetOneParamsSchema,
+		},
+		handler: async (req, res) => {
+			const game = mockGamesDb.find((g) => g._id === req.params.id);
+			if (game) {
+				res.set("x-last-updated-at", game.updatedAt).status(204).end();
+			} else {
+				res.status(404).send({ message: `game ${req.params.id} not found` });
+			}
+		},
+	}),
+);
 
 /******************************************************************************
  * ### PATCH games/{id}
@@ -138,11 +143,12 @@ games.head("/:id", async (req: Request<{ id: GameId }>, res: Response) => {
  ******************************************************************************/
 games.patch(
 	"/:id",
-	async (
-		req: Request<{ id: GameId }, undefined, GamesPatchBody>,
-		res: Response<undefined | ErrorResponse>,
-	) => {
-		try {
+	...handlers({
+		schemas: {
+			requestParams: gamesGetOneParamsSchema,
+			requestBody: gamesPatchBodySchema,
+		},
+		handler: async (req, res) => {
 			gamesPatchBodySchema.parse(req.body);
 			const game = mockGamesDb.find((g) => g._id === req.params.id);
 			if (game) {
@@ -159,9 +165,6 @@ games.patch(
 				// 404-Not Found
 				res.status(404).send({ message: `game ${req.params.id} not found` });
 			}
-		} catch (error) {
-			res.status(500).send({ message: `${error}` });
-			console.log(error);
-		}
-	},
+		},
+	}),
 );
