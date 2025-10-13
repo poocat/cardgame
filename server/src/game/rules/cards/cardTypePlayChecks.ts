@@ -1,5 +1,5 @@
 import { CardData, CardTypeMap } from "@common/types";
-import { CONFIG } from "@server/game/rules/config";
+import { CONSTANTS } from "@server/game/rules/constants";
 import { GameState } from "@server/game/utils/GameState";
 import { CheckResult } from "@server/types";
 
@@ -23,11 +23,11 @@ export const cardTypePlayChecks: CardTypeMap<
 				c.type === "producer" &&
 				c.ownerId == cardData.ownerId,
 		);
-		if (producersInPlay.length >= CONFIG.MAX_NUM_PRODUCERS_IN_PLAY) {
+		if (producersInPlay.length >= CONSTANTS.maxNumProducersInPlay) {
 			return {
 				ok: false,
 				reasons: [
-					`Already ${CONFIG.MAX_NUM_PRODUCERS_IN_PLAY} producers in play.`,
+					`Already ${CONSTANTS.maxNumProducersInPlay} producers in play.`,
 				],
 			};
 		} else {
