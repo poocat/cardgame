@@ -1,14 +1,8 @@
-import express from "express";
-import { games } from "@server/api/games/route";
+import { createServer } from "@server/server";
+import { CONFIG } from "@server/config";
 
-const PORT = "7000";
+const app = createServer();
 
-try {
-	const app = express();
-	app.use("/games", games);
-	app.listen(PORT, () => {
-		console.log(`Server is running on port ${PORT}`);
-	});
-} catch (error) {
-	console.log(error);
-}
+app.listen(CONFIG.port, () => {
+	console.log(`Server running on port ${CONFIG.port} (${CONFIG.nodeEnv})`);
+});
