@@ -1,4 +1,4 @@
-import { ActivityData, ActivityTypeMap, Decision } from "@common/types";
+import { ActivityData, ActivityTypeMap, Decision } from "@common/game/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeDefaultEffects } from "@server/game/rules/actions";
 import { Decisions } from "@server/game/utils/Decisions";

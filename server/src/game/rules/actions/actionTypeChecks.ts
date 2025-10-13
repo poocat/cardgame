@@ -1,4 +1,4 @@
-import { ActionData, ActionTypeMap } from "@common/types";
+import { ActionData, ActionTypeMap } from "@common/game/types";
 import { cardTypePlayChecks } from "@server/game/rules/cards";
 import { GameState } from "@server/game/utils/GameState";
 import { CheckResult } from "@server/types";

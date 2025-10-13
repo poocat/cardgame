@@ -9,7 +9,7 @@ import {
 	gamesPatchRequestBodySchema,
 	gamesPostResponseBodySchema,
 } from "@common/api/schemas";
-import { GameData } from "@common/types";
+import { GameData } from "@common/game/types";
 import { validated } from "@server/api/handlers";
 
 export const games = Router();

@@ -1,4 +1,4 @@
-import { ActivityData, GameData } from "@common/types";
+import { ActivityData, GameData } from "@common/game/types";
 import { GameState, Mutator, MutatorQueue } from "@server/game/utils";
 
 /******************************************************************************

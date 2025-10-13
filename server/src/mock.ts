@@ -1,4 +1,4 @@
-import { ActionType, GameData } from "@common/types";
+import { ActionType, GameData } from "@common/game/types";
 import { CARDS } from "@server/game/cards/definitions";
 
 export function createMockGameData(): GameData {

@@ -5,9 +5,8 @@ import {
 	CardType,
 	ChipLocationData,
 	ChoiceType,
-	GameData,
 	Id,
-} from "@common/types";
+} from "@common/game/types";
 import { Decisions, GameState } from "@server/game/utils";
 
 export const mutationTypes = [

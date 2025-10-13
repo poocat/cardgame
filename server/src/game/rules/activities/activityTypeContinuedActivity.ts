@@ -3,7 +3,7 @@ import {
 	ActivityTypeMap,
 	Decision,
 	NextChoiceData,
-} from "@common/types";
+} from "@common/game/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { Decisions } from "@server/game/utils/Decisions";
 import { GameState } from "@server/game/utils/GameState";

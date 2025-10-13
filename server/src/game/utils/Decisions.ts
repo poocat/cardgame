@@ -1,4 +1,4 @@
-import { ChoiceValue, Decision, Id } from "@common/types";
+import { ChoiceValue, Decision, Id } from "@common/game/types";
 
 /******************************************************************************
  * ### Decisions

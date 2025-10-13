@@ -2,7 +2,7 @@
  * An incredibly clumsy first test, where players choose values randomly for
  * each choice.
  */
-import { GameData } from "@common/types";
+import { GameData } from "@common/game/types";
 import { makeDecision } from "@server/game/stateMachine";
 import { createMockGameData } from "@server/mock";
 
