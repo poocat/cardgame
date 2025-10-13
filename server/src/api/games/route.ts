@@ -10,7 +10,7 @@ import {
 	gamesPostResponseSchema,
 } from "@server/api/games/schemas";
 import { GameData } from "@common/types";
-import { handlers } from "../handlers";
+import { validated } from "@server/api/handlers";
 
 export const games = Router();
 games.use(jsonHandler());
@@ -31,11 +31,11 @@ const mockGamesDb: GameDbDocument[] = [];
  ******************************************************************************/
 games.post(
 	"/",
-	...handlers({
+	validated({
 		schemas: {
 			responseBody: gamesPostResponseSchema,
 		},
-		handler: async (_, res, next) => {
+		handler: async (_, res) => {
 			const now = new Date().toISOString();
 			const gameDocument: GameDbDocument = {
 				_id: now,
@@ -56,7 +56,7 @@ games.post(
  ******************************************************************************/
 games.get(
 	"/",
-	...handlers({
+	validated({
 		schemas: {
 			responseBody: gamesGetAllResponseSchema,
 		},
@@ -81,7 +81,7 @@ games.get(
  ******************************************************************************/
 games.get(
 	"/:id",
-	...handlers({
+	validated({
 		schemas: {
 			requestParams: gamesGetOneParamsSchema,
 			requestQuery: gamesGetOneQuerySchema,
@@ -118,7 +118,7 @@ games.get(
  ******************************************************************************/
 games.head(
 	"/:id",
-	...handlers({
+	validated({
 		schemas: {
 			requestParams: gamesGetOneParamsSchema,
 		},
@@ -143,7 +143,7 @@ games.head(
  ******************************************************************************/
 games.patch(
 	"/:id",
-	...handlers({
+	validated({
 		schemas: {
 			requestParams: gamesGetOneParamsSchema,
 			requestBody: gamesPatchBodySchema,

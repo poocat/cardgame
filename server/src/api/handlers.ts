@@ -1,9 +1,6 @@
 /**
- * Use the `handlers` helper when defining endpoint handlers, to add
- * schema validation with Zod.
+ * Use to add type inference and validation to route handlers with Zod schemas.
  */
-
-// handlers.ts
 import { RequestHandler } from "express";
 import { z, ZodError, ZodObject, ZodRawShape } from "zod";
 
@@ -24,14 +21,19 @@ type ValidatedRequestHandler<TSchemas extends RouteSchemas> = RequestHandler<
 	z.infer<TSchemas["requestQuery"]>
 >;
 
-function validateHandler<TSchemas extends RouteSchemas>(
-	schemas: RouteSchemas,
-): ValidatedRequestHandler<TSchemas> {
-	return (req, res, next) => {
+/**
+ * Use to wrap a request handler
+ */
+export function validated<TSchemas extends RouteSchemas>(args: {
+	schemas: TSchemas;
+	handler: ValidatedRequestHandler<TSchemas>;
+}): ValidatedRequestHandler<TSchemas> {
+	return async (req, res, next) => {
 		try {
-			if (schemas.requestParams) schemas.requestParams.parse(req.params);
-			if (schemas.requestQuery) schemas.requestQuery.parse(req.query);
-			if (schemas.requestBody) schemas.requestBody.parse(req.body);
+			if (args.schemas.requestParams)
+				args.schemas.requestParams.parse(req.params);
+			if (args.schemas.requestQuery) args.schemas.requestQuery.parse(req.query);
+			if (args.schemas.requestBody) args.schemas.requestBody.parse(req.body);
 		} catch (err) {
 			if (err instanceof ZodError) {
 				// 400-Bad Request
@@ -39,31 +41,8 @@ function validateHandler<TSchemas extends RouteSchemas>(
 			}
 			return next(err);
 		}
-		next();
-	};
-}
-
-/**
- * Use to generate a pipeline of route handlers, with the given `handler`
- * callback at the end.
- */
-export function handlers<TSchemas extends RouteSchemas>(args: {
-	schemas: TSchemas;
-	handler: ValidatedRequestHandler<TSchemas>;
-}): ValidatedRequestHandler<TSchemas>[] {
-	// Wrap the handler so that any uncaught errors will get handled by express's
-	// default error handler.
-	const wrappedHandler: ValidatedRequestHandler<TSchemas> = (
-		req,
-		res,
-		next,
-	) => {
+		// Make sure any uncaught errors in the handler will get handled by
+		// Express's default error handler.
 		Promise.resolve(args.handler(req, res, next)).catch(next);
 	};
-	return [
-		// Validate request from schemas.
-		validateHandler(args.schemas),
-		// Handle route request.
-		wrappedHandler,
-	];
 }
