@@ -48,3 +48,7 @@ There are different types of actions available on cards:
     ```
     npm run test
     ```
+  - To start server locally:
+    ```
+    npm run start
+    ```

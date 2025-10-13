@@ -1,5 +1,5 @@
 import { ActivityTypeMap, Decision, PlayerData } from "@common/types";
-import { CONFIG } from "@server/game/rules/config";
+import { CONSTANTS } from "@server/game/rules/constants";
 import { GameState } from "@server/game/utils/GameState";
 import { IMutator } from "@server/types";
 import {
@@ -41,7 +41,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
 		});
 		if (
 			playerData.turnCount === 0 &&
-			cardsInHand.length < CONFIG.OPENING_HAND_SIZE &&
+			cardsInHand.length < CONSTANTS.openingHandSize &&
 			cardsInDeck.length > 0
 		) {
 			// If it's the player's first turn, repeat the "drawingCards" activity until hand is the right size.
