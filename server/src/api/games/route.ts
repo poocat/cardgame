@@ -2,13 +2,13 @@ import { Router, json as jsonHandler } from "express";
 import { makeDecision } from "@server/game/stateMachine";
 import { createMockGameData } from "@server/mock";
 import {
-	gamesGetAllResponseSchema,
-	gamesGetOneParamsSchema,
-	gamesGetOneQuerySchema,
-	gamesGetOneResponseSchema,
-	gamesPatchBodySchema,
-	gamesPostResponseSchema,
-} from "@server/api/games/schemas";
+	gamesGetManyResponseBodySchema,
+	gamesGetOneRequestParamsSchema,
+	gamesGetOneRequestQuerySchema,
+	gamesGetOneResponseBodySchema,
+	gamesPatchRequestBodySchema,
+	gamesPostResponseBodySchema,
+} from "@common/api/schemas";
 import { GameData } from "@common/types";
 import { validated } from "@server/api/handlers";
 
@@ -33,7 +33,7 @@ games.post(
 	"/",
 	validated({
 		schemas: {
-			responseBody: gamesPostResponseSchema,
+			responseBody: gamesPostResponseBodySchema,
 		},
 		handler: async (_, res) => {
 			const now = new Date().toISOString();
@@ -58,7 +58,7 @@ games.get(
 	"/",
 	validated({
 		schemas: {
-			responseBody: gamesGetAllResponseSchema,
+			responseBody: gamesGetManyResponseBodySchema,
 		},
 		handler: async (_, res) => {
 			const games = mockGamesDb.map((g) => ({
@@ -83,9 +83,9 @@ games.get(
 	"/:id",
 	validated({
 		schemas: {
-			requestParams: gamesGetOneParamsSchema,
-			requestQuery: gamesGetOneQuerySchema,
-			responseBody: gamesGetOneResponseSchema,
+			requestParams: gamesGetOneRequestParamsSchema,
+			requestQuery: gamesGetOneRequestQuerySchema,
+			responseBody: gamesGetOneResponseBodySchema,
 		},
 		handler: async (req, res) => {
 			/**
@@ -120,7 +120,7 @@ games.head(
 	"/:id",
 	validated({
 		schemas: {
-			requestParams: gamesGetOneParamsSchema,
+			requestParams: gamesGetOneRequestParamsSchema,
 		},
 		handler: async (req, res) => {
 			const game = mockGamesDb.find((g) => g._id === req.params.id);
@@ -145,11 +145,10 @@ games.patch(
 	"/:id",
 	validated({
 		schemas: {
-			requestParams: gamesGetOneParamsSchema,
-			requestBody: gamesPatchBodySchema,
+			requestParams: gamesGetOneRequestParamsSchema,
+			requestBody: gamesPatchRequestBodySchema,
 		},
 		handler: async (req, res) => {
-			gamesPatchBodySchema.parse(req.body);
 			const game = mockGamesDb.find((g) => g._id === req.params.id);
 			if (game) {
 				const nextGameData = makeDecision({
