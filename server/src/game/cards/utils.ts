@@ -8,11 +8,11 @@ const cardMap = Object.fromEntries(CARDS.map((c) => [c.name, c]));
  * Finds the card definition matching the given name, or throws an error.
  ******************************************************************************/
 export function getCardDefinition(name: string): CardDef {
-	const match = cardMap[name];
-	if (!match) {
-		throw new Error(`No card found with name ${name}`);
-	}
-	return match;
+  const match = cardMap[name];
+  if (!match) {
+    throw new Error(`No card found with name ${name}`);
+  }
+  return match;
 }
 
 /******************************************************************************
@@ -20,12 +20,12 @@ export function getCardDefinition(name: string): CardDef {
  * throws an error.
  ******************************************************************************/
 export function getActionDefinition(args: {
-	cardName: string;
-	actionType: ActionType;
+  cardName: string;
+  actionType: ActionType;
 }): ActionDef {
-	const match = getCardDefinition(args.cardName).actions[args.actionType];
-	if (!match) {
-		throw new Error(`No ${args.actionType} action on card ${args.cardName}`);
-	}
-	return match;
+  const match = getCardDefinition(args.cardName).actions[args.actionType];
+  if (!match) {
+    throw new Error(`No ${args.actionType} action on card ${args.cardName}`);
+  }
+  return match;
 }

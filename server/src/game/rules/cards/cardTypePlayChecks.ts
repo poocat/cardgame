@@ -10,36 +10,36 @@ import { CheckResult } from "@server/types";
  * play.
  ******************************************************************************/
 export const cardTypePlayChecks: CardTypeMap<
-	(args: { cardData: CardData; gameState: GameState }) => CheckResult
+  (args: { cardData: CardData; gameState: GameState }) => CheckResult
 > = {
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * A player can only have a certain number of "producer" cards in play at a
-	 * time.
-	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	producer: ({ cardData, gameState }) => {
-		const producersInPlay = gameState.cards.filter(
-			(c) =>
-				c.location.type === "inPlay" &&
-				c.type === "producer" &&
-				c.ownerId == cardData.ownerId,
-		);
-		if (producersInPlay.length >= CONSTANTS.maxNumProducersInPlay) {
-			return {
-				ok: false,
-				reasons: [
-					`Already ${CONSTANTS.maxNumProducersInPlay} producers in play.`,
-				],
-			};
-		} else {
-			return { ok: true };
-		}
-	},
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * A player can only have a certain number of "producer" cards in play at a
+   * time.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  producer: ({ cardData, gameState }) => {
+    const producersInPlay = gameState.cards.filter(
+      (c) =>
+        c.location.type === "inPlay" &&
+        c.type === "producer" &&
+        c.ownerId == cardData.ownerId,
+    );
+    if (producersInPlay.length >= CONSTANTS.maxNumProducersInPlay) {
+      return {
+        ok: false,
+        reasons: [
+          `Already ${CONSTANTS.maxNumProducersInPlay} producers in play.`,
+        ],
+      };
+    } else {
+      return { ok: true };
+    }
+  },
 
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * There are no limits on the number of "consumer" cards that can be brought
-	 * into play.
-	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	consumer: () => {
-		return { ok: true };
-	},
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * There are no limits on the number of "consumer" cards that can be brought
+   * into play.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  consumer: () => {
+    return { ok: true };
+  },
 };
