@@ -1,5 +1,5 @@
 import express from "express";
-import { games } from "@server/api/games/route";
+import { games } from "@server/api/routes/games";
 
 export function createServer() {
 	const app = express();
