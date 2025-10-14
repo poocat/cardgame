@@ -1,25 +1,25 @@
 {
-	"compilerOptions": {
-		/* Visit https://aka.ms/tsconfig to read more about this file */
-		/* Language and Environment */
-		"target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-		/* Modules */
-		"module": "commonjs" /* Specify what module code is generated. */,
-		"paths": {
-			"@common/*": ["../common/*"],
-			"@server/*": ["./src/*"]
-		} /* Specify a set of entries that re-map imports to additional lookup locations. */,
-		"rootDirs": [
-			"./src",
-			"../common"
-		] /* Allow multiple folders to be treated as one when resolving modules. */,
-		"outDir": "./dist" /* Specify an output folder for all emitted files. */,
-		"esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
-		"forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
-		/* Type Checking */
-		"strict": true /* Enable all strict type-checking options. */,
-		"skipLibCheck": true /* Skip type checking all .d.ts files. */
-	},
-	"include": ["src", "../common"],
-	"exclude": ["node_modules", "dist/*"]
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+    /* Language and Environment */
+    "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    /* Modules */
+    "module": "commonjs" /* Specify what module code is generated. */,
+    "paths": {
+      "@common/*": ["../common/*"],
+      "@server/*": ["./src/*"]
+    } /* Specify a set of entries that re-map imports to additional lookup locations. */,
+    "rootDirs": [
+      "./src",
+      "../common"
+    ] /* Allow multiple folders to be treated as one when resolving modules. */,
+    "outDir": "./dist" /* Specify an output folder for all emitted files. */,
+    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+    /* Type Checking */
+    "strict": true /* Enable all strict type-checking options. */,
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+  },
+  "include": ["src", "../common"],
+  "exclude": ["node_modules", "dist/*"]
 }

@@ -1,4 +1,4 @@
-import { ActionTypeMap } from "@common/types";
+import { ActionTypeMap } from "@common/game/types";
 import { ActionContext, IMutator } from "@server/types";
 
 /******************************************************************************
@@ -8,32 +8,32 @@ import { ActionContext, IMutator } from "@server/types";
  * implementation of the action on the card, once the action is completed.
  ******************************************************************************/
 export const actionTypeDefaultEffects: ActionTypeMap<
-	(args: { context: ActionContext; mutator: IMutator }) => void
+  (args: { context: ActionContext; mutator: IMutator }) => void
 > = {
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * "Play" actions should result in moving the card into play.
-	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	play: (args) => {
-		args.mutator.moveCard({
-			id: args.context.cardId,
-			location: { type: "inPlay", exhausted: false },
-		});
-	},
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * "Play" actions should result in moving the card into play.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  play: (args) => {
+    args.mutator.moveCard({
+      id: args.context.cardId,
+      location: { type: "inPlay", exhausted: false },
+    });
+  },
 
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * "Ability" actions should exhaust the card.
-	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	ability: (args) => {
-		args.mutator.exhaustCard({ id: args.context.cardId, value: true });
-	},
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * "Ability" actions should exhaust the card.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  ability: (args) => {
+    args.mutator.exhaustCard({ id: args.context.cardId, value: true });
+  },
 
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * "Discard" actions should move the card out of play.
-	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	discard: (args) => {
-		args.mutator.moveCard({
-			id: args.context.cardId,
-			location: { type: "inDiscard" },
-		});
-	},
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * "Discard" actions should move the card out of play.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  discard: (args) => {
+    args.mutator.moveCard({
+      id: args.context.cardId,
+      location: { type: "inDiscard" },
+    });
+  },
 };

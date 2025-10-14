@@ -1,4 +1,4 @@
-import { ActivityData, GameData } from "@common/types";
+import { ActivityData, GameData } from "@common/game/types";
 import { GameState, Mutator, MutatorQueue } from "@server/game/utils";
 
 /******************************************************************************
@@ -6,29 +6,29 @@ import { GameState, Mutator, MutatorQueue } from "@server/game/utils";
  * player making a decision.
  ******************************************************************************/
 export class Next {
-	/** A deep copy of the given game state, to mutate. */
-	private gameData: GameData;
-	public mutatorQueue: MutatorQueue;
+  /** A deep copy of the given game state, to mutate. */
+  private gameData: GameData;
+  public mutatorQueue: MutatorQueue;
 
-	constructor(gameData: GameData) {
-		this.gameData = JSON.parse(JSON.stringify(gameData));
-		this.mutatorQueue = new MutatorQueue();
-	}
+  constructor(gameData: GameData) {
+    this.gameData = JSON.parse(JSON.stringify(gameData));
+    this.mutatorQueue = new MutatorQueue();
+  }
 
-	get activity(): ActivityData {
-		return this.gameData.activity;
-	}
+  get activity(): ActivityData {
+    return this.gameData.activity;
+  }
 
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * Use to apply all the currently queued mutations and return the updated
-	 * game state.
-	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	dequeueMutations(): GameState {
-		this.mutatorQueue.apply(new Mutator(this.gameData));
-		return new GameState(this.gameData);
-	}
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Use to apply all the currently queued mutations and return the updated
+   * game state.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  dequeueMutations(): GameState {
+    this.mutatorQueue.apply(new Mutator(this.gameData));
+    return new GameState(this.gameData);
+  }
 
-	finish(): GameData {
-		return this.gameData;
-	}
+  finish(): GameData {
+    return this.gameData;
+  }
 }

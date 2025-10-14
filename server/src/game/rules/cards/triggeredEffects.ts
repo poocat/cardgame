@@ -8,19 +8,19 @@ import { ActionContext, IMutator } from "@server/types";
  * Any card in play may have a trigger defined for it.
  ******************************************************************************/
 export function triggeredEffects(args: {
-	current: GameState;
-	next: GameState;
-	mutator: IMutator;
+  current: GameState;
+  next: GameState;
+  mutator: IMutator;
 }): void {
-	args.current.getCards({ locationTypes: ["inPlay"] }).forEach((c) => {
-		const cardDef = getCardDefinition(c.name);
-		if (cardDef.trigger) {
-			cardDef.trigger.affect({
-				current: args.current,
-				next: args.next,
-				context: { cardId: c.id },
-				mutator: args.mutator,
-			});
-		}
-	});
+  args.current.getCards({ locationTypes: ["inPlay"] }).forEach((c) => {
+    const cardDef = getCardDefinition(c.name);
+    if (cardDef.trigger) {
+      cardDef.trigger.affect({
+        current: args.current,
+        next: args.next,
+        context: { cardId: c.id },
+        mutator: args.mutator,
+      });
+    }
+  });
 }

@@ -1,4 +1,4 @@
-import { CardData, CardTypeMap } from "@common/types";
+import { CardData, CardTypeMap } from "@common/game/types";
 import { GameState } from "@server/game/utils/GameState";
 import { IMutator } from "@server/types";
 
@@ -9,27 +9,27 @@ import { IMutator } from "@server/types";
  * of each "take action" activity.
  ******************************************************************************/
 export const cardTypeTriggeredEffects: CardTypeMap<
-	(args: {
-		cardData: CardData;
-		gameState: GameState;
-		mutator: IMutator;
-	}) => void
+  (args: {
+    cardData: CardData;
+    gameState: GameState;
+    mutator: IMutator;
+  }) => void
 > = {
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * No type-based triggers for "producer" cards.
-	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	producer: () => {},
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * No type-based triggers for "producer" cards.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  producer: () => {},
 
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * "Consumer" cards must be "alive" at the end of the activity (that is, they
-	 * have at least one chip on them), else they must be discarded.
-	 ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	consumer: ({ cardData, gameState, mutator }) => {
-		const alive = gameState.chips.some(
-			(c) => c.location.type === "onCard" && c.location.cardId === cardData.id,
-		);
-		if (!alive) {
-			mutator.moveCard({ id: cardData.id, location: { type: "inDiscard" } });
-		}
-	},
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * "Consumer" cards must be "alive" at the end of the activity (that is, they
+   * have at least one chip on them), else they must be discarded.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  consumer: ({ cardData, gameState, mutator }) => {
+    const alive = gameState.chips.some(
+      (c) => c.location.type === "onCard" && c.location.cardId === cardData.id,
+    );
+    if (!alive) {
+      mutator.moveCard({ id: cardData.id, location: { type: "inDiscard" } });
+    }
+  },
 };

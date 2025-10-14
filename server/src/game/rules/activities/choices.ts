@@ -1,12 +1,12 @@
 import {
-	ActionData,
-	ActivityData,
-	ChoiceData,
-	Decision,
-	Id,
-	NextChoiceData,
-	PlayerData,
-} from "@common/types";
+  ActionData,
+  ActivityData,
+  ChoiceData,
+  Decision,
+  Id,
+  NextChoiceData,
+  PlayerData,
+} from "@common/game/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeChecks } from "@server/game/rules/actions";
 import { Decisions } from "@server/game/utils/Decisions";
@@ -22,14 +22,14 @@ import { ActionContext, ChoiceDef } from "@server/types";
  * choice".
  ******************************************************************************/
 export function nullChoice(): ChoiceData {
-	return {
-		name: "",
-		type: "arbitrary",
-		choosingPlayerId: "",
-		values: [],
-		min: 0,
-		max: 0,
-	};
+  return {
+    name: "",
+    type: "arbitrary",
+    choosingPlayerId: "",
+    values: [],
+    min: 0,
+    max: 0,
+  };
 }
 
 /******************************************************************************
@@ -45,109 +45,109 @@ export function nullChoice(): ChoiceData {
  * choosing players.
  ******************************************************************************/
 export function createActionChoices(args: {
-	choiceDef: ChoiceDef;
-	gameState: GameState;
-	currentDecisions: Decisions;
-	actionContext: ActionContext;
+  choiceDef: ChoiceDef;
+  gameState: GameState;
+  currentDecisions: Decisions;
+  actionContext: ActionContext;
 }): ChoiceData[] {
-	const choosingPlayerIds: Id[] = [];
-	if (!args.choiceDef.getChoosingPlayers) {
-		// By default, the choosing player is the one taking the action.
-		choosingPlayerIds.push(args.actionContext.playerTakingActionId);
-	} else {
-		choosingPlayerIds.push(
-			...args.choiceDef.getChoosingPlayers({
-				gameState: args.gameState,
-				currentDecisions: args.currentDecisions,
-				context: args.actionContext,
-			}),
-		);
-	}
-	return choosingPlayerIds.map((playerId) => {
-		const values = args.choiceDef.getValues({
-			gameState: args.gameState,
-			currentDecisions: args.currentDecisions,
-			context: { ...args.actionContext, choosingPlayerId: playerId },
-		});
-		return {
-			name: args.choiceDef.name,
-			type: args.choiceDef.type,
-			min: args.choiceDef.min,
-			max: args.choiceDef.max,
-			choosingPlayerId: playerId,
-			values,
-		};
-	});
+  const choosingPlayerIds: Id[] = [];
+  if (!args.choiceDef.getChoosingPlayers) {
+    // By default, the choosing player is the one taking the action.
+    choosingPlayerIds.push(args.actionContext.playerTakingActionId);
+  } else {
+    choosingPlayerIds.push(
+      ...args.choiceDef.getChoosingPlayers({
+        gameState: args.gameState,
+        currentDecisions: args.currentDecisions,
+        context: args.actionContext,
+      }),
+    );
+  }
+  return choosingPlayerIds.map((playerId) => {
+    const values = args.choiceDef.getValues({
+      gameState: args.gameState,
+      currentDecisions: args.currentDecisions,
+      context: { ...args.actionContext, choosingPlayerId: playerId },
+    });
+    return {
+      name: args.choiceDef.name,
+      type: args.choiceDef.type,
+      min: args.choiceDef.min,
+      max: args.choiceDef.max,
+      choosingPlayerId: playerId,
+      values,
+    };
+  });
 }
 
 /******************************************************************************
  * Generates the single choice for the "drawingCards" activity.
  ******************************************************************************/
 export function createDrawingCardsChoice(args: {
-	playerId: Id;
-	gameState: GameState;
+  playerId: Id;
+  gameState: GameState;
 }): ChoiceData {
-	const values = args.gameState
-		.getCards({ playerIds: [args.playerId], locationTypes: ["inDeck"] })
-		.slice(0, 1)
-		.map((c) => c.id);
-	return {
-		name: "cardsToDraw",
-		type: "cardId",
-		choosingPlayerId: args.playerId,
-		values,
-		// If nothing left in the deck, allow zero choices.
-		min: Math.min(values.length, 1),
-		max: 1,
-	};
+  const values = args.gameState
+    .getCards({ playerIds: [args.playerId], locationTypes: ["inDeck"] })
+    .slice(0, 1)
+    .map((c) => c.id);
+  return {
+    name: "cardsToDraw",
+    type: "cardId",
+    choosingPlayerId: args.playerId,
+    values,
+    // If nothing left in the deck, allow zero choices.
+    min: Math.min(values.length, 1),
+    max: 1,
+  };
 }
 
 /******************************************************************************
  * Generates the single choice for the "choosingAction" activity.
  ******************************************************************************/
 export function createChoosingActionChoice(args: {
-	playerId: Id;
-	gameState: GameState;
+  playerId: Id;
+  gameState: GameState;
 }): ChoiceData {
-	// Filtering through every action seems dumb, but...
-	const values = args.gameState.actions
-		.filter((a) => {
-			// Cannot take an action from another player's card.
-			if (a.card.ownerId !== args.playerId) {
-				return false;
-			}
-			const typeCheckResult = actionTypeChecks[a.type]({
-				actionData: a,
-				gameState: args.gameState,
-			});
-			if (!typeCheckResult.ok) {
-				return false;
-			}
-			const actionDef = getActionDefinition({
-				cardName: a.card.name,
-				actionType: a.type,
-			});
-			const sequenceCheck = actionDef.sequence?.check;
-			if (sequenceCheck) {
-				const result = sequenceCheck({
-					gameState: args.gameState,
-					context: { cardId: a.card.id, playerTakingActionId: args.playerId },
-				});
-				if (!result.ok) {
-					return false;
-				}
-			}
-			return true;
-		})
-		.map((a) => a.id);
-	return {
-		name: "actionToTake",
-		type: "actionId",
-		choosingPlayerId: args.playerId,
-		values,
-		min: 0,
-		max: 1,
-	};
+  // Filtering through every action seems dumb, but...
+  const values = args.gameState.actions
+    .filter((a) => {
+      // Cannot take an action from another player's card.
+      if (a.card.ownerId !== args.playerId) {
+        return false;
+      }
+      const typeCheckResult = actionTypeChecks[a.type]({
+        actionData: a,
+        gameState: args.gameState,
+      });
+      if (!typeCheckResult.ok) {
+        return false;
+      }
+      const actionDef = getActionDefinition({
+        cardName: a.card.name,
+        actionType: a.type,
+      });
+      const sequenceCheck = actionDef.sequence?.check;
+      if (sequenceCheck) {
+        const result = sequenceCheck({
+          gameState: args.gameState,
+          context: { cardId: a.card.id, playerTakingActionId: args.playerId },
+        });
+        if (!result.ok) {
+          return false;
+        }
+      }
+      return true;
+    })
+    .map((a) => a.id);
+  return {
+    name: "actionToTake",
+    type: "actionId",
+    choosingPlayerId: args.playerId,
+    values,
+    min: 0,
+    max: 1,
+  };
 }
 
 /******************************************************************************
@@ -158,43 +158,43 @@ export function createChoosingActionChoice(args: {
  * given the current game state...
  ******************************************************************************/
 export function createTakingActionChoices(args: {
-	playerData: PlayerData;
-	gameState: GameState;
-	actionData: ActionData;
-	decisions: Decision[];
+  playerData: PlayerData;
+  gameState: GameState;
+  actionData: ActionData;
+  decisions: Decision[];
 }): Pick<ActivityData, "currentChoice" | "nextChoices"> {
-	const actionDef = getActionDefinition({
-		cardName: args.actionData.card.name,
-		actionType: args.actionData.type,
-	});
-	if (!actionDef.sequence?.choices) {
-		// Not all actions have choices (e.g. "play" or "discard" type actions).
-		// In those cases, send a special choice to signal the state machine.
-		return { currentChoice: nullChoice(), nextChoices: [] };
-	}
-	const firstChoiceDef = actionDef.sequence.choices[0];
-	const firstChoices = createActionChoices({
-		choiceDef: firstChoiceDef,
-		gameState: args.gameState,
-		currentDecisions: new Decisions(args.decisions),
-		actionContext: {
-			cardId: args.actionData.card.id,
-			playerTakingActionId: args.playerData.id,
-		},
-	});
-	// The rest of the choices are "dependent", because they may depend on
-	// decisions made for previous choices.
-	const dependentChoices: NextChoiceData[] = actionDef.sequence.choices
-		.slice(1)
-		.map((_, i) => ({ type: "dependent", index: i + 1 }));
-	// If no viable players for first choice, send a null current choice and move
-	// on.
-	if (firstChoices.length < 1) {
-		return { currentChoice: nullChoice(), nextChoices: dependentChoices };
-	}
-	const nextChoices: NextChoiceData[] = firstChoices
-		.slice(1)
-		.map((choice) => ({ type: "independent", choice }));
-	nextChoices.push(...dependentChoices);
-	return { currentChoice: firstChoices[0], nextChoices };
+  const actionDef = getActionDefinition({
+    cardName: args.actionData.card.name,
+    actionType: args.actionData.type,
+  });
+  if (!actionDef.sequence?.choices) {
+    // Not all actions have choices (e.g. "play" or "discard" type actions).
+    // In those cases, send a special choice to signal the state machine.
+    return { currentChoice: nullChoice(), nextChoices: [] };
+  }
+  const firstChoiceDef = actionDef.sequence.choices[0];
+  const firstChoices = createActionChoices({
+    choiceDef: firstChoiceDef,
+    gameState: args.gameState,
+    currentDecisions: new Decisions(args.decisions),
+    actionContext: {
+      cardId: args.actionData.card.id,
+      playerTakingActionId: args.playerData.id,
+    },
+  });
+  // The rest of the choices are "dependent", because they may depend on
+  // decisions made for previous choices.
+  const dependentChoices: NextChoiceData[] = actionDef.sequence.choices
+    .slice(1)
+    .map((_, i) => ({ type: "dependent", index: i + 1 }));
+  // If no viable players for first choice, send a null current choice and move
+  // on.
+  if (firstChoices.length < 1) {
+    return { currentChoice: nullChoice(), nextChoices: dependentChoices };
+  }
+  const nextChoices: NextChoiceData[] = firstChoices
+    .slice(1)
+    .map((choice) => ({ type: "independent", choice }));
+  nextChoices.push(...dependentChoices);
+  return { currentChoice: firstChoices[0], nextChoices };
 }
