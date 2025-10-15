@@ -63,7 +63,7 @@ games.get(
     handler: async (_, res) => {
       const games = mockGamesDb.map((g) => ({
         gameId: g._id,
-        updatedAt: new Date(g.updatedAt),
+        updatedAt: new Date(g.updatedAt).toISOString(),
       }));
       res.status(200).json({ games });
     },
@@ -101,7 +101,7 @@ games.get(
         res.set("x-last-updated-At", game.updatedAt);
         res.status(200).send({
           gameId: game._id,
-          updatedAt: new Date(game.updatedAt),
+          updatedAt: new Date(game.updatedAt).toISOString(),
           data: game.data,
         });
       } else {

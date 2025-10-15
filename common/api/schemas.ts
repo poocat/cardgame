@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const gameIdSchema = z.string();
 export const playerIdSchema = z.string();
-export const timestampSchema = z.date();
+export const timestampSchema = z.string();
 
 export const gamesGetManyResponseBodySchema = z.strictObject({
   games: z.array(
