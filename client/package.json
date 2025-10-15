@@ -1,0 +1,27 @@
+{
+  "name": "cardgame-client",
+  "private": true,
+  "version": "0.0.1",
+  "description": "",
+  "author": "Steven Lewis",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router": "^7.9.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@types/react-router": "^5.1.20",
+    "@vitejs/plugin-react": "^5.0.4",
+    "globals": "^16.4.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.7"
+  }
+}
