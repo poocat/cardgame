@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type UsePollerHook<TData> = {
   /** The most recently fetched data. */
   data: TData | null;
+  error: string | null;
   pollCount: number;
   pollTimeMs: number;
 } & (
@@ -28,15 +29,20 @@ type UsePollerHook<TData> = {
  * 3. GET fetch after delay with "If-Modified-Since" header.
  * 4. If game is unmodified, go back to 3, else go back to 2.
  * 5. Wait for user to initiate another fetch, then go back to 1.
+ *
+ * If any fetch fails, the poller will stop polling until either the component
+ * it's used in unmounts or the returned `fetchOnce` is called and runs without
+ * error.
+ *
  ******************************************************************************/
 export function usePoller<TData extends object>(args: {
   /** The endpoint for the resource to poll/fetch. */
   url: string;
   /** Specifies what the polling interval should be, based on how long the poller has been polling. */
   getIntervalMs: (elapsedTimeMs: number) => number;
-  /** Specifies how data is extracted from the GET response. */
+  /** Specifies how data is extracted from the GET response body. */
   getData: (response: Response) => Promise<TData>;
-  /** Specifies how the timestamp is extracted from the data extracted from the GET response. */
+  /** Specifies how the timestamp is extracted from the data extracted from the GET response body. */
   getLastModified: (data: TData) => Date | null;
   /** Specifies the conditions under which to continue polling. */
   getPollingEnabled: (data: TData) => boolean;
@@ -45,6 +51,7 @@ export function usePoller<TData extends object>(args: {
   const [pollCount, setPollCount] = useState(0);
   const [elapsedTimeMs, setElapsedTimeMs] = useState(0);
   const [data, setData] = useState<TData | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const lastUpdatedRef = useRef<Date | null>(null);
   const intervalIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -66,8 +73,11 @@ export function usePoller<TData extends object>(args: {
       } else {
         throw new Error(`Fetch failed: ${response.status}`);
       }
+      setError(null);
     } catch (err) {
+      const msg = `Poller Error: ${err}`;
       console.error("Poller Error:", err);
+      setError(msg);
     }
   }, [polling, args.url, args.getData, args.getLastModified]);
 
@@ -77,13 +87,19 @@ export function usePoller<TData extends object>(args: {
     setElapsedTimeMs((t) => t + intervalMs);
   };
 
+  // Examine the latest data to find out if polling should continue.
+  const pollingEnabled = useMemo(
+    () => !data || args.getPollingEnabled(data),
+    [data, args.getPollingEnabled],
+  );
+
   // Manage change in polling state.
   if (polling) {
-    if (data && !args.getPollingEnabled(data)) {
+    if (error || !pollingEnabled) {
       setPolling(false);
     }
   } else {
-    if (!data || args.getPollingEnabled(data)) {
+    if (!error && pollingEnabled) {
       setPolling(true);
       setPollCount(0);
       setElapsedTimeMs(0);
@@ -110,6 +126,7 @@ export function usePoller<TData extends object>(args: {
   return polling
     ? {
         data,
+        error,
         polling: true,
         pollCount,
         pollTimeMs: elapsedTimeMs,
@@ -117,6 +134,7 @@ export function usePoller<TData extends object>(args: {
       }
     : {
         data,
+        error,
         polling: false,
         pollCount,
         pollTimeMs: elapsedTimeMs,

@@ -52,10 +52,8 @@ const GameList = () => {
       <div>Games:</div>
       {error && <div>{error}</div>}
       {data?.games?.map((g: any) => (
-        <div>
-          <Link key={g.gameId} to={`/${g.gameId}`}>
-            {g.gameId}
-          </Link>
+        <div key={g.gameId}>
+          <Link to={`/${g.gameId}`}>{g.gameId}</Link>
         </div>
       ))}
       <div>
@@ -152,7 +150,7 @@ const Game = () => {
       {poller.polling ? (
         <div>Polled {poller.pollCount} times..</div>
       ) : (
-        <div>Not polling...</div>
+        <div>Not polling... {poller.error && `(${poller.error})`}</div>
       )}
       <>
         {poller.data && (
