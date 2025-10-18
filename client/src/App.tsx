@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Routes,
   Route,
@@ -82,17 +82,20 @@ const GameList = () => {
 
 const Game = () => {
   const { gameId } = useParams();
-  const url = `/api/games/${gameId}`;
 
   const [query, setQuery] = useSearchParams();
   const playerId = query.get("playerId");
+
+  const url = useMemo(() => {
+    const base = `api/games/${gameId}`;
+    return playerId ? `${base}?playerId=${playerId}` : base;
+  }, [gameId, playerId]);
 
   const [choices, setChoices] = useState<string[]>([]);
 
   // Polling:
   const poller = usePoller<GamesGetOneResponseBody>({
     url,
-    fetchQuery: playerId ? { playerId } : {},
     getData: async (response) => {
       const payload = await response.json();
       return gamesGetOneResponseBodySchema.parse(payload);
@@ -106,8 +109,8 @@ const Game = () => {
         return 60000; // Once every minute after first 5 minutes.
       }
     },
-    getLastUpdated: (headers) => {
-      const ts = headers.get("x-last-updated-at");
+    getLastModified: (data) => {
+      const ts = data.updatedAt;
       return ts ? new Date(ts) : null;
     },
     getPollingEnabled: (data) =>
@@ -151,62 +154,58 @@ const Game = () => {
       ) : (
         <div>Not polling...</div>
       )}
-      {poller.loading ? (
-        <div>Loading...</div>
-      ) : (
-        <>
-          {poller.data && (
-            <div>
-              <label htmlFor="player-select">Playing As: </label>
-              <select
-                id="player-select"
-                value={playerId ?? ""}
-                onChange={(e) => setQuery({ playerId: e.target.value })}
-              >
-                {poller.data?.data.players.map((p: any) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-                <option value="">Spectator</option>
-              </select>
-            </div>
-          )}
-          <hr />
+      <>
+        {poller.data && (
           <div>
-            Current Activity: {JSON.stringify(poller.data?.data.activity)}
+            <label htmlFor="player-select">Playing As: </label>
+            <select
+              id="player-select"
+              value={playerId ?? ""}
+              onChange={(e) => setQuery({ playerId: e.target.value })}
+            >
+              {poller.data?.data.players.map((p: any) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+              <option value="">Spectator</option>
+            </select>
           </div>
-          <hr />
-          {!poller.polling && (
-            <>
-              <div>
-                {(poller.data?.data?.activity?.currentChoice?.values ?? []).map(
-                  (v: any) => (
-                    <div key={v}>
-                      <input
-                        id={v}
-                        value={v}
-                        type="checkbox"
-                        onChange={(e) =>
-                          setChoices((current) =>
-                            e.target.checked
-                              ? [...current, v]
-                              : current?.filter((c) => c !== v),
-                          )
-                        }
-                      />
-                      <label htmlFor={v}>{v}</label>
-                    </div>
-                  ),
-                )}
-              </div>
-              <div>
-                <button onClick={handleSubmitChoices}>Submit Choices</button>
-              </div>
-            </>
-          )}
-        </>
-      )}
+        )}
+        <hr />
+        <div>
+          Current Activity: {JSON.stringify(poller.data?.data.activity)}
+        </div>
+        <hr />
+        {!poller.polling && (
+          <>
+            <div>
+              {(poller.data?.data?.activity?.currentChoice?.values ?? []).map(
+                (v: any) => (
+                  <div key={v}>
+                    <input
+                      id={v}
+                      value={v}
+                      type="checkbox"
+                      onChange={(e) =>
+                        setChoices((current) =>
+                          e.target.checked
+                            ? [...current, v]
+                            : current?.filter((c) => c !== v),
+                        )
+                      }
+                    />
+                    <label htmlFor={v}>{v}</label>
+                  </div>
+                ),
+              )}
+            </div>
+            <div>
+              <button onClick={handleSubmitChoices}>Submit Choices</button>
+            </div>
+          </>
+        )}
+      </>
     </div>
   );
 };

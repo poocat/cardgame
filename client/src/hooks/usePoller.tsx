@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type UsePollerHook<TData> = {
   /** The most recently fetched data. */
   data: TData | null;
-  /** Indicates that the poller is currently fetching new data. */
-  loading: boolean;
   pollCount: number;
   pollTimeMs: number;
 } & (
@@ -22,73 +20,56 @@ type UsePollerHook<TData> = {
 /******************************************************************************
  * ### usePoller
  *
- * A hook to support a specific polling procedure using HTTP GET and HEAD
- * requests to an endpoint that provides the "last updated" timestamp for
- * the associated date in the response headers.
+ * A hook to support a polling procedure on an endpoint that will accept a
+ * "If-Modified-Since" header.
  *
- * 1. GET fetch resource, get "last updated" timestamp from headers and store.
- * 2. Check data for whether to keep polling. If not, skip to 6.
- * 3. HEAD fetch after delay for the latest "last updated" timestamp.
- * 4. If no change in the timestamp from server, go back to 3.
- * 5. Else, go back to 1.
- * 6. Wait for user to initiate another fetch, then go back to 1.
+ * 1. GET fetch resource, get "last updated" timestamp from payload and store.
+ * 2. Check data for whether to keep polling. If not, skip to 5.
+ * 3. GET fetch after delay with "If-Modified-Since" header.
+ * 4. If game is unmodified, go back to 3, else go back to 2.
+ * 5. Wait for user to initiate another fetch, then go back to 1.
  ******************************************************************************/
 export function usePoller<TData extends object>(args: {
   /** The endpoint for the resource to poll/fetch. */
   url: string;
   /** Specifies what the polling interval should be, based on how long the poller has been polling. */
   getIntervalMs: (elapsedTimeMs: number) => number;
-  /** Specifies how the timestamp is extracted from the GET and HEAD response headers. */
-  getLastUpdated: (headers: Headers) => Date | null;
   /** Specifies how data is extracted from the GET response. */
   getData: (response: Response) => Promise<TData>;
+  /** Specifies how the timestamp is extracted from the data extracted from the GET response. */
+  getLastModified: (data: TData) => Date | null;
   /** Specifies the conditions under which to continue polling. */
   getPollingEnabled: (data: TData) => boolean;
-  /** Query params that will be appended to the url when fetching data with a GET request. */
-  fetchQuery?: Record<string, string>;
 }): UsePollerHook<TData> {
   const [polling, setPolling] = useState(true);
   const [pollCount, setPollCount] = useState(0);
   const [elapsedTimeMs, setElapsedTimeMs] = useState(0);
   const [data, setData] = useState<TData | null>(null);
-  const [loading, setLoading] = useState(false);
   const lastUpdatedRef = useRef<Date | null>(null);
   const intervalIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Build a stable url for fetching the resource.
-  const fetchUrl = useMemo(() => {
-    if (!args.fetchQuery) return args.url;
-    const params = new URLSearchParams(args.fetchQuery);
-    return `${args.url}?${params.toString()}`;
-  }, [args.url, args.fetchQuery]);
-
-  // Use to fetch the resource in full.
+  // Use to fetch the data, using the last updated timestamp to check if any
+  // changes have been made to the resource.
   const fetchResource = useCallback(async () => {
     try {
-      setLoading(true);
-      const response = await fetch(fetchUrl, { method: "GET" });
-      const newData = await args.getData(response);
-      setData(newData);
-      lastUpdatedRef.current = args.getLastUpdated(response.headers);
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchUrl, args.getData, args.getLastUpdated]);
-
-  // Use to fetch the headers, in order to get the latest update timestamp.
-  const fetchLastUpdatedAt = useCallback(async () => {
-    try {
-      const response = await fetch(args.url, { method: "HEAD" });
-      if (!response.ok) throw new Error(`HEAD failed: ${response.status}`);
-      const current = args.getLastUpdated(response.headers);
-      const prev = lastUpdatedRef.current;
-      if (current && current.getTime() !== prev?.getTime()) {
-        await fetchResource();
+      const headers =
+        lastUpdatedRef.current && polling
+          ? { "If-Modified-Since": lastUpdatedRef.current.toString() }
+          : undefined;
+      const response = await fetch(args.url, { method: "GET", headers });
+      if (response.status === 304) {
+        // Not modified since the given timestamp.
+      } else if (response.ok) {
+        const newData = await args.getData(response);
+        setData(newData);
+        lastUpdatedRef.current = args.getLastModified(newData);
+      } else {
+        throw new Error(`Fetch failed: ${response.status}`);
       }
     } catch (err) {
-      console.error("[usePoller] Error:", err);
+      console.error("Poller Error:", err);
     }
-  }, [args.url, args.getLastUpdated, fetchResource]);
+  }, [polling, args.url, args.getData, args.getLastModified]);
 
   // Use to update the polling count and elapsed time.
   const updatePollClock = (intervalMs: number) => {
@@ -106,11 +87,8 @@ export function usePoller<TData extends object>(args: {
       setPolling(true);
       setPollCount(0);
       setElapsedTimeMs(0);
-      fetchLastUpdatedAt().then(() => updatePollClock(0));
+      fetchResource().then(() => updatePollClock(0));
     }
-  }
-  if (pollCount >= 100) {
-    setPolling(false);
   }
 
   // Setup polling loop.
@@ -121,18 +99,17 @@ export function usePoller<TData extends object>(args: {
     }
     const nextIntervalMs = args.getIntervalMs(elapsedTimeMs);
     const poll = async () => {
-      fetchLastUpdatedAt().then(() => updatePollClock(nextIntervalMs));
+      fetchResource().then(() => updatePollClock(nextIntervalMs));
     };
     intervalIdRef.current = setInterval(poll, nextIntervalMs);
     return () => {
       if (intervalIdRef.current) clearInterval(intervalIdRef.current);
     };
-  }, [polling, fetchLastUpdatedAt, args.getIntervalMs, elapsedTimeMs]);
+  }, [polling, fetchResource, args.getIntervalMs, elapsedTimeMs]);
 
   return polling
     ? {
         data,
-        loading,
         polling: true,
         pollCount,
         pollTimeMs: elapsedTimeMs,
@@ -140,7 +117,6 @@ export function usePoller<TData extends object>(args: {
       }
     : {
         data,
-        loading,
         polling: false,
         pollCount,
         pollTimeMs: elapsedTimeMs,
