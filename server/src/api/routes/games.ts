@@ -30,8 +30,8 @@ games.post(
       const now = new Date();
       const gameDocument: GameDbDocument = {
         _id: now.toISOString(),
-        createdAt: now.toString(),
-        updatedAt: now.toString(),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
         data: createMockGameData(),
       };
       mockGamesDb.push(gameDocument);
@@ -52,7 +52,7 @@ games.get(
     handler: async (_, res) => {
       const games = mockGamesDb.map((g) => ({
         gameId: g._id,
-        updatedAt: new Date(g.updatedAt).toString(),
+        updatedAt: new Date(g.updatedAt).toISOString(),
       }));
       res.status(200).json({ games });
     },
@@ -86,7 +86,7 @@ games.get(
       const game = mockGamesDb.find((g) => g._id === req.params.id);
       if (game) {
         const lastModified = new Date(game.updatedAt);
-        res.set("Last-Modified", lastModified.toString());
+        res.set("Last-Modified", lastModified.toUTCString());
         const challenge = req.headers["if-modified-since"];
         if (challenge && new Date(challenge) >= lastModified) {
           // 304-Not Modified
@@ -94,7 +94,7 @@ games.get(
         } else {
           res.status(200).send({
             gameId: game._id,
-            updatedAt: new Date(game.updatedAt).toString(),
+            updatedAt: new Date(game.updatedAt).toISOString(),
             data: game.data,
           });
         }
@@ -125,7 +125,7 @@ games.patch(
           decision: req.body.decision,
         });
         game.data = nextGameData;
-        game.updatedAt = new Date().toString();
+        game.updatedAt = new Date().toISOString();
         // 204-No Content, indicates success, should trigger client to make
         // another GET to get the updated game state.
         res.status(204).end();
