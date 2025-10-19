@@ -27,7 +27,7 @@ export const ROUTES = {
         schemas: {
           requestParams: z.strictObject({ id: z.string() }),
           requestQuery: z.object({ playerId: z.string().optional() }),
-          requestBody: z.strictObject({
+          responseBody: z.strictObject({
             gameId: gameIdSchema,
             updatedAt: timestampSchema,
             data: z.record(z.string(), z.any()), // TODO!!!
