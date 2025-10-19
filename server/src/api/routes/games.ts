@@ -1,14 +1,7 @@
 import { Router, json as jsonHandler } from "express";
 import { makeDecision } from "@server/game/stateMachine";
 import { createMockGameData } from "@server/mock";
-import {
-  gamesGetManyResponseBodySchema,
-  gamesGetOneRequestParamsSchema,
-  gamesGetOneRequestQuerySchema,
-  gamesGetOneResponseBodySchema,
-  gamesPatchRequestBodySchema,
-  gamesPostResponseBodySchema,
-} from "@common/api/schemas";
+import { ROUTES } from "@common/api/routes";
 import { GameData } from "@common/game/types";
 import { validated } from "@server/api/handlers";
 
@@ -30,11 +23,9 @@ const mockGamesDb: GameDbDocument[] = [];
  * Creates a new game.
  ******************************************************************************/
 games.post(
-  "/",
+  ROUTES.games.methods.post.path,
   validated({
-    schemas: {
-      responseBody: gamesPostResponseBodySchema,
-    },
+    schemas: ROUTES.games.methods.post.schemas,
     handler: async (_, res) => {
       const now = new Date();
       const gameDocument: GameDbDocument = {
@@ -55,11 +46,9 @@ games.post(
  * Lists active games, with most recently updated first.
  ******************************************************************************/
 games.get(
-  "/",
+  ROUTES.games.methods.getMany.path,
   validated({
-    schemas: {
-      responseBody: gamesGetManyResponseBodySchema,
-    },
+    schemas: ROUTES.games.methods.getMany.schemas,
     handler: async (_, res) => {
       const games = mockGamesDb.map((g) => ({
         gameId: g._id,
@@ -82,13 +71,9 @@ games.get(
  * player should not be able to see.
  ******************************************************************************/
 games.get(
-  "/:id",
+  ROUTES.games.methods.getOne.path,
   validated({
-    schemas: {
-      requestParams: gamesGetOneRequestParamsSchema,
-      requestQuery: gamesGetOneRequestQuerySchema,
-      responseBody: gamesGetOneResponseBodySchema,
-    },
+    schemas: ROUTES.games.methods.getOne.schemas,
     handler: async (req, res) => {
       /**
        * TODO!!!
@@ -128,12 +113,9 @@ games.get(
  * accordingly.
  ******************************************************************************/
 games.patch(
-  "/:id",
+  ROUTES.games.methods.patch.path,
   validated({
-    schemas: {
-      requestParams: gamesGetOneRequestParamsSchema,
-      requestBody: gamesPatchRequestBodySchema,
-    },
+    schemas: ROUTES.games.methods.patch.schemas,
     handler: async (req, res) => {
       const game = mockGamesDb.find((g) => g._id === req.params.id);
       if (game) {
