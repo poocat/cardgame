@@ -9,17 +9,18 @@ import {
   useSearchParams,
 } from "react-router";
 import { z } from "zod";
-import {
-  gamesGetManyResponseBodySchema,
-  gamesGetOneResponseBodySchema,
-  gamesPatchRequestBodySchema,
-  gamesPostResponseBodySchema,
-} from "@common/api/schemas";
+import { ROUTES } from "@common/api/routes";
 import { usePoller } from "@client/hooks/usePoller";
 
-type GamesGetManyResponseBody = z.infer<typeof gamesGetManyResponseBodySchema>;
-type GamesGetOneResponseBody = z.infer<typeof gamesGetOneResponseBodySchema>;
-type GamesPatchRequestBody = z.infer<typeof gamesPatchRequestBodySchema>;
+type GamesGetManyResponseBody = z.infer<
+  typeof ROUTES.games.methods.getMany.schemas.responseBody
+>;
+type GamesGetOneResponseBody = z.infer<
+  typeof ROUTES.games.methods.getOne.schemas.responseBody
+>;
+type GamesPatchRequestBody = z.infer<
+  typeof ROUTES.games.methods.patch.schemas.requestBody
+>;
 
 const GameList = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const GameList = () => {
         });
         if (response.ok) {
           const j = await response.json();
-          const d = gamesGetManyResponseBodySchema.parse(j);
+          const d = ROUTES.games.methods.getMany.schemas.responseBody.parse(j);
           setData(d);
         } else {
           setError(`Could not fetch games: ${response.statusText}`);
@@ -63,7 +64,8 @@ const GameList = () => {
               const response = await fetch("/api/games", { method: "POST" });
               if (response.ok) {
                 const j = await response.json();
-                const d = gamesPostResponseBodySchema.parse(j);
+                const d =
+                  ROUTES.games.methods.post.schemas.responseBody.parse(j);
                 navigate(`/${d.gameId}`);
               }
             } catch (error) {
@@ -96,7 +98,7 @@ const Game = () => {
     url,
     getData: async (response) => {
       const payload = await response.json();
-      return gamesGetOneResponseBodySchema.parse(payload);
+      return ROUTES.games.methods.getOne.schemas.responseBody.parse(payload);
     },
     getIntervalMs: (elapsedTimeMs) => {
       if (elapsedTimeMs < 1 * 60 * 1000) {
