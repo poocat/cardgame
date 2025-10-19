@@ -109,8 +109,8 @@ const Game = () => {
         return 60000; // Once every minute after first 5 minutes.
       }
     },
-    getLastModified: (data) => {
-      const ts = data.updatedAt;
+    getLastModified: (headers) => {
+      const ts = headers.get("Last-Modified");
       return ts ? new Date(ts) : null;
     },
     getPollingEnabled: (data) =>

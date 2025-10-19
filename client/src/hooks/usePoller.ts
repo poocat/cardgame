@@ -43,7 +43,7 @@ export function usePoller<TData extends object>(args: {
   /** Specifies how data is extracted from the GET response body. */
   getData: (response: Response) => Promise<TData>;
   /** Specifies how the timestamp is extracted from the data extracted from the GET response body. */
-  getLastModified: (data: TData) => Date | null;
+  getLastModified: (headers: Headers) => Date | null;
   /** Specifies the conditions under which to continue polling. */
   getPollingEnabled: (data: TData) => boolean;
 }): UsePollerHook<TData> {
@@ -64,12 +64,12 @@ export function usePoller<TData extends object>(args: {
           ? { "If-Modified-Since": lastUpdatedRef.current.toString() }
           : undefined;
       const response = await fetch(args.url, { method: "GET", headers });
+      lastUpdatedRef.current = args.getLastModified(response.headers);
       if (response.status === 304) {
         // Not modified since the given timestamp.
       } else if (response.ok) {
         const newData = await args.getData(response);
         setData(newData);
-        lastUpdatedRef.current = args.getLastModified(newData);
       } else {
         throw new Error(`Fetch failed: ${response.status}`);
       }
