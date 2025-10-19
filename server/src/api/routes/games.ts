@@ -86,6 +86,7 @@ games.get(
       const game = mockGamesDb.find((g) => g._id === req.params.id);
       if (game) {
         const lastModified = new Date(game.updatedAt);
+        res.set("Last-Modified", lastModified.toString());
         const challenge = req.headers["if-modified-since"];
         if (challenge && new Date(challenge) >= lastModified) {
           // 304-Not Modified
