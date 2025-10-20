@@ -1,19 +1,16 @@
 import { ActionType, GameData } from "@common/game/types";
 import { CARDS } from "@server/game/cards/definitions";
 
-export function createMockGameData(): GameData {
-  const mockPlayers: GameData["players"] = [
-    {
-      id: "dick",
-      name: "Dick",
-      turnCount: 0,
-    },
-    {
-      id: "jane",
-      name: "Jane",
-      turnCount: 0,
-    },
-  ];
+export function initGameData(
+  players: { id: string; name: string }[] = [
+    { id: "dick", name: "Dick" },
+    { id: "jane", name: "Jane" },
+  ],
+): GameData {
+  const mockPlayers: GameData["players"] = players.map((player) => ({
+    ...player,
+    turnCount: 0,
+  }));
   const mockCards = ((players: GameData["players"]): GameData["cards"] => {
     const cards: GameData["cards"] = [];
     players.forEach(({ id }) => {

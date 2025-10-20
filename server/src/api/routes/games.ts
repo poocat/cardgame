@@ -1,9 +1,9 @@
 import { Router, json as jsonHandler } from "express";
-import { makeDecision } from "@server/game/stateMachine";
-import { createMockGameData } from "@server/mock";
 import { ROUTES } from "@common/api/routes";
+import { allGames } from "@server/api/data";
 import { validated } from "@server/api/handlers";
-import { allGames } from "../data";
+import { initGameData } from "@server/game/initGameData";
+import { makeDecision } from "@server/game/stateMachine";
 
 export const games = Router();
 games.use(jsonHandler());
@@ -19,11 +19,15 @@ games.post(
     schemas: ROUTES.games.methods.post.schemas,
     handler: async (_, res) => {
       const now = new Date();
+      const gameData = initGameData([
+        { id: "dick", name: "Dick" },
+        { id: "jane", name: "Jane" },
+      ]);
       const gameDocument: (typeof allGames)[number] = {
         _id: now.toISOString(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
-        data: createMockGameData(),
+        data: gameData,
       };
       allGames.push(gameDocument);
       res.status(200).json({ gameId: gameDocument._id });

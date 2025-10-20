@@ -4,7 +4,7 @@
  */
 import { GameData } from "@common/game/types";
 import { makeDecision } from "@server/game/stateMachine";
-import { createMockGameData } from "@server/mock";
+import { initGameData } from "@server/game/initGameData";
 
 function shuffle(array: any[]) {
   const copy = [...array];
@@ -61,4 +61,10 @@ const mockGame = (initialGameData: GameData, numChoices: number) => {
   logGameData(gameData);
 };
 
-mockGame(createMockGameData(), 100);
+mockGame(
+  initGameData([
+    { id: "dick", name: "Dick" },
+    { id: "jane", name: "Jane" },
+  ]),
+  100,
+);
