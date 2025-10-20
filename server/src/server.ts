@@ -1,4 +1,5 @@
 import express from "express";
+import { ROUTES } from "@common/api/routes";
 import { games } from "@server/api/routes/games";
 
 export function createServer() {
@@ -6,7 +7,7 @@ export function createServer() {
   app.use(express.json());
 
   // Routes:
-  app.use("/games", games);
+  app.use(ROUTES.games.path, games);
 
   return app;
 }

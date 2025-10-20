@@ -7,7 +7,7 @@ export const timestampSchema = z.iso.datetime();
 
 export const ROUTES = {
   games: {
-    path: "/games",
+    path: "/api/games",
     methods: {
       getMany: {
         path: "/",
@@ -34,7 +34,6 @@ export const ROUTES = {
           }),
         },
       },
-
       patch: {
         path: "/:id",
         schemas: {
