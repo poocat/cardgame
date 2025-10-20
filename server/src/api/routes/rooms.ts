@@ -1,23 +1,10 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
 import { validated } from "@server/api/handlers";
+import { allRooms } from "../data";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
-
-// Room database model
-type PlayerData = { id: string; name: string };
-type RoomData = {
-  host: PlayerData;
-  guests: PlayerData[];
-};
-type RoomDbDocument = {
-  _id: string;
-  createdAt: string;
-  updatedAt: string;
-  data: RoomData;
-};
-const mockRoomsDb: RoomDbDocument[] = [];
 
 /******************************************************************************
  * ### POST rooms/
@@ -31,7 +18,7 @@ rooms.post(
     handler: async (req, res) => {
       const now = new Date().toISOString();
       const hostId = `${req.body.hostName}-${now}`;
-      const roomDocument: RoomDbDocument = {
+      const roomDocument: (typeof allRooms)[number] = {
         _id: now,
         createdAt: now,
         updatedAt: now,
@@ -43,7 +30,7 @@ rooms.post(
           guests: [],
         },
       };
-      mockRoomsDb.push(roomDocument);
+      allRooms.push(roomDocument);
       res.status(200).json({ roomId: roomDocument._id, hostId: hostId });
     },
   }),
@@ -59,7 +46,7 @@ rooms.get(
   validated({
     schemas: ROUTES.rooms.methods.getOne.schemas,
     handler: async (req, res) => {
-      const room = mockRoomsDb.find((r) => r._id === req.params.id);
+      const room = allRooms.find((r) => r._id === req.params.id);
       if (room) {
         const lastModified = new Date(room.updatedAt);
         res.set("Last-Modified", lastModified.toUTCString());
@@ -71,7 +58,10 @@ rooms.get(
           /**
            * TODO!!! Anonymize other player IDs.
            */
-          res.status(200).json({ roomId: room._id, ...room.data });
+          res.status(200).json({
+            roomId: room._id,
+            ...room.data,
+          });
         }
       } else {
         res.status(404).json({ message: `game ${req.params.id} not found` });
@@ -81,7 +71,7 @@ rooms.get(
 );
 
 /******************************************************************************
- * ### POST games/{id}/guests
+ * ### POST rooms/{id}/guests
  *
  * The method by which the client adds players to a room.
  ******************************************************************************/
@@ -90,7 +80,7 @@ rooms.post(
   validated({
     schemas: ROUTES.rooms.methods.postGuest.schemas,
     handler: async (req, res) => {
-      const room = mockRoomsDb.find((r) => r._id === req.params.id);
+      const room = allRooms.find((r) => r._id === req.params.id);
       if (room) {
         const playerNames = [
           room.data.host.name,
@@ -103,7 +93,7 @@ rooms.post(
             .json({ message: `room already has player ${req.body.guestName}` });
         } else {
           const now = new Date().toISOString();
-          const guest: PlayerData = {
+          const guest = {
             id: `${req.body.guestName}-${now}`,
             name: req.body.guestName,
           };

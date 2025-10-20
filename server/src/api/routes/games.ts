@@ -2,20 +2,11 @@ import { Router, json as jsonHandler } from "express";
 import { makeDecision } from "@server/game/stateMachine";
 import { createMockGameData } from "@server/mock";
 import { ROUTES } from "@common/api/routes";
-import { GameData } from "@common/game/types";
 import { validated } from "@server/api/handlers";
+import { allGames } from "../data";
 
 export const games = Router();
 games.use(jsonHandler());
-
-// Database mockery
-type GameDbDocument = {
-  _id: string;
-  createdAt: string;
-  updatedAt: string;
-  data: GameData;
-};
-const mockGamesDb: GameDbDocument[] = [];
 
 /******************************************************************************
  * ### POST games/
@@ -28,13 +19,13 @@ games.post(
     schemas: ROUTES.games.methods.post.schemas,
     handler: async (_, res) => {
       const now = new Date();
-      const gameDocument: GameDbDocument = {
+      const gameDocument: (typeof allGames)[number] = {
         _id: now.toISOString(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
         data: createMockGameData(),
       };
-      mockGamesDb.push(gameDocument);
+      allGames.push(gameDocument);
       res.status(200).json({ gameId: gameDocument._id });
     },
   }),
@@ -50,7 +41,7 @@ games.get(
   validated({
     schemas: ROUTES.games.methods.getMany.schemas,
     handler: async (_, res) => {
-      const games = mockGamesDb.map((g) => ({
+      const games = allGames.map((g) => ({
         gameId: g._id,
         updatedAt: new Date(g.updatedAt).toISOString(),
       }));
@@ -83,7 +74,7 @@ games.get(
        * - redact values that the player shouldn't be able to see
        */
       // console.log(req.query.playerId);
-      const game = mockGamesDb.find((g) => g._id === req.params.id);
+      const game = allGames.find((g) => g._id === req.params.id);
       if (game) {
         const lastModified = new Date(game.updatedAt);
         res.set("Last-Modified", lastModified.toUTCString());
@@ -118,7 +109,7 @@ games.patch(
   validated({
     schemas: ROUTES.games.methods.patch.schemas,
     handler: async (req, res) => {
-      const game = mockGamesDb.find((g) => g._id === req.params.id);
+      const game = allGames.find((g) => g._id === req.params.id);
       if (game) {
         const nextGameData = makeDecision({
           gameData: game.data,
