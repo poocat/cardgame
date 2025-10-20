@@ -1,0 +1,67 @@
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { z } from "zod";
+import { ROUTES } from "@common/api/routes";
+
+type GamesGetManyResponseBody = z.infer<
+  typeof ROUTES.games.methods.getMany.schemas.responseBody
+>;
+
+export const GameList = () => {
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<GamesGetManyResponseBody | null>(null);
+
+  useEffect(() => {
+    const fetchGameList = async () => {
+      try {
+        const response = await fetch("/api/games", {
+          method: "GET",
+        });
+        if (response.ok) {
+          const j = await response.json();
+          const d = ROUTES.games.methods.getMany.schemas.responseBody.parse(j);
+          setData(d);
+        } else {
+          setError(`Could not fetch games: ${response.statusText}`);
+        }
+      } catch (error) {
+        setError(`Error: ${error}`);
+      }
+    };
+    if (data === null && error === null) {
+      fetchGameList();
+    }
+  }, [data, error]);
+
+  return (
+    <div>
+      <div>Games:</div>
+      {error && <div>{error}</div>}
+      {data?.games?.map((g: any) => (
+        <div key={g.gameId}>
+          <Link to={`/games/${g.gameId}`}>{g.gameId}</Link>
+        </div>
+      ))}
+      <div>
+        <button
+          onClick={async () => {
+            try {
+              const response = await fetch("/api/games", { method: "POST" });
+              if (response.ok) {
+                const j = await response.json();
+                const d =
+                  ROUTES.games.methods.post.schemas.responseBody.parse(j);
+                navigate(`/games/${d.gameId}`);
+              }
+            } catch (error) {
+              console.error(error);
+            }
+          }}
+        >
+          New Game
+        </button>
+      </div>
+    </div>
+  );
+};
