@@ -101,10 +101,17 @@ rooms.post(
       const room = allRooms.find((r) => r._id === req.params.id);
       if (room) {
         const { guestName } = req.body;
+        const { maxNumPlayers } = CONSTANTS;
         const currentPlayerNames = [
           room.data.host.name,
           ...room.data.guests.map((g) => g.name),
         ].map((name) => name.toLowerCase());
+        if (currentPlayerNames.includes(guestName.toLowerCase())) {
+          // 409-Conflict
+          res.status(409).json({
+            message: `room already has ${maxNumPlayers} players`,
+          });
+        }
         if (currentPlayerNames.includes(guestName.toLowerCase())) {
           // 409-Conflict
           res.status(409).json({
