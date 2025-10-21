@@ -4,6 +4,7 @@ import { allGames, allRooms, makeId } from "@server/api/data";
 import { validated } from "@server/api/wrappers";
 import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
+import { CONSTANTS } from "@server/game/rules/constants";
 
 export const games = Router();
 games.use(jsonHandler());
@@ -26,22 +27,28 @@ games.post(
         (r) => r._id === req.body.roomId && r.data.host.id === req.body.hostId,
       );
       if (!room) {
-        res.status(404).send({ message: `room ${req.body.roomId} not found` });
-      } else {
-        const players = [...room.data.guests];
-        players.push(room.data.host);
-        const now = new Date();
-        const gameData = initGameData(players);
-        const gameDocument: (typeof allGames)[number] = {
-          _id: makeId(now),
-          createdAt: now.toISOString(),
-          updatedAt: now.toISOString(),
-          data: gameData,
-        };
-        allGames.push(gameDocument);
-        room.gameId = gameDocument._id;
-        res.status(200).json({ gameId: gameDocument._id });
+        return res
+          .status(404)
+          .json({ message: `room ${req.body.roomId} not found` });
       }
+      const players = [room.data.host, ...room.data.guests];
+      const { minNumPlayers } = CONSTANTS;
+      if (players.length < minNumPlayers) {
+        return res
+          .status(400)
+          .json({ message: `room does not have enough players` });
+      }
+      const now = new Date();
+      const gameData = initGameData(players);
+      const gameDocument: (typeof allGames)[number] = {
+        _id: makeId(now),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+        data: gameData,
+      };
+      allGames.push(gameDocument);
+      room.gameId = gameDocument._id;
+      return res.status(200).json({ gameId: gameDocument._id });
     },
   }),
 );
