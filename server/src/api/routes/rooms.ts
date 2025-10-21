@@ -60,27 +60,29 @@ rooms.get(
     schemas: ROUTES.rooms.methods.getOne.schemas,
     handler: async (req, res) => {
       const room = allRooms.find((r) => r._id === req.params.id);
-      if (room) {
-        const lastModified = new Date(room.updatedAt);
-        res.set("Last-Modified", lastModified.toUTCString());
-        const challenge = req.headers["if-modified-since"];
-        if (challenge && new Date(challenge) >= lastModified) {
-          // 304-Not Modified
-          res.status(304).end();
-        } else {
-          /**
-           * TODO!!! Anonymize other player IDs.
-           */
-          res.status(200).json({
-            roomId: room._id,
-            gameId: room.gameId,
-            host: room.data.host,
-            guests: room.data.guests,
-          });
-        }
-      } else {
-        res.status(404).json({ message: `game ${req.params.id} not found` });
+      if (!room) {
+        return res
+          .status(404)
+          .json({ message: `game ${req.params.id} not found` });
       }
+
+      const lastModified = new Date(room.updatedAt);
+      res.set("Last-Modified", lastModified.toUTCString());
+      const challenge = req.headers["if-modified-since"];
+      if (challenge && new Date(challenge) >= lastModified) {
+        // 304-Not Modified
+        return res.status(304).end();
+      }
+
+      /**
+       * TODO!!! Anonymize other player IDs.
+       */
+      return res.status(200).json({
+        roomId: room._id,
+        gameId: room.gameId,
+        host: room.data.host,
+        guests: room.data.guests,
+      });
     },
   }),
 );
@@ -99,38 +101,40 @@ rooms.post(
     schemas: ROUTES.rooms.methods.postGuest.schemas,
     handler: async (req, res) => {
       const room = allRooms.find((r) => r._id === req.params.id);
-      if (room) {
-        const { guestName } = req.body;
-        const { maxNumPlayers } = CONSTANTS;
-        const currentPlayerNames = [
-          room.data.host.name,
-          ...room.data.guests.map((g) => g.name),
-        ].map((name) => name.toLowerCase());
-        if (currentPlayerNames.includes(guestName.toLowerCase())) {
-          // 409-Conflict
-          res.status(409).json({
-            message: `room already has ${maxNumPlayers} players`,
-          });
-        }
-        if (currentPlayerNames.includes(guestName.toLowerCase())) {
-          // 409-Conflict
-          res.status(409).json({
-            message: `room already has player '${guestName}'`,
-          });
-        } else {
-          const now = new Date();
-          const guest = {
-            id: makePlayerId(guestName, now),
-            name: guestName,
-          };
-          room.data.guests.push(guest);
-          room.updatedAt = now.toISOString();
-          res.status(200).json({ playerId: guest.id });
-        }
-      } else {
+      if (!room) {
         // 404-Not Found
-        res.status(404).json({ message: `room ${req.params.id} not found` });
+        return res
+          .status(404)
+          .json({ message: `room ${req.params.id} not found` });
       }
+
+      // Validate the request body.
+      const { guestName } = req.body;
+      const { maxNumPlayers } = CONSTANTS;
+      const currentPlayers = [room.data.host, ...room.data.guests];
+      if (currentPlayers.length >= maxNumPlayers) {
+        // 409-Conflict
+        return res.status(409).json({
+          message: `room already has ${maxNumPlayers} players`,
+        });
+      }
+
+      const currentPlayerNames = currentPlayers.map((p) => p.name.trim());
+      if (currentPlayerNames.includes(guestName.trim())) {
+        // 409-Conflict
+        return res.status(409).json({
+          message: `room already has player '${guestName}'`,
+        });
+      }
+
+      const now = new Date();
+      const guest = {
+        id: makePlayerId(guestName, now),
+        name: guestName,
+      };
+      room.data.guests.push(guest);
+      room.updatedAt = now.toISOString();
+      return res.status(200).json({ playerId: guest.id });
     },
   }),
 );
