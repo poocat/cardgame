@@ -1,6 +1,6 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
-import { allGames, allRooms } from "@server/api/data";
+import { allGames, allRooms, makeId } from "@server/api/data";
 import { validated } from "@server/api/wrappers";
 import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
@@ -11,7 +11,11 @@ games.use(jsonHandler());
 /******************************************************************************
  * ### POST games/
  *
- * Creates a new game.
+ * Creates a new game from an existing room.
+ *
+ * Only the room's "host" can start a game. Since none of the room's "guests"
+ * should be able to see the host's id, the host's id used as a way to
+ * "authenticate" the request.
  ******************************************************************************/
 games.post(
   ROUTES.games.methods.post.path,
@@ -29,7 +33,7 @@ games.post(
         const now = new Date();
         const gameData = initGameData(players);
         const gameDocument: (typeof allGames)[number] = {
-          _id: now.toISOString(),
+          _id: makeId(now),
           createdAt: now.toISOString(),
           updatedAt: now.toISOString(),
           data: gameData,
@@ -45,7 +49,7 @@ games.post(
 /******************************************************************************
  * ### GET games/
  *
- * Lists active games, with most recently updated first.
+ * Lists active games, and the last time each was updated.
  ******************************************************************************/
 games.get(
   ROUTES.games.methods.getMany.path,
@@ -68,23 +72,18 @@ games.get(
  *
  * Can poll this endpoint efficiently by setting "If-Modified-Since" header.
  *
- * Query strings can be used to indicate which player is requesting the game
- * state, which may be used to redact certain parts of the game state that the
- * player should not be able to see.
+ * A player's id can be passed as a query string, to indicate which player
+ * is requesting the game state.
+ *
+ * TODO!!! Use the player id to redact certain parts of the game state that the
+ * player should not see. Each player's id should be secret to each other
+ * player.
  ******************************************************************************/
 games.get(
   ROUTES.games.methods.getOne.path,
   validated({
     schemas: ROUTES.games.methods.getOne.schemas,
     handler: async (req, res) => {
-      /**
-       * TODO!!!
-       * Use the player ID to get a "digest" of the game. The digest will:
-       * - transform sensitive values like other player IDs (so they cannot
-       *   play as another player)
-       * - redact values that the player shouldn't be able to see
-       */
-      // console.log(req.query.playerId);
       const game = allGames.find((g) => g._id === req.params.id);
       if (game) {
         const lastModified = new Date(game.updatedAt);

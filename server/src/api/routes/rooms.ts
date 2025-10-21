@@ -1,10 +1,15 @@
 import { Router, json as jsonHandler } from "express";
-import { allRooms } from "@server/api/data";
+import { allRooms, makeId } from "@server/api/data";
 import { ROUTES } from "@common/api/routes";
 import { validated } from "@server/api/wrappers";
+import { CONSTANTS } from "@server/game/rules/constants";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
+
+function makePlayerId(name: string, date: Date): string {
+  return `${name.toLowerCase()}-${date.getTime().toString()}`;
+}
 
 /******************************************************************************
  * ### POST rooms/
@@ -16,12 +21,12 @@ rooms.post(
   validated({
     schemas: ROUTES.rooms.methods.post.schemas,
     handler: async (req, res) => {
-      const now = new Date().toISOString();
-      const hostId = `${req.body.hostName}-${now}`;
+      const now = new Date();
+      const hostId = makePlayerId(req.body.hostName, now);
       const roomDocument: (typeof allRooms)[number] = {
-        _id: now,
-        createdAt: now,
-        updatedAt: now,
+        _id: makeId(now),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
         gameId: null,
         data: {
           host: {
@@ -41,6 +46,13 @@ rooms.post(
  * ### GET rooms/{id}?playerId={playerId}
  *
  * Used to get the full state of the room with the given id.
+ *
+ * A player's id can be passed as a query string, to indicate which player
+ * is requesting the room state.
+ *
+ * TODO!!! Use the player id to redact certain parts of the room that the
+ * player should not see. Each player's id should be secret to each other
+ * player.
  ******************************************************************************/
 rooms.get(
   ROUTES.rooms.methods.getOne.path,
@@ -77,6 +89,9 @@ rooms.get(
  * ### POST rooms/{id}/guests
  *
  * The method by which the client adds players to a room.
+ *
+ * Cannot add players past the maximum, and cannot add a player with the same
+ * name as an existing player in the room.
  ******************************************************************************/
 rooms.post(
   ROUTES.rooms.methods.postGuest.path,
@@ -85,23 +100,24 @@ rooms.post(
     handler: async (req, res) => {
       const room = allRooms.find((r) => r._id === req.params.id);
       if (room) {
-        const playerNames = [
+        const { guestName } = req.body;
+        const currentPlayerNames = [
           room.data.host.name,
           ...room.data.guests.map((g) => g.name),
-        ];
-        if (playerNames.includes(req.body.guestName)) {
+        ].map((name) => name.toLowerCase());
+        if (currentPlayerNames.includes(guestName.toLowerCase())) {
           // 409-Conflict
-          res
-            .status(409)
-            .json({ message: `room already has player ${req.body.guestName}` });
+          res.status(409).json({
+            message: `room already has player '${guestName}'`,
+          });
         } else {
-          const now = new Date().toISOString();
+          const now = new Date();
           const guest = {
-            id: `${req.body.guestName}-${now}`,
-            name: req.body.guestName,
+            id: makePlayerId(guestName, now),
+            name: guestName,
           };
           room.data.guests.push(guest);
-          room.updatedAt = now;
+          room.updatedAt = now.toISOString();
           res.status(200).json({ playerId: guest.id });
         }
       } else {

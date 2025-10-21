@@ -21,3 +21,7 @@ type RoomDbDocument = {
   data: RoomData;
 };
 export const allRooms: RoomDbDocument[] = [];
+
+export function makeId(date: Date): string {
+  return date.getTime().toString();
+}
