@@ -3,7 +3,7 @@ import { Routes } from "./types";
 
 export const gameIdSchema = z.string();
 export const playerIdSchema = z.string();
-export const playerNameSchema = z.string().min(1);
+export const playerNameSchema = z.string().min(1).max(20);
 export const roomIdSchema = z.string();
 export const timestampSchema = z.iso.datetime();
 

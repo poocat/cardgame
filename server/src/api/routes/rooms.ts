@@ -8,7 +8,9 @@ export const rooms = Router();
 rooms.use(jsonHandler());
 
 function makePlayerId(name: string, date: Date): string {
-  return `${name.toLowerCase()}-${date.getTime().toString()}`;
+  let id = `${name.trim().toLowerCase()}-${date.getTime().toString()}`;
+  id = id.replace(/[^a-zA-Z0-9]+/g, "-");
+  return id;
 }
 
 /******************************************************************************
