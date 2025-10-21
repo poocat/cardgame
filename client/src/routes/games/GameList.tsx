@@ -43,25 +43,6 @@ export const GameList = () => {
           <Link to={`/games/${g.gameId}`}>{g.gameId}</Link>
         </div>
       ))}
-      <div>
-        <button
-          onClick={async () => {
-            try {
-              const response = await fetch("/api/games", { method: "POST" });
-              if (response.ok) {
-                const j = await response.json();
-                const d =
-                  ROUTES.games.methods.post.schemas.responseBody.parse(j);
-                navigate(`/games/${d.gameId}`);
-              }
-            } catch (error) {
-              console.error(error);
-            }
-          }}
-        >
-          New Game
-        </button>
-      </div>
     </div>
   );
 };

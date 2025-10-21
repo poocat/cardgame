@@ -52,6 +52,10 @@ export const ROUTES = {
       post: {
         path: "/",
         schemas: {
+          requestBody: z.strictObject({
+            roomId: roomIdSchema,
+            hostId: playerIdSchema,
+          }),
           responseBody: z.strictObject({
             gameId: gameIdSchema,
           }),
@@ -68,6 +72,7 @@ export const ROUTES = {
           requestParams: z.strictObject({ id: roomIdSchema }),
           responseBody: z.strictObject({
             roomId: roomIdSchema,
+            gameId: z.nullable(gameIdSchema),
             host: z.strictObject({
               id: playerIdSchema,
               name: playerNameSchema,

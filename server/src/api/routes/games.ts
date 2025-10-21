@@ -1,7 +1,7 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
-import { allGames } from "@server/api/data";
-import { validated } from "@server/api/handlers";
+import { allGames, allRooms } from "@server/api/data";
+import { validated } from "@server/api/wrappers";
 import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
 
@@ -17,20 +17,27 @@ games.post(
   ROUTES.games.methods.post.path,
   validated({
     schemas: ROUTES.games.methods.post.schemas,
-    handler: async (_, res) => {
-      const now = new Date();
-      const gameData = initGameData([
-        { id: "dick", name: "Dick" },
-        { id: "jane", name: "Jane" },
-      ]);
-      const gameDocument: (typeof allGames)[number] = {
-        _id: now.toISOString(),
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
-        data: gameData,
-      };
-      allGames.push(gameDocument);
-      res.status(200).json({ gameId: gameDocument._id });
+    handler: async (req, res) => {
+      const room = allRooms.find(
+        (r) => r._id === req.body.roomId && r.data.host.id === req.body.hostId,
+      );
+      if (!room) {
+        res.status(404).send({ message: `room ${req.body.roomId} not found` });
+      } else {
+        const players = [...room.data.guests];
+        players.push(room.data.host);
+        const now = new Date();
+        const gameData = initGameData(players);
+        const gameDocument: (typeof allGames)[number] = {
+          _id: now.toISOString(),
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+          data: gameData,
+        };
+        allGames.push(gameDocument);
+        room.gameId = gameDocument._id;
+        res.status(200).json({ gameId: gameDocument._id });
+      }
     },
   }),
 );

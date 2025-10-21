@@ -17,6 +17,7 @@ type RoomDbDocument = {
   _id: string;
   createdAt: string;
   updatedAt: string;
+  gameId: string | null;
   data: RoomData;
 };
 export const allRooms: RoomDbDocument[] = [];

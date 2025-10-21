@@ -1,8 +1,14 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router";
+import z from "zod";
 import { usePoller } from "@client/hooks/usePoller";
 import { ROUTES } from "@common/api/routes";
-import { useCallback, useMemo, useState } from "react";
-import { Link, useLocation, useParams, useSearchParams } from "react-router";
-import z from "zod";
 
 type RoomsGetOneResponseBody = z.infer<
   typeof ROUTES.rooms.methods.getOne.schemas.responseBody
@@ -10,6 +16,7 @@ type RoomsGetOneResponseBody = z.infer<
 
 export const Room = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { roomId } = useParams();
 
@@ -45,10 +52,22 @@ export const Room = () => {
   });
 
   const playerIsHost = poller.data?.host.id === playerId;
+
   const [guestName, setGuestName] = useState("");
 
+  // Once the game has started, redirect.
+  const gameId = poller.data?.gameId ?? null;
+  useEffect(() => {
+    if (gameId) {
+      let gameUrl = `/games/${gameId}`;
+      if (playerId) gameUrl = gameUrl + `?` + new URLSearchParams({ playerId });
+      navigate(gameUrl);
+    }
+  }, [gameId]);
+
+  const submitGuestDisabled = playerIsHost || !guestName;
   const handleSubmitGuest = useCallback(async () => {
-    if (playerIsHost || !guestName) return;
+    if (submitGuestDisabled) return;
     try {
       const payload = ROUTES.rooms.methods.postGuest.schemas.requestBody.parse({
         guestName,
@@ -69,7 +88,33 @@ export const Room = () => {
     } catch (error) {
       console.error(error);
     }
-  }, [url, playerIsHost, guestName]);
+  }, [url, guestName, submitGuestDisabled]);
+
+  const startGameDisabled = !playerIsHost || !roomId;
+  const handleStartGame = useCallback(async () => {
+    if (startGameDisabled) return;
+    try {
+      const payload = ROUTES.games.methods.post.schemas.requestBody.parse({
+        roomId: roomId,
+        hostId: playerId,
+      });
+      const body = JSON.stringify(payload);
+      const response = await fetch(`/api/games`, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        const j = await response.json();
+        const d = ROUTES.games.methods.post.schemas.responseBody.parse(j);
+        console.log(d);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [startGameDisabled, roomId]);
 
   return (
     <div>
@@ -93,11 +138,7 @@ export const Room = () => {
       {playerIsHost && (
         <div>
           <div>
-            <button
-              onClick={() =>
-                window.confirm("Sorry, this doesn't do anything yet...")
-              }
-            >
+            <button disabled={startGameDisabled} onClick={handleStartGame}>
               Start game
             </button>
           </div>

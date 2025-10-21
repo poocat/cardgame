@@ -1,7 +1,7 @@
 import { Router, json as jsonHandler } from "express";
+import { allRooms } from "@server/api/data";
 import { ROUTES } from "@common/api/routes";
-import { validated } from "@server/api/handlers";
-import { allRooms } from "../data";
+import { validated } from "@server/api/wrappers";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
@@ -22,6 +22,7 @@ rooms.post(
         _id: now,
         createdAt: now,
         updatedAt: now,
+        gameId: null,
         data: {
           host: {
             id: hostId,
@@ -60,7 +61,9 @@ rooms.get(
            */
           res.status(200).json({
             roomId: room._id,
-            ...room.data,
+            gameId: room.gameId,
+            host: room.data.host,
+            guests: room.data.guests,
           });
         }
       } else {
