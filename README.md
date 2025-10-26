@@ -52,3 +52,13 @@ There are different types of actions available on cards:
     ```
     npm run start
     ```
+
+- Client `/client`
+  - To install dependencies:
+    ```
+    npm install
+    ```
+  - To run the site locally:
+    ```
+    npm run dev
+    ```

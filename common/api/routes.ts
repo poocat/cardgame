@@ -3,6 +3,8 @@ import { Routes } from "./types";
 
 export const gameIdSchema = z.string();
 export const playerIdSchema = z.string();
+export const playerNameSchema = z.string().min(1).max(20);
+export const roomIdSchema = z.string();
 export const timestampSchema = z.iso.datetime();
 
 export const ROUTES = {
@@ -50,8 +52,61 @@ export const ROUTES = {
       post: {
         path: "/",
         schemas: {
+          requestBody: z.strictObject({
+            roomId: roomIdSchema,
+            hostId: playerIdSchema,
+          }),
           responseBody: z.strictObject({
             gameId: gameIdSchema,
+          }),
+        },
+      },
+    },
+  },
+  rooms: {
+    path: "/api/rooms",
+    methods: {
+      getOne: {
+        path: "/:id",
+        schemas: {
+          requestParams: z.strictObject({ id: roomIdSchema }),
+          responseBody: z.strictObject({
+            roomId: roomIdSchema,
+            gameId: z.nullable(gameIdSchema),
+            host: z.strictObject({
+              id: playerIdSchema,
+              name: playerNameSchema,
+            }),
+            guests: z.array(
+              z.strictObject({
+                id: playerIdSchema,
+                name: playerNameSchema,
+              }),
+            ),
+          }),
+        },
+      },
+      post: {
+        path: "/",
+        schemas: {
+          requestBody: z.strictObject({
+            hostName: playerNameSchema,
+          }),
+          responseBody: z.strictObject({
+            roomId: roomIdSchema,
+            hostId: playerIdSchema,
+          }),
+        },
+      },
+      postGuest: {
+        path: "/:id/guests",
+        schemas: {
+          requestParams: z.strictObject({ id: roomIdSchema }),
+          requestBody: z.strictObject({
+            guestName: playerNameSchema,
+          }),
+          responseBody: z.strictObject({
+            playerId: playerIdSchema,
           }),
         },
       },

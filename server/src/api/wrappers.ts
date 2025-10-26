@@ -30,10 +30,15 @@ export function validated<TSchemas extends RouteSchemas>(args: {
 }): ValidatedRequestHandler<TSchemas> {
   return async (req, res, next) => {
     try {
-      if (args.schemas.requestParams)
+      if (args.schemas.requestParams) {
         args.schemas.requestParams.parse(req.params);
-      if (args.schemas.requestQuery) args.schemas.requestQuery.parse(req.query);
-      if (args.schemas.requestBody) args.schemas.requestBody.parse(req.body);
+      }
+      if (args.schemas.requestQuery) {
+        args.schemas.requestQuery.parse(req.query);
+      }
+      if (args.schemas.requestBody) {
+        args.schemas.requestBody.parse(req.body);
+      }
     } catch (err) {
       if (err instanceof ZodError) {
         // 400-Bad Request
@@ -43,6 +48,6 @@ export function validated<TSchemas extends RouteSchemas>(args: {
     }
     // Make sure any uncaught errors in the handler will get handled by
     // Express's default error handler.
-    Promise.resolve(args.handler(req, res, next)).catch(next);
+    return Promise.resolve(args.handler(req, res, next)).catch(next);
   };
 }

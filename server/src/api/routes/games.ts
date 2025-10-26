@@ -1,41 +1,54 @@
 import { Router, json as jsonHandler } from "express";
-import { makeDecision } from "@server/game/stateMachine";
-import { createMockGameData } from "@server/mock";
 import { ROUTES } from "@common/api/routes";
-import { GameData } from "@common/game/types";
-import { validated } from "@server/api/handlers";
+import { allGames, allRooms, makeId } from "@server/api/data";
+import { validated } from "@server/api/wrappers";
+import { initGameData } from "@server/game/initGameData";
+import { makeDecision } from "@server/game/stateMachine";
+import { CONSTANTS } from "@server/game/rules/constants";
 
 export const games = Router();
 games.use(jsonHandler());
 
-// Database mockery
-type GameDbDocument = {
-  _id: string;
-  createdAt: string;
-  updatedAt: string;
-  data: GameData;
-};
-const mockGamesDb: GameDbDocument[] = [];
-
 /******************************************************************************
  * ### POST games/
  *
- * Creates a new game.
+ * Creates a new game from an existing room.
+ *
+ * Only the room's "host" can start a game. Since none of the room's "guests"
+ * should be able to see the host's id, the host's id used as a way to
+ * "authenticate" the request.
  ******************************************************************************/
 games.post(
   ROUTES.games.methods.post.path,
   validated({
     schemas: ROUTES.games.methods.post.schemas,
-    handler: async (_, res) => {
+    handler: async (req, res) => {
+      const room = allRooms.find(
+        (r) => r._id === req.body.roomId && r.data.host.id === req.body.hostId,
+      );
+      if (!room) {
+        return res
+          .status(404)
+          .json({ message: `room ${req.body.roomId} not found` });
+      }
+      const players = [room.data.host, ...room.data.guests];
+      const { minNumPlayers } = CONSTANTS;
+      if (players.length < minNumPlayers) {
+        return res
+          .status(400)
+          .json({ message: `room does not have enough players` });
+      }
       const now = new Date();
-      const gameDocument: GameDbDocument = {
-        _id: now.toISOString(),
+      const gameData = initGameData(players);
+      const gameDocument: (typeof allGames)[number] = {
+        _id: makeId(now),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
-        data: createMockGameData(),
+        data: gameData,
       };
-      mockGamesDb.push(gameDocument);
-      res.status(200).json({ gameId: gameDocument._id });
+      allGames.push(gameDocument);
+      room.gameId = gameDocument._id;
+      return res.status(200).json({ gameId: gameDocument._id });
     },
   }),
 );
@@ -43,14 +56,14 @@ games.post(
 /******************************************************************************
  * ### GET games/
  *
- * Lists active games, with most recently updated first.
+ * Lists active games, and the last time each was updated.
  ******************************************************************************/
 games.get(
   ROUTES.games.methods.getMany.path,
   validated({
     schemas: ROUTES.games.methods.getMany.schemas,
     handler: async (_, res) => {
-      const games = mockGamesDb.map((g) => ({
+      const games = allGames.map((g) => ({
         gameId: g._id,
         updatedAt: new Date(g.updatedAt).toISOString(),
       }));
@@ -66,24 +79,19 @@ games.get(
  *
  * Can poll this endpoint efficiently by setting "If-Modified-Since" header.
  *
- * Query strings can be used to indicate which player is requesting the game
- * state, which may be used to redact certain parts of the game state that the
- * player should not be able to see.
+ * A player's id can be passed as a query string, to indicate which player
+ * is requesting the game state.
+ *
+ * TODO!!! Use the player id to redact certain parts of the game state that the
+ * player should not see. Each player's id should be secret to each other
+ * player.
  ******************************************************************************/
 games.get(
   ROUTES.games.methods.getOne.path,
   validated({
     schemas: ROUTES.games.methods.getOne.schemas,
     handler: async (req, res) => {
-      /**
-       * TODO!!!
-       * Use the player ID to get a "digest" of the game. The digest will:
-       * - transform sensitive values like other player IDs (so they cannot
-       *   play as another player)
-       * - redact values that the player shouldn't be able to see
-       */
-      // console.log(req.query.playerId);
-      const game = mockGamesDb.find((g) => g._id === req.params.id);
+      const game = allGames.find((g) => g._id === req.params.id);
       if (game) {
         const lastModified = new Date(game.updatedAt);
         res.set("Last-Modified", lastModified.toUTCString());
@@ -118,7 +126,7 @@ games.patch(
   validated({
     schemas: ROUTES.games.methods.patch.schemas,
     handler: async (req, res) => {
-      const game = mockGamesDb.find((g) => g._id === req.params.id);
+      const game = allGames.find((g) => g._id === req.params.id);
       if (game) {
         const nextGameData = makeDecision({
           gameData: game.data,
