@@ -1,6 +1,6 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
-import { allGames, allRooms, makeId } from "@server/api/data";
+import { allGames, allRooms, makeGameEtag, makeId } from "@server/api/data";
 import { validated } from "@server/api/wrappers";
 import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
@@ -31,7 +31,7 @@ games.post(
           .status(404)
           .json({ message: `room ${req.body.roomId} not found` });
       }
-      const players = [room.data.host, ...room.data.guests];
+      const players = [room.data.host, ...room.data.guests]; // TODO!!! Randomize order.
       const { minNumPlayers } = CONSTANTS;
       if (players.length < minNumPlayers) {
         return res
@@ -48,6 +48,7 @@ games.post(
       };
       allGames.push(gameDocument);
       room.gameId = gameDocument._id;
+      room.updatedAt = now.toISOString();
       return res.status(200).json({ gameId: gameDocument._id });
     },
   }),
@@ -77,7 +78,7 @@ games.get(
  *
  * Used to get the full state of the game with the given id.
  *
- * Can poll this endpoint efficiently by setting "If-Modified-Since" header.
+ * Can poll this endpoint efficiently by setting "If-None-Match" header.
  *
  * A player's id can be passed as a query string, to indicate which player
  * is requesting the game state.
@@ -92,23 +93,23 @@ games.get(
     schemas: ROUTES.games.methods.getOne.schemas,
     handler: async (req, res) => {
       const game = allGames.find((g) => g._id === req.params.id);
-      if (game) {
-        const lastModified = new Date(game.updatedAt);
-        res.set("Last-Modified", lastModified.toUTCString());
-        const challenge = req.headers["if-modified-since"];
-        if (challenge && new Date(challenge) >= lastModified) {
-          // 304-Not Modified
-          res.status(304).end();
-        } else {
-          res.status(200).send({
-            gameId: game._id,
-            updatedAt: new Date(game.updatedAt).toISOString(),
-            data: game.data,
-          });
-        }
-      } else {
-        res.status(404).send({ message: `game ${req.params.id} not found` });
+      if (!game) {
+        return res
+          .status(404)
+          .send({ message: `game ${req.params.id} not found` });
       }
+
+      const etag = makeGameEtag(game, req.query.playerId);
+      if (req.get("If-None-Match") === etag) {
+        return res.status(304).end();
+      }
+
+      res.set("ETag", etag);
+      res.status(200).send({
+        gameId: game._id,
+        updatedAt: new Date(game.updatedAt).toISOString(),
+        data: game.data,
+      });
     },
   }),
 );
@@ -127,20 +128,22 @@ games.patch(
     schemas: ROUTES.games.methods.patch.schemas,
     handler: async (req, res) => {
       const game = allGames.find((g) => g._id === req.params.id);
-      if (game) {
-        const nextGameData = makeDecision({
-          gameData: game.data,
-          decision: req.body.decision,
-        });
-        game.data = nextGameData;
-        game.updatedAt = new Date().toISOString();
-        // 204-No Content, indicates success, should trigger client to make
-        // another GET to get the updated game state.
-        res.status(204).end();
-      } else {
+      if (!game) {
         // 404-Not Found
-        res.status(404).send({ message: `game ${req.params.id} not found` });
+        return res
+          .status(404)
+          .send({ message: `game ${req.params.id} not found` });
       }
+
+      const nextGameData = makeDecision({
+        gameData: game.data,
+        decision: req.body.decision,
+      });
+      game.data = nextGameData;
+      game.updatedAt = new Date().toISOString();
+      // 204-No Content, indicates success, should trigger client to make
+      // another GET to get the updated game state.
+      res.status(204).end();
     },
   }),
 );

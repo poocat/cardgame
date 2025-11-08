@@ -24,9 +24,9 @@ type UsePollerHook<TData> = {
  * A hook to support a polling procedure on an endpoint that will accept a
  * "If-Modified-Since" header.
  *
- * 1. GET fetch resource, get "last updated" timestamp from payload and store.
+ * 1. GET fetch resource, store ETag.
  * 2. Check data for whether to keep polling. If not, skip to 5.
- * 3. GET fetch after delay with "If-Modified-Since" header.
+ * 3. GET fetch after delay with "If-None-Match" header.
  * 4. If game is unmodified, go back to 3, else go back to 2.
  * 5. Wait for user to initiate another fetch, then go back to 1.
  *
@@ -42,8 +42,6 @@ export function usePoller<TData extends object>(args: {
   getIntervalMs: (elapsedTimeMs: number) => number;
   /** Specifies how data is extracted from the GET response body. */
   getData: (response: Response) => Promise<TData>;
-  /** Specifies how the timestamp is extracted from the data extracted from the GET response body. */
-  getLastModified: (headers: Headers) => Date | null;
   /** Specifies the conditions under which to continue polling. */
   getPollingEnabled: (data: TData) => boolean;
 }): UsePollerHook<TData> {
@@ -52,7 +50,7 @@ export function usePoller<TData extends object>(args: {
   const [elapsedTimeMs, setElapsedTimeMs] = useState(0);
   const [data, setData] = useState<TData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const lastUpdatedRef = useRef<Date | null>(null);
+  const etag = useRef<string | null>(null);
   const intervalIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Use to fetch the data, using the last updated timestamp to check if any
@@ -60,13 +58,13 @@ export function usePoller<TData extends object>(args: {
   const fetchResource = useCallback(async () => {
     try {
       const headers =
-        lastUpdatedRef.current && polling
-          ? { "If-Modified-Since": lastUpdatedRef.current.toString() }
+        etag.current && polling
+          ? { "If-None-Match": etag.current.toString() }
           : undefined;
       const response = await fetch(args.url, { method: "GET", headers });
-      lastUpdatedRef.current = args.getLastModified(response.headers);
+      etag.current = response.headers.get("ETag");
       if (response.status === 304) {
-        // Not modified since the given timestamp.
+        // Not modified.
       } else if (response.ok) {
         const newData = await args.getData(response);
         setData(newData);
@@ -79,7 +77,7 @@ export function usePoller<TData extends object>(args: {
       console.error("Poller Error:", err);
       setError(msg);
     }
-  }, [polling, args.url, args.getData, args.getLastModified]);
+  }, [polling, args.url, args.getData]);
 
   // Use to update the polling count and elapsed time.
   const updatePollClock = (intervalMs: number) => {

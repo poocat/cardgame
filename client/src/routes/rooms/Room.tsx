@@ -44,10 +44,6 @@ export const Room = () => {
         return 60000; // Once every minute after first 5 minutes.
       }
     },
-    getLastModified: (headers) => {
-      const ts = headers.get("Last-Modified");
-      return ts ? new Date(ts) : null;
-    },
     getPollingEnabled: () => true, // Poll constantly
   });
 
