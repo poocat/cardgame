@@ -27,8 +27,8 @@ export const ROUTES = {
       getOne: {
         path: "/:id",
         schemas: {
-          requestParams: z.strictObject({ id: z.string() }),
-          requestQuery: z.object({ playerId: z.string().optional() }),
+          requestParams: z.strictObject({ id: gameIdSchema }),
+          requestQuery: z.object({ playerId: playerIdSchema.optional() }),
           responseBody: z.strictObject({
             gameId: gameIdSchema,
             updatedAt: timestampSchema,
@@ -39,7 +39,7 @@ export const ROUTES = {
       patch: {
         path: "/:id",
         schemas: {
-          requestParams: z.strictObject({ id: z.string() }),
+          requestParams: z.strictObject({ id: gameIdSchema }),
           requestBody: z.strictObject({
             decision: z.strictObject({
               playerId: playerIdSchema,
@@ -70,6 +70,7 @@ export const ROUTES = {
         path: "/:id",
         schemas: {
           requestParams: z.strictObject({ id: roomIdSchema }),
+          requestQuery: z.object({ playerId: playerIdSchema.optional() }),
           responseBody: z.strictObject({
             roomId: roomIdSchema,
             gameId: z.nullable(gameIdSchema),

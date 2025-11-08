@@ -1,5 +1,5 @@
 import { Router, json as jsonHandler } from "express";
-import { allRooms, makeId } from "@server/api/data";
+import { allRooms, makeId, makeRoomEtag } from "@server/api/data";
 import { ROUTES } from "@common/api/routes";
 import { validated } from "@server/api/wrappers";
 import { CONSTANTS } from "@server/game/rules/constants";
@@ -65,17 +65,13 @@ rooms.get(
       if (!room) {
         return res
           .status(404)
-          .json({ message: `game ${req.params.id} not found` });
+          .json({ message: `room ${req.params.id} not found` });
       }
-
-      const lastModified = new Date(room.updatedAt);
-      res.set("Last-Modified", lastModified.toUTCString());
-      const challenge = req.headers["if-modified-since"];
-      if (challenge && new Date(challenge) >= lastModified) {
-        // 304-Not Modified
+      const etag = makeRoomEtag(room, req.query.playerId);
+      if (req.get("If-None-Match") === etag) {
         return res.status(304).end();
       }
-
+      res.set("ETag", etag);
       /**
        * TODO!!! Anonymize other player IDs.
        */

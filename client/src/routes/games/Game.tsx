@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 import z from "zod";
 import { usePoller } from "@client/hooks/usePoller";
@@ -40,43 +40,52 @@ export const Game = () => {
         return 60000; // Once every minute after first 5 minutes.
       }
     },
-    getLastModified: (headers) => {
-      const ts = headers.get("Last-Modified");
-      return ts ? new Date(ts) : null;
-    },
     getPollingEnabled: (data) =>
       data.data.activity.currentChoice.choosingPlayerId !== playerId,
   });
 
+  // Memoize the game state, as is only changes with the "last updated" time.
+  const game = useMemo(() => {
+    return poller?.data?.data;
+  }, [poller.data?.updatedAt]);
+  const choosing = useMemo(() => !poller.polling, [poller.polling]);
+
   // Submission:
-  // (Not memoized, because it depends on practically everything...)
-  const handleSubmitChoices = async () => {
-    if (gameId && playerId && !poller.polling) {
+  const handleSubmitChoices = useCallback(async () => {
+    if (gameId && playerId && choosing && game && poller.fetchOnce) {
       const payload: GamesPatchRequestBody = {
         decision: {
           playerId: playerId,
-          name: poller.data?.data?.activity?.currentChoice?.name ?? "",
+          name: game.activity?.currentChoice?.name ?? "",
           values: choices,
         },
       };
       const body = JSON.stringify(payload);
-      try {
-        const response = await fetch(url, {
-          method: "PATCH",
-          body,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
+      await fetch(url, {
+        method: "PATCH",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .catch((reason) => console.error(reason))
+        .finally(() => {
           poller.fetchOnce();
           setChoices([]);
-        }
-      } catch (error) {
-        console.error(error);
-      }
+        });
     }
-  };
+  }, [gameId, playerId, game, choosing, poller.fetchOnce]);
+
+  // Choice value setters:
+  const handleAddChoice = useCallback((value: string) => {
+    setChoices((current) => [...current, value]);
+  }, []);
+  const handleRemoveChoice = useCallback((value: string) => {
+    setChoices((current) => {
+      const idx = current.findIndex((v) => v === value);
+      return [...current.slice(0, idx), ...current.slice(idx)];
+    });
+  }, []);
 
   return (
     <div>
@@ -86,7 +95,7 @@ export const Game = () => {
         <div>Not polling... {poller.error && `(${poller.error})`}</div>
       )}
       <>
-        {poller.data && (
+        {game && (
           <div>
             <label htmlFor="player-select">Playing As: </label>
             <select
@@ -94,7 +103,7 @@ export const Game = () => {
               value={playerId ?? ""}
               onChange={(e) => setQuery({ playerId: e.target.value })}
             >
-              {poller.data?.data.players.map((p: any) => (
+              {game.players.map((p: any) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
                 </option>
@@ -104,39 +113,58 @@ export const Game = () => {
           </div>
         )}
         <hr />
-        <div>
-          Current Activity: {JSON.stringify(poller.data?.data.activity)}
-        </div>
-        <hr />
-        {!poller.polling && (
-          <>
-            <div>
-              {(poller.data?.data?.activity?.currentChoice?.values ?? []).map(
-                (v: any) => (
-                  <div key={v}>
-                    <input
-                      id={v}
-                      value={v}
-                      type="checkbox"
-                      onChange={(e) =>
-                        setChoices((current) =>
-                          e.target.checked
-                            ? [...current, v]
-                            : current?.filter((c) => c !== v),
-                        )
-                      }
-                    />
-                    <label htmlFor={v}>{v}</label>
-                  </div>
-                ),
-              )}
-            </div>
-            <div>
-              <button onClick={handleSubmitChoices}>Submit Choices</button>
-            </div>
-          </>
+        {game && (
+          <PlayArea
+            game={game}
+            choosing={choosing}
+            handleAddChoice={handleAddChoice}
+            handleRemoveChoice={handleRemoveChoice}
+            handleSubmitChoices={handleSubmitChoices}
+          />
         )}
       </>
     </div>
   );
 };
+
+const PlayArea = memo(
+  (props: {
+    game: GamesGetOneResponseBody["data"];
+    choosing: boolean;
+    handleAddChoice: (value: string) => void;
+    handleRemoveChoice: (value: string) => void;
+    handleSubmitChoices: () => void;
+  }) => {
+    return (
+      <>
+        <div>Current Activity: {JSON.stringify(props.game.activity)}</div>
+        {props.choosing && (
+          <div>
+            {(props.game.activity?.currentChoice?.values ?? []).map(
+              (v: any) => (
+                <div key={v}>
+                  <input
+                    id={v}
+                    value={v}
+                    type="checkbox"
+                    onChange={(e) =>
+                      e.target.checked
+                        ? props.handleAddChoice(v)
+                        : props.handleRemoveChoice(v)
+                    }
+                  />
+                  <label htmlFor={v}>{v}</label>
+                </div>
+              ),
+            )}
+            <div>
+              <button onClick={props.handleSubmitChoices}>
+                Submit Choices
+              </button>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  },
+);

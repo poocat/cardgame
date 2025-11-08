@@ -37,7 +37,6 @@ export class MutatorQueue implements IMutator {
 
   apply(mutator: Mutator) {
     this.queue.slice(this.index).forEach((item) => {
-      console.log(`mutation: ${JSON.stringify(item)}`);
       mutator[item.method](item.args as any);
       this.index += 1;
     });
