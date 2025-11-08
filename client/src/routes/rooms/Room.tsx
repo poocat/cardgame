@@ -104,8 +104,7 @@ export const Room = () => {
       });
       if (response.ok) {
         const j = await response.json();
-        const d = ROUTES.games.methods.post.schemas.responseBody.parse(j);
-        console.log(d);
+        ROUTES.games.methods.post.schemas.responseBody.parse(j);
       }
     } catch (error) {
       console.error(error);

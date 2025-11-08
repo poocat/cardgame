@@ -68,7 +68,7 @@ export const Game = () => {
           "Content-Type": "application/json",
         },
       })
-        .catch((reason) => console.log(reason))
+        .catch((reason) => console.error(reason))
         .finally(() => {
           poller.fetchOnce();
           setChoices([]);
