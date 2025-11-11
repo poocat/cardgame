@@ -1,18 +1,12 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
-import { allRooms, makeDocumentId, makeRoomEtag } from "@server/api/data";
+import { allRooms, makeId, makeRoomEtag } from "@server/api/data";
 import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
-
-function makePlayerId(name: string, date: Date): string {
-  let id = `${name.trim().toLowerCase()}-${date.getTime().toString()}`;
-  id = id.replace(/[^a-zA-Z0-9]+/g, "-");
-  return id;
-}
 
 /******************************************************************************
  * ### POST rooms/
@@ -25,9 +19,9 @@ rooms.post(
     schemas: ROUTES.rooms.methods.post.schemas,
     handler: async (req, res) => {
       const now = new Date();
-      const hostId = makePlayerId(req.body.hostName, now);
+      const hostId = makeId();
       const roomDocument: (typeof allRooms)[number] = {
-        _id: makeDocumentId(now),
+        _id: makeId(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
         gameId: null,
@@ -126,7 +120,7 @@ rooms.post(
 
       const now = new Date();
       const guest = {
-        id: makePlayerId(guestName, now),
+        id: makeId(),
         name: guestName,
       };
       room.data.guests.push(guest);

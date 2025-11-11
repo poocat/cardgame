@@ -4,12 +4,12 @@ import { CONSTANTS } from "@common/game/constants";
 import {
   allGames,
   allRooms,
+  initGameData,
   makeGameEtag,
-  makeDocumentId,
+  makeId,
 } from "@server/api/data";
 import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
-import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
 
 export const games = Router();
@@ -47,7 +47,7 @@ games.post(
       const now = new Date();
       const gameData = initGameData(players);
       const gameDocument: (typeof allGames)[number] = {
-        _id: makeDocumentId(now),
+        _id: makeId(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
         data: gameData,
