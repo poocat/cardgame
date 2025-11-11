@@ -1,5 +1,5 @@
 import z from "zod";
-import { Routes } from "./types";
+import { Routes } from "@common/api/types";
 
 export const gameIdSchema = z.string();
 export const playerIdSchema = z.string();

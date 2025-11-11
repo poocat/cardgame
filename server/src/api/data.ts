@@ -22,7 +22,7 @@ type RoomDbDocument = DbDocumentMeta & {
 };
 export const allRooms: RoomDbDocument[] = [];
 
-export function makeId(date: Date): string {
+export function makeDocumentId(date: Date): string {
   return date.getTime().toString();
 }
 

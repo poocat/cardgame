@@ -1,5 +1,5 @@
+import { CONSTANTS } from "@common/game/constants";
 import { ActivityTypeMap, Decision, PlayerData } from "@common/game/types";
-import { CONSTANTS } from "@server/game/rules/constants";
 import { GameState } from "@server/game/utils/GameState";
 import { IMutator } from "@server/types";
 import {

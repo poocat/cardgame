@@ -1,8 +1,9 @@
 import { Router, json as jsonHandler } from "express";
-import { allRooms, makeId, makeRoomEtag } from "@server/api/data";
 import { ROUTES } from "@common/api/routes";
+import { CONSTANTS } from "@common/game/constants";
+import { allRooms, makeDocumentId, makeRoomEtag } from "@server/api/data";
+import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
-import { CONSTANTS } from "@server/game/rules/constants";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
@@ -26,7 +27,7 @@ rooms.post(
       const now = new Date();
       const hostId = makePlayerId(req.body.hostName, now);
       const roomDocument: (typeof allRooms)[number] = {
-        _id: makeId(now),
+        _id: makeDocumentId(now),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
         gameId: null,
@@ -39,7 +40,7 @@ rooms.post(
         },
       };
       allRooms.push(roomDocument);
-      res.status(200).json({ roomId: roomDocument._id, hostId: hostId });
+      res.status(STATUS.ok).json({ roomId: roomDocument._id, hostId: hostId });
     },
   }),
 );
@@ -64,18 +65,18 @@ rooms.get(
       const room = allRooms.find((r) => r._id === req.params.id);
       if (!room) {
         return res
-          .status(404)
+          .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });
       }
       const etag = makeRoomEtag(room, req.query.playerId);
       if (req.get("If-None-Match") === etag) {
-        return res.status(304).end();
+        return res.status(STATUS.notModified).end();
       }
       res.set("ETag", etag);
       /**
        * TODO!!! Anonymize other player IDs.
        */
-      return res.status(200).json({
+      return res.status(STATUS.ok).json({
         roomId: room._id,
         gameId: room.gameId,
         host: room.data.host,
@@ -102,7 +103,7 @@ rooms.post(
       if (!room) {
         // 404-Not Found
         return res
-          .status(404)
+          .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });
       }
 
@@ -111,16 +112,14 @@ rooms.post(
       const { maxNumPlayers } = CONSTANTS;
       const currentPlayers = [room.data.host, ...room.data.guests];
       if (currentPlayers.length >= maxNumPlayers) {
-        // 409-Conflict
-        return res.status(409).json({
+        return res.status(STATUS.conflict).json({
           message: `room already has ${maxNumPlayers} players`,
         });
       }
 
       const currentPlayerNames = currentPlayers.map((p) => p.name.trim());
       if (currentPlayerNames.includes(guestName.trim())) {
-        // 409-Conflict
-        return res.status(409).json({
+        return res.status(STATUS.conflict).json({
           message: `room already has player '${guestName}'`,
         });
       }
@@ -132,7 +131,7 @@ rooms.post(
       };
       room.data.guests.push(guest);
       room.updatedAt = now.toISOString();
-      return res.status(200).json({ playerId: guest.id });
+      return res.status(STATUS.ok).json({ playerId: guest.id });
     },
   }),
 );

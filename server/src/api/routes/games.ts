@@ -1,10 +1,16 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
-import { allGames, allRooms, makeGameEtag, makeId } from "@server/api/data";
+import { CONSTANTS } from "@common/game/constants";
+import {
+  allGames,
+  allRooms,
+  makeGameEtag,
+  makeDocumentId,
+} from "@server/api/data";
+import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
 import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
-import { CONSTANTS } from "@server/game/rules/constants";
 
 export const games = Router();
 games.use(jsonHandler());
@@ -28,20 +34,20 @@ games.post(
       );
       if (!room) {
         return res
-          .status(404)
+          .status(STATUS.notFound)
           .json({ message: `room ${req.body.roomId} not found` });
       }
       const players = [room.data.host, ...room.data.guests]; // TODO!!! Randomize order.
       const { minNumPlayers } = CONSTANTS;
       if (players.length < minNumPlayers) {
         return res
-          .status(400)
+          .status(STATUS.badRequest)
           .json({ message: `room does not have enough players` });
       }
       const now = new Date();
       const gameData = initGameData(players);
       const gameDocument: (typeof allGames)[number] = {
-        _id: makeId(now),
+        _id: makeDocumentId(now),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
         data: gameData,
@@ -49,7 +55,7 @@ games.post(
       allGames.push(gameDocument);
       room.gameId = gameDocument._id;
       room.updatedAt = now.toISOString();
-      return res.status(200).json({ gameId: gameDocument._id });
+      return res.status(STATUS.ok).json({ gameId: gameDocument._id });
     },
   }),
 );
@@ -68,7 +74,7 @@ games.get(
         gameId: g._id,
         updatedAt: new Date(g.updatedAt).toISOString(),
       }));
-      res.status(200).json({ games });
+      res.status(STATUS.ok).json({ games });
     },
   }),
 );
@@ -95,17 +101,17 @@ games.get(
       const game = allGames.find((g) => g._id === req.params.id);
       if (!game) {
         return res
-          .status(404)
+          .status(STATUS.notFound)
           .send({ message: `game ${req.params.id} not found` });
       }
 
       const etag = makeGameEtag(game, req.query.playerId);
       if (req.get("If-None-Match") === etag) {
-        return res.status(304).end();
+        return res.status(STATUS.notModified).end();
       }
 
       res.set("ETag", etag);
-      res.status(200).send({
+      res.status(STATUS.ok).send({
         gameId: game._id,
         updatedAt: new Date(game.updatedAt).toISOString(),
         data: game.data,
@@ -131,7 +137,7 @@ games.patch(
       if (!game) {
         // 404-Not Found
         return res
-          .status(404)
+          .status(STATUS.notFound)
           .send({ message: `game ${req.params.id} not found` });
       }
 
@@ -141,9 +147,7 @@ games.patch(
       });
       game.data = nextGameData;
       game.updatedAt = new Date().toISOString();
-      // 204-No Content, indicates success, should trigger client to make
-      // another GET to get the updated game state.
-      res.status(204).end();
+      res.status(STATUS.noContent).end();
     },
   }),
 );
