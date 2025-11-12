@@ -7,7 +7,9 @@ import {
   initGameData,
   makeGameEtag,
   makeId,
+  makeSalt,
 } from "@server/api/data";
+import { deanonymizeDecision, digestGameData } from "@server/api/transformers";
 import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
 import { makeDecision } from "@server/game/stateMachine";
@@ -50,6 +52,7 @@ games.post(
         _id: makeId(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
+        anonymizationSalt: makeSalt(),
         data: gameData,
       };
       allGames.push(gameDocument);
@@ -88,10 +91,6 @@ games.get(
  *
  * A player's id can be passed as a query string, to indicate which player
  * is requesting the game state.
- *
- * TODO!!! Use the player id to redact certain parts of the game state that the
- * player should not see. Each player's id should be secret to each other
- * player.
  ******************************************************************************/
 games.get(
   ROUTES.games.methods.getOne.path,
@@ -110,11 +109,17 @@ games.get(
         return res.status(STATUS.notModified).end();
       }
 
+      const digest = digestGameData({
+        gameData: game.data,
+        anonymizationSalt: game.anonymizationSalt,
+        playerId: req.query.playerId,
+      });
+
       res.set("ETag", etag);
       res.status(STATUS.ok).send({
         gameId: game._id,
         updatedAt: new Date(game.updatedAt).toISOString(),
-        data: game.data,
+        digest,
       });
     },
   }),
@@ -141,9 +146,16 @@ games.patch(
           .send({ message: `game ${req.params.id} not found` });
       }
 
+      const playerIds = game.data.players.map((p) => p.id);
+      const decision = deanonymizeDecision({
+        decision: req.body.decision,
+        anonymizationSalt: game.anonymizationSalt,
+        playerIds,
+      });
+
       const nextGameData = makeDecision({
         gameData: game.data,
-        decision: req.body.decision,
+        decision,
       });
       game.data = nextGameData;
       game.updatedAt = new Date().toISOString();

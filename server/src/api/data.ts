@@ -7,6 +7,7 @@ type DbDocumentMeta = {
   _id: string;
   createdAt: string;
   updatedAt: string;
+  anonymizationSalt: string;
 };
 type GameDbDocument = DbDocumentMeta & {
   data: GameData;
@@ -14,7 +15,7 @@ type GameDbDocument = DbDocumentMeta & {
 export const allGames: GameDbDocument[] = [];
 
 type PlayerData = { id: string; name: string };
-type RoomData = {
+export type RoomData = {
   host: PlayerData;
   guests: PlayerData[];
 };
@@ -25,6 +26,10 @@ type RoomDbDocument = DbDocumentMeta & {
 export const allRooms: RoomDbDocument[] = [];
 
 export function makeId(): string {
+  return randomUUID().toString();
+}
+
+export function makeSalt(): string {
   return randomUUID().toString();
 }
 

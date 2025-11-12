@@ -1,8 +1,9 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
-import { allRooms, makeId, makeRoomEtag } from "@server/api/data";
+import { allRooms, makeId, makeRoomEtag, makeSalt } from "@server/api/data";
 import { STATUS } from "@server/api/status";
+import { digestRoomData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
 
 export const rooms = Router();
@@ -24,6 +25,7 @@ rooms.post(
         _id: makeId(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
+        anonymizationSalt: makeSalt(),
         gameId: null,
         data: {
           host: {
@@ -66,15 +68,18 @@ rooms.get(
       if (req.get("If-None-Match") === etag) {
         return res.status(STATUS.notModified).end();
       }
+
+      const digest = digestRoomData({
+        roomData: room.data,
+        anonymizationSalt: room.anonymizationSalt,
+        playerId: req.query.playerId,
+      });
+
       res.set("ETag", etag);
-      /**
-       * TODO!!! Anonymize other player IDs.
-       */
       return res.status(STATUS.ok).json({
         roomId: room._id,
         gameId: room.gameId,
-        host: room.data.host,
-        guests: room.data.guests,
+        digest,
       });
     },
   }),
@@ -95,7 +100,6 @@ rooms.post(
     handler: async (req, res) => {
       const room = allRooms.find((r) => r._id === req.params.id);
       if (!room) {
-        // 404-Not Found
         return res
           .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });

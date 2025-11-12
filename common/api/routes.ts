@@ -1,4 +1,5 @@
 import z from "zod";
+import { gameDigestSchema, roomDigestSchema } from "@common/api/digests";
 import { Routes } from "@common/api/types";
 
 export const gameIdSchema = z.string();
@@ -8,6 +9,9 @@ export const roomIdSchema = z.string();
 export const timestampSchema = z.iso.datetime();
 
 export const ROUTES = {
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Games
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   games: {
     path: "/api/games",
     methods: {
@@ -32,7 +36,7 @@ export const ROUTES = {
           responseBody: z.strictObject({
             gameId: gameIdSchema,
             updatedAt: timestampSchema,
-            data: z.record(z.string(), z.any()), // TODO!!!
+            digest: gameDigestSchema,
           }),
         },
       },
@@ -63,6 +67,9 @@ export const ROUTES = {
       },
     },
   },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Rooms
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   rooms: {
     path: "/api/rooms",
     methods: {
@@ -74,16 +81,7 @@ export const ROUTES = {
           responseBody: z.strictObject({
             roomId: roomIdSchema,
             gameId: z.nullable(gameIdSchema),
-            host: z.strictObject({
-              id: playerIdSchema,
-              name: playerNameSchema,
-            }),
-            guests: z.array(
-              z.strictObject({
-                id: playerIdSchema,
-                name: playerNameSchema,
-              }),
-            ),
+            digest: roomDigestSchema,
           }),
         },
       },
