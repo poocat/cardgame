@@ -8,7 +8,6 @@ type GamesGetManyResponseBody = z.infer<
 >;
 
 export const GameList = () => {
-  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<GamesGetManyResponseBody | null>(null);
 

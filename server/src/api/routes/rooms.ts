@@ -1,7 +1,13 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
-import { allRooms, makeId, makeRoomEtag, makeSalt } from "@server/api/data";
+import {
+  allRooms,
+  makeId,
+  makeRoomEtag,
+  makeSalt,
+  RoomDbDocument,
+} from "@server/api/data";
 import { STATUS } from "@server/api/status";
 import { digestRoomData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
@@ -21,7 +27,7 @@ rooms.post(
     handler: async (req, res) => {
       const now = new Date();
       const hostId = makeId();
-      const roomDocument: (typeof allRooms)[number] = {
+      const roomDocument: RoomDbDocument = {
         _id: makeId(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
@@ -48,10 +54,6 @@ rooms.post(
  *
  * A player's id can be passed as a query string, to indicate which player
  * is requesting the room state.
- *
- * TODO!!! Use the player id to redact certain parts of the room that the
- * player should not see. Each player's id should be secret to each other
- * player.
  ******************************************************************************/
 rooms.get(
   ROUTES.rooms.methods.getOne.path,

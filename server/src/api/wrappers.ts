@@ -21,9 +21,12 @@ type ValidatedRequestHandler<TSchemas extends RouteSchemas> = RequestHandler<
   z.infer<TSchemas["requestQuery"]>
 >;
 
-/**
- * Use to wrap a request handler
- */
+/******************************************************************************
+ * ### validated
+ *
+ * Use to wrap a request handler to type constrain and/or validate the request
+ * and response.
+ ******************************************************************************/
 export function validated<TSchemas extends RouteSchemas>(args: {
   schemas: TSchemas;
   handler: ValidatedRequestHandler<TSchemas>;

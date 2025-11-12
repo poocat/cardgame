@@ -4,13 +4,14 @@ import { CONSTANTS } from "@common/game/constants";
 import {
   allGames,
   allRooms,
+  GameDbDocument,
   initGameData,
   makeGameEtag,
   makeId,
   makeSalt,
 } from "@server/api/data";
-import { deanonymizeDecision, digestGameData } from "@server/api/transformers";
 import { STATUS } from "@server/api/status";
+import { deanonymizeDecision, digestGameData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
 import { makeDecision } from "@server/game/stateMachine";
 
@@ -20,7 +21,8 @@ games.use(jsonHandler());
 /******************************************************************************
  * ### POST games/
  *
- * Creates a new game from an existing room.
+ * Creates a new game from an existing room, and updates the room with the
+ * created game id.
  *
  * Only the room's "host" can start a game. Since none of the room's "guests"
  * should be able to see the host's id, the host's id used as a way to
@@ -39,16 +41,19 @@ games.post(
           .status(STATUS.notFound)
           .json({ message: `room ${req.body.roomId} not found` });
       }
-      const players = [room.data.host, ...room.data.guests]; // TODO!!! Randomize order.
+
+      const players = [room.data.host, ...room.data.guests];
+
       const { minNumPlayers } = CONSTANTS;
       if (players.length < minNumPlayers) {
         return res
           .status(STATUS.badRequest)
           .json({ message: `room does not have enough players` });
       }
+
       const now = new Date();
       const gameData = initGameData(players);
-      const gameDocument: (typeof allGames)[number] = {
+      const gameDocument: GameDbDocument = {
         _id: makeId(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
@@ -56,8 +61,10 @@ games.post(
         data: gameData,
       };
       allGames.push(gameDocument);
+
       room.gameId = gameDocument._id;
       room.updatedAt = now.toISOString();
+
       return res.status(STATUS.ok).json({ gameId: gameDocument._id });
     },
   }),
@@ -146,11 +153,10 @@ games.patch(
           .send({ message: `game ${req.params.id} not found` });
       }
 
-      const playerIds = game.data.players.map((p) => p.id);
       const decision = deanonymizeDecision({
         decision: req.body.decision,
         anonymizationSalt: game.anonymizationSalt,
-        playerIds,
+        playerIds: game.data.players.map((p) => p.id),
       });
 
       const nextGameData = makeDecision({

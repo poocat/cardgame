@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "crypto";
+import { CONSTANTS } from "@common/game/constants";
 import { ActionType, GameData } from "@common/game/types";
 import { CARDS } from "@server/game/cards/definitions";
-import { CONSTANTS } from "@common/game/constants";
 
 type DbDocumentMeta = {
   _id: string;
@@ -9,7 +9,7 @@ type DbDocumentMeta = {
   updatedAt: string;
   anonymizationSalt: string;
 };
-type GameDbDocument = DbDocumentMeta & {
+export type GameDbDocument = DbDocumentMeta & {
   data: GameData;
 };
 export const allGames: GameDbDocument[] = [];
@@ -19,7 +19,7 @@ export type RoomData = {
   host: PlayerData;
   guests: PlayerData[];
 };
-type RoomDbDocument = DbDocumentMeta & {
+export type RoomDbDocument = DbDocumentMeta & {
   gameId: string | null;
   data: RoomData;
 };
