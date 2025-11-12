@@ -3,8 +3,8 @@
  * each choice.
  */
 import { GameData } from "@common/game/types";
+import { initGameData } from "@server/api/data";
 import { makeDecision } from "@server/game/stateMachine";
-import { initGameData } from "@server/game/initGameData";
 
 function shuffle(array: any[]) {
   const copy = [...array];
@@ -66,5 +66,5 @@ mockGame(
     { id: "dick", name: "Dick" },
     { id: "jane", name: "Jane" },
   ]),
-  100,
+  1000,
 );
