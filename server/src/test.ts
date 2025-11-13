@@ -2,15 +2,15 @@
  * An incredibly clumsy first test, where players choose values randomly for
  * each choice.
  */
-import { GameData } from "@common/game/types";
+import { Decision, GameData } from "@common/game/types";
+import { initGameData } from "@server/api/data";
 import { makeDecision } from "@server/game/stateMachine";
-import { initGameData } from "@server/game/initGameData";
 
 function shuffle(array: any[]) {
   const copy = [...array];
   let currentIndex = array.length;
-  while (currentIndex != 0) {
-    let randomIndex = Math.floor(Math.random() * currentIndex);
+  while (currentIndex !== 0) {
+    const randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
     [copy[currentIndex], copy[randomIndex]] = [
       copy[randomIndex],
@@ -35,7 +35,7 @@ const mockGame = (initialGameData: GameData, numChoices: number) => {
     const randomizedValues = shuffle(currentChoice.values);
     // Always choose the maximum number of choices allowed from the beginning of
     // the list.
-    const decision = {
+    const decision: Decision = {
       name: currentChoice.name,
       playerId: gameData.activity.currentChoice.choosingPlayerId,
       values: randomizedValues.slice(
@@ -66,5 +66,5 @@ mockGame(
     { id: "dick", name: "Dick" },
     { id: "jane", name: "Jane" },
   ]),
-  100,
+  1000,
 );

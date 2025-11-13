@@ -1,17 +1,19 @@
 import { Router, json as jsonHandler } from "express";
-import { allRooms, makeId, makeRoomEtag } from "@server/api/data";
 import { ROUTES } from "@common/api/routes";
+import { CONSTANTS } from "@common/game/constants";
+import {
+  allRooms,
+  makeId,
+  makeRoomEtag,
+  makeSalt,
+  RoomDbDocument,
+} from "@server/api/data";
+import { STATUS } from "@server/api/status";
+import { digestRoomData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
-import { CONSTANTS } from "@server/game/rules/constants";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
-
-function makePlayerId(name: string, date: Date): string {
-  let id = `${name.trim().toLowerCase()}-${date.getTime().toString()}`;
-  id = id.replace(/[^a-zA-Z0-9]+/g, "-");
-  return id;
-}
 
 /******************************************************************************
  * ### POST rooms/
@@ -24,11 +26,12 @@ rooms.post(
     schemas: ROUTES.rooms.methods.post.schemas,
     handler: async (req, res) => {
       const now = new Date();
-      const hostId = makePlayerId(req.body.hostName, now);
-      const roomDocument: (typeof allRooms)[number] = {
-        _id: makeId(now),
+      const hostId = makeId();
+      const roomDocument: RoomDbDocument = {
+        _id: makeId(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
+        anonymizationSalt: makeSalt(),
         gameId: null,
         data: {
           host: {
@@ -39,7 +42,7 @@ rooms.post(
         },
       };
       allRooms.push(roomDocument);
-      res.status(200).json({ roomId: roomDocument._id, hostId: hostId });
+      res.status(STATUS.ok).json({ roomId: roomDocument._id, hostId: hostId });
     },
   }),
 );
@@ -51,10 +54,6 @@ rooms.post(
  *
  * A player's id can be passed as a query string, to indicate which player
  * is requesting the room state.
- *
- * TODO!!! Use the player id to redact certain parts of the room that the
- * player should not see. Each player's id should be secret to each other
- * player.
  ******************************************************************************/
 rooms.get(
   ROUTES.rooms.methods.getOne.path,
@@ -64,22 +63,25 @@ rooms.get(
       const room = allRooms.find((r) => r._id === req.params.id);
       if (!room) {
         return res
-          .status(404)
+          .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });
       }
       const etag = makeRoomEtag(room, req.query.playerId);
       if (req.get("If-None-Match") === etag) {
-        return res.status(304).end();
+        return res.status(STATUS.notModified).end();
       }
+
+      const digest = digestRoomData({
+        roomData: room.data,
+        anonymizationSalt: room.anonymizationSalt,
+        playerId: req.query.playerId,
+      });
+
       res.set("ETag", etag);
-      /**
-       * TODO!!! Anonymize other player IDs.
-       */
-      return res.status(200).json({
+      return res.status(STATUS.ok).json({
         roomId: room._id,
         gameId: room.gameId,
-        host: room.data.host,
-        guests: room.data.guests,
+        digest,
       });
     },
   }),
@@ -100,9 +102,8 @@ rooms.post(
     handler: async (req, res) => {
       const room = allRooms.find((r) => r._id === req.params.id);
       if (!room) {
-        // 404-Not Found
         return res
-          .status(404)
+          .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });
       }
 
@@ -111,28 +112,26 @@ rooms.post(
       const { maxNumPlayers } = CONSTANTS;
       const currentPlayers = [room.data.host, ...room.data.guests];
       if (currentPlayers.length >= maxNumPlayers) {
-        // 409-Conflict
-        return res.status(409).json({
+        return res.status(STATUS.conflict).json({
           message: `room already has ${maxNumPlayers} players`,
         });
       }
 
       const currentPlayerNames = currentPlayers.map((p) => p.name.trim());
       if (currentPlayerNames.includes(guestName.trim())) {
-        // 409-Conflict
-        return res.status(409).json({
+        return res.status(STATUS.conflict).json({
           message: `room already has player '${guestName}'`,
         });
       }
 
       const now = new Date();
       const guest = {
-        id: makePlayerId(guestName, now),
+        id: makeId(),
         name: guestName,
       };
       room.data.guests.push(guest);
       room.updatedAt = now.toISOString();
-      return res.status(200).json({ playerId: guest.id });
+      return res.status(STATUS.ok).json({ playerId: guest.id });
     },
   }),
 );

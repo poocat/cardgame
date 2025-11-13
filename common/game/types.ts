@@ -1,3 +1,12 @@
+import {
+  actionTypes,
+  activityTypes,
+  cardLocationTypes,
+  cardTypes,
+  chipLocationTypes,
+  choiceTypes,
+} from "@common/game/enums";
+
 /** Generic type for const arrays. Only used in other generic utility types. */
 type _LiteralArray = readonly string[];
 
@@ -19,7 +28,6 @@ type _DiscriminatedUnionFromArray<
 
 export type Id = string;
 
-const actionTypes = ["play", "ability", "discard"] as const;
 export type ActionType = _UnionFromArray<typeof actionTypes>;
 export type ActionTypeMap<T> = _MapFromArray<typeof actionTypes, T>;
 export type ActionData = _DiscriminatedUnionFromArray<
@@ -35,14 +43,12 @@ export type ActionData = _DiscriminatedUnionFromArray<
   }
 >;
 
-const chipLocationTypes = ["inReserve", "inChannel", "onCard"] as const;
 export type ChipLocationType = _UnionFromArray<typeof chipLocationTypes>;
 export type ChipLocationMap<T> = _MapFromArray<typeof chipLocationTypes, T>;
 export type ChipLocationData = _DiscriminatedUnionFromArray<
   typeof chipLocationTypes,
   {
     inReserve: {};
-    inChannel: {};
     onCard: { cardId: Id };
   }
 >;
@@ -52,7 +58,6 @@ export type ChipData = {
   location: ChipLocationData;
 };
 
-const cardLocationTypes = ["inDeck", "inHand", "inPlay", "inDiscard"] as const;
 export type CardLocationType = _UnionFromArray<typeof cardLocationTypes>;
 export type CardLocationMap<T> = _MapFromArray<typeof cardLocationTypes, T>;
 export type CardLocationData = _DiscriminatedUnionFromArray<
@@ -65,7 +70,6 @@ export type CardLocationData = _DiscriminatedUnionFromArray<
   }
 >;
 
-const cardTypes = ["producer", "consumer"] as const;
 export type CardType = _UnionFromArray<typeof cardTypes>;
 export type CardTypeMap<T> = _MapFromArray<typeof cardTypes, T>;
 export type CardData = _DiscriminatedUnionFromArray<
@@ -88,13 +92,6 @@ export type PlayerData = {
   turnCount: number;
 };
 
-const choiceTypes = [
-  "arbitrary",
-  "actionId",
-  "cardId",
-  "chipId",
-  "playerId",
-] as const;
 export type ChoiceType = _UnionFromArray<typeof choiceTypes>;
 export type ChoiceTypeMap<T> = _MapFromArray<typeof choiceTypes, T>;
 export type ChoiceValue = string;
@@ -122,11 +119,6 @@ export type NextChoiceData =
 
 export type Decision = { name: string; playerId: Id; values: ChoiceValue[] };
 
-const activityTypes = [
-  "drawingCards",
-  "choosingAction",
-  "takingAction",
-] as const;
 export type ActivityType = _UnionFromArray<typeof activityTypes>;
 export type ActivityTypeMap<T> = _MapFromArray<typeof activityTypes, T>;
 export type ActivityData = _DiscriminatedUnionFromArray<

@@ -41,12 +41,12 @@ export const Game = () => {
       }
     },
     getPollingEnabled: (data) =>
-      data.data.activity.currentChoice.choosingPlayerId !== playerId,
+      data.digest.activity.choice.choosingPlayerId !== playerId,
   });
 
   // Memoize the game state, as is only changes with the "last updated" time.
   const game = useMemo(() => {
-    return poller?.data?.data;
+    return poller?.data?.digest;
   }, [poller.data?.updatedAt]);
   const choosing = useMemo(() => !poller.polling, [poller.polling]);
 
@@ -56,7 +56,7 @@ export const Game = () => {
       const payload: GamesPatchRequestBody = {
         decision: {
           playerId: playerId,
-          name: game.activity?.currentChoice?.name ?? "",
+          name: game.activity?.choice?.name ?? "",
           values: choices,
         },
       };
@@ -95,23 +95,6 @@ export const Game = () => {
         <div>Not polling... {poller.error && `(${poller.error})`}</div>
       )}
       <>
-        {game && (
-          <div>
-            <label htmlFor="player-select">Playing As: </label>
-            <select
-              id="player-select"
-              value={playerId ?? ""}
-              onChange={(e) => setQuery({ playerId: e.target.value })}
-            >
-              {game.players.map((p: any) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-              <option value="">Spectator</option>
-            </select>
-          </div>
-        )}
         <hr />
         {game && (
           <PlayArea
@@ -129,7 +112,7 @@ export const Game = () => {
 
 const PlayArea = memo(
   (props: {
-    game: GamesGetOneResponseBody["data"];
+    game: GamesGetOneResponseBody["digest"];
     choosing: boolean;
     handleAddChoice: (value: string) => void;
     handleRemoveChoice: (value: string) => void;
@@ -140,23 +123,21 @@ const PlayArea = memo(
         <div>Current Activity: {JSON.stringify(props.game.activity)}</div>
         {props.choosing && (
           <div>
-            {(props.game.activity?.currentChoice?.values ?? []).map(
-              (v: any) => (
-                <div key={v}>
-                  <input
-                    id={v}
-                    value={v}
-                    type="checkbox"
-                    onChange={(e) =>
-                      e.target.checked
-                        ? props.handleAddChoice(v)
-                        : props.handleRemoveChoice(v)
-                    }
-                  />
-                  <label htmlFor={v}>{v}</label>
-                </div>
-              ),
-            )}
+            {(props.game.activity?.choice?.values ?? []).map((v: any) => (
+              <div key={v}>
+                <input
+                  id={v}
+                  value={v}
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked
+                      ? props.handleAddChoice(v)
+                      : props.handleRemoveChoice(v)
+                  }
+                />
+                <label htmlFor={v}>{v}</label>
+              </div>
+            ))}
             <div>
               <button onClick={props.handleSubmitChoices}>
                 Submit Choices

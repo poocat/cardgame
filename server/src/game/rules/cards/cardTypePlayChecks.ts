@@ -1,5 +1,5 @@
+import { CONSTANTS } from "@common/game/constants";
 import { CardData, CardTypeMap } from "@common/game/types";
-import { CONSTANTS } from "@server/game/rules/constants";
 import { GameState } from "@server/game/utils/GameState";
 import { CheckResult } from "@server/types";
 

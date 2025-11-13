@@ -47,7 +47,7 @@ export const Room = () => {
     getPollingEnabled: () => true, // Poll constantly
   });
 
-  const playerIsHost = poller.data?.host.id === playerId;
+  const playerIsHost = poller.data?.digest.host.id === playerId;
 
   const [guestName, setGuestName] = useState("");
 
@@ -124,9 +124,10 @@ export const Room = () => {
       {poller.data && (
         <div>
           <hr />
-          <div>Host: {poller.data.host.name}</div>
+          <div>Host: {poller.data.digest.host.name}</div>
           <div>
-            Guests: {poller.data.guests.map((guest) => guest.name).join(", ")}
+            Guests:{" "}
+            {poller.data.digest.guests.map((guest) => guest.name).join(", ")}
           </div>
         </div>
       )}
