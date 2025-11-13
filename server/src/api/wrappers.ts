@@ -4,9 +4,9 @@
 import { RequestHandler } from "express";
 import { z, ZodError, ZodObject, ZodRawShape } from "zod";
 
-export type ErrorResponseBody = { message: string };
+type ErrorResponseBody = { message: string };
 
-export type RouteSchemas = {
+type RouteSchemas = {
   requestBody?: ZodObject<ZodRawShape>;
   requestParams?: ZodObject<ZodRawShape>;
   requestQuery?: ZodObject<ZodRawShape>;

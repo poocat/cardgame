@@ -1,16 +1,22 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
-import {
-  allRooms,
-  makeId,
-  makeRoomEtag,
-  makeSalt,
-  RoomDbDocument,
-} from "@server/api/data";
+// import {
+//   allRooms,
+//   makeId,
+//   makeRoomEtag,
+//   makeSalt,
+//   RoomDbDocument,
+// } from "@server/api/data";
 import { STATUS } from "@server/api/status";
 import { digestRoomData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
+import {
+  findRoom,
+  insertRoomWithHost,
+  updateRoomAddGuest,
+} from "@server/db/collections/rooms";
+import { makeEtag } from "@server/db/meta";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
@@ -25,24 +31,8 @@ rooms.post(
   validated({
     schemas: ROUTES.rooms.methods.post.schemas,
     handler: async (req, res) => {
-      const now = new Date();
-      const hostId = makeId();
-      const roomDocument: RoomDbDocument = {
-        _id: makeId(),
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
-        anonymizationSalt: makeSalt(),
-        gameId: null,
-        data: {
-          host: {
-            id: hostId,
-            name: req.body.hostName,
-          },
-          guests: [],
-        },
-      };
-      allRooms.push(roomDocument);
-      res.status(STATUS.ok).json({ roomId: roomDocument._id, hostId: hostId });
+      const { roomId, hostId } = await insertRoomWithHost(req.body.hostName);
+      res.status(STATUS.ok).json({ roomId, hostId });
     },
   }),
 );
@@ -60,27 +50,28 @@ rooms.get(
   validated({
     schemas: ROUTES.rooms.methods.getOne.schemas,
     handler: async (req, res) => {
-      const room = allRooms.find((r) => r._id === req.params.id);
+      const { room } = await findRoom(req.params.id);
       if (!room) {
         return res
           .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });
       }
-      const etag = makeRoomEtag(room, req.query.playerId);
+
+      const etag = makeEtag(room.meta, req.query.playerId);
       if (req.get("If-None-Match") === etag) {
         return res.status(STATUS.notModified).end();
       }
 
       const digest = digestRoomData({
         roomData: room.data,
-        anonymizationSalt: room.anonymizationSalt,
+        anonymizationSalt: room.meta.anonymizationSalt,
         playerId: req.query.playerId,
       });
 
       res.set("ETag", etag);
       return res.status(STATUS.ok).json({
-        roomId: room._id,
-        gameId: room.gameId,
+        roomId: room.meta.id,
+        gameId: room.data.gameId,
         digest,
       });
     },
@@ -100,7 +91,7 @@ rooms.post(
   validated({
     schemas: ROUTES.rooms.methods.postGuest.schemas,
     handler: async (req, res) => {
-      const room = allRooms.find((r) => r._id === req.params.id);
+      const { room } = await findRoom(req.params.id);
       if (!room) {
         return res
           .status(STATUS.notFound)
@@ -124,14 +115,8 @@ rooms.post(
         });
       }
 
-      const now = new Date();
-      const guest = {
-        id: makeId(),
-        name: guestName,
-      };
-      room.data.guests.push(guest);
-      room.updatedAt = now.toISOString();
-      return res.status(STATUS.ok).json({ playerId: guest.id });
+      const { guestId } = await updateRoomAddGuest(room.meta.id, guestName);
+      return res.status(STATUS.ok).json({ playerId: guestId });
     },
   }),
 );

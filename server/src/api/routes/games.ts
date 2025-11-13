@@ -1,19 +1,20 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
-import {
-  allGames,
-  allRooms,
-  GameDbDocument,
-  initGameData,
-  makeGameEtag,
-  makeId,
-  makeSalt,
-} from "@server/api/data";
 import { STATUS } from "@server/api/status";
 import { deanonymizeDecision, digestGameData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
+import {
+  findGame,
+  findGames,
+  insertGame,
+  updateGameData,
+} from "@server/db/collections/games";
+import { findRoom, updateRoomGameId } from "@server/db/collections/rooms";
 import { makeDecision } from "@server/game/stateMachine";
+import { initGameData } from "@server/game/initGameData";
+import { GameData } from "@common/game/types";
+import { makeEtag } from "@server/db/meta";
 
 export const games = Router();
 games.use(jsonHandler());
@@ -33,13 +34,16 @@ games.post(
   validated({
     schemas: ROUTES.games.methods.post.schemas,
     handler: async (req, res) => {
-      const room = allRooms.find(
-        (r) => r._id === req.body.roomId && r.data.host.id === req.body.hostId,
-      );
+      const { room } = await findRoom(req.body.roomId);
+
       if (!room) {
         return res
           .status(STATUS.notFound)
           .json({ message: `room ${req.body.roomId} not found` });
+      } else if (room.data.host.id !== req.body.hostId) {
+        return res
+          .status(STATUS.forbidden)
+          .json({ message: `game can only be started by host` });
       }
 
       const players = [room.data.host, ...room.data.guests];
@@ -51,21 +55,11 @@ games.post(
           .json({ message: `room does not have enough players` });
       }
 
-      const now = new Date();
       const gameData = initGameData(players);
-      const gameDocument: GameDbDocument = {
-        _id: makeId(),
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
-        anonymizationSalt: makeSalt(),
-        data: gameData,
-      };
-      allGames.push(gameDocument);
+      const { gameId } = await insertGame(gameData);
+      await updateRoomGameId(room.meta.id, gameId);
 
-      room.gameId = gameDocument._id;
-      room.updatedAt = now.toISOString();
-
-      return res.status(STATUS.ok).json({ gameId: gameDocument._id });
+      return res.status(STATUS.ok).json({ gameId });
     },
   }),
 );
@@ -80,11 +74,14 @@ games.get(
   validated({
     schemas: ROUTES.games.methods.getMany.schemas,
     handler: async (_, res) => {
-      const games = allGames.map((g) => ({
-        gameId: g._id,
-        updatedAt: new Date(g.updatedAt).toISOString(),
+      const { games } = await findGames();
+
+      const items = games.map((g) => ({
+        gameId: g.meta.id,
+        updatedAt: g.meta.updatedAt,
       }));
-      res.status(STATUS.ok).json({ games });
+
+      res.status(STATUS.ok).json({ games: items });
     },
   }),
 );
@@ -92,7 +89,7 @@ games.get(
 /******************************************************************************
  * ### GET games/{id}?playerId={playerId}
  *
- * Used to get the full state of the game with the given id.
+ * Used to get the full digest of the game with the given id.
  *
  * Can poll this endpoint efficiently by setting "If-None-Match" header.
  *
@@ -104,28 +101,28 @@ games.get(
   validated({
     schemas: ROUTES.games.methods.getOne.schemas,
     handler: async (req, res) => {
-      const game = allGames.find((g) => g._id === req.params.id);
+      const { game } = await findGame(req.params.id);
       if (!game) {
         return res
           .status(STATUS.notFound)
           .send({ message: `game ${req.params.id} not found` });
       }
 
-      const etag = makeGameEtag(game, req.query.playerId);
+      const etag = makeEtag(game.meta, req.query.playerId);
       if (req.get("If-None-Match") === etag) {
         return res.status(STATUS.notModified).end();
       }
 
       const digest = digestGameData({
         gameData: game.data,
-        anonymizationSalt: game.anonymizationSalt,
+        anonymizationSalt: game.meta.anonymizationSalt,
         playerId: req.query.playerId,
       });
 
       res.set("ETag", etag);
       res.status(STATUS.ok).send({
-        gameId: game._id,
-        updatedAt: new Date(game.updatedAt).toISOString(),
+        gameId: game.meta.id,
+        updatedAt: new Date(game.meta.updatedAt).toISOString(),
         digest,
       });
     },
@@ -145,7 +142,7 @@ games.patch(
   validated({
     schemas: ROUTES.games.methods.patch.schemas,
     handler: async (req, res) => {
-      const game = allGames.find((g) => g._id === req.params.id);
+      const { game } = await findGame(req.params.id);
       if (!game) {
         // 404-Not Found
         return res
@@ -155,7 +152,7 @@ games.patch(
 
       const decision = deanonymizeDecision({
         decision: req.body.decision,
-        anonymizationSalt: game.anonymizationSalt,
+        anonymizationSalt: game.meta.anonymizationSalt,
         playerIds: game.data.players.map((p) => p.id),
       });
 
@@ -163,8 +160,8 @@ games.patch(
         gameData: game.data,
         decision,
       });
-      game.data = nextGameData;
-      game.updatedAt = new Date().toISOString();
+      await updateGameData(game.meta.id, nextGameData);
+
       res.status(STATUS.noContent).end();
     },
   }),

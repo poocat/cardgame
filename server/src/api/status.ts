@@ -7,6 +7,8 @@ export const STATUS = {
   notModified: 304,
   /** 400-Bad Request */
   badRequest: 400,
+  /** 403-Forbidden */
+  forbidden: 403,
   /** 404-Not Found */
   notFound: 404,
   /** 409-Conflict */

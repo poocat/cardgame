@@ -10,7 +10,7 @@ import {
   visibleCardDigestSchema,
 } from "@common/api/digests";
 import { CardData, Decision, GameData, Id } from "@common/game/types";
-import { RoomData } from "@server/api/data";
+import { RoomData } from "@server/db/collections/rooms";
 
 type GameDigest = z.infer<typeof gameDigestSchema>;
 type RoomDigest = z.infer<typeof roomDigestSchema>;
