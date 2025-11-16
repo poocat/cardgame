@@ -3,7 +3,7 @@
  * each choice.
  */
 import { Decision, GameData } from "@common/game/types";
-import { initGameData } from "@server/api/data";
+import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
 
 function shuffle(array: any[]) {

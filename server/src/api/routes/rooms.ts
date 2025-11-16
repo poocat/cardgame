@@ -1,16 +1,11 @@
 import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
-import {
-  allRooms,
-  makeId,
-  makeRoomEtag,
-  makeSalt,
-  RoomDbDocument,
-} from "@server/api/data";
 import { STATUS } from "@server/api/status";
 import { digestRoomData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
+import { makeId, makeMetaHash } from "@server/db/meta";
+import { getRepositories } from "@server/db/database";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
@@ -25,24 +20,27 @@ rooms.post(
   validated({
     schemas: ROUTES.rooms.methods.post.schemas,
     handler: async (req, res) => {
-      const now = new Date();
+      const { rooms: roomRepo } = getRepositories();
+
       const hostId = makeId();
-      const roomDocument: RoomDbDocument = {
-        _id: makeId(),
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
-        anonymizationSalt: makeSalt(),
-        gameId: null,
+      const room = await roomRepo.insertOne({
         data: {
+          gameId: null,
           host: {
             id: hostId,
             name: req.body.hostName,
           },
           guests: [],
         },
-      };
-      allRooms.push(roomDocument);
-      res.status(STATUS.ok).json({ roomId: roomDocument._id, hostId: hostId });
+      });
+
+      if (!room) {
+        return res
+          .status(STATUS.internalServerError)
+          .json({ message: `could not insert room` });
+      }
+
+      res.status(STATUS.ok).json({ roomId: room.meta.id, hostId });
     },
   }),
 );
@@ -60,27 +58,40 @@ rooms.get(
   validated({
     schemas: ROUTES.rooms.methods.getOne.schemas,
     handler: async (req, res) => {
-      const room = allRooms.find((r) => r._id === req.params.id);
+      const { rooms: roomRepo } = getRepositories();
+
+      const projected = await roomRepo.findOne({
+        id: req.params.id,
+        metaOnly: true,
+      });
+      if (!projected) {
+        return res
+          .status(STATUS.notFound)
+          .json({ message: `room ${req.params.id} not found` });
+      }
+
+      const etag = makeMetaHash(projected.meta, req.query.playerId);
+      if (req.get("If-None-Match") === etag) {
+        return res.status(STATUS.notModified).end();
+      }
+
+      const room = await roomRepo.findOne({ id: req.params.id });
       if (!room) {
         return res
           .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });
       }
-      const etag = makeRoomEtag(room, req.query.playerId);
-      if (req.get("If-None-Match") === etag) {
-        return res.status(STATUS.notModified).end();
-      }
 
       const digest = digestRoomData({
         roomData: room.data,
-        anonymizationSalt: room.anonymizationSalt,
+        anonymizationSalt: room.meta.salt,
         playerId: req.query.playerId,
       });
 
       res.set("ETag", etag);
       return res.status(STATUS.ok).json({
-        roomId: room._id,
-        gameId: room.gameId,
+        roomId: room.meta.id,
+        gameId: room.data.gameId,
         digest,
       });
     },
@@ -100,7 +111,9 @@ rooms.post(
   validated({
     schemas: ROUTES.rooms.methods.postGuest.schemas,
     handler: async (req, res) => {
-      const room = allRooms.find((r) => r._id === req.params.id);
+      const { rooms: roomRepo } = getRepositories();
+
+      const room = await roomRepo.findOne({ id: req.params.id });
       if (!room) {
         return res
           .status(STATUS.notFound)
@@ -124,14 +137,26 @@ rooms.post(
         });
       }
 
-      const now = new Date();
-      const guest = {
-        id: makeId(),
-        name: guestName,
+      const guestId = makeId();
+      const roomData = {
+        ...room.data,
+        guests: [
+          ...room.data.guests,
+          { id: guestId, name: req.body.guestName },
+        ],
       };
-      room.data.guests.push(guest);
-      room.updatedAt = now.toISOString();
-      return res.status(STATUS.ok).json({ playerId: guest.id });
+      const result = await roomRepo.updateOne({
+        id: req.params.id,
+        version: room.meta.version,
+        data: roomData,
+      });
+      if (result.matchedCount === 0) {
+        return res
+          .status(STATUS.conflict)
+          .json({ message: `room already updated, please retry` });
+      }
+
+      return res.status(STATUS.ok).json({ playerId: guestId });
     },
   }),
 );
