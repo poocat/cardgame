@@ -1,5 +1,7 @@
 import { MongoClient, Db, Collection } from "mongodb";
 import { CONFIG } from "@server/config";
+import { GameDoc, RoomDoc } from "./types";
+import { Repo } from "./utils/Repo";
 
 const collectionNames = {
   games: "games",
@@ -21,9 +23,12 @@ export async function initDb() {
   }
 }
 
-export function getCollection(name: CollectionName): Collection {
+export function getRepositories() {
   if (!db) {
     throw new Error("Database not initialized.");
   }
-  return db.collection(collectionNames[name]);
+  return {
+    games: new Repo(db.collection<GameDoc>("games")),
+    rooms: new Repo(db.collection<RoomDoc>("rooms")),
+  };
 }

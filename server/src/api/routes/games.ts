@@ -4,17 +4,10 @@ import { CONSTANTS } from "@common/game/constants";
 import { STATUS } from "@server/api/status";
 import { deanonymizeDecision, digestGameData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
-import {
-  findGame,
-  findGames,
-  insertGame,
-  updateGameData,
-} from "@server/db/collections/games";
-import { findRoom, updateRoomGameId } from "@server/db/collections/rooms";
 import { makeDecision } from "@server/game/stateMachine";
 import { initGameData } from "@server/game/initGameData";
-import { GameData } from "@common/game/types";
-import { makeEtag } from "@server/db/meta";
+import { makeMetaHash } from "@server/db/meta";
+import { getRepositories } from "@server/db/database";
 
 export const games = Router();
 games.use(jsonHandler());
@@ -34,7 +27,8 @@ games.post(
   validated({
     schemas: ROUTES.games.methods.post.schemas,
     handler: async (req, res) => {
-      const { room } = await findRoom(req.body.roomId);
+      const { rooms: roomRepo, games: gameRepo } = getRepositories();
+      const room = await roomRepo.findOne({ id: req.body.roomId });
 
       if (!room) {
         return res
@@ -56,10 +50,18 @@ games.post(
       }
 
       const gameData = initGameData(players);
-      const { gameId } = await insertGame(gameData);
-      await updateRoomGameId(room.meta.id, gameId);
+      const game = await gameRepo.insertOne({ data: gameData });
 
-      return res.status(STATUS.ok).json({ gameId });
+      if (!game) {
+        return res
+          .status(STATUS.internalServerError)
+          .json({ message: `failed to insert game` });
+      }
+
+      const roomData = { ...room.data, gameId: game.meta.id };
+      await roomRepo.updateOne({ id: room.meta.id, data: roomData });
+
+      return res.status(STATUS.ok).json({ gameId: game.meta.id });
     },
   }),
 );
@@ -74,7 +76,9 @@ games.get(
   validated({
     schemas: ROUTES.games.methods.getMany.schemas,
     handler: async (_, res) => {
-      const { games } = await findGames();
+      const { games: gameRepo } = getRepositories();
+
+      const games = await gameRepo.findMany({ metaOnly: true });
 
       const items = games.map((g) => ({
         gameId: g.meta.id,
@@ -101,21 +105,33 @@ games.get(
   validated({
     schemas: ROUTES.games.methods.getOne.schemas,
     handler: async (req, res) => {
-      const { game } = await findGame(req.params.id);
+      const { games: gameRepo } = getRepositories();
+
+      const projected = await gameRepo.findOne({
+        id: req.params.id,
+        metaOnly: true,
+      });
+      if (!projected) {
+        return res
+          .status(STATUS.notFound)
+          .send({ message: `game ${req.params.id} not found` });
+      }
+
+      const etag = makeMetaHash(projected.meta, req.query.playerId);
+      if (req.get("If-None-Match") === etag) {
+        return res.status(STATUS.notModified).end();
+      }
+
+      const game = await gameRepo.findOne({ id: req.params.id });
       if (!game) {
         return res
           .status(STATUS.notFound)
           .send({ message: `game ${req.params.id} not found` });
       }
 
-      const etag = makeEtag(game.meta, req.query.playerId);
-      if (req.get("If-None-Match") === etag) {
-        return res.status(STATUS.notModified).end();
-      }
-
       const digest = digestGameData({
         gameData: game.data,
-        anonymizationSalt: game.meta.anonymizationSalt,
+        anonymizationSalt: game.meta.salt,
         playerId: req.query.playerId,
       });
 
@@ -142,7 +158,9 @@ games.patch(
   validated({
     schemas: ROUTES.games.methods.patch.schemas,
     handler: async (req, res) => {
-      const { game } = await findGame(req.params.id);
+      const { games: gameRepo } = getRepositories();
+
+      const game = await gameRepo.findOne({ id: req.params.id });
       if (!game) {
         // 404-Not Found
         return res
@@ -152,7 +170,7 @@ games.patch(
 
       const decision = deanonymizeDecision({
         decision: req.body.decision,
-        anonymizationSalt: game.meta.anonymizationSalt,
+        anonymizationSalt: game.meta.salt,
         playerIds: game.data.players.map((p) => p.id),
       });
 
@@ -160,7 +178,16 @@ games.patch(
         gameData: game.data,
         decision,
       });
-      await updateGameData(game.meta.id, nextGameData);
+
+      const result = await gameRepo.updateOne({
+        id: game.meta.id,
+        data: nextGameData,
+      });
+      if (result.matchedCount === 0) {
+        return res
+          .status(STATUS.internalServerError)
+          .json({ message: `could not update game` });
+      }
 
       res.status(STATUS.noContent).end();
     },
