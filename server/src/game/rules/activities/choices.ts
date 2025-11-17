@@ -11,7 +11,7 @@ import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeChecks } from "@server/game/rules/actions";
 import { Decisions } from "@server/game/utils/Decisions";
 import { GameState } from "@server/game/utils/GameState";
-import { ActionContext, ChoiceDef } from "@server/types";
+import { ActionContext, ChoiceDef } from "@server/game/types";
 
 /******************************************************************************
  * Use to generate a "null choice", which signals to the state machine that the

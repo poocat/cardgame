@@ -1,5 +1,5 @@
 import { ActionTypeMap } from "@common/game/types";
-import { ActionContext, IMutator } from "@server/types";
+import { ActionContext, IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ### Automatic Effects by Action Type

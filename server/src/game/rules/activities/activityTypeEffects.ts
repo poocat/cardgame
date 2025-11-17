@@ -3,7 +3,7 @@ import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeDefaultEffects } from "@server/game/rules/actions";
 import { Decisions } from "@server/game/utils/Decisions";
 import { GameState } from "@server/game/utils/GameState";
-import { ActionContext, IMutator } from "@server/types";
+import { ActionContext, IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ### Automatic Effects by Activity Type

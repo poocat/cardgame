@@ -1,7 +1,7 @@
 import { CONSTANTS } from "@common/game/constants";
 import { CardData, CardTypeMap } from "@common/game/types";
 import { GameState } from "@server/game/utils/GameState";
-import { CheckResult } from "@server/types";
+import { CheckResult } from "@server/game/types";
 
 /******************************************************************************
  * ## "Play Card" Action Checks by Card Type

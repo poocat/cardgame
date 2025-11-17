@@ -1,5 +1,5 @@
 import { Mutator } from "@server/game/utils";
-import { IMutator, MutatorArgs } from "@server/types";
+import { IMutator, MutatorArgs } from "@server/game/types";
 
 type QueueItem = {
   [K in keyof MutatorArgs]: { method: K; args: MutatorArgs[K] };

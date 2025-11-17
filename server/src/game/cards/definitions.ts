@@ -4,7 +4,7 @@
  * One day, will come up with a schema to replace callbacks with serializable
  * objects...
  */
-import { CardDef } from "@server/types";
+import { CardDef } from "@server/game/types";
 
 export const CARDS: CardDef[] = [
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

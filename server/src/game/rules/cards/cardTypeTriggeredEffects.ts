@@ -1,6 +1,6 @@
 import { CardData, CardTypeMap } from "@common/game/types";
 import { GameState } from "@server/game/utils/GameState";
-import { IMutator } from "@server/types";
+import { IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ### Automatic Triggers by Card Type

@@ -1,6 +1,6 @@
 import { getCardDefinition } from "@server/game/cards/utils";
 import { GameState } from "@server/game/utils";
-import { ActionContext, IMutator } from "@server/types";
+import { ActionContext, IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ### Trigger Effects for Cards in Play

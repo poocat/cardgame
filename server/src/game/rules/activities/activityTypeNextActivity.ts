@@ -1,7 +1,7 @@
 import { CONSTANTS } from "@common/game/constants";
 import { ActivityTypeMap, Decision, PlayerData } from "@common/game/types";
 import { GameState } from "@server/game/utils/GameState";
-import { IMutator } from "@server/types";
+import { IMutator } from "@server/game/types";
 import {
   createChoosingActionChoice,
   createDrawingCardsChoice,
