@@ -1,17 +1,17 @@
 import { Collection, DeleteResult, UpdateResult } from "mongodb";
 import { makeDocumentMeta } from "@server/db/meta";
 import {
-  IRepo,
+  IRepository,
   OrderByMeta,
-  ProjectedRepoDoc,
-  RepoDoc,
+  ProjectedRepositoryDoc,
+  RepositoryDoc,
 } from "@server/db/types";
 import { Queries } from "@server/db/utils/Queries";
 
-export class Repo<TData> implements IRepo<TData> {
+export class Repository<TData> implements IRepository<TData> {
   queries: Queries<TData>;
 
-  constructor(protected readonly collection: Collection<RepoDoc<TData>>) {
+  constructor(protected readonly collection: Collection<RepositoryDoc<TData>>) {
     this.collection = collection;
     this.queries = new Queries();
   }
@@ -20,18 +20,18 @@ export class Repo<TData> implements IRepo<TData> {
   async findOne(args: {
     id: string;
     metaOnly: true;
-  }): Promise<Pick<RepoDoc<TData>, "meta"> | null>;
+  }): Promise<Pick<RepositoryDoc<TData>, "meta"> | null>;
 
   // Overload for when metaOnly is false or undefined (the default case)
   async findOne(args: {
     id: string;
     metaOnly?: false;
-  }): Promise<RepoDoc<TData> | null>;
+  }): Promise<RepositoryDoc<TData> | null>;
 
   async findOne<TMetaOnly extends boolean>(args: {
     id: string;
     metaOnly?: TMetaOnly;
-  }): Promise<ProjectedRepoDoc<TData, TMetaOnly> | null> {
+  }): Promise<ProjectedRepositoryDoc<TData, TMetaOnly> | null> {
     const query = this.queries.findOne(args);
     const result = await this.collection.findOne(query.filter, query.options);
     return result;
@@ -41,25 +41,25 @@ export class Repo<TData> implements IRepo<TData> {
   async findMany(args: {
     metaOnly: true;
     orderBy?: OrderByMeta;
-  }): Promise<Pick<RepoDoc<TData>, "meta">[]>;
+  }): Promise<Pick<RepositoryDoc<TData>, "meta">[]>;
 
   // Overload for when metaOnly is false or undefined (the default case)
   async findMany(args: {
     metaOnly?: false;
     orderBy?: OrderByMeta;
-  }): Promise<RepoDoc<TData>[]>;
+  }): Promise<RepositoryDoc<TData>[]>;
 
   async findMany<TMetaOnly extends boolean>(args: {
     metaOnly?: TMetaOnly;
     orderBy?: OrderByMeta;
-  }): Promise<ProjectedRepoDoc<TData, TMetaOnly>[]> {
+  }): Promise<ProjectedRepositoryDoc<TData, TMetaOnly>[]> {
     const query = this.queries.findMany(args);
     const cursor = await this.collection.find(query.filter, query.options);
     if (query.sort) cursor.sort(query.sort);
     return cursor.toArray();
   }
 
-  async insertOne(args: { data: TData }): Promise<RepoDoc<TData> | null> {
+  async insertOne(args: { data: TData }): Promise<RepositoryDoc<TData> | null> {
     const doc = {
       meta: makeDocumentMeta(),
       data: args.data,
