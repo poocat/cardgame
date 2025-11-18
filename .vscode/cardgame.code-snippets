@@ -7,7 +7,7 @@
             " * ### $0",
             " ******************************************************************************/"
         ],
-        "description": "Use only from first column in line."
+        "description": "Use only from first column in line to make a comment header."
     },
     "Comment Header 2": {
         "scope": "javascript,typescript",
@@ -17,6 +17,16 @@
             " * $0",
             " ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */"
         ],
-        "description": "Use only when indented 2 spaces."
+        "description": "Use only when indented 2 spaces to make a comment header."
+    },
+    "Comment Divider": {
+        "scope": "javascript,typescript",
+        "prefix": "cdiv1",
+        "body": [
+            "////////////////////////////////////////////////////////////////////////////////",
+            "// $0",
+            "////////////////////////////////////////////////////////////////////////////////",
+        ],
+        "description": "Use only from first column in line to form a divider."
     }
 }
