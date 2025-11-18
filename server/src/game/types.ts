@@ -12,7 +12,7 @@ import {
   Id,
   PlayerData,
 } from "@server/types";
-import { Decisions } from "@server/game/utils";
+import { Decisions } from "@server/game/runtime";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Utility types

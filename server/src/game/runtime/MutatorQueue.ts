@@ -1,4 +1,4 @@
-import { Mutator } from "@server/game/utils";
+import { Mutator } from "@server/game/runtime";
 import { IMutator, MutatorArgs } from "@server/game/types";
 
 type QueueItem = {

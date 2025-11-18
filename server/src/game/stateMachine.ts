@@ -5,7 +5,7 @@ import {
   activityTypeNextActivity,
   activityTypeTriggeredEffects,
 } from "@server/game/rules/activities";
-import { Accessor, Next } from "@server/game/utils";
+import { Accessor, Next } from "@server/game/runtime";
 import { triggeredEffects } from "@server/game/rules/cards/triggeredEffects";
 
 /******************************************************************************

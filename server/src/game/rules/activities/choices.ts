@@ -9,7 +9,7 @@ import {
 } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeChecks } from "@server/game/rules/actions";
-import { Decisions } from "@server/game/utils/Decisions";
+import { Decisions } from "@server/game/runtime/Decisions";
 import { ActionContext, ChoiceDef, IAccessor } from "@server/game/types";
 
 /******************************************************************************

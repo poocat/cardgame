@@ -6,7 +6,7 @@ import {
   ProjectedRepositoryDoc,
   RepositoryDoc,
 } from "@server/db/types";
-import { Queries } from "@server/db/utils/Queries";
+import { Queries } from "@server/db/repository/Queries";
 
 export class Repository<TData> implements IRepository<TData> {
   queries: Queries<TData>;

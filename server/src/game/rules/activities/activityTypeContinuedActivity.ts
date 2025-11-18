@@ -5,7 +5,7 @@ import {
   NextChoiceData,
 } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
-import { Decisions } from "@server/game/utils/Decisions";
+import { Decisions } from "@server/game/runtime/Decisions";
 import {
   createActionChoices,
   nullChoice,

@@ -1,7 +1,7 @@
 import { ActivityData, ActivityTypeMap, Decision } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeDefaultEffects } from "@server/game/rules/actions";
-import { Decisions } from "@server/game/utils/Decisions";
+import { Decisions } from "@server/game/runtime/Decisions";
 import { ActionContext, IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
