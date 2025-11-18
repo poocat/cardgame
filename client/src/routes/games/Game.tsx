@@ -44,7 +44,7 @@ export const Game = () => {
       data.digest.activity.choice.choosingPlayerId !== playerId,
   });
 
-  // Memoize the game state, as is only changes with the "last updated" time.
+  // Memoize the game data, as is only changes with the "last updated" time.
   const game = useMemo(() => {
     return poller?.data?.digest;
   }, [poller.data?.updatedAt]);

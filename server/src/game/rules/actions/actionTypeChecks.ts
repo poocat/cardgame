@@ -9,16 +9,16 @@ import { CheckResult, IAccessor } from "@server/game/types";
  * on its type.
  ******************************************************************************/
 export const actionTypeChecks: ActionTypeMap<
-  (args: { actionData: ActionData; gameState: IAccessor }) => CheckResult
+  (args: { actionData: ActionData; accessor: IAccessor }) => CheckResult
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * "Play" actions can only be taken on cards that are in the player's hand.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  play: ({ actionData, gameState }) => {
-    const matchingCard = gameState.getCardById({ cardId: actionData.card.id });
+  play: ({ actionData, accessor }) => {
+    const matchingCard = accessor.getCardById({ cardId: actionData.card.id });
     const reasons: string[] = [];
     const result = cardTypePlayChecks[matchingCard.type]({
-      gameState,
+      accessor,
       cardData: matchingCard,
     });
     if (!result.ok) {
@@ -38,8 +38,8 @@ export const actionTypeChecks: ActionTypeMap<
    * "Ability" actions can only be taken when the card is in play, and the card
    * is not exhausted.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  ability: ({ actionData, gameState }) => {
-    const matchingCard = gameState.getCardById({ cardId: actionData.card.id });
+  ability: ({ actionData, accessor }) => {
+    const matchingCard = accessor.getCardById({ cardId: actionData.card.id });
     const reasons: string[] = [];
     if (!matchingCard) {
       reasons.push("Card belonging to action not in game.");
@@ -59,8 +59,8 @@ export const actionTypeChecks: ActionTypeMap<
    * "Discard" actions can only be taken when the card is in play, and the card
    * is not exhausted.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  discard: ({ actionData, gameState }) => {
-    const matchingCard = gameState.getCardById({ cardId: actionData.card.id });
+  discard: ({ actionData, accessor }) => {
+    const matchingCard = accessor.getCardById({ cardId: actionData.card.id });
     const reasons: string[] = [];
     if (!matchingCard) {
       reasons.push("Card belonging to action not in game.");

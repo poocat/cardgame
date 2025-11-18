@@ -20,7 +20,7 @@ import { IAccessor } from "@server/game/types";
  ******************************************************************************/
 export const activityTypeContinuedActivity: ActivityTypeMap<
   (args: {
-    gameState: IAccessor;
+    accessor: IAccessor;
     currentActivity: ActivityData;
     currentDecisions: Decision[];
   }) => ActivityData
@@ -35,7 +35,7 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
       `'${currentActivity.type}' activities must only have one choice`,
     );
   },
-  takingAction: ({ gameState, currentActivity, currentDecisions }) => {
+  takingAction: ({ accessor, currentActivity, currentDecisions }) => {
     if (currentActivity.type !== "takingAction") {
       throw new Error(
         `Expected a 'takingAction' activity type, found '${currentActivity.type}.'`,
@@ -51,7 +51,7 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
     };
     const nextChoice = currentActivity.nextChoices[0];
     if (nextChoice.type === "dependent") {
-      const action = gameState.getActionById({
+      const action = accessor.getActionById({
         actionId: currentActivity.actionId,
       });
       const actionDef = getActionDefinition({
@@ -66,7 +66,7 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
       }
       const nextActionChoices = createActionChoices({
         choiceDef,
-        gameState: gameState,
+        accessor: accessor,
         currentDecisions: new Decisions(currentDecisions),
         actionContext: {
           cardId: action.card.id,

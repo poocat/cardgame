@@ -16,8 +16,8 @@ import {
 export const activityTypeNextActivity: ActivityTypeMap<
   (args: {
     playerData: PlayerData;
-    /** This game state should have already been mutated by the effects of the given activity. */
-    gameState: IAccessor;
+    /** This game data should have already been mutated by the effects of the given activity. */
+    accessor: IAccessor;
     currentDecisions: Decision[];
     mutator: IMutator;
   }) => void
@@ -29,12 +29,12 @@ export const activityTypeNextActivity: ActivityTypeMap<
    * However, at the beginning of the game, repeat the "drawing cards" activity
    * until the entire opening hand is drawn.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  drawingCards: ({ playerData, gameState, mutator }) => {
-    const cardsInHand = gameState.getCards({
+  drawingCards: ({ playerData, accessor, mutator }) => {
+    const cardsInHand = accessor.getCards({
       playerIds: [playerData.id],
       locationTypes: ["inHand"],
     });
-    const cardsInDeck = gameState.getCards({
+    const cardsInDeck = accessor.getCards({
       playerIds: [playerData.id],
       locationTypes: ["inDeck"],
     });
@@ -49,7 +49,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
           type: "drawingCards",
           currentChoice: createDrawingCardsChoice({
             playerId: playerData.id,
-            gameState,
+            accessor,
           }),
           nextChoices: [],
           previousDecisions: [],
@@ -63,7 +63,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
           playerChoosingActionId: playerData.id,
           currentChoice: createChoosingActionChoice({
             playerId: playerData.id,
-            gameState,
+            accessor,
           }),
           nextChoices: [],
           previousDecisions: [],
@@ -80,32 +80,32 @@ export const activityTypeNextActivity: ActivityTypeMap<
    * If one value is chosen, it is the action that should be taken, and thus,
    * the action definition must be used to generate the next set of choices.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  choosingAction: ({ playerData, gameState, currentDecisions, mutator }) => {
+  choosingAction: ({ playerData, accessor, currentDecisions, mutator }) => {
     const actionIds = currentDecisions[0].values ?? [];
     if (actionIds.length === 0) {
       // If nothing was chosen, then it's time to pass the turn.
-      const playerIndex = gameState.players.findIndex(
+      const playerIndex = accessor.players.findIndex(
         (p) => p.id === playerData.id,
       );
-      const nextPlayerIndex = (playerIndex + 1) % gameState.players.length;
-      const nextPlayerData = gameState.players[nextPlayerIndex];
+      const nextPlayerIndex = (playerIndex + 1) % accessor.players.length;
+      const nextPlayerData = accessor.players[nextPlayerIndex];
       mutator.passTurn({ from: playerData.id, to: nextPlayerData.id });
       mutator.setActivity({
         activity: {
           type: "drawingCards",
           currentChoice: createDrawingCardsChoice({
             playerId: nextPlayerData.id,
-            gameState,
+            accessor,
           }),
           nextChoices: [],
           previousDecisions: [],
         },
       });
     } else if (actionIds.length === 1) {
-      const actionData = gameState.getActionById({ actionId: actionIds[0] });
+      const actionData = accessor.getActionById({ actionId: actionIds[0] });
       const choices = createTakingActionChoices({
         playerData,
-        gameState,
+        accessor,
         actionData,
         decisions: currentDecisions,
       });
@@ -128,14 +128,14 @@ export const activityTypeNextActivity: ActivityTypeMap<
    * Every "taking action" activity should be followed by a "choosing action"
    * activity.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  takingAction: ({ playerData, gameState, mutator }) => {
+  takingAction: ({ playerData, accessor, mutator }) => {
     mutator.setActivity({
       activity: {
         type: "choosingAction",
         playerChoosingActionId: playerData.id,
         currentChoice: createChoosingActionChoice({
           playerId: playerData.id,
-          gameState,
+          accessor,
         }),
         nextChoices: [],
         previousDecisions: [],

@@ -25,8 +25,8 @@ export const CARDS: CardDef[] = [
                 "Move up to one chip from your reserve to this card.",
               min: 0,
               max: 1,
-              getValues: ({ gameState, context }) => {
-                return gameState
+              getValues: ({ accessor, context }) => {
+                return accessor
                   .getPlayerChipsInReserve({
                     playerId: context.choosingPlayerId,
                   })
@@ -55,8 +55,8 @@ export const CARDS: CardDef[] = [
       play: {
         instructions: "Bring into play with 1 chip from one of your producers.",
         sequence: {
-          check: ({ gameState, context }) => {
-            const candidates = gameState.getCards({
+          check: ({ accessor, context }) => {
+            const candidates = accessor.getCards({
               playerIds: [context.playerTakingActionId],
               types: ["producer"],
               minChips: 1,
@@ -78,14 +78,14 @@ export const CARDS: CardDef[] = [
                 "Move one chip from one of your producers onto this card.",
               min: 1,
               max: 1,
-              getValues: ({ gameState, context }) => {
-                const producersInPlayIds = gameState
+              getValues: ({ accessor, context }) => {
+                const producersInPlayIds = accessor
                   .getCards({
                     playerIds: [context.choosingPlayerId],
                     types: ["producer"],
                   })
                   .map((c) => c.id);
-                return gameState.chips
+                return accessor.chips
                   .filter(
                     (c) =>
                       c.location.type === "onCard" &&
@@ -107,8 +107,8 @@ export const CARDS: CardDef[] = [
         instructions:
           "Move one chip from this card to one of your producers in play.",
         sequence: {
-          check: ({ gameState, context }) => {
-            const candidates = gameState.getCards({
+          check: ({ accessor, context }) => {
+            const candidates = accessor.getCards({
               playerIds: [context.playerTakingActionId],
               types: ["producer"],
               locationTypes: ["inPlay"],
@@ -129,8 +129,8 @@ export const CARDS: CardDef[] = [
               instructions: "Choose one of your producer cards.",
               min: 1,
               max: 1,
-              getValues: ({ gameState, context }) => {
-                return gameState
+              getValues: ({ accessor, context }) => {
+                return accessor
                   .getCards({
                     playerIds: [context.choosingPlayerId],
                     locationTypes: ["inPlay"],
@@ -145,8 +145,8 @@ export const CARDS: CardDef[] = [
               instructions: "Choose a chip from this card.",
               min: 1,
               max: 1,
-              getValues: ({ gameState, context }) => {
-                return gameState
+              getValues: ({ accessor, context }) => {
+                return accessor
                   .getChipsOnCard({ cardId: context.cardId })
                   .map((c) => c.id);
               },
@@ -184,13 +184,13 @@ export const CARDS: CardDef[] = [
               instructions: "Choose up to 1 of the chips in your reserve.",
               min: 0,
               max: 1,
-              getChoosingPlayers: ({ gameState }) =>
-                gameState.players
+              getChoosingPlayers: ({ accessor }) =>
+                accessor.players
                   .filter((p) => {
-                    const chipsInReserve = gameState.getPlayerChipsInReserve({
+                    const chipsInReserve = accessor.getPlayerChipsInReserve({
                       playerId: p.id,
                     });
-                    const consumersInPlay = gameState.getCards({
+                    const consumersInPlay = accessor.getCards({
                       playerIds: [p.id],
                       locationTypes: ["inPlay"],
                       types: ["consumer"],
@@ -200,8 +200,8 @@ export const CARDS: CardDef[] = [
                     );
                   })
                   .map((p) => p.id),
-              getValues: ({ gameState, context }) => {
-                return gameState
+              getValues: ({ accessor, context }) => {
+                return accessor
                   .getPlayerChipsInReserve({
                     playerId: context.choosingPlayerId,
                   })
@@ -216,8 +216,8 @@ export const CARDS: CardDef[] = [
               max: 1,
               getChoosingPlayers: ({ currentDecisions }) =>
                 currentDecisions.getPlayerIds("targetChip"),
-              getValues: ({ gameState, context }) =>
-                gameState
+              getValues: ({ accessor, context }) =>
+                accessor
                   .getCards({
                     playerIds: [context.choosingPlayerId],
                     locationTypes: ["inPlay"],
@@ -259,8 +259,8 @@ export const CARDS: CardDef[] = [
               instructions: "Choose up to 1 of the chips in your reserve.",
               min: 0,
               max: 1,
-              getValues: ({ gameState, context }) => {
-                return gameState
+              getValues: ({ accessor, context }) => {
+                return accessor
                   .getPlayerChipsInReserve({
                     playerId: context.choosingPlayerId,
                   })
@@ -280,8 +280,8 @@ export const CARDS: CardDef[] = [
         instructions:
           "Move one chip from this card to one of your other consumers in play.",
         sequence: {
-          check: ({ gameState, context }) => {
-            const candidates = gameState.getCards({
+          check: ({ accessor, context }) => {
+            const candidates = accessor.getCards({
               playerIds: [context.playerTakingActionId],
               locationTypes: ["inPlay"],
               types: ["consumer"],
@@ -303,8 +303,8 @@ export const CARDS: CardDef[] = [
               instructions: "Choose one of your consumer cards.",
               min: 1,
               max: 1,
-              getValues: ({ gameState, context }) => {
-                return gameState
+              getValues: ({ accessor, context }) => {
+                return accessor
                   .getCards({
                     playerIds: [context.playerTakingActionId],
                     locationTypes: ["inPlay"],
@@ -320,8 +320,8 @@ export const CARDS: CardDef[] = [
               instructions: "Choose a chip from this card.",
               min: 1,
               max: 1,
-              getValues: ({ gameState, context }) => {
-                return gameState
+              getValues: ({ accessor, context }) => {
+                return accessor
                   .getChipsOnCard({ cardId: context.cardId })
                   .map((c) => c.id);
               },

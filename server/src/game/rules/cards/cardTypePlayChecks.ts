@@ -9,14 +9,14 @@ import { CheckResult, IAccessor } from "@server/game/types";
  * play.
  ******************************************************************************/
 export const cardTypePlayChecks: CardTypeMap<
-  (args: { cardData: CardData; gameState: IAccessor }) => CheckResult
+  (args: { cardData: CardData; accessor: IAccessor }) => CheckResult
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * A player can only have a certain number of "producer" cards in play at a
    * time.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  producer: ({ cardData, gameState }) => {
-    const producersInPlay = gameState.cards.filter(
+  producer: ({ cardData, accessor }) => {
+    const producersInPlay = accessor.cards.filter(
       (c) =>
         c.location.type === "inPlay" &&
         c.type === "producer" &&

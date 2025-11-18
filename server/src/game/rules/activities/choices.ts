@@ -14,7 +14,7 @@ import { ActionContext, ChoiceDef, IAccessor } from "@server/game/types";
 
 /******************************************************************************
  * Use to generate a "null choice", which signals to the state machine that the
- * game state should be passed back through the state machine. Most relevant
+ * game data should be passed back through the state machine. Most relevant
  * when an action has no choices.
  *
  * Note, any choice that has a `max` value of 0 will be interpreted as a "null
@@ -32,7 +32,7 @@ export function nullChoice(): ChoiceData {
 }
 
 /******************************************************************************
- * Feeds the current game state, and all the currently made decisions, into the
+ * Feeds the current game data, and all the currently made decisions, into the
  * callbacks defined for the relevant card, to yield a series of choices for
  * the given choice definition.
  *
@@ -45,7 +45,7 @@ export function nullChoice(): ChoiceData {
  ******************************************************************************/
 export function createActionChoices(args: {
   choiceDef: ChoiceDef;
-  gameState: IAccessor;
+  accessor: IAccessor;
   currentDecisions: Decisions;
   actionContext: ActionContext;
 }): ChoiceData[] {
@@ -56,7 +56,7 @@ export function createActionChoices(args: {
   } else {
     choosingPlayerIds.push(
       ...args.choiceDef.getChoosingPlayers({
-        gameState: args.gameState,
+        accessor: args.accessor,
         currentDecisions: args.currentDecisions,
         context: args.actionContext,
       }),
@@ -64,7 +64,7 @@ export function createActionChoices(args: {
   }
   return choosingPlayerIds.map((playerId) => {
     const values = args.choiceDef.getValues({
-      gameState: args.gameState,
+      accessor: args.accessor,
       currentDecisions: args.currentDecisions,
       context: { ...args.actionContext, choosingPlayerId: playerId },
     });
@@ -84,9 +84,9 @@ export function createActionChoices(args: {
  ******************************************************************************/
 export function createDrawingCardsChoice(args: {
   playerId: Id;
-  gameState: IAccessor;
+  accessor: IAccessor;
 }): ChoiceData {
-  const values = args.gameState
+  const values = args.accessor
     .getCards({ playerIds: [args.playerId], locationTypes: ["inDeck"] })
     .slice(0, 1)
     .map((c) => c.id);
@@ -106,10 +106,10 @@ export function createDrawingCardsChoice(args: {
  ******************************************************************************/
 export function createChoosingActionChoice(args: {
   playerId: Id;
-  gameState: IAccessor;
+  accessor: IAccessor;
 }): ChoiceData {
   // Filtering through every action seems dumb, but...
-  const values = args.gameState.actions
+  const values = args.accessor.actions
     .filter((a) => {
       // Cannot take an action from another player's card.
       if (a.card.ownerId !== args.playerId) {
@@ -117,7 +117,7 @@ export function createChoosingActionChoice(args: {
       }
       const typeCheckResult = actionTypeChecks[a.type]({
         actionData: a,
-        gameState: args.gameState,
+        accessor: args.accessor,
       });
       if (!typeCheckResult.ok) {
         return false;
@@ -129,7 +129,7 @@ export function createChoosingActionChoice(args: {
       const sequenceCheck = actionDef.sequence?.check;
       if (sequenceCheck) {
         const result = sequenceCheck({
-          gameState: args.gameState,
+          accessor: args.accessor,
           context: { cardId: a.card.id, playerTakingActionId: args.playerId },
         });
         if (!result.ok) {
@@ -154,11 +154,11 @@ export function createChoosingActionChoice(args: {
  *
  * If returns an empty array, then no viable choosing players could be found.
  * Ideally this wouldn't happen, as it implies that the action is not possible
- * given the current game state...
+ * given the current game data...
  ******************************************************************************/
 export function createTakingActionChoices(args: {
   playerData: PlayerData;
-  gameState: IAccessor;
+  accessor: IAccessor;
   actionData: ActionData;
   decisions: Decision[];
 }): Pick<ActivityData, "currentChoice" | "nextChoices"> {
@@ -174,7 +174,7 @@ export function createTakingActionChoices(args: {
   const firstChoiceDef = actionDef.sequence.choices[0];
   const firstChoices = createActionChoices({
     choiceDef: firstChoiceDef,
-    gameState: args.gameState,
+    accessor: args.accessor,
     currentDecisions: new Decisions(args.decisions),
     actionContext: {
       cardId: args.actionData.card.id,

@@ -1,5 +1,5 @@
 /**
- * An activity is a sequence of choices that are made to affect the game state.
+ * An activity is a sequence of choices that are made to affect the game data.
  *
  * Some are configured as "scripted" parts of the game (e.g. drawing cards at
  * the beginning of a player's turn).

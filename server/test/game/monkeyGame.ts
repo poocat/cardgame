@@ -51,13 +51,13 @@ const mockGame = (initialGameData: GameData, numChoices: number) => {
       });
     } catch (error) {
       console.log(
-        `Final game state ---------------------------------------------`,
+        `Final game data ---------------------------------------------`,
       );
       logGameData(gameData);
       throw error;
     }
   }
-  console.log(`Final game state ---------------------------------------------`);
+  console.log(`Final game data ---------------------------------------------`);
   logGameData(gameData);
 };
 

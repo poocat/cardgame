@@ -5,7 +5,7 @@ import { IAccessor, IMutator } from "@server/game/types";
 /******************************************************************************
  * ## Triggers by Activity Type
  *
- * Effects that are triggered by changes in game state that came about as a
+ * Effects that are triggered by changes in game data that came about as a
  * result of concluding the given activity type.
  *
  * Note: these are not applied in a loop! Be careful that triggers do not rely
@@ -13,9 +13,9 @@ import { IAccessor, IMutator } from "@server/game/types";
  ******************************************************************************/
 export const activityTypeTriggeredEffects: ActivityTypeMap<
   (args: {
-    /** The game state before any effects were applied to the game data. */
+    /** The game data before any effects were applied to the game data. */
     current: IAccessor;
-    /** The game state after any effects were applied at the conclusion of the current activity. */
+    /** The game data after any effects were applied at the conclusion of the current activity. */
     next: IAccessor;
     mutator: IMutator;
   }) => void
@@ -57,7 +57,7 @@ export const activityTypeTriggeredEffects: ActivityTypeMap<
     cardsInPlay.forEach((cardData) =>
       cardTypeTriggeredEffects[cardData.type]({
         cardData,
-        gameState: next,
+        accessor: next,
         mutator,
       }),
     );

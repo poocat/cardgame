@@ -6,7 +6,7 @@ import { Accessor, Mutator, MutatorQueue } from "@server/game/utils";
  * player making a decision.
  ******************************************************************************/
 export class Next {
-  /** A deep copy of the given game state, to mutate. */
+  /** A deep copy of the given game data, to mutate. */
   private gameData: GameData;
   public mutatorQueue: MutatorQueue;
 
@@ -21,7 +21,7 @@ export class Next {
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Use to apply all the currently queued mutations and return the updated
-   * game state.
+   * game data.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   dequeueMutations(): Accessor {
     this.mutatorQueue.apply(new Mutator(this.gameData));

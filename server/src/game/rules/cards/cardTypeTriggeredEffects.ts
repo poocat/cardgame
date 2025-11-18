@@ -8,11 +8,7 @@ import { IAccessor, IMutator } from "@server/game/types";
  * of each "take action" activity.
  ******************************************************************************/
 export const cardTypeTriggeredEffects: CardTypeMap<
-  (args: {
-    cardData: CardData;
-    gameState: IAccessor;
-    mutator: IMutator;
-  }) => void
+  (args: { cardData: CardData; accessor: IAccessor; mutator: IMutator }) => void
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * No type-based triggers for "producer" cards.
@@ -23,8 +19,8 @@ export const cardTypeTriggeredEffects: CardTypeMap<
    * "Consumer" cards must be "alive" at the end of the activity (that is, they
    * have at least one chip on them), else they must be discarded.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  consumer: ({ cardData, gameState, mutator }) => {
-    const alive = gameState.chips.some(
+  consumer: ({ cardData, accessor, mutator }) => {
+    const alive = accessor.chips.some(
       (c) => c.location.type === "onCard" && c.location.cardId === cardData.id,
     );
     if (!alive) {

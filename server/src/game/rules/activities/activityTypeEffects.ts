@@ -11,7 +11,7 @@ import { ActionContext, IAccessor, IMutator } from "@server/game/types";
  ******************************************************************************/
 export const activityTypeEffects: ActivityTypeMap<
   (args: {
-    gameState: IAccessor;
+    accessor: IAccessor;
     currentActivity: ActivityData;
     currentDecisions: Decision[];
     mutator: IMutator;
@@ -39,7 +39,7 @@ export const activityTypeEffects: ActivityTypeMap<
    * action on its card. There are also some default effects for different
    * types of cards.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  takingAction: ({ gameState, currentActivity, currentDecisions, mutator }) => {
+  takingAction: ({ accessor, currentActivity, currentDecisions, mutator }) => {
     if (!(currentActivity.type === "takingAction")) {
       // Should never get here, but necessary for typescript to believe that
       // `actionId` is in `currentActivity`.
@@ -47,7 +47,7 @@ export const activityTypeEffects: ActivityTypeMap<
         `Expected 'takingAction' activity, found '${currentActivity.type}'`,
       );
     }
-    const action = gameState.getActionById({
+    const action = accessor.getActionById({
       actionId: currentActivity.actionId,
     });
     const actionContext: ActionContext = {
@@ -59,7 +59,7 @@ export const activityTypeEffects: ActivityTypeMap<
       actionType: action.type,
     });
     actionDef.sequence?.affect({
-      gameState,
+      accessor,
       context: actionContext,
       decisions: new Decisions(currentDecisions),
       mutator,

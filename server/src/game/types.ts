@@ -136,29 +136,29 @@ export type ChoiceDef = {
   max: number;
   /** Use to determine which players must make the choice. If not included, will default to only the player taking the action. */
   getChoosingPlayers?: (args: {
-    gameState: IAccessor;
+    accessor: IAccessor;
     currentDecisions: Decisions;
     context: ActionContext;
   }) => Id[];
-  /** Use to retrieve the values to choose between from the game state. */
+  /** Use to retrieve the values to choose between from the game data. */
   getValues: (args: {
-    gameState: IAccessor;
+    accessor: IAccessor;
     currentDecisions: Decisions;
     context: ActionContext & { choosingPlayerId: Id };
   }) => string[];
 };
 
 export type SequenceDef = {
-  /** Use to check the game state for the conditions necessary to complete the sequence. */
+  /** Use to check the game data for the conditions necessary to complete the sequence. */
   check?: (args: {
-    gameState: IAccessor;
+    accessor: IAccessor;
     context: ActionContext;
   }) => CheckResult;
-  /** Use to define the choices that need to be made in order to affect the game state. */
+  /** Use to define the choices that need to be made in order to affect the game data. */
   choices: ChoiceDef[];
-  /** Use to define the effect the decisions should have on the game state at the conclusion of the activity. */
+  /** Use to define the effect the decisions should have on the game data at the conclusion of the activity. */
   affect: (args: {
-    gameState: IAccessor;
+    accessor: IAccessor;
     context: ActionContext;
     decisions: Decisions;
     mutator: IMutator;
@@ -186,7 +186,7 @@ export type TriggerDef = {
 };
 
 export type CardDef = {
-  /** The unique name of the card. Will be copied into the game state, and used to correlate cards in the game with their definitions. */
+  /** The unique name of the card. Will be copied into the game data, and used to correlate cards in the game with their definitions. */
   name: string;
   type: CardType;
   actions: Partial<ActionTypeMap<ActionDef>>;
