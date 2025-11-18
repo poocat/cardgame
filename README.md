@@ -1,6 +1,8 @@
-# card-game
+# cardgame
 
-A simple, strategy-based card game, without thematic elements.
+A multi-player strategy-based card game for the web, without any specific thematic elements.
+
+This stems from a personal project, originally made with flashcards, and play-tested with friends and family. Unfortunately, gathering groups of people to sit at a table to play the game became a bottleneck for testing new rules and cards. So, it made sense to turn it into a web app, where people could play from anywhere, bots could be made to play against (or against one another), and designs could be evaluated with quantitative data.
 
 ## Description
 
@@ -14,7 +16,7 @@ On a player's turn, they first draw cards from their decks into to their hands, 
   - Taking an action from a card in play exhausts the card
   - Exhausted cards are unexhausted automatically at the beginning of their owners' next turn.
 - Moving "chips" to different locations
-  - E.g. to/from the player's reserve, cards.
+  - E.g. in and out of the player's "reserve", and onto and off of their cards.
 
 There are different types of cards:
 - Producers
@@ -35,30 +37,36 @@ There are different types of actions available on cards:
 
 # Dev
 
-- Prerequisites
+- Prerequisites:
   - Install Node (e.g. [download](https://nodejs.org/en/download/) an installer...)
     - At the time of this writing, Node was on version 22.
+  - Install Docker
+
     
-- Server `/server`
-  - To install dependencies:
+- Server:
+  - Bring up database (`/`):
+    ```
+    docker compose up
+    ```
+  - Install dependencies (`/server`):
     ```
     npm install
     ```
-  - To run a (jank) test on the state machine using js runtime:
+  - Run a monkey test on the state machine using js runtime (`/server`):
     ```
     npm run test
     ```
-  - To start server locally:
+  - To start server locally (`/server`):
     ```
     npm run start
     ```
 
-- Client `/client`
-  - To install dependencies:
+- Client:
+  - To install dependencies (`/client`):
     ```
     npm install
     ```
-  - To run the site locally:
+  - To run the site locally (`/client`):
     ```
     npm run dev
     ```
