@@ -5,7 +5,7 @@ import {
   activityTypeNextActivity,
   activityTypeTriggeredEffects,
 } from "@server/game/rules/activities";
-import { GameState, Next } from "@server/game/utils";
+import { Accessor, Next } from "@server/game/utils";
 import { triggeredEffects } from "@server/game/rules/cards/triggeredEffects";
 
 /******************************************************************************
@@ -48,7 +48,7 @@ export function makeDecision(args: {
     );
   }
 
-  let currentGameState = new GameState(args.gameData);
+  let currentGameState = new Accessor(args.gameData);
   let currentActivity = args.gameData.activity;
   let currentDecisions = [...currentActivity.previousDecisions, args.decision];
 

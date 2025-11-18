@@ -1,6 +1,5 @@
 import { getCardDefinition } from "@server/game/cards/utils";
-import { GameState } from "@server/game/utils";
-import { ActionContext, IMutator } from "@server/game/types";
+import { IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ### Trigger Effects for Cards in Play
@@ -8,8 +7,8 @@ import { ActionContext, IMutator } from "@server/game/types";
  * Any card in play may have a trigger defined for it.
  ******************************************************************************/
 export function triggeredEffects(args: {
-  current: GameState;
-  next: GameState;
+  current: IAccessor;
+  next: IAccessor;
   mutator: IMutator;
 }): void {
   args.current.getCards({ locationTypes: ["inPlay"] }).forEach((c) => {

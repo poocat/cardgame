@@ -1,6 +1,5 @@
 import { CardData, CardTypeMap } from "@server/types";
-import { GameState } from "@server/game/utils/GameState";
-import { IMutator } from "@server/game/types";
+import { IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ### Automatic Triggers by Card Type
@@ -11,7 +10,7 @@ import { IMutator } from "@server/game/types";
 export const cardTypeTriggeredEffects: CardTypeMap<
   (args: {
     cardData: CardData;
-    gameState: GameState;
+    gameState: IAccessor;
     mutator: IMutator;
   }) => void
 > = {

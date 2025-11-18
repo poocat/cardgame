@@ -1,23 +1,102 @@
 import {
+  ActionData,
   ActionTypeMap,
   ActivityData,
+  CardData,
   CardLocationData,
+  CardLocationType,
   CardType,
+  ChipData,
   ChipLocationData,
   ChoiceType,
   Id,
+  PlayerData,
 } from "@server/types";
-import { Decisions, GameState } from "@server/game/utils";
+import { Decisions } from "@server/game/utils";
 
-export const mutationTypes = [
+////////////////////////////////////////////////////////////////////////////////
+// Utility types
+////////////////////////////////////////////////////////////////////////////////
+
+interface _DeepReadonlyArray<T> extends ReadonlyArray<DeepReadonly<T>> {}
+type _DeepReadonlyObject<T> = {
+  readonly [P in keyof T]: DeepReadonly<T[P]>;
+};
+export type DeepReadonly<T> = T extends (infer R)[]
+  ? _DeepReadonlyArray<R>
+  : T extends Function
+    ? T
+    : T extends object
+      ? _DeepReadonlyObject<T>
+      : T;
+
+////////////////////////////////////////////////////////////////////////////////
+// Accessor utility
+////////////////////////////////////////////////////////////////////////////////
+const accessorTypes = [
+  "getActionById",
+  "getCardById",
+  "getCards",
+  "getChipsOnCard",
+  "getPlayerChipsInReserve",
+  "getPlayerTakingTurn",
+] as const;
+type AccessorType = (typeof accessorTypes)[number];
+type _AccessorArgs = {
+  getActionById: { actionId: Id };
+  getCardById: { cardId: Id };
+  getCards: {
+    playerIds?: Id[];
+    types?: CardType[];
+    locationTypes?: CardLocationType[];
+    exhausted?: boolean;
+    minChips?: number;
+    maxChips?: number;
+    excludeIds?: Id[];
+  };
+  getChipsOnCard: { cardId: Id };
+  getPlayerChipsInReserve: { playerId: Id };
+  getPlayerTakingTurn: undefined;
+};
+export type AccessorArgs = {
+  [K in AccessorType]: _AccessorArgs[K];
+};
+type AccessorMethods<TReturn> = {
+  [key in keyof AccessorArgs]: (args: AccessorArgs[key]) => TReturn;
+};
+export interface IAccessor extends AccessorMethods<unknown> {
+  cards: DeepReadonly<CardData[]>;
+  players: DeepReadonly<PlayerData[]>;
+  chips: DeepReadonly<ChipData[]>;
+  actions: DeepReadonly<ActionData[]>;
+
+  getActionById(args: { actionId: Id }): DeepReadonly<ActionData>;
+  getCardById(args: { cardId: Id }): DeepReadonly<CardData>;
+  getCards(args: {
+    playerIds?: Id[];
+    types?: CardType[];
+    locationTypes?: CardLocationType[];
+    exhausted?: boolean;
+    minChips?: number;
+    maxChips?: number;
+    excludeIds?: Id[];
+  }): DeepReadonly<CardData>[];
+  getChipsOnCard(args: { cardId: Id }): DeepReadonly<ChipData>[];
+  getPlayerChipsInReserve(args: { playerId: Id }): DeepReadonly<ChipData>[];
+  getPlayerTakingTurn(): DeepReadonly<PlayerData>;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Mutation utility
+////////////////////////////////////////////////////////////////////////////////
+const mutationTypes = [
   "moveChips",
   "moveCard",
   "exhaustCard",
   "passTurn",
   "setActivity",
 ] as const;
-export type MutatorType = (typeof mutationTypes)[number];
-export type MutatorMap<T> = { [K in MutatorType]: T };
+type MutatorType = (typeof mutationTypes)[number];
 // TODO!!! No actions should have access to `passTurn` and `setActivity`
 // mutations.
 type _MutatorArgs = {
@@ -30,7 +109,7 @@ type _MutatorArgs = {
 export type MutatorArgs = {
   [K in MutatorType]: _MutatorArgs[K];
 };
-export type MutatorMethods<TReturn> = {
+type MutatorMethods<TReturn> = {
   [key in keyof MutatorArgs]: (args: MutatorArgs[key]) => TReturn;
 };
 export interface IMutator extends MutatorMethods<void> {}
@@ -57,13 +136,13 @@ export type ChoiceDef = {
   max: number;
   /** Use to determine which players must make the choice. If not included, will default to only the player taking the action. */
   getChoosingPlayers?: (args: {
-    gameState: GameState;
+    gameState: IAccessor;
     currentDecisions: Decisions;
     context: ActionContext;
   }) => Id[];
   /** Use to retrieve the values to choose between from the game state. */
   getValues: (args: {
-    gameState: GameState;
+    gameState: IAccessor;
     currentDecisions: Decisions;
     context: ActionContext & { choosingPlayerId: Id };
   }) => string[];
@@ -72,14 +151,14 @@ export type ChoiceDef = {
 export type SequenceDef = {
   /** Use to check the game state for the conditions necessary to complete the sequence. */
   check?: (args: {
-    gameState: GameState;
+    gameState: IAccessor;
     context: ActionContext;
   }) => CheckResult;
   /** Use to define the choices that need to be made in order to affect the game state. */
   choices: ChoiceDef[];
   /** Use to define the effect the decisions should have on the game state at the conclusion of the activity. */
   affect: (args: {
-    gameState: GameState;
+    gameState: IAccessor;
     context: ActionContext;
     decisions: Decisions;
     mutator: IMutator;
@@ -96,8 +175,8 @@ export type ActionDef = {
 export type TriggerDef = {
   instructions: string;
   affect: (args: {
-    current: GameState;
-    next: GameState;
+    current: IAccessor;
+    next: IAccessor;
     context: {
       /** The card with the trigger. */
       cardId: Id;

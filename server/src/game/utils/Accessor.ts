@@ -8,31 +8,18 @@ import {
   Id,
   PlayerData,
 } from "@server/types";
-
-type DeepReadonly<T> = T extends (infer R)[]
-  ? DeepReadonlyArray<R>
-  : T extends Function
-    ? T
-    : T extends object
-      ? DeepReadonlyObject<T>
-      : T;
-
-interface DeepReadonlyArray<T> extends ReadonlyArray<DeepReadonly<T>> {}
-
-type DeepReadonlyObject<T> = {
-  readonly [P in keyof T]: DeepReadonly<T[P]>;
-};
+import { DeepReadonly, IAccessor } from "@server/game/types";
 
 /******************************************************************************
- * ### GameState
+ * ### Accessor
  *
- * The game state is a read-only version of the given game data, which does not
+ * The accessor is a read-only version of the given game data, which does not
  * include the current activity.
  *
  * Includes a number of concise "getter" methods ease the definition of rules
  * and cards.
  ******************************************************************************/
-export class GameState {
+export class Accessor implements IAccessor {
   private gameData: DeepReadonly<GameData>;
   public cards: DeepReadonly<CardData[]>;
   public players: DeepReadonly<PlayerData[]>;
@@ -47,7 +34,7 @@ export class GameState {
     this.actions = this.gameData.actions;
   }
 
-  getPlayerTakingTurn(): DeepReadonly<PlayerData> {
+  getPlayerTakingTurn() {
     const matches = this.gameData.players.filter(
       (p) => p.id === this.gameData.playerTakingTurnId,
     );
@@ -58,7 +45,7 @@ export class GameState {
     }
   }
 
-  getActionById(args: { actionId: Id }): DeepReadonly<ActionData> {
+  getActionById(args: { actionId: Id }) {
     const match = this.gameData.actions.find((a) => a.id === args.actionId);
     if (!match) {
       throw new Error(`Action '${args.actionId}' not in game.`);
@@ -66,7 +53,7 @@ export class GameState {
     return match;
   }
 
-  getCardById(args: { cardId: Id }): DeepReadonly<CardData> {
+  getCardById(args: { cardId: Id }) {
     const match = this.gameData.cards.find((card) => card.id === args.cardId);
     if (!match) {
       throw new Error(`Card ${args.cardId} not in game.`);
@@ -82,7 +69,7 @@ export class GameState {
     minChips?: number;
     maxChips?: number;
     excludeIds?: Id[];
-  }): DeepReadonly<CardData[]> {
+  }) {
     return this.gameData.cards.filter((c) => {
       // Easiest checks first.
       if (
@@ -119,13 +106,13 @@ export class GameState {
     });
   }
 
-  getPlayerChipsInReserve(args: { playerId: Id }): DeepReadonly<ChipData[]> {
+  getPlayerChipsInReserve(args: { playerId: Id }) {
     return this.gameData.chips.filter(
       (c) => c.ownerId === args.playerId && c.location.type === "inReserve",
     );
   }
 
-  getChipsOnCard(args: { cardId: Id }): DeepReadonly<ChipData>[] {
+  getChipsOnCard(args: { cardId: Id }) {
     return this.gameData.chips.filter(
       (chip) =>
         chip.location.type === "onCard" && chip.location.cardId === args.cardId,

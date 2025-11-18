@@ -1,7 +1,6 @@
 import { ActivityTypeMap } from "@server/types";
 import { cardTypeTriggeredEffects } from "@server/game/rules/cards";
-import { GameState } from "@server/game/utils/GameState";
-import { IMutator } from "@server/game/types";
+import { IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ## Triggers by Activity Type
@@ -15,9 +14,9 @@ import { IMutator } from "@server/game/types";
 export const activityTypeTriggeredEffects: ActivityTypeMap<
   (args: {
     /** The game state before any effects were applied to the game data. */
-    current: GameState;
+    current: IAccessor;
     /** The game state after any effects were applied at the conclusion of the current activity. */
-    next: GameState;
+    next: IAccessor;
     mutator: IMutator;
   }) => void
 > = {

@@ -2,8 +2,7 @@ import { ActivityData, ActivityTypeMap, Decision } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeDefaultEffects } from "@server/game/rules/actions";
 import { Decisions } from "@server/game/utils/Decisions";
-import { GameState } from "@server/game/utils/GameState";
-import { ActionContext, IMutator } from "@server/game/types";
+import { ActionContext, IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ### Automatic Effects by Activity Type
@@ -12,7 +11,7 @@ import { ActionContext, IMutator } from "@server/game/types";
  ******************************************************************************/
 export const activityTypeEffects: ActivityTypeMap<
   (args: {
-    gameState: GameState;
+    gameState: IAccessor;
     currentActivity: ActivityData;
     currentDecisions: Decision[];
     mutator: IMutator;

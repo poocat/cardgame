@@ -10,8 +10,7 @@ import {
 import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeChecks } from "@server/game/rules/actions";
 import { Decisions } from "@server/game/utils/Decisions";
-import { GameState } from "@server/game/utils/GameState";
-import { ActionContext, ChoiceDef } from "@server/game/types";
+import { ActionContext, ChoiceDef, IAccessor } from "@server/game/types";
 
 /******************************************************************************
  * Use to generate a "null choice", which signals to the state machine that the
@@ -46,7 +45,7 @@ export function nullChoice(): ChoiceData {
  ******************************************************************************/
 export function createActionChoices(args: {
   choiceDef: ChoiceDef;
-  gameState: GameState;
+  gameState: IAccessor;
   currentDecisions: Decisions;
   actionContext: ActionContext;
 }): ChoiceData[] {
@@ -85,7 +84,7 @@ export function createActionChoices(args: {
  ******************************************************************************/
 export function createDrawingCardsChoice(args: {
   playerId: Id;
-  gameState: GameState;
+  gameState: IAccessor;
 }): ChoiceData {
   const values = args.gameState
     .getCards({ playerIds: [args.playerId], locationTypes: ["inDeck"] })
@@ -107,7 +106,7 @@ export function createDrawingCardsChoice(args: {
  ******************************************************************************/
 export function createChoosingActionChoice(args: {
   playerId: Id;
-  gameState: GameState;
+  gameState: IAccessor;
 }): ChoiceData {
   // Filtering through every action seems dumb, but...
   const values = args.gameState.actions
@@ -159,7 +158,7 @@ export function createChoosingActionChoice(args: {
  ******************************************************************************/
 export function createTakingActionChoices(args: {
   playerData: PlayerData;
-  gameState: GameState;
+  gameState: IAccessor;
   actionData: ActionData;
   decisions: Decision[];
 }): Pick<ActivityData, "currentChoice" | "nextChoices"> {

@@ -1,7 +1,6 @@
 import { ActionData, ActionTypeMap } from "@server/types";
 import { cardTypePlayChecks } from "@server/game/rules/cards";
-import { GameState } from "@server/game/utils/GameState";
-import { CheckResult } from "@server/game/types";
+import { CheckResult, IAccessor } from "@server/game/types";
 
 /******************************************************************************
  * ### Action Checks by Type
@@ -10,7 +9,7 @@ import { CheckResult } from "@server/game/types";
  * on its type.
  ******************************************************************************/
 export const actionTypeChecks: ActionTypeMap<
-  (args: { actionData: ActionData; gameState: GameState }) => CheckResult
+  (args: { actionData: ActionData; gameState: IAccessor }) => CheckResult
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * "Play" actions can only be taken on cards that are in the player's hand.

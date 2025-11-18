@@ -1,5 +1,5 @@
 import { ActivityData, GameData } from "@server/types";
-import { GameState, Mutator, MutatorQueue } from "@server/game/utils";
+import { Accessor, Mutator, MutatorQueue } from "@server/game/utils";
 
 /******************************************************************************
  * A utility for managing changes to game data that occur as a result of the
@@ -23,9 +23,9 @@ export class Next {
    * Use to apply all the currently queued mutations and return the updated
    * game state.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  dequeueMutations(): GameState {
+  dequeueMutations(): Accessor {
     this.mutatorQueue.apply(new Mutator(this.gameData));
-    return new GameState(this.gameData);
+    return new Accessor(this.gameData);
   }
 
   finish(): GameData {

@@ -6,11 +6,11 @@ import {
 } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { Decisions } from "@server/game/utils/Decisions";
-import { GameState } from "@server/game/utils/GameState";
 import {
   createActionChoices,
   nullChoice,
 } from "@server/game/rules/activities/choices";
+import { IAccessor } from "@server/game/types";
 
 /******************************************************************************
  * ### Activity Generators by Continued Activity
@@ -20,7 +20,7 @@ import {
  ******************************************************************************/
 export const activityTypeContinuedActivity: ActivityTypeMap<
   (args: {
-    gameState: GameState;
+    gameState: IAccessor;
     currentActivity: ActivityData;
     currentDecisions: Decision[];
   }) => ActivityData

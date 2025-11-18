@@ -1,7 +1,6 @@
 import { CONSTANTS } from "@common/game/constants";
 import { CardData, CardTypeMap } from "@server/types";
-import { GameState } from "@server/game/utils/GameState";
-import { CheckResult } from "@server/game/types";
+import { CheckResult, IAccessor } from "@server/game/types";
 
 /******************************************************************************
  * ## "Play Card" Action Checks by Card Type
@@ -10,7 +9,7 @@ import { CheckResult } from "@server/game/types";
  * play.
  ******************************************************************************/
 export const cardTypePlayChecks: CardTypeMap<
-  (args: { cardData: CardData; gameState: GameState }) => CheckResult
+  (args: { cardData: CardData; gameState: IAccessor }) => CheckResult
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * A player can only have a certain number of "producer" cards in play at a

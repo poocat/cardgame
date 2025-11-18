@@ -1,7 +1,6 @@
 import { CONSTANTS } from "@common/game/constants";
 import { ActivityTypeMap, Decision, PlayerData } from "@server/types";
-import { GameState } from "@server/game/utils/GameState";
-import { IMutator } from "@server/game/types";
+import { IAccessor, IMutator } from "@server/game/types";
 import {
   createChoosingActionChoice,
   createDrawingCardsChoice,
@@ -18,7 +17,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
   (args: {
     playerData: PlayerData;
     /** This game state should have already been mutated by the effects of the given activity. */
-    gameState: GameState;
+    gameState: IAccessor;
     currentDecisions: Decision[];
     mutator: IMutator;
   }) => void
