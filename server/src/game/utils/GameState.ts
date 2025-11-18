@@ -7,7 +7,7 @@ import {
   GameData,
   Id,
   PlayerData,
-} from "@common/game/types";
+} from "@server/types";
 
 type DeepReadonly<T> = T extends (infer R)[]
   ? DeepReadonlyArray<R>

@@ -1,9 +1,10 @@
 import { DeleteResult, Document, Filter, Sort, UpdateResult } from "mongodb";
 import z from "zod";
 import { documentMetaSchema } from "@server/db/meta";
-import { GameData } from "@common/game/types";
+import { GameData } from "@server/types";
 
-export type RepoDocMeta = z.infer<typeof documentMetaSchema>;
+type RepoDocMeta = z.infer<typeof documentMetaSchema>;
+
 export type RepoDoc<TData> = { meta: RepoDocMeta; data: TData };
 export type ProjectedRepoDoc<
   TData,
@@ -24,7 +25,7 @@ type RepoMethods<TData, TReturnType> = {
   ) => TReturnType;
 };
 
-export type Query<TData> = {
+type Query<TData> = {
   filter: Filter<RepoDoc<TData>>;
   options: Document;
   sort: Sort | null;

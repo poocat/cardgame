@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { CONSTANTS } from "@common/game/constants";
-import { ActionType, GameData } from "@common/game/types";
+import { ActionType, GameData } from "@server/types";
 import { CARDS } from "@server/game/cards/definitions";
 
 function makeId(): string {

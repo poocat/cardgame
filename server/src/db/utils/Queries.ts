@@ -1,4 +1,4 @@
-import { IQueries, OrderByMeta, Query } from "@server/db/types";
+import { IQueries, OrderByMeta } from "@server/db/types";
 import { Document, Sort } from "mongodb";
 
 export class Queries<TData = unknown> implements IQueries<TData> {

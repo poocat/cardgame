@@ -1,4 +1,4 @@
-import { CardData, CardTypeMap } from "@common/game/types";
+import { CardData, CardTypeMap } from "@server/types";
 import { GameState } from "@server/game/utils/GameState";
 import { IMutator } from "@server/game/types";
 

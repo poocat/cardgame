@@ -6,7 +6,7 @@ import {
   Id,
   NextChoiceData,
   PlayerData,
-} from "@common/game/types";
+} from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeChecks } from "@server/game/rules/actions";
 import { Decisions } from "@server/game/utils/Decisions";

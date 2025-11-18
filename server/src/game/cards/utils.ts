@@ -1,4 +1,4 @@
-import { ActionType } from "@common/game/types";
+import { ActionType } from "@server/types";
 import { CARDS } from "@server/game/cards/definitions";
 import { ActionDef, CardDef } from "@server/game/types";
 

@@ -1,4 +1,4 @@
-import { Decision, GameData } from "@common/game/types";
+import { Decision, GameData } from "@server/types";
 import {
   activityTypeContinuedActivity,
   activityTypeEffects,

@@ -1,4 +1,4 @@
-import { ActionTypeMap } from "@common/game/types";
+import { ActionTypeMap } from "@server/types";
 import { ActionContext, IMutator } from "@server/game/types";
 
 /******************************************************************************

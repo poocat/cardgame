@@ -1,4 +1,4 @@
-import { ActivityTypeMap } from "@common/game/types";
+import { ActivityTypeMap } from "@server/types";
 import { cardTypeTriggeredEffects } from "@server/game/rules/cards";
 import { GameState } from "@server/game/utils/GameState";
 import { IMutator } from "@server/game/types";
