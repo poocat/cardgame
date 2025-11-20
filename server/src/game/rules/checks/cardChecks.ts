@@ -3,12 +3,12 @@ import { CardData, CardTypeMap } from "@server/types";
 import { CheckResult, IAccessor } from "@server/game/types";
 
 /******************************************************************************
- * ## "Play Card" Action Checks by Card Type
+ * ### Card Play Checks
  *
- * Game state checks to determine whether or not a card can be brought into
- * play.
+ * Checks whether a card can be brought into play based on card type.
+ * Co-located with action validation for cohesion.
  ******************************************************************************/
-export const cardTypePlayChecks: CardTypeMap<
+export const cardPlayChecks: CardTypeMap<
   (args: { cardData: CardData; accessor: IAccessor }) => CheckResult
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

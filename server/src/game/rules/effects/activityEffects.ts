@@ -1,6 +1,6 @@
 import { ActivityData, ActivityTypeMap } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
-import { actionTypeDefaultEffects } from "@server/game/rules/actions";
+import { actionTypeDefaultEffects } from "./actionEffects";
 import {
   ActionContext,
   IAccessor,
@@ -9,9 +9,10 @@ import {
 } from "@server/game/types";
 
 /******************************************************************************
- * ### Automatic Effects by Activity Type
+ * ### Activity Execution Effects
  *
- * Effects that come about from completing an activity of the given type.
+ * Effects that occur when an activity completes, based on activity type.
+ * Co-located with action effects since they're applied in the same game loop phase.
  ******************************************************************************/
 export const activityTypeEffects: ActivityTypeMap<
   (args: {

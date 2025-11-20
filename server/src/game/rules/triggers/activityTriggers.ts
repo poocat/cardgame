@@ -1,12 +1,13 @@
 import { ActivityTypeMap } from "@server/types";
-import { cardTypeTriggeredEffects } from "@server/game/rules/cards";
+import { cardTypeTriggeredEffects } from "./cardTriggers";
 import { IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
- * ## Triggers by Activity Type
+ * ## Activity Type Triggers
  *
  * Effects that are triggered by changes in game data that came about as a
  * result of concluding the given activity type.
+ * Co-located with card triggers since they fire in the same phase.
  *
  * Note: these are not applied in a loop! Be careful that triggers do not rely
  * on other triggers!

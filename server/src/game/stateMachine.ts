@@ -4,9 +4,9 @@ import {
   activityTypeEffects,
   activityTypeNextActivity,
   activityTypeTriggeredEffects,
-} from "@server/game/rules/activities";
+  triggeredEffects,
+} from "@server/game/rules";
 import { Accessor, Decisions, Next } from "@server/game/runtime";
-import { triggeredEffects } from "@server/game/rules/cards/triggeredEffects";
 
 /******************************************************************************
  * ### Main Game "Loop"

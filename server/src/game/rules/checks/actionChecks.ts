@@ -1,12 +1,12 @@
 import { ActionData, ActionTypeMap } from "@server/types";
-import { cardTypePlayChecks } from "@server/game/rules/cards";
+import { cardPlayChecks } from "./cardChecks";
 import { CheckResult, IAccessor } from "@server/game/types";
 
 /******************************************************************************
- * ### Action Checks by Type
+ * ### Action Validation
  *
- * Game state checks to determine whether or not an action can be taken based
- * on its type.
+ * Checks whether an action can be taken based on action type.
+ * Co-located with card validation since they work together.
  ******************************************************************************/
 export const actionTypeChecks: ActionTypeMap<
   (args: { actionData: ActionData; accessor: IAccessor }) => CheckResult
@@ -17,7 +17,7 @@ export const actionTypeChecks: ActionTypeMap<
   play: ({ actionData, accessor }) => {
     const matchingCard = accessor.getCardById({ cardId: actionData.card.id });
     const reasons: string[] = [];
-    const result = cardTypePlayChecks[matchingCard.type]({
+    const result = cardPlayChecks[matchingCard.type]({
       accessor,
       cardData: matchingCard,
     });

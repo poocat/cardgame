@@ -7,7 +7,7 @@ import {
   PlayerData,
 } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
-import { actionTypeChecks } from "@server/game/rules/actions";
+import { actionTypeChecks } from "../checks/actionChecks";
 import {
   ActionContext,
   ChoiceDef,

@@ -2,10 +2,9 @@ import { ActionTypeMap } from "@server/types";
 import { ActionContext, IMutator } from "@server/game/types";
 
 /******************************************************************************
- * ### Automatic Effects by Action Type
+ * ### Action Effects
  *
- * Effects that should take place per action type, regardless of the
- * implementation of the action on the card, once the action is completed.
+ * Default effects that occur when an action completes, based on action type.
  ******************************************************************************/
 export const actionTypeDefaultEffects: ActionTypeMap<
   (args: { context: ActionContext; mutator: IMutator }) => void

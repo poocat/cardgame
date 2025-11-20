@@ -2,9 +2,10 @@ import { getCardDefinition } from "@server/game/cards/utils";
 import { IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
- * ### Trigger Effects for Cards in Play
+ * ### Custom Trigger Effects for Cards in Play
  *
- * Any card in play may have a trigger defined for it.
+ * Any card in play may have a custom trigger defined for it.
+ * These are card-specific effects that fire after type-based triggers.
  ******************************************************************************/
 export function triggeredEffects(args: {
   current: IAccessor;

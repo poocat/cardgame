@@ -2,10 +2,10 @@ import { CardData, CardTypeMap } from "@server/types";
 import { IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
- * ### Automatic Triggers by Card Type
+ * ### Card Type Triggers
  *
- * Effects that should trigger, per card type, for each card in play, at the end
- * of each "take action" activity.
+ * Automatic triggers that fire based on card type after each action.
+ * Co-located with activity triggers since they fire in the same phase.
  ******************************************************************************/
 export const cardTypeTriggeredEffects: CardTypeMap<
   (args: { cardData: CardData; accessor: IAccessor; mutator: IMutator }) => void

@@ -5,13 +5,14 @@ import {
   createChoosingActionChoice,
   createDrawingCardsChoice,
   createTakingActionChoices,
-} from "@server/game/rules/activities/choices";
+} from "./choices";
 
 /******************************************************************************
- * ### Activity Generators/Mutators by Previous Activity Type
+ * ### Activity State Transitions
  *
- * Generates the activity that should follow the conclusion of an activity of
- * the given type, and applies it to the game data via the given mutator.
+ * Generates the next activity based on the completed activity type.
+ * Co-located with choices and continuation logic since they all manage
+ * activity state transitions.
  ******************************************************************************/
 export const activityTypeNextActivity: ActivityTypeMap<
   (args: {

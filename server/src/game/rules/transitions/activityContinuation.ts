@@ -8,14 +8,14 @@ import { getActionDefinition } from "@server/game/cards/utils";
 import {
   createActionChoices,
   nullChoice,
-} from "@server/game/rules/activities/choices";
+} from "./choices";
 import { IAccessor, IDecisions } from "@server/game/types";
 
 /******************************************************************************
- * ### Activity Generators by Continued Activity
+ * ### Activity Continuation Logic
  *
  * If an activity requires more than one choice, it will need to be
- * "continued".
+ * "continued". Co-located with transitions since they manage activity flow.
  ******************************************************************************/
 export const activityTypeContinuedActivity: ActivityTypeMap<
   (args: {
