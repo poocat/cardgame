@@ -2,15 +2,18 @@ import {
   ActionData,
   ActivityData,
   ChoiceData,
-  Decision,
   Id,
   NextChoiceData,
   PlayerData,
 } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeChecks } from "@server/game/rules/actions";
-import { Decisions } from "@server/game/runtime/Decisions";
-import { ActionContext, ChoiceDef, IAccessor } from "@server/game/types";
+import {
+  ActionContext,
+  ChoiceDef,
+  IAccessor,
+  IDecisions,
+} from "@server/game/types";
 
 /******************************************************************************
  * Use to generate a "null choice", which signals to the state machine that the
@@ -46,7 +49,7 @@ export function nullChoice(): ChoiceData {
 export function createActionChoices(args: {
   choiceDef: ChoiceDef;
   accessor: IAccessor;
-  currentDecisions: Decisions;
+  currentDecisions: IDecisions;
   actionContext: ActionContext;
 }): ChoiceData[] {
   const choosingPlayerIds: Id[] = [];
@@ -160,7 +163,7 @@ export function createTakingActionChoices(args: {
   playerData: PlayerData;
   accessor: IAccessor;
   actionData: ActionData;
-  decisions: Decision[];
+  decisions: IDecisions;
 }): Pick<ActivityData, "currentChoice" | "nextChoices"> {
   const actionDef = getActionDefinition({
     cardName: args.actionData.card.name,
@@ -175,7 +178,7 @@ export function createTakingActionChoices(args: {
   const firstChoices = createActionChoices({
     choiceDef: firstChoiceDef,
     accessor: args.accessor,
-    currentDecisions: new Decisions(args.decisions),
+    currentDecisions: args.decisions,
     actionContext: {
       cardId: args.actionData.card.id,
       playerTakingActionId: args.playerData.id,

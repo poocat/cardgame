@@ -5,12 +5,11 @@ import {
   NextChoiceData,
 } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
-import { Decisions } from "@server/game/runtime/Decisions";
 import {
   createActionChoices,
   nullChoice,
 } from "@server/game/rules/activities/choices";
-import { IAccessor } from "@server/game/types";
+import { IAccessor, IDecisions } from "@server/game/types";
 
 /******************************************************************************
  * ### Activity Generators by Continued Activity
@@ -22,7 +21,7 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
   (args: {
     accessor: IAccessor;
     currentActivity: ActivityData;
-    currentDecisions: Decision[];
+    currentDecisions: IDecisions;
   }) => ActivityData
 > = {
   drawingCards: ({ currentActivity }) => {
@@ -47,7 +46,7 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
     const next: ActivityData = {
       ...currentActivity,
       nextChoices: currentActivity.nextChoices.slice(1),
-      previousDecisions: currentDecisions,
+      previousDecisions: currentDecisions.decisions as Decision[], // boo...
     };
     const nextChoice = currentActivity.nextChoices[0];
     if (nextChoice.type === "dependent") {
@@ -67,7 +66,7 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
       const nextActionChoices = createActionChoices({
         choiceDef,
         accessor: accessor,
-        currentDecisions: new Decisions(currentDecisions),
+        currentDecisions,
         actionContext: {
           cardId: action.card.id,
           playerTakingActionId: currentActivity.playerTakingActionId,

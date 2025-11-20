@@ -5,7 +5,7 @@ import {
   activityTypeNextActivity,
   activityTypeTriggeredEffects,
 } from "@server/game/rules/activities";
-import { Accessor, Next } from "@server/game/runtime";
+import { Accessor, Decisions, Next } from "@server/game/runtime";
 import { triggeredEffects } from "@server/game/rules/cards/triggeredEffects";
 
 /******************************************************************************
@@ -48,9 +48,12 @@ export function makeDecision(args: {
     );
   }
 
-  let currentAccessor = new Accessor(args.gameData);
   let currentActivity = args.gameData.activity;
-  let currentDecisions = [...currentActivity.previousDecisions, args.decision];
+  let currentAccessor = new Accessor(args.gameData);
+  let currentDecisions = new Decisions([
+    ...currentActivity.previousDecisions,
+    args.decision,
+  ]);
 
   const playerTakingTurn = currentAccessor.getPlayerTakingTurn();
 
@@ -117,7 +120,7 @@ export function makeDecision(args: {
        */
       currentAccessor = next.dequeueMutations();
       currentActivity = next.activity;
-      currentDecisions = [];
+      currentDecisions = new Decisions([]);
       // If the next activity has no choices to be made, repeat the process with
       // the updated game data, activity, decisions.
     } while (currentActivity.currentChoice.max === 0);

@@ -36,7 +36,7 @@ export const CARDS: CardDef[] = [
           ],
           affect: ({ context, decisions, mutator }) => {
             mutator.moveChips({
-              ids: decisions.get("targetChips"),
+              ids: decisions.getValues({ name: "targetChips" }),
               location: { type: "onCard", cardId: context.cardId },
             });
           },
@@ -97,7 +97,7 @@ export const CARDS: CardDef[] = [
           ],
           affect: ({ context, decisions, mutator }) => {
             mutator.moveChips({
-              ids: decisions.get("targetChips"),
+              ids: decisions.getValues({ name: "targetChips" }),
               location: { type: "onCard", cardId: context.cardId },
             });
           },
@@ -153,10 +153,10 @@ export const CARDS: CardDef[] = [
             },
           ],
           affect: ({ decisions, mutator }) => {
-            const chosenCardId = decisions.get("targetCard")[0];
+            const chosenCardId = decisions.getValues({ name: "targetCard" })[0];
             if (chosenCardId) {
               mutator.moveChips({
-                ids: decisions.get("targetChips"),
+                ids: decisions.getValues({ name: "targetChips" }),
                 location: { type: "onCard", cardId: chosenCardId },
               });
             }
@@ -215,7 +215,7 @@ export const CARDS: CardDef[] = [
               min: 1,
               max: 1,
               getChoosingPlayers: ({ currentDecisions }) =>
-                currentDecisions.getPlayerIds("targetChip"),
+                currentDecisions.getPlayerIds({ name: "targetChip" }),
               getValues: ({ accessor, context }) =>
                 accessor
                   .getCards({
@@ -227,15 +227,22 @@ export const CARDS: CardDef[] = [
             },
           ],
           affect: ({ decisions, mutator }) => {
-            decisions.getPlayerIds("targetChip").forEach((playerId) => {
-              const chipIds = decisions.get("targetChip", playerId);
-              decisions.get("targetCard", playerId).forEach((cardId) => {
-                mutator.moveChips({
-                  ids: chipIds,
-                  location: { type: "onCard", cardId: cardId },
+            decisions
+              .getPlayerIds({ name: "targetChip" })
+              .forEach((playerId) => {
+                const chipIds = decisions.getValues({
+                  name: "targetChip",
+                  playerId,
                 });
+                decisions
+                  .getValues({ name: "targetCard", playerId })
+                  .forEach((cardId) => {
+                    mutator.moveChips({
+                      ids: chipIds,
+                      location: { type: "onCard", cardId: cardId },
+                    });
+                  });
               });
-            });
           },
         },
       },
@@ -270,7 +277,7 @@ export const CARDS: CardDef[] = [
           ],
           affect: ({ decisions, mutator, context }) => {
             mutator.moveChips({
-              ids: decisions.get("targetChips"),
+              ids: decisions.getValues({ name: "targetChips" }),
               location: { type: "onCard", cardId: context.cardId },
             });
           },
@@ -328,10 +335,10 @@ export const CARDS: CardDef[] = [
             },
           ],
           affect: ({ decisions, mutator }) => {
-            const chosenCardId = decisions.get("targetCard")[0];
+            const chosenCardId = decisions.getValues({ name: "targetCard" })[0];
             if (chosenCardId) {
               mutator.moveChips({
-                ids: decisions.get("targetChips"),
+                ids: decisions.getValues({ name: "targetChips" }),
                 location: { type: "onCard", cardId: chosenCardId },
               });
             }

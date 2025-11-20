@@ -1,8 +1,12 @@
-import { ActivityData, ActivityTypeMap, Decision } from "@server/types";
+import { ActivityData, ActivityTypeMap } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeDefaultEffects } from "@server/game/rules/actions";
-import { Decisions } from "@server/game/runtime/Decisions";
-import { ActionContext, IAccessor, IMutator } from "@server/game/types";
+import {
+  ActionContext,
+  IAccessor,
+  IDecisions,
+  IMutator,
+} from "@server/game/types";
 
 /******************************************************************************
  * ### Automatic Effects by Activity Type
@@ -13,7 +17,7 @@ export const activityTypeEffects: ActivityTypeMap<
   (args: {
     accessor: IAccessor;
     currentActivity: ActivityData;
-    currentDecisions: Decision[];
+    currentDecisions: IDecisions;
     mutator: IMutator;
   }) => void
 > = {
@@ -22,7 +26,7 @@ export const activityTypeEffects: ActivityTypeMap<
    * "in hand".
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   drawingCards: ({ currentDecisions, mutator }) => {
-    const cardId = currentDecisions[0].values[0];
+    const cardId = currentDecisions.decisions[0].values[0];
     // Not guaranteed to have a card in deck at the draw step.
     if (cardId) {
       mutator.moveCard({ id: cardId, location: { type: "inHand" } });
@@ -61,7 +65,7 @@ export const activityTypeEffects: ActivityTypeMap<
     actionDef.sequence?.affect({
       accessor,
       context: actionContext,
-      decisions: new Decisions(currentDecisions),
+      decisions: currentDecisions,
       mutator,
     });
     // Apply default effects per action type.

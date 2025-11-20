@@ -1,26 +1,26 @@
 import { ChoiceValue, Decision, Id } from "@server/types";
+import { DeepReadonly, IDecisions } from "@server/game/types";
 
 /******************************************************************************
  * ### Decisions
  *
- * Use as a convenient way of getting decisions values by their associated
- * choice name.
+ * An accessor for the values chosen for a set of decisions.
  ******************************************************************************/
-export class Decisions {
-  private decisions: Decision[];
+export class Decisions implements IDecisions {
+  decisions: DeepReadonly<Decision[]>;
 
   constructor(decisions: Decision[]) {
     this.decisions = decisions;
   }
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Use to get all the decisions made for the given name. If a player ID is
-   * given, will only include decisions made by that player.
+   * Use to get all the values chosen for the given name. If a player ID is
+   * given, will only include values chosen by that player.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  get(name: string, playerId?: Id): ChoiceValue[] {
-    let decisions = this.decisions.filter((d) => d.name === name);
-    if (playerId) {
-      decisions = decisions.filter((d) => d.playerId === playerId);
+  getValues(args: { name: string; playerId?: Id }): ChoiceValue[] {
+    let decisions = this.decisions.filter((d) => d.name === args.name);
+    if (args.playerId) {
+      decisions = decisions.filter((d) => d.playerId === args.playerId);
     }
     const values: ChoiceValue[] = [];
     decisions.forEach((d) => values.push(...d.values));
@@ -31,9 +31,9 @@ export class Decisions {
    * Use to get the set of IDs of players who have made choices for the given
    * name.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  getPlayerIds(name: string): Id[] {
+  getPlayerIds(args: { name: string }): Id[] {
     const players = new Set(
-      this.decisions.filter((d) => d.name === name).map((d) => d.playerId),
+      this.decisions.filter((d) => d.name === args.name).map((d) => d.playerId),
     );
     return [...players];
   }

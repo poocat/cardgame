@@ -1,6 +1,6 @@
 import { CONSTANTS } from "@common/game/constants";
-import { ActivityTypeMap, Decision, PlayerData } from "@server/types";
-import { IAccessor, IMutator } from "@server/game/types";
+import { ActivityTypeMap, PlayerData } from "@server/types";
+import { IAccessor, IDecisions, IMutator } from "@server/game/types";
 import {
   createChoosingActionChoice,
   createDrawingCardsChoice,
@@ -18,7 +18,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
     playerData: PlayerData;
     /** This game data should have already been mutated by the effects of the given activity. */
     accessor: IAccessor;
-    currentDecisions: Decision[];
+    currentDecisions: IDecisions;
     mutator: IMutator;
   }) => void
 > = {
@@ -81,7 +81,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
    * the action definition must be used to generate the next set of choices.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   choosingAction: ({ playerData, accessor, currentDecisions, mutator }) => {
-    const actionIds = currentDecisions[0].values ?? [];
+    const actionIds = currentDecisions.decisions[0].values ?? [];
     if (actionIds.length === 0) {
       // If nothing was chosen, then it's time to pass the turn.
       const playerIndex = accessor.players.findIndex(
@@ -120,7 +120,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
       });
     } else {
       throw new Error(
-        `Expected one value selected for one choice; found ${actionIds.length} values and ${currentDecisions.length} decisions.`,
+        `Expected one value selected for one choice; found ${actionIds.length} values and ${currentDecisions.decisions.length} decisions.`,
       );
     }
   },
