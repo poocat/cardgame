@@ -1,12 +1,12 @@
-import { Decision, GameData } from "@common/game/types";
+import { Decision, GameData } from "@server/types";
 import {
   activityTypeContinuedActivity,
   activityTypeEffects,
   activityTypeNextActivity,
   activityTypeTriggeredEffects,
-} from "@server/game/rules/activities";
-import { GameState, Next } from "@server/game/utils";
-import { triggeredEffects } from "@server/game/rules/cards/triggeredEffects";
+  triggeredEffects,
+} from "@server/game/rules";
+import { Accessor, Decisions, Next } from "@server/game/runtime";
 
 /******************************************************************************
  * ### Main Game "Loop"
@@ -14,8 +14,8 @@ import { triggeredEffects } from "@server/game/rules/cards/triggeredEffects";
  * At all times the game is waiting for a single player to make a "choice" for
  * the current "activity".
  *
- * A combination of the current game state/data and the last choice made are
- * used to affect the game state and prompt the next choice.
+ * A combination of the current game data and the last choice made are used to
+ * affect the game data and prompt the next choice.
  ******************************************************************************/
 export function makeDecision(args: {
   gameData: GameData;
@@ -48,28 +48,31 @@ export function makeDecision(args: {
     );
   }
 
-  let currentGameState = new GameState(args.gameData);
   let currentActivity = args.gameData.activity;
-  let currentDecisions = [...currentActivity.previousDecisions, args.decision];
+  let currentAccessor = new Accessor(args.gameData);
+  let currentDecisions = new Decisions([
+    ...currentActivity.previousDecisions,
+    args.decision,
+  ]);
 
-  const playerTakingTurn = currentGameState.getPlayerTakingTurn();
+  const playerTakingTurn = currentAccessor.getPlayerTakingTurn();
 
   // Initialize object that will track all the changes that will need to be made
-  // to the game state.
+  // to the game data.
   const next = new Next(args.gameData);
 
   if (currentActivity.nextChoices.length > 0) {
     // If the current activity needs more choices to be made, continue the activity.
     next.mutatorQueue.setActivity({
       activity: activityTypeContinuedActivity[currentActivity.type]({
-        gameState: currentGameState,
+        accessor: currentAccessor,
         currentActivity,
         currentDecisions,
       }),
     });
     next.dequeueMutations();
   } else {
-    // Otherwise, use the decisions made to affect the game state.
+    // Otherwise, use the decisions made to affect the game data.
     let loopCount = 0;
     do {
       if (loopCount++ >= 10) {
@@ -80,31 +83,31 @@ export function makeDecision(args: {
       }
       // Apply all the effects for the decisions made for this activity.
       activityTypeEffects[currentActivity.type]({
-        gameState: currentGameState,
+        accessor: currentAccessor,
         currentActivity: currentActivity,
         currentDecisions,
         mutator: next.mutatorQueue,
         // logger: logger, // Something to think about...
       });
-      let nextGameState = next.dequeueMutations();
-      // Fire triggers for this activity, based on changes to the game state.
+      let nextAccessor = next.dequeueMutations();
+      // Fire triggers for this activity, based on changes to the game data.
       activityTypeTriggeredEffects[currentActivity.type]({
-        current: currentGameState,
-        next: nextGameState,
+        current: currentAccessor,
+        next: nextAccessor,
         mutator: next.mutatorQueue,
       });
-      nextGameState = next.dequeueMutations();
+      nextAccessor = next.dequeueMutations();
       // Look for any custom triggers on cards in play and fire.
       triggeredEffects({
-        current: currentGameState,
-        next: nextGameState,
+        current: currentAccessor,
+        next: nextAccessor,
         mutator: next.mutatorQueue,
       });
-      nextGameState = next.dequeueMutations();
-      // Generate and apply the next activity using the updated game state.
+      nextAccessor = next.dequeueMutations();
+      // Generate and apply the next activity using the updated game data.
       activityTypeNextActivity[currentActivity.type]({
         playerData: playerTakingTurn,
-        gameState: nextGameState,
+        accessor: nextAccessor,
         currentDecisions,
         mutator: next.mutatorQueue,
       });
@@ -115,11 +118,11 @@ export function makeDecision(args: {
        * the number of values available. Need to figure out how to catch this
        * and roll back.
        */
-      currentGameState = next.dequeueMutations();
+      currentAccessor = next.dequeueMutations();
       currentActivity = next.activity;
-      currentDecisions = [];
+      currentDecisions = new Decisions([]);
       // If the next activity has no choices to be made, repeat the process with
-      // the updated game state, activity, decisions.
+      // the updated game data, activity, decisions.
     } while (currentActivity.currentChoice.max === 0);
   }
   return next.finish();

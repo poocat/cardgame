@@ -1,7 +1,6 @@
 import express from "express";
 import { ROUTES } from "@common/api/routes";
-import { games } from "@server/api/routes/games";
-import { rooms } from "@server/api/routes/rooms";
+import { games, rooms } from "@server/api/routes";
 import { CONFIG } from "@server/config";
 import { initDb } from "@server/db/database";
 

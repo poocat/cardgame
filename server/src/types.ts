@@ -1,116 +1,156 @@
 import {
-  ActionTypeMap,
-  ActivityData,
-  CardLocationData,
-  CardType,
-  ChipLocationData,
-  ChoiceType,
-  Id,
-} from "@common/game/types";
-import { Decisions, GameState } from "@server/game/utils";
+  actionTypes,
+  activityTypes,
+  cardLocationTypes,
+  cardTypes,
+  chipLocationTypes,
+  choiceTypes,
+} from "@common/game/enums";
 
-export const mutationTypes = [
-  "moveChips",
-  "moveCard",
-  "exhaustCard",
-  "passTurn",
-  "setActivity",
-] as const;
-export type MutatorType = (typeof mutationTypes)[number];
-export type MutatorMap<T> = { [K in MutatorType]: T };
-// TODO!!! No actions should have access to `passTurn` and `setActivity`
-// mutations.
-type _MutatorArgs = {
-  moveChips: { ids: Id[]; location: ChipLocationData };
-  moveCard: { id: Id; location: CardLocationData };
-  exhaustCard: { id: Id; value: boolean };
-  passTurn: { from: Id; to: Id };
-  setActivity: { activity: ActivityData };
-};
-export type MutatorArgs = {
-  [K in MutatorType]: _MutatorArgs[K];
-};
-export type MutatorMethods<TReturn> = {
-  [key in keyof MutatorArgs]: (args: MutatorArgs[key]) => TReturn;
-};
-export interface IMutator extends MutatorMethods<void> {}
+////////////////////////////////////////////////////////////////////////////////
+// Utility types
+////////////////////////////////////////////////////////////////////////////////
 
-export type ActionContext = {
-  /** The id of the card the action is printed on. */
-  cardId: Id;
-  playerTakingActionId: Id;
+/** Generic type for const arrays. Only used in other generic utility types. */
+type _LiteralArray = readonly string[];
+
+/** Use to type a constant array of strings into a literal union type. */
+type _UnionFromArray<TArray extends _LiteralArray> = TArray[number];
+
+/** Use to type a mapping from keys defined in a constant array of strings to a given type. */
+type _MapFromArray<TArray extends _LiteralArray, TValue> = {
+  [K in TArray[number]]: TValue;
+};
+/** Use to type a discriminated union of objects from constant array of strings, and a mapping of those strings to their data.  */
+type _DiscriminatedUnionFromArray<
+  TArray extends _LiteralArray,
+  TDataMap extends _MapFromArray<TArray, any>,
+  Tcommon extends object = {},
+> = {
+  [K in _UnionFromArray<TArray>]: { type: K } & Tcommon & TDataMap[K];
+}[_UnionFromArray<TArray>];
+
+////////////////////////////////////////////////////////////////////////////////
+// Game data types
+////////////////////////////////////////////////////////////////////////////////
+
+export type Id = string;
+
+export type ActionType = _UnionFromArray<typeof actionTypes>;
+export type ActionTypeMap<T> = _MapFromArray<typeof actionTypes, T>;
+export type ActionData = _DiscriminatedUnionFromArray<
+  typeof actionTypes,
+  {
+    play: {};
+    ability: {};
+    discard: {};
+  },
+  {
+    id: Id;
+    card: { id: Id; name: string; ownerId: Id };
+  }
+>;
+
+export type ChipLocationType = _UnionFromArray<typeof chipLocationTypes>;
+export type ChipLocationMap<T> = _MapFromArray<typeof chipLocationTypes, T>;
+export type ChipLocationData = _DiscriminatedUnionFromArray<
+  typeof chipLocationTypes,
+  {
+    inReserve: {};
+    onCard: { cardId: Id };
+  }
+>;
+export type ChipData = {
+  id: Id;
+  ownerId: Id;
+  location: ChipLocationData;
 };
 
-export type CheckResult =
-  | { ok: true; reasons?: never }
-  | { ok: false; reasons: string[] };
+export type CardLocationType = _UnionFromArray<typeof cardLocationTypes>;
+export type CardLocationMap<T> = _MapFromArray<typeof cardLocationTypes, T>;
+export type CardLocationData = _DiscriminatedUnionFromArray<
+  typeof cardLocationTypes,
+  {
+    inHand: {};
+    inPlay: { exhausted: boolean };
+    inDiscard: {};
+    inDeck: {};
+  }
+>;
 
-// Cards
-export type ChoiceDef = {
-  /** The "name" of the choice. */
+export type CardType = _UnionFromArray<typeof cardTypes>;
+export type CardTypeMap<T> = _MapFromArray<typeof cardTypes, T>;
+export type CardData = _DiscriminatedUnionFromArray<
+  typeof cardTypes,
+  {
+    producer: {};
+    consumer: {};
+  },
+  {
+    id: Id;
+    name: string;
+    ownerId: Id;
+    location: CardLocationData;
+  }
+>;
+
+export type PlayerData = {
+  id: Id;
   name: string;
-  type: ChoiceType;
-  instructions: string;
-  /** Use to indicate the minimum number of options the player must select from the given options. */
-  min: number;
-  /** Use to indicate the maximum number of options the player may select from the given options. */
-  max: number;
-  /** Use to determine which players must make the choice. If not included, will default to only the player taking the action. */
-  getChoosingPlayers?: (args: {
-    gameState: GameState;
-    currentDecisions: Decisions;
-    context: ActionContext;
-  }) => Id[];
-  /** Use to retrieve the values to choose between from the game state. */
-  getValues: (args: {
-    gameState: GameState;
-    currentDecisions: Decisions;
-    context: ActionContext & { choosingPlayerId: Id };
-  }) => string[];
+  turnCount: number;
 };
 
-export type SequenceDef = {
-  /** Use to check the game state for the conditions necessary to complete the sequence. */
-  check?: (args: {
-    gameState: GameState;
-    context: ActionContext;
-  }) => CheckResult;
-  /** Use to define the choices that need to be made in order to affect the game state. */
-  choices: ChoiceDef[];
-  /** Use to define the effect the decisions should have on the game state at the conclusion of the activity. */
-  affect: (args: {
-    gameState: GameState;
-    context: ActionContext;
-    decisions: Decisions;
-    mutator: IMutator;
-  }) => void;
-};
+export type ChoiceType = _UnionFromArray<typeof choiceTypes>;
+export type ChoiceTypeMap<T> = _MapFromArray<typeof choiceTypes, T>;
+export type ChoiceValue = string;
+export type ChoiceData = _DiscriminatedUnionFromArray<
+  typeof choiceTypes,
+  {
+    arbitrary: {};
+    actionId: {};
+    cardId: {};
+    chipId: {};
+    playerId: {};
+  },
+  {
+    name: string;
+    choosingPlayerId: Id;
+    values: ChoiceValue[];
+    min: number;
+    max: number | null;
+  }
+>;
+/** When an activity requires multiple choices, all but the first may be "dependent" on previous choices made during the activity. */
+export type NextChoiceData =
+  | { type: "dependent"; index: number }
+  | { type: "independent"; choice: ChoiceData };
 
-export type ActionDef = {
-  /** Instructions to display on the card. */
-  instructions?: string;
-  /** The sequence for the action's activity. If undefined, only the default effects (for the given action type) will be used. */
-  sequence?: SequenceDef;
-};
+export type Decision = { name: string; playerId: Id; values: ChoiceValue[] };
 
-export type TriggerDef = {
-  instructions: string;
-  affect: (args: {
-    current: GameState;
-    next: GameState;
-    context: {
-      /** The card with the trigger. */
-      cardId: Id;
+export type ActivityType = _UnionFromArray<typeof activityTypes>;
+export type ActivityTypeMap<T> = _MapFromArray<typeof activityTypes, T>;
+export type ActivityData = _DiscriminatedUnionFromArray<
+  typeof activityTypes,
+  {
+    drawingCards: {};
+    choosingAction: { playerChoosingActionId: Id };
+    takingAction: {
+      actionId: Id;
+      playerTakingActionId: Id;
     };
-    mutator: IMutator;
-  }) => void;
-};
+  },
+  {
+    currentChoice: ChoiceData;
+    nextChoices: NextChoiceData[];
+    previousDecisions: Decision[];
+  }
+>;
 
-export type CardDef = {
-  /** The unique name of the card. Will be copied into the game state, and used to correlate cards in the game with their definitions. */
-  name: string;
-  type: CardType;
-  actions: Partial<ActionTypeMap<ActionDef>>;
-  /** Each card can have a single, custom triggered effect. The trigger is only active while the card is in play. */
-  trigger?: TriggerDef;
+export type GameData = {
+  playerTakingTurnId: Id;
+  activity: ActivityData;
+  actions: ActionData[];
+  players: PlayerData[];
+  cards: CardData[];
+  chips: ChipData[];
 };

@@ -1,52 +1,56 @@
 import { DeleteResult, Document, Filter, Sort, UpdateResult } from "mongodb";
 import z from "zod";
 import { documentMetaSchema } from "@server/db/meta";
-import { GameData } from "@common/game/types";
+import { GameData } from "@server/types";
 
-export type RepoDocMeta = z.infer<typeof documentMetaSchema>;
-export type RepoDoc<TData> = { meta: RepoDocMeta; data: TData };
-export type ProjectedRepoDoc<
+type RepoDocMeta = z.infer<typeof documentMetaSchema>;
+
+export type RepositoryDoc<TData> = { meta: RepoDocMeta; data: TData };
+export type ProjectedRepositoryDoc<
   TData,
   TMetaOnly extends boolean,
-> = TMetaOnly extends true ? Pick<RepoDoc<TData>, "meta"> : RepoDoc<TData>;
+> = TMetaOnly extends true
+  ? Pick<RepositoryDoc<TData>, "meta">
+  : RepositoryDoc<TData>;
 export type OrderByMeta = "update timestamp desc";
 
-type RepoMethodArgs<TData> = {
+type RepositoryMethodArgs<TData> = {
   findOne: { id: string; metaOnly?: boolean };
   findMany: { metaOnly?: boolean; orderBy?: OrderByMeta };
   insertOne: { data: TData };
   updateOne: { id: string; data: TData; version?: number };
   deleteOne: { id: string };
 };
-type RepoMethods<TData, TReturnType> = {
-  [M in keyof RepoMethodArgs<TData>]: (
-    args: RepoMethodArgs<TData>[M],
+type RepositoryMethods<TData, TReturnType> = {
+  [M in keyof RepositoryMethodArgs<TData>]: (
+    args: RepositoryMethodArgs<TData>[M],
   ) => TReturnType;
 };
 
-export type Query<TData> = {
-  filter: Filter<RepoDoc<TData>>;
+type Query<TData> = {
+  filter: Filter<RepositoryDoc<TData>>;
   options: Document;
   sort: Sort | null;
 };
 
 export type IQueries<TData> = Omit<
-  RepoMethods<unknown, Query<TData>>,
+  RepositoryMethods<unknown, Query<TData>>,
   "insertOne"
 >;
 
-export interface IRepo<TData> extends RepoMethods<TData, Promise<unknown>> {
+export interface IRepository<TData>
+  extends RepositoryMethods<TData, Promise<unknown>> {
   findOne<TMetaOnly extends boolean>(args: {
     id: string;
     metaOnly?: TMetaOnly;
-  }): Promise<ProjectedRepoDoc<TData, TMetaOnly> | null>;
+  }): Promise<ProjectedRepositoryDoc<TData, TMetaOnly> | null>;
 
   findMany<TMetaOnly extends boolean>(args: {
     metaOnly?: TMetaOnly;
     orderBy?: OrderByMeta;
-  }): Promise<ProjectedRepoDoc<TData, TMetaOnly>[]>;
+  }): Promise<ProjectedRepositoryDoc<TData, TMetaOnly>[]>;
 
-  insertOne(args: { data: TData }): Promise<RepoDoc<TData> | null>;
+  insertOne(args: { data: TData }): Promise<RepositoryDoc<TData> | null>;
 
   updateOne(args: {
     id: string;
@@ -60,7 +64,7 @@ export interface IRepo<TData> extends RepoMethods<TData, Promise<unknown>> {
 ////////////////////////////////////////////////////////////////////////////////
 // Game Document
 ////////////////////////////////////////////////////////////////////////////////
-export type GameDoc = RepoDoc<GameData>;
+export type GameDoc = RepositoryDoc<GameData>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Room Document
@@ -71,4 +75,4 @@ type RoomData = {
   host: RoomPlayer;
   guests: RoomPlayer[];
 };
-export type RoomDoc = RepoDoc<RoomData>;
+export type RoomDoc = RepositoryDoc<RoomData>;

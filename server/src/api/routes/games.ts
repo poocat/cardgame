@@ -98,7 +98,7 @@ games.get(
  * Can poll this endpoint efficiently by setting "If-None-Match" header.
  *
  * A player's id can be passed as a query string, to indicate which player
- * is requesting the game state.
+ * is requesting the game data.
  ******************************************************************************/
 games.get(
   ROUTES.games.methods.getOne.path,
@@ -148,9 +148,9 @@ games.get(
 /******************************************************************************
  * ### PATCH games/{id}
  *
- * The primary method by which the client updates the game state.
+ * The primary method by which the client updates the game data.
  *
- * Sends a decision for the current choice, and updates the game state
+ * Sends a decision for the current choice, and updates the game data
  * accordingly.
  ******************************************************************************/
 games.patch(

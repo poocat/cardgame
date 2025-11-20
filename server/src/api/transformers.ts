@@ -9,7 +9,7 @@ import {
   roomDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
-import { CardData, Decision, GameData, Id } from "@common/game/types";
+import { CardData, Decision, GameData, Id } from "@server/types";
 import { RoomDoc } from "@server/db/types";
 
 type RoomData = RoomDoc["data"];
