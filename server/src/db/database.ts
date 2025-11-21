@@ -3,6 +3,7 @@ import { CONFIG } from "@server/config";
 import { migrations, collectionNames } from "@server/db/migrations";
 import { Repository } from "@server/db/repository";
 import { GameDoc, RoomDoc } from "@server/db/types";
+import { logger } from "@server/logger";
 
 let db: Db;
 
@@ -10,6 +11,7 @@ export async function runMigrations(db: Db): Promise<void> {
   const migrationsCollection = db.collection("_migrations");
   await migrationsCollection.createIndex({ version: 1 }, { unique: true });
 
+  let appliedCount = 0;
   for (const migration of migrations) {
     const applied = await migrationsCollection.findOne({
       version: migration.version,
@@ -21,10 +23,14 @@ export async function runMigrations(db: Db): Promise<void> {
         name: migration.name,
         appliedAt: new Date().toISOString(),
       });
-      console.log(`Applied migration ${migration.version}: ${migration.name}`);
+      logger.info(
+        { version: migration.version, name: migration.name },
+        "migration applied",
+      );
+      appliedCount++;
     }
   }
-  console.log("All migrations up to date");
+  logger.info({ count: appliedCount }, "all migrations applied");
 }
 
 export async function initDb() {
@@ -32,9 +38,9 @@ export async function initDb() {
   try {
     const mongoClient = await MongoClient.connect(mongoConnectionString);
     db = mongoClient.db(CONFIG.mongoDbName);
-    console.log("Connected to MongoDB");
+    logger.info({ dbName: db.databaseName }, "database connected");
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+    logger.error({ error }, "database connection failed");
     process.exit(1);
   }
   runMigrations(db);

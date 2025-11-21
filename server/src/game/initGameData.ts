@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { CONSTANTS } from "@common/game/constants";
 import { ActionType, GameData } from "@server/types";
 import { CARDS } from "@server/game/cards/definitions";
+import { logger } from "@server/logger";
 
 function makeId(): string {
   return randomUUID().toString();
@@ -22,6 +23,7 @@ function shuffle(array: unknown[]) {
 export function initGameData(
   players: { id: string; name: string }[],
 ): GameData {
+  logger.info({ playerCount: players.length }, "game initialized");
   const playerData: GameData["players"] = players.map((player) => ({
     ...player,
     turnCount: 0,
