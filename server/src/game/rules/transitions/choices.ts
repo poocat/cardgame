@@ -28,6 +28,7 @@ export function nullChoice(): ChoiceData {
     name: "",
     type: "arbitrary",
     choosingPlayerId: "",
+    instructions: "",
     values: [],
     min: 0,
     max: 0,
@@ -77,6 +78,7 @@ export function createActionChoices(args: {
       min: args.choiceDef.min,
       max: args.choiceDef.max,
       choosingPlayerId: playerId,
+      instructions: args.choiceDef.instructions,
       values,
     };
   });
@@ -97,6 +99,7 @@ export function createDrawingCardsChoice(args: {
     name: "cardsToDraw",
     type: "cardId",
     choosingPlayerId: args.playerId,
+    instructions: "Choose a card to draw.",
     values,
     // If nothing left in the deck, allow zero choices.
     min: Math.min(values.length, 1),
@@ -146,6 +149,7 @@ export function createChoosingActionChoice(args: {
     name: "actionToTake",
     type: "actionId",
     choosingPlayerId: args.playerId,
+    instructions: "Choose an action to take, or pass your turn.",
     values,
     min: 0,
     max: 1,

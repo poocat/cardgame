@@ -70,7 +70,7 @@ export function digestGameData({
       type: cardData.type,
       actions: gameData.actions
         .filter((a) => a.card.id === cardData.id)
-        .map((a) => ({ id: a.id, type: a.type, instructions: "TODO" })),
+        .map((a) => ({ id: a.id, type: a.type, instructions: a.instructions })),
       chips: gameData.chips
         .filter(
           (c) =>
@@ -103,7 +103,7 @@ export function digestGameData({
           anonymizedPlayerIdMap[
             gameData.activity.currentChoice.choosingPlayerId
           ],
-        instructions: "TODO",
+        instructions: gameData.activity.currentChoice.instructions,
       },
     },
     otherPlayers: otherPlayerData.map((playerData) => {

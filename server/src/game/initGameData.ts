@@ -63,13 +63,16 @@ export function initGameData(
     const actions: GameData["actions"] = [];
     cards.forEach((c) => {
       const cardDef = CARDS.find(({ name }) => name === c.name);
-      Object.keys(cardDef?.actions ?? {}).forEach((actionType) => {
-        actions.push({
-          id: makeId(),
-          type: actionType as ActionType,
-          card: { name: c.name, id: c.id, ownerId: c.ownerId },
-        });
-      });
+      Object.entries(cardDef?.actions ?? {}).forEach(
+        ([actionType, actionDef]) => {
+          actions.push({
+            id: makeId(),
+            type: actionType as ActionType,
+            card: { name: c.name, id: c.id, ownerId: c.ownerId },
+            instructions: actionDef.instructions ?? "",
+          });
+        },
+      );
     });
     return actions;
   })(cardData);
@@ -92,6 +95,7 @@ export function initGameData(
         min: 1,
         max: 1,
         choosingPlayerId: firstPlayer.id,
+        instructions: "Choose your first card to draw.",
       },
       nextChoices: [],
     },
