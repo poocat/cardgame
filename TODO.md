@@ -1,7 +1,15 @@
 # TODO:
 
-In no particular order:
+Production readiness:
 - [x] Transform data for front end views, redact values that users shouldn't see, and anonymize player ids.
-- [ ] Persist games and rooms with database.
-- [ ] Support defining cards in serializable format, without code.
-- [ ] Replace string literals (for text that might make its way to the user) with data structures that support translations.
+- [x] Persist games and rooms with database.
+- [x] Set up logging utility.
+- [ ] Add slowdown and rate limiting.
+- [ ] Send instructions in game digest.
+- [ ] Write test suite.
+- [ ] Enable linter.
+- [ ] Write helpers for defining common actions for cards.
+
+One day:
+- [ ] Set up messaging system that supports different languages.
+- [ ] Support serializable card definitions.
