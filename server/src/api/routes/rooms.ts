@@ -6,6 +6,7 @@ import { digestRoomData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
 import { makeId, makeMetaHash } from "@server/db/meta";
 import { getRepositories } from "@server/db/database";
+import { logger } from "@server/logger";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
@@ -35,11 +36,13 @@ rooms.post(
       });
 
       if (!room) {
+        logger.error({ hostName: req.body.hostName }, "room creation failed");
         return res
           .status(STATUS.internalServerError)
           .json({ message: `could not insert room` });
       }
 
+      logger.info({ roomId: room.meta.id, hostId }, "room created");
       res.status(STATUS.ok).json({ roomId: room.meta.id, hostId });
     },
   }),
@@ -65,6 +68,7 @@ rooms.get(
         metaOnly: true,
       });
       if (!projected) {
+        logger.warn({ roomId: req.params.id }, "room not found");
         return res
           .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });
@@ -72,11 +76,16 @@ rooms.get(
 
       const etag = makeMetaHash(projected.meta, req.query.playerId);
       if (req.get("If-None-Match") === etag) {
+        logger.debug(
+          { roomId: req.params.id, playerId: req.query.playerId },
+          "room not modified",
+        );
         return res.status(STATUS.notModified).end();
       }
 
       const room = await roomRepo.findOne({ id: req.params.id });
       if (!room) {
+        logger.warn({ roomId: req.params.id }, "room not found");
         return res
           .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });
@@ -115,6 +124,7 @@ rooms.post(
 
       const room = await roomRepo.findOne({ id: req.params.id });
       if (!room) {
+        logger.warn({ roomId: req.params.id }, "room not found");
         return res
           .status(STATUS.notFound)
           .json({ message: `room ${req.params.id} not found` });
@@ -125,6 +135,10 @@ rooms.post(
       const { maxNumPlayers } = CONSTANTS;
       const currentPlayers = [room.data.host, ...room.data.guests];
       if (currentPlayers.length >= maxNumPlayers) {
+        logger.warn(
+          { roomId: req.params.id, reason: "max players", guestName },
+          "guest add conflict",
+        );
         return res.status(STATUS.conflict).json({
           message: `room already has ${maxNumPlayers} players`,
         });
@@ -132,6 +146,10 @@ rooms.post(
 
       const currentPlayerNames = currentPlayers.map((p) => p.name.trim());
       if (currentPlayerNames.includes(guestName.trim())) {
+        logger.warn(
+          { roomId: req.params.id, reason: "duplicate name", guestName },
+          "guest add conflict",
+        );
         return res.status(STATUS.conflict).json({
           message: `room already has player '${guestName}'`,
         });
@@ -151,11 +169,13 @@ rooms.post(
         data: roomData,
       });
       if (result.matchedCount === 0) {
+        logger.warn({ roomId: req.params.id, guestName }, "guest add conflict");
         return res
           .status(STATUS.conflict)
           .json({ message: `room already updated, please retry` });
       }
 
+      logger.info({ roomId: req.params.id, guestId, guestName }, "guest added");
       return res.status(STATUS.ok).json({ playerId: guestId });
     },
   }),

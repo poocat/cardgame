@@ -8,6 +8,7 @@ import { makeDecision } from "@server/game/stateMachine";
 import { initGameData } from "@server/game/initGameData";
 import { makeMetaHash } from "@server/db/meta";
 import { getRepositories } from "@server/db/database";
+import { logger } from "@server/logger";
 
 export const games = Router();
 games.use(jsonHandler());
@@ -31,10 +32,15 @@ games.post(
       const room = await roomRepo.findOne({ id: req.body.roomId });
 
       if (!room) {
+        logger.warn({ roomId: req.body.roomId }, "room not found");
         return res
           .status(STATUS.notFound)
           .json({ message: `room ${req.body.roomId} not found` });
       } else if (room.data.host.id !== req.body.hostId) {
+        logger.warn(
+          { roomId: req.body.roomId, attemptedBy: req.body.hostId },
+          "unauthorized game start",
+        );
         return res
           .status(STATUS.forbidden)
           .json({ message: `game can only be started by host` });
@@ -44,6 +50,14 @@ games.post(
 
       const { minNumPlayers } = CONSTANTS;
       if (players.length < minNumPlayers) {
+        logger.warn(
+          {
+            roomId: req.body.roomId,
+            playerCount: players.length,
+            required: minNumPlayers,
+          },
+          "insufficient players",
+        );
         return res
           .status(STATUS.badRequest)
           .json({ message: `room does not have enough players` });
@@ -53,6 +67,7 @@ games.post(
       const game = await gameRepo.insertOne({ data: gameData });
 
       if (!game) {
+        logger.error({ roomId: req.body.roomId }, "game creation failed");
         return res
           .status(STATUS.internalServerError)
           .json({ message: `failed to insert game` });
@@ -61,6 +76,14 @@ games.post(
       const roomData = { ...room.data, gameId: game.meta.id };
       await roomRepo.updateOne({ id: room.meta.id, data: roomData });
 
+      logger.info(
+        {
+          gameId: game.meta.id,
+          roomId: req.body.roomId,
+          playerCount: players.length,
+        },
+        "game created",
+      );
       return res.status(STATUS.ok).json({ gameId: game.meta.id });
     },
   }),
@@ -79,6 +102,8 @@ games.get(
       const { games: gameRepo } = getRepositories();
 
       const games = await gameRepo.findMany({ metaOnly: true });
+
+      logger.debug({ count: games.length }, "listing games");
 
       const items = games.map((g) => ({
         gameId: g.meta.id,
@@ -112,6 +137,7 @@ games.get(
         metaOnly: true,
       });
       if (!projected) {
+        logger.warn({ gameId: req.params.id }, "game not found");
         return res
           .status(STATUS.notFound)
           .send({ message: `game ${req.params.id} not found` });
@@ -119,11 +145,16 @@ games.get(
 
       const etag = makeMetaHash(projected.meta, req.query.playerId);
       if (req.get("If-None-Match") === etag) {
+        logger.debug(
+          { gameId: req.params.id, playerId: req.query.playerId },
+          "game not modified",
+        );
         return res.status(STATUS.notModified).end();
       }
 
       const game = await gameRepo.findOne({ id: req.params.id });
       if (!game) {
+        logger.warn({ gameId: req.params.id }, "game not found");
         return res
           .status(STATUS.notFound)
           .send({ message: `game ${req.params.id} not found` });
@@ -162,7 +193,7 @@ games.patch(
 
       const game = await gameRepo.findOne({ id: req.params.id });
       if (!game) {
-        // 404-Not Found
+        logger.warn({ gameId: req.params.id }, "game not found");
         return res
           .status(STATUS.notFound)
           .send({ message: `game ${req.params.id} not found` });
@@ -174,6 +205,16 @@ games.patch(
         playerIds: game.data.players.map((p) => p.id),
       });
 
+      logger.info(
+        {
+          gameId: req.params.id,
+          playerId: decision.playerId,
+          decisionName: decision.name,
+          activityType: game.data.activity.type,
+        },
+        "decision received",
+      );
+
       const nextGameData = makeDecision({
         gameData: game.data,
         decision,
@@ -184,10 +225,21 @@ games.patch(
         data: nextGameData,
       });
       if (result.matchedCount === 0) {
+        logger.error({ gameId: req.params.id }, "game update failed");
         return res
           .status(STATUS.internalServerError)
           .json({ message: `could not update game` });
       }
+
+      logger.info(
+        {
+          gameId: req.params.id,
+          playerId: decision.playerId,
+          previousActivity: game.data.activity.type,
+          newActivity: nextGameData.activity.type,
+        },
+        "decision applied",
+      );
 
       res.status(STATUS.noContent).end();
     },

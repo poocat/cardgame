@@ -7,13 +7,16 @@ import {
   RepositoryDoc,
 } from "@server/db/types";
 import { Queries } from "@server/db/repository/Queries";
+import { makeChildLogger } from "@server/logger";
 
 export class Repository<TData> implements IRepository<TData> {
   queries: Queries<TData>;
+  private logger;
 
   constructor(protected readonly collection: Collection<RepositoryDoc<TData>>) {
     this.collection = collection;
     this.queries = new Queries();
+    this.logger = makeChildLogger({ collection: collection.collectionName });
   }
 
   // Overload for when metaOnly is explicitly true
@@ -32,8 +35,17 @@ export class Repository<TData> implements IRepository<TData> {
     id: string;
     metaOnly?: TMetaOnly;
   }): Promise<ProjectedRepositoryDoc<TData, TMetaOnly> | null> {
+    this.logger.debug(
+      { id: args.id, metaOnly: args.metaOnly },
+      "finding document",
+    );
     const query = this.queries.findOne(args);
     const result = await this.collection.findOne(query.filter, query.options);
+
+    if (!result) {
+      this.logger.warn({ id: args.id }, "document not found");
+    }
+
     return result;
   }
 
@@ -65,7 +77,14 @@ export class Repository<TData> implements IRepository<TData> {
       data: args.data,
     };
     const result = await this.collection.insertOne(doc);
-    return result.insertedId ? doc : null;
+
+    if (result.insertedId) {
+      this.logger.info({ id: doc.meta.id }, "document inserted");
+      return doc;
+    } else {
+      this.logger.error({}, "insert failed");
+      return null;
+    }
   }
 
   async updateOne(args: {
@@ -83,12 +102,31 @@ export class Repository<TData> implements IRepository<TData> {
       $inc: { "meta.version": 1 },
     };
     const result = await this.collection.updateOne(query.filter, update);
+
+    if (result.matchedCount === 0) {
+      this.logger.warn(
+        { id: args.id, expectedVersion: args.version },
+        "version conflict",
+      );
+    } else {
+      this.logger.debug(
+        { id: args.id, matched: result.matchedCount },
+        "document updated",
+      );
+    }
+
     return result;
   }
 
   async deleteOne(args: { id: string }): Promise<DeleteResult> {
     const query = this.queries.deleteOne(args);
     const result = await this.collection.deleteOne(query.filter);
+
+    this.logger.info(
+      { id: args.id, deleted: result.deletedCount },
+      "document deleted",
+    );
+
     return result;
   }
 }
