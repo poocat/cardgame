@@ -1,4 +1,3 @@
-import { Mutator } from "@server/game/runtime";
 import { IMutator, MutatorArgs } from "@server/game/types";
 
 type QueueItem = {
@@ -35,9 +34,27 @@ export class MutatorQueue implements IMutator {
     this.queue.push({ method: "setActivity", args });
   }
 
-  apply(mutator: Mutator) {
+  apply(mutator: IMutator) {
     this.queue.slice(this.index).forEach((item) => {
-      mutator[item.method](item.args as any);
+      switch (item.method) {
+        case "moveCard":
+          mutator.moveCard(item.args);
+          break;
+        case "moveChips":
+          mutator.moveChips(item.args);
+          break;
+        case "exhaustCard":
+          mutator.exhaustCard(item.args);
+          break;
+        case "passTurn":
+          mutator.passTurn(item.args);
+          break;
+        case "setActivity":
+          mutator.setActivity(item.args);
+          break;
+        default:
+          throw new Error(`Could not apply mutation: ${item}`);
+      }
       this.index += 1;
     });
   }
