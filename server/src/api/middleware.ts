@@ -16,7 +16,9 @@ export const burstLimiter = rateLimit({
   legacyHeaders: false,
   handler: (req, res) => {
     logger.warn({ ip: req.ip, url: req.url }, "burst rate limit exceeded");
-    res.status(429).json({ message: "Too many requests, slow down" });
+    res
+      .status(STATUS.tooManyRequests)
+      .json({ message: "Too many requests, slow down" });
   },
 });
 
