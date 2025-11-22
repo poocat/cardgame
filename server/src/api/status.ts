@@ -13,6 +13,8 @@ export const STATUS = {
   notFound: 404,
   /** 409-Conflict */
   conflict: 409,
+  /** 429-Too Many Requests */
+  tooManyRequests: 429,
   /** 500-Internal Server Error */
   internalServerError: 500,
 } as const;

@@ -5,7 +5,7 @@ Production readiness (backend):
 - [x] Persist games and rooms with database.
 - [x] Set up logging utility.
 - [x] Send instructions in game digest.
-- [ ] Add slowdown and rate limiting.
+- [x] Add slowdown and rate limiting.
 - [ ] Write test suite.
 - [ ] Enable linter.
 - [ ] Write helpers for defining common actions for cards.

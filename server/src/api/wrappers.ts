@@ -3,6 +3,8 @@
  */
 import { RequestHandler } from "express";
 import { z, ZodError, ZodObject, ZodRawShape } from "zod";
+import { STATUS } from "@server/api/status";
+import { logger } from "@server/logger";
 
 type ErrorResponseBody = { message: string };
 
@@ -44,8 +46,11 @@ export function validated<TSchemas extends RouteSchemas>(args: {
       }
     } catch (err) {
       if (err instanceof ZodError) {
-        // 400-Bad Request
-        return res.status(400).json({ message: err.message });
+        logger.warn(
+          { method: req.method, url: req.url, errors: err },
+          "validation failed",
+        );
+        return res.status(STATUS.badRequest).json({ message: err.message });
       }
       return next(err);
     }
