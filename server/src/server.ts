@@ -4,6 +4,11 @@ import { games, rooms } from "@server/api/routes";
 import { CONFIG } from "@server/config";
 import { initDb } from "@server/db/database";
 import { logger } from "@server/logger";
+import {
+  burstLimiter,
+  pollSlowdown,
+  sustainedLimiter,
+} from "@server/api/middleware";
 
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
@@ -12,6 +17,11 @@ export async function startServer() {
 
   const app = express();
   app.use(express.json());
+
+  // Rate limiting and slowdown:
+  app.use(burstLimiter);
+  app.use(sustainedLimiter);
+  app.use(pollSlowdown);
 
   // Routes:
   app.use(ROUTES.games.path, games);
