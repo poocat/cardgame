@@ -2,10 +2,10 @@ import z from "zod";
 import { gameDigestSchema, roomDigestSchema } from "@common/api/digests";
 import { Routes } from "@common/api/types";
 
-export const gameIdSchema = z.string();
-export const playerIdSchema = z.string();
+export const gameIdSchema = z.uuid();
+export const playerIdSchema = z.uuid();
 export const playerNameSchema = z.string().min(1).max(20);
-export const roomIdSchema = z.string();
+export const roomIdSchema = z.uuid();
 export const timestampSchema = z.iso.datetime();
 
 export const ROUTES = {
