@@ -1,4 +1,4 @@
-// biome-ignore lint/style/useImportType: TODO!!! UNDERSTAND!!! EXPLAIN!!!
+// biome-ignore lint/style/useImportType: these are used exclusively in `typeof` expressions, which require value imports, not type imports.
 import {
   actionTypes,
   activityTypes,
@@ -42,9 +42,9 @@ export type ActionTypeMap<T> = _MapFromArray<typeof actionTypes, T>;
 export type ActionData = _DiscriminatedUnionFromArray<
   typeof actionTypes,
   {
-    play: {};
-    ability: {};
-    discard: {};
+    play: unknown;
+    ability: unknown;
+    discard: unknown;
   },
   {
     id: Id;
@@ -61,7 +61,7 @@ export type ChipLocationMap<T> = _MapFromArray<typeof chipLocationTypes, T>;
 export type ChipLocationData = _DiscriminatedUnionFromArray<
   typeof chipLocationTypes,
   {
-    inReserve: {};
+    inReserve: unknown;
     onCard: { cardId: Id };
   }
 >;
@@ -76,10 +76,10 @@ export type CardLocationMap<T> = _MapFromArray<typeof cardLocationTypes, T>;
 export type CardLocationData = _DiscriminatedUnionFromArray<
   typeof cardLocationTypes,
   {
-    inHand: {};
+    inHand: unknown;
     inPlay: { exhausted: boolean };
-    inDiscard: {};
-    inDeck: {};
+    inDiscard: unknown;
+    inDeck: unknown;
   }
 >;
 
@@ -88,8 +88,8 @@ export type CardTypeMap<T> = _MapFromArray<typeof cardTypes, T>;
 export type CardData = _DiscriminatedUnionFromArray<
   typeof cardTypes,
   {
-    producer: {};
-    consumer: {};
+    producer: unknown;
+    consumer: unknown;
   },
   {
     id: Id;
@@ -111,11 +111,11 @@ export type ChoiceValue = string;
 export type ChoiceData = _DiscriminatedUnionFromArray<
   typeof choiceTypes,
   {
-    arbitrary: {};
-    actionId: {};
-    cardId: {};
-    chipId: {};
-    playerId: {};
+    arbitrary: unknown;
+    actionId: unknown;
+    cardId: unknown;
+    chipId: unknown;
+    playerId: unknown;
   },
   {
     name: string;
@@ -138,7 +138,7 @@ export type ActivityTypeMap<T> = _MapFromArray<typeof activityTypes, T>;
 export type ActivityData = _DiscriminatedUnionFromArray<
   typeof activityTypes,
   {
-    drawingCards: {};
+    drawingCards: unknown;
     choosingAction: { playerChoosingActionId: Id };
     takingAction: {
       actionId: Id;
