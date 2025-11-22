@@ -148,8 +148,9 @@ export function makeDecision(args: {
        * and roll back.
        */
       const previousActivityType = currentActivity.type;
-      currentActivity = next.activity;
       currentAccessor = next.dequeueMutations();
+      currentActivity = next.activity;
+      currentDecisions = new Decisions([]);
 
       logger.info(
         {
@@ -160,7 +161,6 @@ export function makeDecision(args: {
         "activity transitioned",
       );
 
-      currentDecisions = new Decisions([]);
       // If the next activity has no choices to be made, repeat the process with
       // the updated game data, activity, decisions.
     } while (currentActivity.currentChoice.max === 0);
