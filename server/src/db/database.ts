@@ -43,7 +43,7 @@ export async function initDb() {
     logger.error({ error }, "database connection failed");
     process.exit(1);
   }
-  runMigrations(db);
+  await runMigrations(db);
 }
 
 export function getRepositories() {
