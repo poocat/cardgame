@@ -16,7 +16,7 @@ export const migrations: Migration[] = [
     version: 1,
     name: "create_initial_indexes",
     up: async (db: Db) => {
-      Object.values(collectionNames).forEach(async (collectionName) => {
+      for (const collectionName of Object.values(collectionNames)) {
         await db
           .collection(collectionName)
           .createIndex(
@@ -32,7 +32,7 @@ export const migrations: Migration[] = [
         await db
           .collection(collectionName)
           .createIndex({ "meta.updatedAt": -1 }, { name: "updated_at_desc" });
-      });
+      }
     },
   },
 ];

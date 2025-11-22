@@ -6,7 +6,7 @@ import { Decision, GameData } from "@server/types";
 import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
 
-function shuffle(array: any[]) {
+function shuffle<T>(array: T[]) {
   const copy = [...array];
   let currentIndex = array.length;
   while (currentIndex !== 0) {

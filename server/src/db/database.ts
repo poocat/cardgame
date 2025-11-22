@@ -39,11 +39,11 @@ export async function initDb() {
     const mongoClient = await MongoClient.connect(mongoConnectionString);
     db = mongoClient.db(CONFIG.mongoDbName);
     logger.info({ dbName: db.databaseName }, "database connected");
+    await runMigrations(db);
   } catch (error) {
     logger.error({ error }, "database connection failed");
-    process.exit(1);
+    throw error;
   }
-  runMigrations(db);
 }
 
 export function getRepositories() {

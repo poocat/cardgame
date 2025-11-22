@@ -11,7 +11,7 @@ export class Next {
   public mutatorQueue: MutatorQueue;
 
   constructor(gameData: GameData) {
-    this.gameData = JSON.parse(JSON.stringify(gameData));
+    this.gameData = structuredClone(gameData);
     this.mutatorQueue = new MutatorQueue();
   }
 

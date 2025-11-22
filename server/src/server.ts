@@ -14,7 +14,12 @@ import {
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
 
-  await initDb();
+  try {
+    await initDb();
+  } catch (error) {
+    logger.error({ error }, "failed to initialize server");
+    process.exit(1);
+  }
 
   const app = express();
   app.use(express.json());
