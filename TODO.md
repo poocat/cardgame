@@ -9,6 +9,7 @@ Production readiness (backend):
 - [ ] Write test suite.
 - [ ] Enable linter.
 - [ ] Write helpers for defining common actions for cards.
+- [ ] Support moving cards back into the deck.
 
 One day:
 - [ ] Set up messaging system that supports different languages.
