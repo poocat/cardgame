@@ -47,9 +47,9 @@ export const sustainedLimiter = rateLimit({
  ******************************************************************************/
 export const pollSlowdown = slowDown({
   windowMs: 30 * 1000,
-  delayAfter: 15,
-  delayMs: (hits) => (hits - 15) * 200,
-  maxDelayMs: 2000,
+  delayAfter: 60,
+  delayMs: (hits) => Math.max(0, hits - 60) * 200,
+  maxDelayMs: 1000,
 });
 
 /******************************************************************************
