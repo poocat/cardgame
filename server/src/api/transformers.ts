@@ -27,8 +27,8 @@ function anonymizeId(id: string, salt: string): string {
   const uuid = [
     hash.substring(0, 8),
     hash.substring(8, 12),
-    "4" + hash.substring(12, 15), // Set the version to 4
-    "8" + hash.substring(15, 18), // Set the variant to 8 (RFC 4122)
+    `4${hash.substring(12, 15)}`, // Set the version to 4
+    `8${hash.substring(15, 18)}`, // Set the variant to 8 (RFC 4122)
     hash.substring(18, 30),
   ].join("-");
 

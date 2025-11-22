@@ -83,7 +83,7 @@ export const Game = () => {
   }, []);
   const handleRemoveChoice = useCallback((value: string) => {
     setChoices((current) => {
-      const idx = current.findIndex((v) => v === value);
+      const idx = current.indexOf(value);
       return [...current.slice(0, idx), ...current.slice(idx)];
     });
   }, []);
