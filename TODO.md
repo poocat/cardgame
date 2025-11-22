@@ -1,11 +1,11 @@
 # TODO:
 
-Production readiness:
+Production readiness (backend):
 - [x] Transform data for front end views, redact values that users shouldn't see, and anonymize player ids.
 - [x] Persist games and rooms with database.
 - [x] Set up logging utility.
+- [x] Send instructions in game digest.
 - [ ] Add slowdown and rate limiting.
-- [ ] Send instructions in game digest.
 - [ ] Write test suite.
 - [ ] Enable linter.
 - [ ] Write helpers for defining common actions for cards.
