@@ -1,5 +1,6 @@
-import { pino, Logger } from "pino";
 import { CONFIG } from "@server/config";
+import type { Logger } from "pino";
+import { pino } from "pino";
 
 export const logger: Logger = pino({
   level: process.env.LOG_LEVEL || "info",

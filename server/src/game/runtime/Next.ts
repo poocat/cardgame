@@ -1,5 +1,5 @@
-import { ActivityData, GameData } from "@server/types";
 import { Accessor, Mutator, MutatorQueue } from "@server/game/runtime";
+import type { ActivityData, GameData } from "@server/types";
 
 /******************************************************************************
  * A utility for managing changes to game data that occur as a result of the

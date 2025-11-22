@@ -1,4 +1,5 @@
-import {
+import type { Decisions } from "@server/game/runtime";
+import type {
   ActionData,
   ActionTypeMap,
   ActivityData,
@@ -14,7 +15,6 @@ import {
   Id,
   PlayerData,
 } from "@server/types";
-import { Decisions } from "@server/game/runtime";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Utility types
@@ -24,9 +24,11 @@ interface _DeepReadonlyArray<T> extends ReadonlyArray<DeepReadonly<T>> {}
 type _DeepReadonlyObject<T> = {
   readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
+type _Function = (...args: never) => unknown;
+
 export type DeepReadonly<T> = T extends (infer R)[]
   ? _DeepReadonlyArray<R>
-  : T extends Function
+  : T extends _Function
     ? T
     : T extends object
       ? _DeepReadonlyObject<T>

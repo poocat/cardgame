@@ -80,10 +80,10 @@ export function usePoller<TData extends object>(args: {
   }, [polling, args.url, args.getData]);
 
   // Use to update the polling count and elapsed time.
-  const updatePollClock = (intervalMs: number) => {
+  const updatePollClock = useCallback((intervalMs: number) => {
     setPollCount((i) => i + 1);
     setElapsedTimeMs((t) => t + intervalMs);
-  };
+  }, []);
 
   // Examine the latest data to find out if polling should continue.
   const pollingEnabled = useMemo(
@@ -119,7 +119,13 @@ export function usePoller<TData extends object>(args: {
     return () => {
       if (intervalIdRef.current) clearInterval(intervalIdRef.current);
     };
-  }, [polling, fetchResource, args.getIntervalMs, elapsedTimeMs]);
+  }, [
+    polling,
+    fetchResource,
+    args.getIntervalMs,
+    elapsedTimeMs,
+    updatePollClock,
+  ]);
 
   return polling
     ? {

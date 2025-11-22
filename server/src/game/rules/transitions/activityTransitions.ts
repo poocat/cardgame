@@ -1,6 +1,6 @@
 import { CONSTANTS } from "@common/game/constants";
-import { ActivityTypeMap, PlayerData } from "@server/types";
-import { IAccessor, IDecisions, IMutator } from "@server/game/types";
+import type { IAccessor, IDecisions, IMutator } from "@server/game/types";
+import type { ActivityTypeMap, PlayerData } from "@server/types";
 import {
   createChoosingActionChoice,
   createDrawingCardsChoice,

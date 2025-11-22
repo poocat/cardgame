@@ -1,16 +1,17 @@
 /**
  * Contains transformations of database models into "digests" that will
  */
-import { createHash } from "crypto";
-import z from "zod";
-import {
+
+import type {
   gameDigestSchema,
   inPlayCardDigestSchema,
   roomDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
-import { CardData, Decision, GameData, Id } from "@server/types";
-import { RoomDoc } from "@server/db/types";
+import type { RoomDoc } from "@server/db/types";
+import type { CardData, Decision, GameData, Id } from "@server/types";
+import { createHash } from "crypto";
+import type z from "zod";
 
 type RoomData = RoomDoc["data"];
 

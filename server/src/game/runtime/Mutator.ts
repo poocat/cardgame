@@ -1,5 +1,5 @@
-import { GameData } from "@server/types";
-import { IMutator, MutatorArgs } from "@server/game/types";
+import type { IMutator, MutatorArgs } from "@server/game/types";
+import type { GameData } from "@server/types";
 
 /******************************************************************************
  * ### Mutator

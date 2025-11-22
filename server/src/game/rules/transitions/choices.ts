@@ -1,4 +1,11 @@
-import {
+import { getActionDefinition } from "@server/game/cards/utils";
+import type {
+  ActionContext,
+  ChoiceDef,
+  IAccessor,
+  IDecisions,
+} from "@server/game/types";
+import type {
   ActionData,
   ActivityData,
   ChoiceData,
@@ -6,14 +13,7 @@ import {
   NextChoiceData,
   PlayerData,
 } from "@server/types";
-import { getActionDefinition } from "@server/game/cards/utils";
 import { actionTypeChecks } from "../checks/actionChecks";
-import {
-  ActionContext,
-  ChoiceDef,
-  IAccessor,
-  IDecisions,
-} from "@server/game/types";
 
 /******************************************************************************
  * Use to generate a "null choice", which signals to the state machine that the

@@ -1,6 +1,6 @@
-import { ActionData, ActionTypeMap } from "@server/types";
+import type { CheckResult, IAccessor } from "@server/game/types";
+import type { ActionData, ActionTypeMap } from "@server/types";
 import { cardPlayChecks } from "./cardChecks";
-import { CheckResult, IAccessor } from "@server/game/types";
 
 /******************************************************************************
  * ### Action Validation

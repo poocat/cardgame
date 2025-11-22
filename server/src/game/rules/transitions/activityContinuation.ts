@@ -1,15 +1,12 @@
-import {
+import { getActionDefinition } from "@server/game/cards/utils";
+import type { IAccessor, IDecisions } from "@server/game/types";
+import type {
   ActivityData,
   ActivityTypeMap,
   Decision,
   NextChoiceData,
 } from "@server/types";
-import { getActionDefinition } from "@server/game/cards/utils";
-import {
-  createActionChoices,
-  nullChoice,
-} from "./choices";
-import { IAccessor, IDecisions } from "@server/game/types";
+import { createActionChoices, nullChoice } from "./choices";
 
 /******************************************************************************
  * ### Activity Continuation Logic

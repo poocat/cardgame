@@ -1,8 +1,8 @@
-import { randomUUID } from "crypto";
 import { CONSTANTS } from "@common/game/constants";
-import { ActionType, GameData } from "@server/types";
 import { CARDS } from "@server/game/cards/definitions";
 import { logger } from "@server/logger";
+import type { ActionType, GameData } from "@server/types";
+import { randomUUID } from "crypto";
 
 function makeId(): string {
   return randomUUID().toString();
@@ -10,8 +10,8 @@ function makeId(): string {
 
 function shuffle(array: unknown[]) {
   let currentIndex = array.length;
-  while (currentIndex != 0) {
-    let randomIndex = Math.floor(Math.random() * currentIndex);
+  while (currentIndex !== 0) {
+    const randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
     [array[currentIndex], array[randomIndex]] = [
       array[randomIndex],
@@ -49,13 +49,13 @@ export function initGameData(
   const chipData = ((players: GameData["players"]): GameData["chips"] => {
     const chips: GameData["chips"] = [];
     players.forEach(({ id }) => {
-      [...Array(CONSTANTS.numChipsPerPlayer).keys()].map((i) => {
+      for (let i = 0; i < CONSTANTS.numChipsPerPlayer; i++) {
         chips.push({
           id: makeId(),
           location: { type: "inReserve" },
           ownerId: id,
         });
-      });
+      }
     });
     return chips;
   })(playerData);

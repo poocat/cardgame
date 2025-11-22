@@ -1,13 +1,13 @@
-import { Collection, DeleteResult, UpdateResult } from "mongodb";
 import { makeDocumentMeta } from "@server/db/meta";
-import {
+import { Queries } from "@server/db/repository/Queries";
+import type {
   IRepository,
   OrderByMeta,
   ProjectedRepositoryDoc,
   RepositoryDoc,
 } from "@server/db/types";
-import { Queries } from "@server/db/repository/Queries";
 import { makeChildLogger } from "@server/logger";
+import type { Collection, DeleteResult, UpdateResult } from "mongodb";
 
 export class Repository<TData> implements IRepository<TData> {
   queries: Queries<TData>;

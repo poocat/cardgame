@@ -1,6 +1,6 @@
-import z from "zod";
 import { gameDigestSchema, roomDigestSchema } from "@common/api/digests";
-import { Routes } from "@common/api/types";
+import type { Routes } from "@common/api/types";
+import z from "zod";
 
 export const gameIdSchema = z.uuid();
 export const playerIdSchema = z.uuid();
