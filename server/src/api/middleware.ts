@@ -1,6 +1,7 @@
-import { logger } from "@server/logger";
+import { ErrorRequestHandler } from "express";
 import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
+import { logger } from "@server/logger";
 import { STATUS } from "./status";
 
 /******************************************************************************
@@ -48,3 +49,25 @@ export const pollSlowdown = slowDown({
   delayMs: (hits) => (hits - 15) * 200,
   maxDelayMs: 2000,
 });
+
+/******************************************************************************
+ * ### errorHandler
+ *
+ * Logs unhandled errors in request handlers.
+ *
+ * Note: must be registered after all routes.
+ ******************************************************************************/
+export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
+  logger.error(
+    {
+      error: err.message,
+      stack: err.stack,
+      method: req.method,
+      url: req.url,
+    },
+    "unhandled error",
+  );
+  res
+    .status(STATUS.internalServerError)
+    .json({ message: "Internal server error" });
+};

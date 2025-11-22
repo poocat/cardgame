@@ -6,6 +6,7 @@ import { initDb } from "@server/db/database";
 import { logger } from "@server/logger";
 import {
   burstLimiter,
+  errorHandler,
   pollSlowdown,
   sustainedLimiter,
 } from "@server/api/middleware";
@@ -26,6 +27,9 @@ export async function startServer() {
   // Routes:
   app.use(ROUTES.games.path, games);
   app.use(ROUTES.rooms.path, rooms);
+
+  // Error handling:
+  app.use(errorHandler);
 
   app.listen(CONFIG.port, () => {
     logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server listening");
