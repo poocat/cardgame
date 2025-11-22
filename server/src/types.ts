@@ -24,10 +24,10 @@ type _MapFromArray<TArray extends _LiteralArray, TValue> = {
 /** Use to type a discriminated union of objects from constant array of strings, and a mapping of those strings to their data.  */
 type _DiscriminatedUnionFromArray<
   TArray extends _LiteralArray,
-  TDataMap extends _MapFromArray<TArray, any>,
-  Tcommon extends object = {},
+  TDataMap extends _MapFromArray<TArray, unknown>,
+  TCommon extends object = Record<string, unknown>,
 > = {
-  [K in _UnionFromArray<TArray>]: { type: K } & Tcommon & TDataMap[K];
+  [K in _UnionFromArray<TArray>]: { type: K } & TCommon & TDataMap[K];
 }[_UnionFromArray<TArray>];
 
 ////////////////////////////////////////////////////////////////////////////////
