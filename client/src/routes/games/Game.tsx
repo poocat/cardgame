@@ -1,8 +1,8 @@
-import { memo, useCallback, useMemo, useState } from "react";
-import { useParams, useSearchParams } from "react-router";
-import z from "zod";
 import { usePoller } from "@client/hooks/usePoller";
 import { ROUTES } from "@common/api/routes";
+import { memo, useCallback, useMemo, useState } from "react";
+import { useParams, useSearchParams } from "react-router";
+import type z from "zod";
 
 type GamesGetOneResponseBody = z.infer<
   typeof ROUTES.games.methods.getOne.schemas.responseBody
@@ -14,7 +14,7 @@ type GamesPatchRequestBody = z.infer<
 export const Game = () => {
   const { gameId } = useParams();
 
-  const [query, setQuery] = useSearchParams();
+  const [query] = useSearchParams();
   const playerId = query.get("playerId");
 
   const url = useMemo(() => {
@@ -45,6 +45,7 @@ export const Game = () => {
   });
 
   // Memoize the game data, as is only changes with the "last updated" time.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the timestamp is good enough
   const game = useMemo(() => {
     return poller?.data?.digest;
   }, [poller.data?.updatedAt]);
@@ -74,7 +75,7 @@ export const Game = () => {
           setChoices([]);
         });
     }
-  }, [gameId, playerId, game, choosing, poller.fetchOnce]);
+  }, [gameId, playerId, game, choices, choosing, poller.fetchOnce, url]);
 
   // Choice value setters:
   const handleAddChoice = useCallback((value: string) => {
@@ -82,7 +83,7 @@ export const Game = () => {
   }, []);
   const handleRemoveChoice = useCallback((value: string) => {
     setChoices((current) => {
-      const idx = current.findIndex((v) => v === value);
+      const idx = current.indexOf(value);
       return [...current.slice(0, idx), ...current.slice(idx)];
     });
   }, []);
@@ -94,18 +95,16 @@ export const Game = () => {
       ) : (
         <div>Not polling... {poller.error && `(${poller.error})`}</div>
       )}
-      <>
-        <hr />
-        {game && (
-          <PlayArea
-            game={game}
-            choosing={choosing}
-            handleAddChoice={handleAddChoice}
-            handleRemoveChoice={handleRemoveChoice}
-            handleSubmitChoices={handleSubmitChoices}
-          />
-        )}
-      </>
+      <hr />
+      {game && (
+        <PlayArea
+          game={game}
+          choosing={choosing}
+          handleAddChoice={handleAddChoice}
+          handleRemoveChoice={handleRemoveChoice}
+          handleSubmitChoices={handleSubmitChoices}
+        />
+      )}
     </div>
   );
 };
@@ -123,7 +122,7 @@ const PlayArea = memo(
         <div>Current Activity: {JSON.stringify(props.game.activity)}</div>
         {props.choosing && (
           <div>
-            {(props.game.activity?.choice?.values ?? []).map((v: any) => (
+            {(props.game.activity?.choice?.values ?? []).map((v) => (
               <div key={v}>
                 <input
                   id={v}
@@ -139,7 +138,7 @@ const PlayArea = memo(
               </div>
             ))}
             <div>
-              <button onClick={props.handleSubmitChoices}>
+              <button type="button" onClick={props.handleSubmitChoices}>
                 Submit Choices
               </button>
             </div>

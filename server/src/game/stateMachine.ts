@@ -1,4 +1,3 @@
-import { Decision, GameData } from "@server/types";
 import {
   activityTypeContinuedActivity,
   activityTypeEffects,
@@ -8,6 +7,7 @@ import {
 } from "@server/game/rules";
 import { Accessor, Decisions, Next } from "@server/game/runtime";
 import { logger } from "@server/logger";
+import type { Decision, GameData } from "@server/types";
 
 /******************************************************************************
  * ### Main Game "Loop"

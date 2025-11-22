@@ -2,9 +2,10 @@
  * An incredibly clumsy first test, where players choose values randomly for
  * each choice.
  */
-import { Decision, GameData } from "@server/types";
+
 import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
+import type { Decision, GameData } from "@server/types";
 
 function shuffle<T>(array: T[]) {
   const copy = [...array];
@@ -22,7 +23,7 @@ function shuffle<T>(array: T[]) {
 
 function logGameData(gameData: GameData) {
   // Extract states that are not interesting.
-  const { actions, ...rest } = gameData;
+  const { actions: _, ...rest } = gameData;
   console.log(JSON.stringify(rest, null, 2));
 }
 

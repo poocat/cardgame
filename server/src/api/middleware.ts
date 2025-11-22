@@ -1,7 +1,7 @@
-import { ErrorRequestHandler } from "express";
+import { logger } from "@server/logger";
+import type { ErrorRequestHandler } from "express";
 import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
-import { logger } from "@server/logger";
 import { STATUS } from "./status";
 
 /******************************************************************************

@@ -1,12 +1,12 @@
-import { ActivityData, ActivityTypeMap } from "@server/types";
 import { getActionDefinition } from "@server/game/cards/utils";
-import { actionTypeDefaultEffects } from "./actionEffects";
-import {
+import type {
   ActionContext,
   IAccessor,
   IDecisions,
   IMutator,
 } from "@server/game/types";
+import type { ActivityData, ActivityTypeMap } from "@server/types";
+import { actionTypeDefaultEffects } from "./actionEffects";
 
 /******************************************************************************
  * ### Activity Execution Effects

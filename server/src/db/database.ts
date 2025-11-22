@@ -1,9 +1,10 @@
-import { MongoClient, Db } from "mongodb";
 import { CONFIG } from "@server/config";
-import { migrations, collectionNames } from "@server/db/migrations";
+import { collectionNames, migrations } from "@server/db/migrations";
 import { Repository } from "@server/db/repository";
-import { GameDoc, RoomDoc } from "@server/db/types";
+import type { GameDoc, RoomDoc } from "@server/db/types";
 import { logger } from "@server/logger";
+import type { Db } from "mongodb";
+import { MongoClient } from "mongodb";
 
 let db: Db;
 

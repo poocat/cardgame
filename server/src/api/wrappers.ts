@@ -1,10 +1,12 @@
 /**
  * Use to add type inference and validation to route handlers with Zod schemas.
  */
-import { RequestHandler } from "express";
-import { z, ZodError, ZodObject, ZodRawShape } from "zod";
+
 import { STATUS } from "@server/api/status";
 import { logger } from "@server/logger";
+import type { RequestHandler } from "express";
+import type { ZodObject, ZodRawShape, z } from "zod";
+import { ZodError } from "zod";
 
 type ErrorResponseBody = { message: string };
 

@@ -1,12 +1,12 @@
-import { Router, json as jsonHandler } from "express";
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
 import { STATUS } from "@server/api/status";
 import { digestRoomData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
-import { makeId, makeMetaHash } from "@server/db/meta";
 import { getRepositories } from "@server/db/database";
+import { makeId, makeMetaHash } from "@server/db/meta";
 import { logger } from "@server/logger";
+import { json as jsonHandler, Router } from "express";
 
 export const rooms = Router();
 rooms.use(jsonHandler());

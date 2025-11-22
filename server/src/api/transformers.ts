@@ -1,16 +1,17 @@
 /**
  * Contains transformations of database models into "digests" that will
  */
-import { createHash } from "crypto";
-import z from "zod";
-import {
+
+import type {
   gameDigestSchema,
   inPlayCardDigestSchema,
   roomDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
-import { CardData, Decision, GameData, Id } from "@server/types";
-import { RoomDoc } from "@server/db/types";
+import type { RoomDoc } from "@server/db/types";
+import type { CardData, Decision, GameData, Id } from "@server/types";
+import { createHash } from "crypto";
+import type z from "zod";
 
 type RoomData = RoomDoc["data"];
 
@@ -26,8 +27,8 @@ function anonymizeId(id: string, salt: string): string {
   const uuid = [
     hash.substring(0, 8),
     hash.substring(8, 12),
-    "4" + hash.substring(12, 15), // Set the version to 4
-    "8" + hash.substring(15, 18), // Set the variant to 8 (RFC 4122)
+    `4${hash.substring(12, 15)}`, // Set the version to 4
+    `8${hash.substring(15, 18)}`, // Set the variant to 8 (RFC 4122)
     hash.substring(18, 30),
   ].join("-");
 
