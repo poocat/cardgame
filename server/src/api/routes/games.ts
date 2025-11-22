@@ -157,7 +157,7 @@ games.get(
         logger.warn({ gameId: req.params.id }, "game not found");
         return res
           .status(STATUS.notFound)
-          .send({ message: `game ${req.params.id} not found` });
+          .json({ message: `game ${req.params.id} not found` });
       }
 
       const digest = digestGameData({
