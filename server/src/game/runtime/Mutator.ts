@@ -14,14 +14,16 @@ export class Mutator implements IMutator {
   }
 
   moveCard(args: MutatorArgs["moveCard"]) {
-    const match = this.gameData.cards.find((c) => c.id === args.id);
-    if (match === undefined) {
+    const index = this.gameData.cards.findIndex((c) => c.id === args.id);
+    if (index === -1) {
       throw new Error(`Card id ${args.id} not in game.`);
-    } else {
-      switch (args.location.type) {
-        case "inDeck":
-          throw new Error("No implementation for moving a card to the deck!");
-      }
+    }
+    const match = this.gameData.cards[index];
+    switch (args.location.type) {
+      case "inDeck":
+        // Cards can only be moved to the top of the deck.
+        this.gameData.cards.splice(index, 1);
+        this.gameData.cards.unshift(match);
     }
     match.location = args.location;
   }
