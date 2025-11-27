@@ -1,8 +1,17 @@
+import {
+  ChoiceContext,
+  SelectorContext,
+  useChoice,
+  useChoiceContext,
+  useSelector,
+  useSelectorContext,
+} from "@client/routes/games/choices";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router";
 import type z from "zod";
+import { GameBoard } from "./board";
 
 type GamesGetOneResponseBody = z.infer<
   typeof ROUTES.games.methods.getOne.schemas.responseBody
@@ -11,18 +20,37 @@ type GamesPatchRequestBody = z.infer<
   typeof ROUTES.games.methods.patch.schemas.requestBody
 >;
 
+const ValueSelect = (props: { value: string; label?: string }) => {
+  const { value, label } = props;
+  const choice = useChoice();
+  const selectable = choice.checkValue(props.value);
+  const selector = useSelector();
+  const { checkValue, addValue, removeValue } = selector.handlers(value);
+  const selected = checkValue();
+  return (
+    <span>
+      <input
+        id={value}
+        type="checkbox"
+        disabled={!selectable}
+        checked={selected}
+        onChange={() => (checkValue() ? removeValue() : addValue())}
+      />
+      {label && <label htmlFor={value}>{label}</label>}
+    </span>
+  );
+};
+
 export const Game = () => {
   const { gameId } = useParams();
 
   const [query] = useSearchParams();
-  const playerId = query.get("playerId");
+  const observingPlayerId = query.get("playerId");
 
   const url = useMemo(() => {
     const base = `/api/games/${gameId}`;
-    return playerId ? `${base}?playerId=${playerId}` : base;
-  }, [gameId, playerId]);
-
-  const [choices, setChoices] = useState<string[]>([]);
+    return observingPlayerId ? `${base}?playerId=${observingPlayerId}` : base;
+  }, [gameId, observingPlayerId]);
 
   // Polling:
   const poller = usePoller<GamesGetOneResponseBody>({
@@ -41,7 +69,7 @@ export const Game = () => {
       }
     },
     getPollingEnabled: (data) =>
-      data.digest.activity.choice.choosingPlayerId !== playerId,
+      data.digest.activity.choice.choosingPlayerId !== observingPlayerId,
   });
 
   // Memoize the game data, as is only changes with the "last updated" time.
@@ -49,16 +77,31 @@ export const Game = () => {
   const game = useMemo(() => {
     return poller?.data?.digest;
   }, [poller.data?.updatedAt]);
-  const choosing = useMemo(() => !poller.polling, [poller.polling]);
+  const ovservingPlayerChoosing = useMemo(
+    () => !poller.polling,
+    [poller.polling],
+  );
+
+  // TODO!!! Should take the submission handler!!!
+  const selectorContext = useSelectorContext(game);
+
+  // TODO!!! Move to game board component???
+  const choiceContext = useChoiceContext(game);
 
   // Submission:
   const handleSubmitChoices = useCallback(async () => {
-    if (gameId && playerId && choosing && game && poller.fetchOnce) {
+    if (
+      gameId &&
+      observingPlayerId &&
+      ovservingPlayerChoosing &&
+      game &&
+      poller.fetchOnce
+    ) {
       const payload: GamesPatchRequestBody = {
         decision: {
-          playerId: playerId,
+          playerId: observingPlayerId,
           name: game.activity?.choice?.name ?? "",
-          values: choices,
+          values: selectorContext.chosen,
         },
       };
       const body = JSON.stringify(payload);
@@ -72,21 +115,19 @@ export const Game = () => {
         .catch((reason) => console.error(reason))
         .finally(() => {
           poller.fetchOnce();
-          setChoices([]);
+          selectorContext.clear();
         });
     }
-  }, [gameId, playerId, game, choices, choosing, poller.fetchOnce, url]);
-
-  // Choice value setters:
-  const handleAddChoice = useCallback((value: string) => {
-    setChoices((current) => [...current, value]);
-  }, []);
-  const handleRemoveChoice = useCallback((value: string) => {
-    setChoices((current) => {
-      const idx = current.indexOf(value);
-      return [...current.slice(0, idx), ...current.slice(idx)];
-    });
-  }, []);
+  }, [
+    gameId,
+    observingPlayerId,
+    game,
+    selectorContext.chosen,
+    selectorContext.clear,
+    ovservingPlayerChoosing,
+    poller.fetchOnce,
+    url,
+  ]);
 
   return (
     <div>
@@ -97,24 +138,25 @@ export const Game = () => {
       )}
       <hr />
       {game && (
-        <PlayArea
-          game={game}
-          choosing={choosing}
-          handleAddChoice={handleAddChoice}
-          handleRemoveChoice={handleRemoveChoice}
-          handleSubmitChoices={handleSubmitChoices}
-        />
+        <ChoiceContext.Provider value={choiceContext}>
+          <SelectorContext.Provider value={selectorContext}>
+            <Debug
+              game={game}
+              choosing={ovservingPlayerChoosing}
+              handleSubmitChoices={handleSubmitChoices}
+            />
+            <GameBoard game={game} />
+          </SelectorContext.Provider>
+        </ChoiceContext.Provider>
       )}
     </div>
   );
 };
 
-const PlayArea = memo(
+const Debug = memo(
   (props: {
     game: GamesGetOneResponseBody["digest"];
     choosing: boolean;
-    handleAddChoice: (value: string) => void;
-    handleRemoveChoice: (value: string) => void;
     handleSubmitChoices: () => void;
   }) => {
     return (
@@ -122,19 +164,14 @@ const PlayArea = memo(
         <div>Current Activity: {JSON.stringify(props.game.activity)}</div>
         {props.choosing && (
           <div>
+            {/*  */}
             {(props.game.activity?.choice?.values ?? []).map(({ value }) => (
               <div key={value}>
-                <input
-                  id={value}
+                <ValueSelect
+                  key={value}
                   value={value}
-                  type="checkbox"
-                  onChange={(e) =>
-                    e.target.checked
-                      ? props.handleAddChoice(value)
-                      : props.handleRemoveChoice(value)
-                  }
+                  label={`${props.game.activity.choice.type} ${value}`}
                 />
-                <label htmlFor={value}>{value}</label>
               </div>
             ))}
             <div>
