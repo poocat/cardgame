@@ -1,4 +1,4 @@
-import { usePoller } from "@client/hooks/usePoller";
+import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
 import { memo, useCallback, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router";

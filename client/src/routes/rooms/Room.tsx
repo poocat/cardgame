@@ -1,3 +1,5 @@
+import { usePoller } from "@client/utils/usePoller";
+import { ROUTES } from "@common/api/routes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Link,
@@ -6,9 +8,7 @@ import {
   useParams,
   useSearchParams,
 } from "react-router";
-import z from "zod";
-import { usePoller } from "@client/hooks/usePoller";
-import { ROUTES } from "@common/api/routes";
+import type z from "zod";
 
 type RoomsGetOneResponseBody = z.infer<
   typeof ROUTES.rooms.methods.getOne.schemas.responseBody
