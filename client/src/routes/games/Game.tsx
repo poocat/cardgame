@@ -122,19 +122,19 @@ const PlayArea = memo(
         <div>Current Activity: {JSON.stringify(props.game.activity)}</div>
         {props.choosing && (
           <div>
-            {(props.game.activity?.choice?.values ?? []).map((v) => (
-              <div key={v}>
+            {(props.game.activity?.choice?.values ?? []).map(({ value }) => (
+              <div key={value}>
                 <input
-                  id={v}
-                  value={v}
+                  id={value}
+                  value={value}
                   type="checkbox"
                   onChange={(e) =>
                     e.target.checked
-                      ? props.handleAddChoice(v)
-                      : props.handleRemoveChoice(v)
+                      ? props.handleAddChoice(value)
+                      : props.handleRemoveChoice(value)
                   }
                 />
-                <label htmlFor={v}>{v}</label>
+                <label htmlFor={value}>{value}</label>
               </div>
             ))}
             <div>

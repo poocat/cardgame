@@ -2,13 +2,14 @@
  * The "digest" is a view of a game's data which reflects how the visual and
  * interactive elements might be arranged.
  */
-import z from "zod";
+
 import {
   actionTypes,
   activityTypes,
   cardTypes,
   choiceTypes,
 } from "@common/game/enums";
+import z from "zod";
 
 const idSchema = z.uuid();
 
@@ -17,20 +18,26 @@ const idSchema = z.uuid();
  ******************************************************************************/
 
 /** */
-const activityDigestSchema = z.strictObject({
+export const choiceValueDigestSchema = z.strictObject({
+  value: z.string(),
+  // All actions and some chips can be associated with a card.
+  onCardId: z.string().nullable(),
+});
+
+export const activityDigestSchema = z.strictObject({
   type: z.union(activityTypes.map((t) => z.literal(t))),
   choice: z.strictObject({
     name: z.string(),
     type: z.union(choiceTypes.map((t) => z.literal(t))),
     min: z.number().int().min(0),
     max: z.number().int().min(0).nullable(),
-    values: z.array(z.string()),
+    values: z.array(choiceValueDigestSchema),
     choosingPlayerId: idSchema,
     instructions: z.string(),
   }),
 });
 
-const actionDigestSchema = z.strictObject({
+export const actionDigestSchema = z.strictObject({
   id: idSchema,
   type: z.union(actionTypes.map((t) => z.literal(t))),
   instructions: z.string(),
@@ -52,7 +59,7 @@ export const inPlayCardDigestSchema = visibleCardDigestSchema.extend({
   exhausted: z.boolean(),
 });
 
-const hiddenCardDigestSchema = z.strictObject({
+export const hiddenCardDigestSchema = z.strictObject({
   id: idSchema,
 });
 
