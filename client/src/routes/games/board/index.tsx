@@ -1,8 +1,8 @@
-import { FaceUpCard } from "@client/routes/games/cards";
 import type { gameDigestSchema } from "@common/api/digests";
 import type { CSSProperties } from "react";
 import type z from "zod";
-import { thumbnailCardBorderWidth } from "../cards/thumbnails/constants";
+import { FaceUpCard } from "./cards";
+import { thumbnailCardBorderWidth } from "./cards/thumbnails/constants";
 
 type GameDigest = z.infer<typeof gameDigestSchema>;
 
