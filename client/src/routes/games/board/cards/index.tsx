@@ -37,13 +37,21 @@
  *
  */
 
-import { useChoice, useSelector } from "@client/routes/games/choices";
 import type {
   inPlayCardDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
 import { useMemo } from "react";
 import type z from "zod";
+import { useChoice, useDialog, useSelector, useValueSelect } from "../contexts";
+import type { FaceUpCardDigest } from "../types";
+import {
+  CardDetail,
+  CardDetailAction,
+  CardDetailChipSelect,
+  CardDetailContainer,
+  CardDetailFooterContainer,
+} from "./details";
 import {
   CardThumbnailBodyContainer,
   CardThumbnailContainer,
@@ -57,8 +65,12 @@ import type { ThumbnailCardHighlightVariant } from "./thumbnails/types";
 type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
 
+////////////////////////////////////////////////////////////////////////////////
+// Thumbnail Form Factor
+////////////////////////////////////////////////////////////////////////////////
+
 /******************************************************************************
- * ### FaceUpCard
+ * ### FaceUpThumbnailCard
  *
  * A complete component for displaying a card in play in the "thumbnail" form
  * factor, within its own container, which takes on different styles depending
@@ -68,7 +80,7 @@ type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
  * - whether or not the card or one of its actions or chips were chosen
  *   previously in the current activity
  ******************************************************************************/
-export const FaceUpCard = (
+export const FaceUpThumbnailCard = (
   props:
     | {
         variant: "inPlay";
@@ -88,10 +100,20 @@ export const FaceUpCard = (
   const cardWasChosenPreviously = choice.checkPreviousValue(cardId);
 
   const selector = useSelector();
-  const { checkValue, addValue, removeValue } = useMemo(
-    () => selector.handlers(cardId),
-    [selector.handlers, cardId],
-  );
+  const cardSelected = selector.checkValueSelected(cardId);
+
+  const dialog = useDialog();
+
+  const handleClick = () => {
+    // TODO!!! Need better union type for visible/in play cards.
+    dialog.set({ type: "card", card: props.card });
+  };
+  const handleSelect = () => {
+    selector.addValue(cardId);
+  };
+  const handleDeselect = () => {
+    selector.removeValue(cardId);
+  };
 
   /**
    * Determine the variant:
@@ -131,27 +153,113 @@ export const FaceUpCard = (
 
   return (
     <CardThumbnailContainer>
-      <CardThumbnailHighlight variant={variant} cardSelected={checkValue()}>
+      <CardThumbnailHighlight variant={variant} cardSelected={cardSelected}>
         <CardThumbnailHeaderContainer>
           <CardThumbnailHeader
             cardId={props.card.id}
             cardName={props.card.name}
             cardSelectable={variant === "observerChoosingCards"}
-            cardSelected={checkValue()}
-            onSelect={addValue}
-            onDeselect={removeValue}
+            cardSelected={cardSelected}
+            onSelect={handleSelect}
+            onDeselect={handleDeselect}
           />
         </CardThumbnailHeaderContainer>
         <CardThumbnailBodyContainer>
           <CardThumbnailFaceUp
             cardType={props.card.type}
             numChips={props.card.chips.length}
-            onClick={() => {
-              // TODO!!!
-            }}
+            onClick={handleClick}
           />
         </CardThumbnailBodyContainer>
       </CardThumbnailHighlight>
     </CardThumbnailContainer>
+  );
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// Details Form Factor
+////////////////////////////////////////////////////////////////////////////////
+
+const DetailedCardAction = (props: {
+  disabled: boolean;
+  actionType: string;
+  actionId: string;
+  instructions: string;
+}) => {
+  const { selected, disabled, toggle } = useValueSelect(props.actionId);
+
+  return (
+    <CardDetailAction
+      label={`[${props.actionType}] ${props.instructions}`}
+      value={props.actionId}
+      selected={selected}
+      disabled={disabled || props.disabled}
+      onChange={toggle}
+    />
+  );
+};
+
+const DetailCardChipSelect = (props: { chipIds: string[] }) => {
+  const selector = useSelector();
+  const selected = selector.selectedValues;
+  const remaining = props.chipIds.filter(
+    (chipId) => !selected.includes(chipId),
+  );
+
+  const handleAddChip = () => {
+    if (selector.moreValuesAllowed && remaining.length > 0) {
+      selector.addValue(remaining[0]);
+    }
+  };
+
+  const handleRemoveChip = () => {
+    if (selector.selectedValues.length > 0) {
+      selector.removeValue(selected[0]);
+    }
+  };
+
+  return (
+    <CardDetailChipSelect
+      numSelected={selected.length}
+      numRemaining={remaining.length}
+      disableIncrement={!selector.moreValuesAllowed}
+      onIncrement={handleAddChip}
+      onDecrement={handleRemoveChip}
+    />
+  );
+};
+
+/******************************************************************************
+ * ### DetailedCard
+ ******************************************************************************/
+export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
+  const choice = useChoice();
+
+  const cardHasChoice = choice.checkCard(props.card.id);
+  const useSelectableActions =
+    choice.choiceType === "actionId" && cardHasChoice;
+  const useSelectableChips = choice.choiceType === "chipId" && cardHasChoice;
+  const chipIds = props.card.chips.map(({ id }) => id);
+
+  return (
+    <CardDetailContainer>
+      <CardDetail>
+        <div>{props.card.name}</div>
+        {props.card.actions.map((action) => (
+          <DetailedCardAction
+            key={action.id}
+            actionId={action.id}
+            actionType={action.type}
+            instructions={action.instructions}
+            disabled={!useSelectableActions}
+          />
+        ))}
+      </CardDetail>
+      {useSelectableChips && (
+        <CardDetailFooterContainer>
+          <DetailCardChipSelect chipIds={chipIds} />
+        </CardDetailFooterContainer>
+      )}
+    </CardDetailContainer>
   );
 };

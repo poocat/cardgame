@@ -1,14 +1,10 @@
 import {
-  ChoiceContext,
   SelectorContext,
-  useChoice,
-  useChoiceContext,
-  useSelector,
   useSelectorContext,
-} from "@client/routes/games/choices";
+} from "@client/routes/games/board/contexts";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
-import { memo, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router";
 import type z from "zod";
 import { GameBoard } from "./board";
@@ -20,37 +16,16 @@ type GamesPatchRequestBody = z.infer<
   typeof ROUTES.games.methods.patch.schemas.requestBody
 >;
 
-const ValueSelect = (props: { value: string; label?: string }) => {
-  const { value, label } = props;
-  const choice = useChoice();
-  const selectable = choice.checkValue(props.value);
-  const selector = useSelector();
-  const { checkValue, addValue, removeValue } = selector.handlers(value);
-  const selected = checkValue();
-  return (
-    <span>
-      <input
-        id={value}
-        type="checkbox"
-        disabled={!selectable}
-        checked={selected}
-        onChange={() => (checkValue() ? removeValue() : addValue())}
-      />
-      {label && <label htmlFor={value}>{label}</label>}
-    </span>
-  );
-};
-
 export const Game = () => {
   const { gameId } = useParams();
 
   const [query] = useSearchParams();
   const observingPlayerId = query.get("playerId");
 
-  const url = useMemo(() => {
-    const base = `/api/games/${gameId}`;
-    return observingPlayerId ? `${base}?playerId=${observingPlayerId}` : base;
-  }, [gameId, observingPlayerId]);
+  const baseUrl = `/api/games/${gameId}`;
+  const url = observingPlayerId
+    ? `${baseUrl}?playerId=${observingPlayerId}`
+    : baseUrl;
 
   // Polling:
   const poller = usePoller<GamesGetOneResponseBody>({
@@ -77,19 +52,14 @@ export const Game = () => {
   const game = useMemo(() => {
     return poller?.data?.digest;
   }, [poller.data?.updatedAt]);
-  const ovservingPlayerChoosing = useMemo(
-    () => !poller.polling,
-    [poller.polling],
-  );
+
+  const ovservingPlayerChoosing = !poller.polling;
 
   // TODO!!! Should take the submission handler!!!
   const selectorContext = useSelectorContext(game);
 
-  // TODO!!! Move to game board component???
-  const choiceContext = useChoiceContext(game);
-
   // Submission:
-  const handleSubmitChoices = useCallback(async () => {
+  const submitChoices = useCallback(async () => {
     if (
       gameId &&
       observingPlayerId &&
@@ -101,7 +71,7 @@ export const Game = () => {
         decision: {
           playerId: observingPlayerId,
           name: game.activity?.choice?.name ?? "",
-          values: selectorContext.chosen,
+          values: selectorContext.selectedValues,
         },
       };
       const body = JSON.stringify(payload);
@@ -115,15 +85,15 @@ export const Game = () => {
         .catch((reason) => console.error(reason))
         .finally(() => {
           poller.fetchOnce();
-          selectorContext.clear();
+          selectorContext.clearValues();
         });
     }
   }, [
     gameId,
     observingPlayerId,
     game,
-    selectorContext.chosen,
-    selectorContext.clear,
+    selectorContext.selectedValues,
+    selectorContext.clearValues,
     ovservingPlayerChoosing,
     poller.fetchOnce,
     url,
@@ -131,57 +101,17 @@ export const Game = () => {
 
   return (
     <div>
+      <hr />
       {poller.polling ? (
         <div>Polled {poller.pollCount} times..</div>
       ) : (
         <div>Not polling... {poller.error && `(${poller.error})`}</div>
       )}
-      <hr />
       {game && (
-        <ChoiceContext.Provider value={choiceContext}>
-          <SelectorContext.Provider value={selectorContext}>
-            <Debug
-              game={game}
-              choosing={ovservingPlayerChoosing}
-              handleSubmitChoices={handleSubmitChoices}
-            />
-            <GameBoard game={game} />
-          </SelectorContext.Provider>
-        </ChoiceContext.Provider>
+        <SelectorContext.Provider value={selectorContext}>
+          <GameBoard game={game} submitChoices={submitChoices} />
+        </SelectorContext.Provider>
       )}
     </div>
   );
 };
-
-const Debug = memo(
-  (props: {
-    game: GamesGetOneResponseBody["digest"];
-    choosing: boolean;
-    handleSubmitChoices: () => void;
-  }) => {
-    return (
-      <>
-        <div>Current Activity: {JSON.stringify(props.game.activity)}</div>
-        {props.choosing && (
-          <div>
-            {/*  */}
-            {(props.game.activity?.choice?.values ?? []).map(({ value }) => (
-              <div key={value}>
-                <ValueSelect
-                  key={value}
-                  value={value}
-                  label={`${props.game.activity.choice.type} ${value}`}
-                />
-              </div>
-            ))}
-            <div>
-              <button type="button" onClick={props.handleSubmitChoices}>
-                Submit Choices
-              </button>
-            </div>
-          </div>
-        )}
-      </>
-    );
-  },
-);

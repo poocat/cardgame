@@ -1,19 +1,21 @@
+import { Dialog } from "@client/components/Dialog";
 import type { gameDigestSchema } from "@common/api/digests";
-import type { CSSProperties } from "react";
+import type { choiceTypes } from "@common/game/enums";
 import type z from "zod";
-import { FaceUpCard } from "./cards";
-import { thumbnailCardBorderWidth } from "./cards/thumbnails/constants";
+import { DetailedCard, FaceUpThumbnailCard } from "./cards";
+import {
+  ChoiceContext,
+  DialogContext,
+  useChoiceContext,
+  useDialogContext,
+  useSelector,
+  useValueSelect,
+} from "./contexts";
 
+type ChoiceType = (typeof choiceTypes)[number];
 type GameDigest = z.infer<typeof gameDigestSchema>;
 
-const floatingDialogHeight = 100;
-
-const cardArrayStyleProps: CSSProperties = {
-  display: "flex",
-  flexDirection: "row",
-  // Setting the gap equal to the border width ensures that they overlap perfectly.
-  gap: thumbnailCardBorderWidth,
-};
+const floatingChoiceBoxHeight = 100;
 
 /******************************************************************************
  * ### GameBoardContainer
@@ -31,7 +33,12 @@ const GameBoardContainer = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 const GameBoardFooter = (props: { children?: React.ReactNode }) => {
   return (
-    <div style={{ width: "100%", height: floatingDialogHeight }}>
+    <div
+      style={{
+        width: "100%",
+        height: floatingChoiceBoxHeight,
+      }}
+    >
       {props.children}
     </div>
   );
@@ -44,10 +51,34 @@ const GameBoardPlayerArea = (props: { children?: React.ReactNode }) => {
   return <div>{props.children}</div>;
 };
 
+/******************************************************************************
+ * ### const GameBoardPlayerHeader = (props: { playerName: string }) => {
+
+ ******************************************************************************/
 const GameBoardPlayerHeader = (props: { playerName: string }) => {
   return (
     <div>
       <h2>{props.playerName}</h2>
+    </div>
+  );
+};
+
+/******************************************************************************
+ * ### GameBoardCardArray
+ *
+ * Establishes spacing between thumbnail cards.
+ ******************************************************************************/
+const GameBoardCardArray = (props: { children?: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        // Setting the gap equal to the border width ensures that they overlap perfectly.
+        gap: 10,
+      }}
+    >
+      {props.children}
     </div>
   );
 };
@@ -59,7 +90,7 @@ const GameBoardPlayerHandArea = (props: { children?: React.ReactNode }) => {
   return (
     <div>
       <h4>Cards in Hand:</h4>
-      <div style={{ ...cardArrayStyleProps }}>{props.children}</div>
+      <GameBoardCardArray>{props.children}</GameBoardCardArray>
     </div>
   );
 };
@@ -71,7 +102,83 @@ const GameBoardPlayerPlayArea = (props: { children?: React.ReactNode }) => {
   return (
     <div>
       <h4>Cards in Play:</h4>
-      <div style={{ ...cardArrayStyleProps }}>{props.children}</div>
+      <GameBoardCardArray>{props.children}</GameBoardCardArray>
+    </div>
+  );
+};
+
+/******************************************************************************
+ * ### GameBoardChoiceMenuValueSelect
+ ******************************************************************************/
+const GameBoardChoiceMenuValueSelect = (props: {
+  value: string;
+  label: string;
+}) => {
+  const { value, label } = props;
+  const { selected, disabled, toggle } = useValueSelect(value);
+
+  return (
+    <div>
+      <span>
+        <input
+          id={value}
+          type="checkbox"
+          disabled={disabled}
+          checked={selected}
+          onChange={toggle}
+        />
+        {label && <label htmlFor={value}>{label}</label>}
+      </span>
+    </div>
+  );
+};
+
+/******************************************************************************
+ * ### GameBoardChoiceMenu
+ ******************************************************************************/
+const GameBoardChoiceMenu = (props: {
+  instructions: string;
+  choiceType: ChoiceType;
+  values: string[];
+  submitChoices: () => void;
+}) => {
+  const selector = useSelector();
+
+  return (
+    <div
+      style={{
+        backgroundColor: "white",
+        position: "fixed",
+        borderTop: "1px solid",
+        width: "100%",
+        bottom: 0,
+        maxHeight: floatingChoiceBoxHeight,
+        height: floatingChoiceBoxHeight,
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+        overflowY: "auto",
+      }}
+    >
+      <div style={{ padding: 3, margin: 3 }}>
+        <div>{props.instructions}</div>
+        {props.values.map((value) => (
+          <GameBoardChoiceMenuValueSelect
+            key={value}
+            value={value}
+            label={`[${props.choiceType}] ${value}`}
+          />
+        ))}
+        <div>
+          <button
+            type="button"
+            disabled={selector.moreValuesNeeded}
+            onClick={props.submitChoices}
+          >
+            Submit Choices
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -79,37 +186,78 @@ const GameBoardPlayerPlayArea = (props: { children?: React.ReactNode }) => {
 /******************************************************************************
  * ### GameBoard
  ******************************************************************************/
-export const GameBoard = (props: { game: GameDigest }) => {
+export const GameBoard = (props: {
+  game: GameDigest;
+  submitChoices: () => void;
+}) => {
   const observingPlayer = props.game.observingPlayer;
+  const choosingPlayerId = props.game.activity.choice.choosingPlayerId;
+  const observingPlayerIsChoosing = observingPlayer?.id === choosingPlayerId;
+
+  const choiceContext = useChoiceContext(props.game);
+  const dialogContext = useDialogContext();
 
   return (
-    <GameBoardContainer>
-      {props.game.otherPlayers.map((player) => (
-        <GameBoardPlayerArea key={player.id}>
-          <GameBoardPlayerHeader playerName={player.name} />
-          <GameBoardPlayerPlayArea>
-            {player.cardsInPlay.map((card) => (
-              <FaceUpCard key={card.id} variant="inPlay" card={card} />
-            ))}
-          </GameBoardPlayerPlayArea>
-        </GameBoardPlayerArea>
-      ))}
-      {observingPlayer && (
-        <GameBoardPlayerArea>
-          <GameBoardPlayerHeader playerName={observingPlayer.name} />
-          <GameBoardPlayerHandArea>
-            {observingPlayer.cardsInHand.map((card) => (
-              <FaceUpCard key={card.id} variant="inHand" card={card} />
-            ))}
-          </GameBoardPlayerHandArea>
-          <GameBoardPlayerPlayArea>
-            {observingPlayer.cardsInPlay.map((card) => (
-              <FaceUpCard key={card.id} variant="inPlay" card={card} />
-            ))}
-          </GameBoardPlayerPlayArea>
-        </GameBoardPlayerArea>
-      )}
-      <GameBoardFooter />
-    </GameBoardContainer>
+    <ChoiceContext.Provider value={choiceContext}>
+      <DialogContext.Provider value={dialogContext}>
+        <GameBoardContainer>
+          {props.game.otherPlayers.map((player) => (
+            <GameBoardPlayerArea key={player.id}>
+              <hr />
+              <GameBoardPlayerHeader playerName={player.name} />
+              <GameBoardPlayerPlayArea>
+                {player.cardsInPlay.map((card) => (
+                  <FaceUpThumbnailCard
+                    key={card.id}
+                    variant="inPlay"
+                    card={card}
+                  />
+                ))}
+              </GameBoardPlayerPlayArea>
+            </GameBoardPlayerArea>
+          ))}
+          {observingPlayer && (
+            <GameBoardPlayerArea>
+              <hr />
+              <GameBoardPlayerHeader playerName={observingPlayer.name} />
+              <GameBoardPlayerPlayArea>
+                {observingPlayer.cardsInPlay.map((card) => (
+                  <FaceUpThumbnailCard
+                    key={card.id}
+                    variant="inPlay"
+                    card={card}
+                  />
+                ))}
+              </GameBoardPlayerPlayArea>
+              <GameBoardPlayerHandArea>
+                {observingPlayer.cardsInHand.map((card) => (
+                  <FaceUpThumbnailCard
+                    key={card.id}
+                    variant="inHand"
+                    card={card}
+                  />
+                ))}
+              </GameBoardPlayerHandArea>
+            </GameBoardPlayerArea>
+          )}
+          {observingPlayerIsChoosing && (
+            <GameBoardChoiceMenu
+              instructions={props.game.activity.choice.instructions}
+              choiceType={props.game.activity.choice.type}
+              values={props.game.activity.choice.values.map(
+                ({ value }) => value,
+              )}
+              submitChoices={props.submitChoices}
+            />
+          )}
+          <GameBoardFooter />
+          <Dialog isOpen={dialogContext.isOpen} onClose={dialogContext.close}>
+            {dialogContext.value?.type === "card" && (
+              <DetailedCard card={dialogContext.value.card} />
+            )}
+          </Dialog>
+        </GameBoardContainer>
+      </DialogContext.Provider>
+    </ChoiceContext.Provider>
   );
 };
