@@ -85,6 +85,8 @@ type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
  * - whether or not the card or one of its actions or chips can be chosen
  * - whether or not the card or one of its actions or chips were chosen
  *   previously in the current activity
+ *
+ * TODO!!! Memoize?
  ******************************************************************************/
 export const FaceUpThumbnailCard = (
   props:
@@ -101,17 +103,19 @@ export const FaceUpThumbnailCard = (
   const choice = useChoice();
   const choiceType = choice.choiceType;
   const choiceIsForObserver = choice.forObserver;
-  const cardHasChoosableValue = choice.checkCard(cardId);
+  const cardHasChoosableValue = choice.getValuesOnCard(cardId).length > 0;
   const cardIsChoosableValue = choice.checkValue(cardId);
   const cardWasChosenPreviously = choice.checkPreviousValue(cardId);
 
   const selector = useSelector();
   const cardSelected = selector.checkValueSelected(cardId);
 
+  const select = useValueSelect(cardId);
+  const cardSelectable = !select.disabled;
+
   const dialog = useDialog();
 
   const handleClick = () => {
-    // TODO!!! Need better union type for visible/in play cards.
     dialog.set({ type: "card", card: props.card });
   };
   const handleSelect = () => {
@@ -137,11 +141,13 @@ export const FaceUpThumbnailCard = (
     if (cardHasChoosableValue || cardIsChoosableValue) {
       if (choiceIsForObserver) {
         if (choiceType === "actionId" && cardHasChoosableValue)
-          return "observerChoosingActionsOnCard";
+          return "observerCanChooseActionOnCard";
         if (choiceType === "chipId" && cardHasChoosableValue)
-          return "observerChoosingChipsOnCard";
+          return "observerCanChooseChipOnCard";
+        if (choiceType === "cardId" && cardSelected)
+          return "observerHasChosenCard";
         if (choiceType === "cardId" && cardIsChoosableValue)
-          return "observerChoosingCards";
+          return "observerCanChooseCard";
       } else {
         return "otherPlayerChoosing";
       }
@@ -152,6 +158,7 @@ export const FaceUpThumbnailCard = (
   }, [
     choiceType,
     choiceIsForObserver,
+    cardSelected,
     cardHasChoosableValue,
     cardIsChoosableValue,
     cardWasChosenPreviously,
@@ -159,12 +166,12 @@ export const FaceUpThumbnailCard = (
 
   return (
     <CardThumbnailContainer>
-      <CardThumbnailHighlight variant={variant} cardSelected={cardSelected}>
+      <CardThumbnailHighlight variant={variant}>
         <CardThumbnailHeaderContainer>
           <CardThumbnailHeader
             cardId={props.card.id}
             cardName={props.card.name}
-            cardSelectable={variant === "observerChoosingCards"}
+            cardSelectable={cardSelectable}
             cardSelected={cardSelected}
             onSelect={handleSelect}
             onDeselect={handleDeselect}
@@ -186,6 +193,7 @@ export const FaceUpThumbnailCard = (
 // Details Form Factor
 ////////////////////////////////////////////////////////////////////////////////
 
+// TODO!!! Memoize?
 const DetailedCardAction = (props: {
   disabled: boolean;
   actionType: string;
@@ -240,14 +248,25 @@ const DetailCardChipSelect = (props: { chipIds: string[] }) => {
  ******************************************************************************/
 export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
   const choice = useChoice();
+  const selector = useSelector();
   const dialog = useDialog();
   const { submit, canSubmit } = useSubmit();
 
-  const cardHasChoice = choice.checkCard(props.card.id);
-  const useSelectableActions =
-    choice.choiceType === "actionId" && cardHasChoice;
-  const useSelectableChips = choice.choiceType === "chipId" && cardHasChoice;
+  const valuesOnCard = choice.getValuesOnCard(props.card.id);
+  const selectedValuesOnCard = valuesOnCard.filter((v) =>
+    selector.checkValueSelected(v),
+  );
+
+  const cardHasChoice = valuesOnCard.length > 0 && choice.forObserver;
+  const cardHasSelectableActions =
+    cardHasChoice && choice.choiceType === "actionId";
+  const cardHasSelectableChips =
+    cardHasChoice && choice.choiceType === "chipId";
+
   const chipIds = props.card.chips.map(({ id }) => id);
+
+  // Disable the submit button if nothing from this card was selected.
+  const submitDisabled = !canSubmit || selectedValuesOnCard.length < 1;
 
   const submitHandler = () => {
     submit();
@@ -264,15 +283,20 @@ export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
             actionId={action.id}
             actionType={action.type}
             instructions={action.instructions}
-            disabled={!useSelectableActions}
+            disabled={!cardHasSelectableActions}
           />
         ))}
       </CardDetail>
       {cardHasChoice && (
         <CardDetailFooterContainer>
-          {useSelectableChips && <DetailCardChipSelect chipIds={chipIds} />}
+          {cardHasSelectableChips && <DetailCardChipSelect chipIds={chipIds} />}
+          {/* TODO!!! Create a new component. */}
           <div>
-            <button type="button" disabled={!canSubmit} onClick={submitHandler}>
+            <button
+              type="button"
+              disabled={submitDisabled}
+              onClick={submitHandler}
+            >
               Submit
             </button>
           </div>

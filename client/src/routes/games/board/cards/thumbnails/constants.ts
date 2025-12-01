@@ -3,8 +3,8 @@ export const thumbnailCardHeight = 105;
 export const thumbnailCardWidth = Math.floor(
   thumbnailCardHeight * thumnailCardAspectRatio,
 );
-const thumbnailCardHighlightWidth = 10;
-export const thumbnailCardHeaderHeight = 25;
+const thumbnailCardHighlightWidth = 5;
+export const thumbnailCardHeaderHeight = 40;
 
 export const thumbnailCardContainerWidth =
   thumbnailCardWidth + thumbnailCardHighlightWidth * 2;

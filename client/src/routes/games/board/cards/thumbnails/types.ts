@@ -1,7 +1,8 @@
 export type ThumbnailCardHighlightVariant =
   | "default"
-  | "observerChoosingCards"
-  | "observerChoosingActionsOnCard"
-  | "observerChoosingChipsOnCard"
+  | "observerCanChooseCard"
+  | "observerHasChosenCard"
+  | "observerCanChooseActionOnCard"
+  | "observerCanChooseChipOnCard"
   | "otherPlayerChoosing"
   | "chosenPreviously";

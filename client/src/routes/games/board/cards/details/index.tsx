@@ -123,15 +123,6 @@ export const CardDetail = (props: { children: React.ReactNode }) => {
       }}
     >
       {props.children}
-      {/* <div>{props.card.name}</div>
-      {props.card.actions.map((action) => (
-        <div key={action.id}>
-          <CardDetailActionSelect
-            value={action.id}
-            label={`[${action.type}] ${action.instructions}`}
-          />
-        </div>
-      ))} */}
     </div>
   );
 };

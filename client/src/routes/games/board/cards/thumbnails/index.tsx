@@ -1,6 +1,5 @@
 import { type CSSProperties, useCallback } from "react";
 import {
-  thumbnailCardBorderWidth,
   thumbnailCardContainerHeight,
   thumbnailCardContainerWidth,
   thumbnailCardHeaderHeight,
@@ -13,20 +12,23 @@ const thumbnailCardHighlightVariantStyles = {
   default: {
     backgroundColor: "inherit",
   },
-  observerChoosingCards: {
-    backgroundColor: "yellow",
+  observerCanChooseCard: {
+    backgroundColor: "rgba(0, 255, 255, 0.25)",
   },
-  observerChoosingActionsOnCard: {
-    backgroundColor: "orange",
+  observerHasChosenCard: {
+    backgroundColor: "rgba(0, 255, 255, 0.5)",
   },
-  observerChoosingChipsOnCard: {
-    backgroundColor: "green",
+  observerCanChooseActionOnCard: {
+    backgroundColor: "rgba(0, 0, 255, 0.25)",
+  },
+  observerCanChooseChipOnCard: {
+    backgroundColor: "rgba(255, 0, 0, 0.25)",
   },
   otherPlayerChoosing: {
-    backgroundColor: "gray",
+    backgroundColor: "rgba(0, 0, 0, 0.25)",
   },
   chosenPreviously: {
-    backgroundColor: "gray",
+    backgroundColor: "rgba(0, 0, 0, 0.25)",
   },
 } as const satisfies Record<ThumbnailCardHighlightVariant, CSSProperties>;
 
@@ -99,21 +101,15 @@ export const CardThumbnailBodyContainer = (props: {
  ******************************************************************************/
 export const CardThumbnailHighlight = (props: {
   variant: ThumbnailCardHighlightVariant;
-  cardSelected: boolean;
   children?: React.ReactNode;
 }) => {
-  const outlined = props.variant !== "default";
-  const filled = props.cardSelected;
   const highlightStyleProps =
     thumbnailCardHighlightVariantStyles[props.variant];
   const styleProps: CSSProperties = {
     width: "100%",
     height: "100%",
-    borderRadius: 10,
-    borderWidth: thumbnailCardBorderWidth,
-    borderStyle: "solid",
-    borderColor: outlined ? highlightStyleProps.backgroundColor : "transparent",
-    backgroundColor: filled ? highlightStyleProps.backgroundColor : "inherit",
+    borderRadius: 5,
+    backgroundColor: highlightStyleProps.backgroundColor,
   };
 
   return <div style={{ ...styleProps }}>{props.children}</div>;

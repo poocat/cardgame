@@ -22,10 +22,11 @@ type ChoiceContextType = {
   minValues: number;
   maxValues: number | null;
   forObserver: boolean;
+  getValuesOnCard: (cardId: string) => string[];
+  /** Will indicate if there are any chips or actions on the given card that are part of the current choice. */
+  checkValueOnCard: (value: string) => boolean;
   /** Will indicate if the value is part of the current choice. */
   checkValue: (value: string) => boolean;
-  /** Will indicate whether the given card is associated with any chips or actions that are part of the current choice. */
-  checkCard: (cardId: string) => boolean;
   /** Will indicate whether the value was chosen as part of a previous choice, earlier in the current activity. */
   checkPreviousValue: (value: string) => boolean;
 };
@@ -35,8 +36,9 @@ const dummyChoicesContext = {
   minValues: 0,
   maxValues: 0,
   forObserver: false,
+  getValuesOnCard: () => [],
   checkValue: () => false,
-  checkCard: () => false,
+  checkValueOnCard: () => false,
   checkPreviousValue: () => false,
 } as const satisfies ChoiceContextType;
 
@@ -63,6 +65,17 @@ export function useChoiceContext(game?: GameDigest): ChoiceContextType {
   const minValues = game?.activity.choice.min ?? 0;
   const maxValues = game?.activity.choice.max ?? null;
 
+  const getValuesOnCard = useCallback(
+    (cardId: string) => {
+      return (
+        game?.activity.choice.values
+          .filter((v) => v.onCardId === cardId)
+          .map((v) => v.value) ?? []
+      );
+    },
+    [game],
+  );
+
   const checkValue = useCallback(
     (value: string) => {
       return (
@@ -72,7 +85,7 @@ export function useChoiceContext(game?: GameDigest): ChoiceContextType {
     [game],
   );
 
-  const checkCard = useCallback(
+  const checkValueOnCard = useCallback(
     (cardId: string) => {
       return (
         game?.activity.choice.values.some(
@@ -95,8 +108,9 @@ export function useChoiceContext(game?: GameDigest): ChoiceContextType {
       minValues,
       maxValues,
       forObserver,
+      getValuesOnCard,
       checkValue,
-      checkCard,
+      checkValueOnCard,
       checkPreviousValue,
     }),
     [
@@ -104,8 +118,9 @@ export function useChoiceContext(game?: GameDigest): ChoiceContextType {
       minValues,
       maxValues,
       forObserver,
+      getValuesOnCard,
       checkValue,
-      checkCard,
+      checkValueOnCard,
       checkPreviousValue,
     ],
   );
@@ -208,7 +223,7 @@ export function useValueSelect(value: string) {
   const choice = useChoice();
   const selector = useSelector();
 
-  const selectable = choice.checkValue(value);
+  const selectable = choice.forObserver && choice.checkValue(value);
   const selected = selector.checkValueSelected(value);
 
   const disabled = useMemo(() => {
