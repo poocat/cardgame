@@ -1,3 +1,4 @@
+import { ButtonBase } from "@client/components/ButtonBase";
 import { type CSSProperties, useCallback } from "react";
 import {
   thumbnailCardContainerHeight,
@@ -31,14 +32,6 @@ const thumbnailCardHighlightVariantStyles = {
     backgroundColor: "rgba(0, 0, 0, 0.25)",
   },
 } as const satisfies Record<ThumbnailCardHighlightVariant, CSSProperties>;
-
-const defaultButtonStyleProps: CSSProperties = {
-  fontFamily: "inherit",
-  borderStyle: "inherit",
-  borderColor: "inherit",
-  backgroundColor: "inherit",
-  padding: 0,
-};
 
 /******************************************************************************
  * ### CardThumbnailContainer
@@ -156,15 +149,11 @@ export const CardThumbnailHeader = (
     flexDirection: "row",
   };
   return props.cardSelectable ? (
-    <button
-      style={{ ...defaultButtonStyleProps }}
-      type="button"
-      onClick={clickHandler}
-    >
+    <ButtonBase onClick={clickHandler}>
       <div style={{ ...commonStyleProps }}>
         <span>{props.cardName}</span>
       </div>
-    </button>
+    </ButtonBase>
   ) : (
     <div style={{ ...commonStyleProps }}>
       <span>{props.cardName}</span>
@@ -178,11 +167,7 @@ export const CardThumbnailFaceUp = (props: {
   onClick: () => void;
 }) => {
   return (
-    <button
-      type="button"
-      style={{ ...defaultButtonStyleProps }}
-      onClick={props.onClick}
-    >
+    <ButtonBase onClick={props.onClick}>
       <div
         style={{
           width: thumbnailCardWidth,
@@ -202,7 +187,7 @@ export const CardThumbnailFaceUp = (props: {
         <div>{props.cardType}</div>
         {props.numChips && <div>{props.numChips}</div>}
       </div>
-    </button>
+    </ButtonBase>
   );
 };
 
