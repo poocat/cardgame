@@ -4,9 +4,7 @@ import type { choiceTypes } from "@common/game/enums";
 import type z from "zod";
 import { DetailedCard, FaceUpThumbnailCard } from "./cards";
 import {
-  ChoiceContext,
   DialogContext,
-  useChoiceContext,
   useDialogContext,
   useSubmit,
   useValueSelect,
@@ -74,8 +72,7 @@ const GameBoardCardArray = (props: { children?: React.ReactNode }) => {
       style={{
         display: "flex",
         flexDirection: "row",
-        // Setting the gap equal to the border width ensures that they overlap perfectly.
-        gap: 10,
+        gap: 3,
       }}
     >
       {props.children}
@@ -109,6 +106,8 @@ const GameBoardPlayerPlayArea = (props: { children?: React.ReactNode }) => {
 
 /******************************************************************************
  * ### GameBoardChoiceMenuValueSelect
+ *
+ * TODO!!! Memoize?
  ******************************************************************************/
 const GameBoardChoiceMenuValueSelect = (props: {
   value: string;
@@ -186,69 +185,64 @@ export const GameBoard = (props: { game: GameDigest }) => {
   const choosingPlayerId = props.game.activity.choice.choosingPlayerId;
   const observingPlayerIsChoosing = observingPlayer?.id === choosingPlayerId;
 
-  const choiceContext = useChoiceContext(props.game);
   const dialogContext = useDialogContext();
 
   return (
-    <ChoiceContext.Provider value={choiceContext}>
-      <DialogContext.Provider value={dialogContext}>
-        <GameBoardContainer>
-          {props.game.otherPlayers.map((player) => (
-            <GameBoardPlayerArea key={player.id}>
-              <hr />
-              <GameBoardPlayerHeader playerName={player.name} />
-              <GameBoardPlayerPlayArea>
-                {player.cardsInPlay.map((card) => (
-                  <FaceUpThumbnailCard
-                    key={card.id}
-                    variant="inPlay"
-                    card={card}
-                  />
-                ))}
-              </GameBoardPlayerPlayArea>
-            </GameBoardPlayerArea>
-          ))}
-          {observingPlayer && (
-            <GameBoardPlayerArea>
-              <hr />
-              <GameBoardPlayerHeader playerName={observingPlayer.name} />
-              <GameBoardPlayerPlayArea>
-                {observingPlayer.cardsInPlay.map((card) => (
-                  <FaceUpThumbnailCard
-                    key={card.id}
-                    variant="inPlay"
-                    card={card}
-                  />
-                ))}
-              </GameBoardPlayerPlayArea>
-              <GameBoardPlayerHandArea>
-                {observingPlayer.cardsInHand.map((card) => (
-                  <FaceUpThumbnailCard
-                    key={card.id}
-                    variant="inHand"
-                    card={card}
-                  />
-                ))}
-              </GameBoardPlayerHandArea>
-            </GameBoardPlayerArea>
+    <DialogContext.Provider value={dialogContext}>
+      <GameBoardContainer>
+        {props.game.otherPlayers.map((player) => (
+          <GameBoardPlayerArea key={player.id}>
+            <hr />
+            <GameBoardPlayerHeader playerName={player.name} />
+            <GameBoardPlayerPlayArea>
+              {player.cardsInPlay.map((card) => (
+                <FaceUpThumbnailCard
+                  key={card.id}
+                  variant="inPlay"
+                  card={card}
+                />
+              ))}
+            </GameBoardPlayerPlayArea>
+          </GameBoardPlayerArea>
+        ))}
+        {observingPlayer && (
+          <GameBoardPlayerArea>
+            <hr />
+            <GameBoardPlayerHeader playerName={observingPlayer.name} />
+            <GameBoardPlayerPlayArea>
+              {observingPlayer.cardsInPlay.map((card) => (
+                <FaceUpThumbnailCard
+                  key={card.id}
+                  variant="inPlay"
+                  card={card}
+                />
+              ))}
+            </GameBoardPlayerPlayArea>
+            <GameBoardPlayerHandArea>
+              {observingPlayer.cardsInHand.map((card) => (
+                <FaceUpThumbnailCard
+                  key={card.id}
+                  variant="inHand"
+                  card={card}
+                />
+              ))}
+            </GameBoardPlayerHandArea>
+          </GameBoardPlayerArea>
+        )}
+        {observingPlayerIsChoosing && (
+          <GameBoardChoiceMenu
+            instructions={props.game.activity.choice.instructions}
+            choiceType={props.game.activity.choice.type}
+            values={props.game.activity.choice.values.map(({ value }) => value)}
+          />
+        )}
+        <GameBoardFooter />
+        <Dialog isOpen={dialogContext.isOpen} onClose={dialogContext.close}>
+          {dialogContext.value?.type === "card" && (
+            <DetailedCard card={dialogContext.value.card} />
           )}
-          {observingPlayerIsChoosing && (
-            <GameBoardChoiceMenu
-              instructions={props.game.activity.choice.instructions}
-              choiceType={props.game.activity.choice.type}
-              values={props.game.activity.choice.values.map(
-                ({ value }) => value,
-              )}
-            />
-          )}
-          <GameBoardFooter />
-          <Dialog isOpen={dialogContext.isOpen} onClose={dialogContext.close}>
-            {dialogContext.value?.type === "card" && (
-              <DetailedCard card={dialogContext.value.card} />
-            )}
-          </Dialog>
-        </GameBoardContainer>
-      </DialogContext.Provider>
-    </ChoiceContext.Provider>
+        </Dialog>
+      </GameBoardContainer>
+    </DialogContext.Provider>
   );
 };

@@ -1,6 +1,8 @@
 import {
+  ChoiceContext,
   SelectorContext,
   SubmitContext,
+  useChoiceContext,
   useSelectorContext,
 } from "@client/routes/games/board/contexts";
 import { usePoller } from "@client/utils/usePoller";
@@ -57,6 +59,7 @@ export const Game = () => {
   const ovservingPlayerChoosing = !poller.polling;
 
   const selectorContext = useSelectorContext(game);
+  const choiceContext = useChoiceContext(game);
 
   // Submission:
   const submitChoices = useCallback(async () => {
@@ -102,9 +105,13 @@ export const Game = () => {
   const submitContext = useMemo(
     () => ({
       submit: submitChoices,
-      canSubmit: !selectorContext.moreValuesNeeded,
+      canSubmit: choiceContext.forObserver && !selectorContext.moreValuesNeeded,
     }),
-    [submitChoices, selectorContext.moreValuesNeeded],
+    [
+      submitChoices,
+      choiceContext.forObserver,
+      selectorContext.moreValuesNeeded,
+    ],
   );
 
   return (
@@ -117,9 +124,11 @@ export const Game = () => {
       )}
       {game && (
         <SelectorContext.Provider value={selectorContext}>
-          <SubmitContext.Provider value={submitContext}>
-            <GameBoard game={game} />
-          </SubmitContext.Provider>
+          <ChoiceContext.Provider value={choiceContext}>
+            <SubmitContext.Provider value={submitContext}>
+              <GameBoard game={game} />
+            </SubmitContext.Provider>
+          </ChoiceContext.Provider>
         </SelectorContext.Provider>
       )}
     </div>
