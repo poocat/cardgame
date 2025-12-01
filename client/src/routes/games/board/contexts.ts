@@ -296,3 +296,24 @@ export function useDialogContext(): DialogContextType {
     [value, isOpen, close, set],
   );
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Submission Context
+////////////////////////////////////////////////////////////////////////////////
+
+type SubmitContextType = {
+  submit: () => Promise<void>;
+  canSubmit: boolean;
+};
+
+const dummySubmitContext = {
+  submit: async () => {},
+  canSubmit: false,
+};
+
+export const SubmitContext =
+  createContext<SubmitContextType>(dummySubmitContext);
+
+export function useSubmit() {
+  return useContext(SubmitContext);
+}

@@ -43,7 +43,13 @@ import type {
 } from "@common/api/digests";
 import { useMemo } from "react";
 import type z from "zod";
-import { useChoice, useDialog, useSelector, useValueSelect } from "../contexts";
+import {
+  useChoice,
+  useDialog,
+  useSelector,
+  useSubmit,
+  useValueSelect,
+} from "../contexts";
 import type { FaceUpCardDigest } from "../types";
 import {
   CardDetail,
@@ -234,12 +240,19 @@ const DetailCardChipSelect = (props: { chipIds: string[] }) => {
  ******************************************************************************/
 export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
   const choice = useChoice();
+  const dialog = useDialog();
+  const { submit, canSubmit } = useSubmit();
 
   const cardHasChoice = choice.checkCard(props.card.id);
   const useSelectableActions =
     choice.choiceType === "actionId" && cardHasChoice;
   const useSelectableChips = choice.choiceType === "chipId" && cardHasChoice;
   const chipIds = props.card.chips.map(({ id }) => id);
+
+  const submitHandler = () => {
+    submit();
+    dialog.close();
+  };
 
   return (
     <CardDetailContainer>
@@ -255,9 +268,14 @@ export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
           />
         ))}
       </CardDetail>
-      {useSelectableChips && (
+      {cardHasChoice && (
         <CardDetailFooterContainer>
-          <DetailCardChipSelect chipIds={chipIds} />
+          {useSelectableChips && <DetailCardChipSelect chipIds={chipIds} />}
+          <div>
+            <button type="button" disabled={!canSubmit} onClick={submitHandler}>
+              Submit
+            </button>
+          </div>
         </CardDetailFooterContainer>
       )}
     </CardDetailContainer>

@@ -1,5 +1,6 @@
 import {
   SelectorContext,
+  SubmitContext,
   useSelectorContext,
 } from "@client/routes/games/board/contexts";
 import { usePoller } from "@client/utils/usePoller";
@@ -55,7 +56,6 @@ export const Game = () => {
 
   const ovservingPlayerChoosing = !poller.polling;
 
-  // TODO!!! Should take the submission handler!!!
   const selectorContext = useSelectorContext(game);
 
   // Submission:
@@ -99,6 +99,14 @@ export const Game = () => {
     url,
   ]);
 
+  const submitContext = useMemo(
+    () => ({
+      submit: submitChoices,
+      canSubmit: !selectorContext.moreValuesNeeded,
+    }),
+    [submitChoices, selectorContext.moreValuesNeeded],
+  );
+
   return (
     <div>
       <hr />
@@ -109,7 +117,9 @@ export const Game = () => {
       )}
       {game && (
         <SelectorContext.Provider value={selectorContext}>
-          <GameBoard game={game} submitChoices={submitChoices} />
+          <SubmitContext.Provider value={submitContext}>
+            <GameBoard game={game} />
+          </SubmitContext.Provider>
         </SelectorContext.Provider>
       )}
     </div>

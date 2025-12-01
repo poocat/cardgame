@@ -8,7 +8,7 @@ import {
   DialogContext,
   useChoiceContext,
   useDialogContext,
-  useSelector,
+  useSubmit,
   useValueSelect,
 } from "./contexts";
 
@@ -140,9 +140,8 @@ const GameBoardChoiceMenu = (props: {
   instructions: string;
   choiceType: ChoiceType;
   values: string[];
-  submitChoices: () => void;
 }) => {
-  const selector = useSelector();
+  const { submit, canSubmit } = useSubmit();
 
   return (
     <div
@@ -170,11 +169,7 @@ const GameBoardChoiceMenu = (props: {
           />
         ))}
         <div>
-          <button
-            type="button"
-            disabled={selector.moreValuesNeeded}
-            onClick={props.submitChoices}
-          >
+          <button type="button" disabled={!canSubmit} onClick={submit}>
             Submit Choices
           </button>
         </div>
@@ -186,10 +181,7 @@ const GameBoardChoiceMenu = (props: {
 /******************************************************************************
  * ### GameBoard
  ******************************************************************************/
-export const GameBoard = (props: {
-  game: GameDigest;
-  submitChoices: () => void;
-}) => {
+export const GameBoard = (props: { game: GameDigest }) => {
   const observingPlayer = props.game.observingPlayer;
   const choosingPlayerId = props.game.activity.choice.choosingPlayerId;
   const observingPlayerIsChoosing = observingPlayer?.id === choosingPlayerId;
@@ -247,7 +239,6 @@ export const GameBoard = (props: {
               values={props.game.activity.choice.values.map(
                 ({ value }) => value,
               )}
-              submitChoices={props.submitChoices}
             />
           )}
           <GameBoardFooter />
