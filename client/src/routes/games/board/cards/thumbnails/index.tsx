@@ -1,5 +1,7 @@
 import { ButtonBase } from "@client/components/ButtonBase";
 import { type CSSProperties, useCallback } from "react";
+import { ThumbnailChipCounter } from "../../chips";
+import { colors } from "../../colors";
 import {
   thumbnailCardContainerHeight,
   thumbnailCardContainerWidth,
@@ -14,16 +16,16 @@ const thumbnailCardHighlightVariantStyles = {
     backgroundColor: "inherit",
   },
   observerCanChooseCard: {
-    backgroundColor: "rgba(0, 255, 255, 0.25)",
+    backgroundColor: colors.cards.alpha(0.25),
   },
   observerHasChosenCard: {
-    backgroundColor: "rgba(0, 255, 255, 0.5)",
+    backgroundColor: colors.cards.alpha(0.5),
   },
   observerCanChooseActionOnCard: {
-    backgroundColor: "rgba(0, 0, 255, 0.25)",
+    backgroundColor: colors.actions.alpha(0.25),
   },
   observerCanChooseChipOnCard: {
-    backgroundColor: "rgba(255, 0, 0, 0.25)",
+    backgroundColor: colors.chips.alpha(0.25),
   },
   otherPlayerChoosing: {
     backgroundColor: "rgba(0, 0, 0, 0.25)",
