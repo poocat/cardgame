@@ -187,7 +187,7 @@ export const CardThumbnailFaceUp = (props: {
         }}
       >
         <div>{props.cardType}</div>
-        {props.numChips && <div>{props.numChips}</div>}
+        {props.numChips && <ThumbnailChipCounter count={props.numChips} />}
       </div>
     </ButtonBase>
   );
