@@ -1,6 +1,5 @@
 import { ButtonBase } from "@client/components/ButtonBase";
 import { type CSSProperties, useCallback } from "react";
-import { ThumbnailChipCounter } from "../../chips";
 import { colors } from "../../colors";
 import {
   thumbnailCardContainerHeight,
@@ -64,6 +63,9 @@ export const CardThumbnailHeaderContainer = (props: {
       style={{
         width: "100%",
         height: thumbnailCardHeaderHeight,
+
+        fontSize: 10,
+        textAlign: "center",
       }}
     >
       {props.children}
@@ -82,8 +84,10 @@ export const CardThumbnailBodyContainer = (props: {
       style={{
         width: "100%",
         height: thumbnailCardContainerHeight - thumbnailCardHeaderHeight,
-        display: "grid",
-        placeItems: "center",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       {props.children}
@@ -144,9 +148,6 @@ export const CardThumbnailHeader = (
     paddingBlock: 2, // vertical
     paddingInline: 10, // horizontal
 
-    fontSize: 10,
-    textAlign: "center",
-
     display: "flex",
     flexDirection: "row",
   };
@@ -163,6 +164,9 @@ export const CardThumbnailHeader = (
   );
 };
 
+/******************************************************************************
+ * ### CardThumbnailFaceUp
+ ******************************************************************************/
 export const CardThumbnailFaceUp = (props: {
   cardType: string;
   numChips: number;
@@ -176,23 +180,22 @@ export const CardThumbnailFaceUp = (props: {
           height: thumbnailCardHeight,
 
           border: "1px solid",
-          borderRadius: 3,
+          borderRadius: 5,
 
           backgroundColor: "white",
 
           fontSize: 10,
-
-          display: "grid",
-          placeItems: "center",
         }}
       >
         <div>{props.cardType}</div>
-        {props.numChips && <ThumbnailChipCounter count={props.numChips} />}
       </div>
     </ButtonBase>
   );
 };
 
+/******************************************************************************
+ * ### CardThumbnailFaceDown
+ ******************************************************************************/
 export const CardThumbnailFaceDown = () => {
   return (
     <div
@@ -203,13 +206,31 @@ export const CardThumbnailFaceDown = () => {
         border: "1px solid",
         borderRadius: 3,
 
-        backgroundColor: "white",
+        backgroundColor: "gray",
 
         fontSize: 10,
-
-        display: "grid",
-        placeItems: "center",
       }}
-    ></div>
+    />
+  );
+};
+
+/******************************************************************************
+ * ### CardThumbnailPlaceholder
+ ******************************************************************************/
+export const CardThumbnailPlaceholder = () => {
+  return (
+    <div
+      style={{
+        width: thumbnailCardWidth,
+        height: thumbnailCardHeight,
+
+        border: "1px dashed",
+        borderRadius: 3,
+
+        backgroundColor: "transparent",
+
+        fontSize: 10,
+      }}
+    />
   );
 };

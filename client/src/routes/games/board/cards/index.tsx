@@ -44,6 +44,11 @@ import type {
 import { useMemo } from "react";
 import type z from "zod";
 import {
+  ChipCounterBadge,
+  DetailedChipCounter,
+  ThumbnailChipCounter,
+} from "../chips";
+import {
   useChoice,
   useDialog,
   useSelector,
@@ -183,6 +188,11 @@ export const FaceUpThumbnailCard = (
             numChips={props.card.chips.length}
             onClick={handleClick}
           />
+          {props.card.chips.length > 0 && (
+            <ChipCounterBadge>
+              <ThumbnailChipCounter count={props.card.chips.length} />
+            </ChipCounterBadge>
+          )}
         </CardThumbnailBodyContainer>
       </CardThumbnailHighlight>
     </CardThumbnailContainer>
@@ -287,6 +297,9 @@ export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
           />
         ))}
       </CardDetail>
+      <ChipCounterBadge>
+        <DetailedChipCounter count={chipIds.length} />
+      </ChipCounterBadge>
       {cardHasChoice && (
         <CardDetailFooterContainer>
           {cardHasSelectableChips && <DetailCardChipSelect chipIds={chipIds} />}

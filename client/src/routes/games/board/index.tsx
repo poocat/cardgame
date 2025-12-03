@@ -3,6 +3,8 @@ import type { gameDigestSchema } from "@common/api/digests";
 import type { choiceTypes } from "@common/game/enums";
 import type z from "zod";
 import { DetailedCard, FaceUpThumbnailCard } from "./cards";
+import { DetailedChipCounter } from "./chips";
+import { colors } from "./colors";
 import {
   DialogContext,
   useDialogContext,
@@ -19,7 +21,16 @@ const floatingChoiceBoxHeight = 100;
  * ### GameBoardContainer
  ******************************************************************************/
 const GameBoardContainer = (props: { children?: React.ReactNode }) => {
-  return <div style={{ width: "100%" }}>{props.children}</div>;
+  return (
+    <div
+      style={{
+        width: "100%",
+        backgroundColor: colors.board.alpha(1),
+      }}
+    >
+      {props.children}
+    </div>
+  );
 };
 
 /******************************************************************************
@@ -55,8 +66,50 @@ const GameBoardPlayerArea = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 const GameBoardPlayerHeader = (props: { playerName: string }) => {
   return (
-    <div>
+    <div style={{ paddingLeft: 10, paddingRight: 10, margin: 10 }}>
       <h2>{props.playerName}</h2>
+    </div>
+  );
+};
+
+/******************************************************************************
+ * ### GameBoardPlayerChipContainer
+ ******************************************************************************/
+const GameBoardPlayerChipContainer = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        gap: 5,
+        padding: 10,
+        marginLeft: 10,
+        marginRight: 10,
+        borderRadius: 5,
+        backgroundColor: colors.board.scale(0.9),
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+/******************************************************************************
+ * ### GameBoardPlayerReserveContainer
+ ******************************************************************************/
+const GameBoardPlayerChipContainerHeading = (props: {
+  children: React.ReactNode;
+}) => {
+  return <div style={{ fontSize: 10, marginBottom: 5 }}>{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### GameBoardPlayerChipContainerBody
+ ******************************************************************************/
+const GameBoardPlayerChipContainerBody = (props: {
+  children: React.ReactNode;
+}) => {
+  return (
+    <div style={{ display: "flex", flexDirection: "row", gap: 3 }}>
+      {props.children}
     </div>
   );
 };
@@ -85,7 +138,7 @@ const GameBoardCardArray = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 const GameBoardPlayerHandArea = (props: { children?: React.ReactNode }) => {
   return (
-    <div>
+    <div style={{ padding: 10, margin: 10 }}>
       <h4>Cards in Hand:</h4>
       <GameBoardCardArray>{props.children}</GameBoardCardArray>
     </div>
@@ -97,7 +150,7 @@ const GameBoardPlayerHandArea = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 const GameBoardPlayerPlayArea = (props: { children?: React.ReactNode }) => {
   return (
-    <div>
+    <div style={{ padding: 10, margin: 10 }}>
       <h4>Cards in Play:</h4>
       <GameBoardCardArray>{props.children}</GameBoardCardArray>
     </div>
@@ -150,6 +203,8 @@ const GameBoardChoiceMenu = (props: {
         borderTop: "1px solid",
         width: "100%",
         bottom: 0,
+        right: 0,
+        left: 0,
         maxHeight: floatingChoiceBoxHeight,
         height: floatingChoiceBoxHeight,
         display: "flex",
@@ -203,6 +258,14 @@ export const GameBoard = (props: { game: GameDigest }) => {
                 />
               ))}
             </GameBoardPlayerPlayArea>
+            <GameBoardPlayerChipContainer>
+              <GameBoardPlayerChipContainerHeading>
+                Reserve
+              </GameBoardPlayerChipContainerHeading>
+              <GameBoardPlayerChipContainerBody>
+                <DetailedChipCounter count={player.chipsInReserve.length} />
+              </GameBoardPlayerChipContainerBody>
+            </GameBoardPlayerChipContainer>
           </GameBoardPlayerArea>
         ))}
         {observingPlayer && (
@@ -218,6 +281,14 @@ export const GameBoard = (props: { game: GameDigest }) => {
                 />
               ))}
             </GameBoardPlayerPlayArea>
+            <GameBoardPlayerChipContainer>
+              <GameBoardPlayerChipContainerHeading>
+                Reserve
+              </GameBoardPlayerChipContainerHeading>
+              <DetailedChipCounter
+                count={observingPlayer.chipsInReserve.length}
+              />
+            </GameBoardPlayerChipContainer>
             <GameBoardPlayerHandArea>
               {observingPlayer.cardsInHand.map((card) => (
                 <FaceUpThumbnailCard
