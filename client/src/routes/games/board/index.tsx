@@ -109,7 +109,14 @@ const GameBoardPlayerChipContainerBody = (props: {
   children: React.ReactNode;
 }) => {
   return (
-    <div style={{ display: "flex", flexDirection: "row", gap: 3 }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 3,
+      }}
+    >
       {props.children}
     </div>
   );
@@ -173,8 +180,11 @@ const GameBoardPlayerChipContainerMenu = (props: { chipIds: string[] }) => {
     choice.checkValue(chipId),
   );
 
-  const { numSelected, numRemaining, moreAllowed, addChip, removeChip } =
-    useChipSelector({ chipIds: props.chipIds });
+  const { numSelected, moreAllowed, addChip, removeChip } = useChipSelector({
+    chipIds: props.chipIds,
+  });
+
+  const { submit, canSubmit } = useSubmit();
 
   return (
     <>
@@ -185,10 +195,11 @@ const GameBoardPlayerChipContainerMenu = (props: { chipIds: string[] }) => {
       {choice.forObserver && selectableChips.length > 0 && (
         <ChipSelectMenu
           numSelected={numSelected}
-          numRemaining={numRemaining}
-          disableIncrement={!moreAllowed}
           onIncrement={addChip}
           onDecrement={removeChip}
+          onSubmit={submit}
+          disableIncrement={!moreAllowed}
+          disableSubmit={!canSubmit}
         />
       )}
     </>

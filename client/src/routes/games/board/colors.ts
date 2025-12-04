@@ -36,7 +36,7 @@ export class Color {
 export const colors = {
   board: new Color({ r: 235, g: 220, b: 200 }),
   cards: new Color({ r: 0, g: 200, b: 200 }),
-  actions: new Color({ r: 0, g: 0, b: 200 }),
+  actions: new Color({ r: 100, g: 100, b: 200 }),
   chips: new Color({ r: 250, g: 125, b: 150 }),
 } as const satisfies Record<string, Color>;
 

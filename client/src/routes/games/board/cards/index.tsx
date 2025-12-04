@@ -37,6 +37,7 @@
  *
  */
 
+import { Button } from "@client/components/Button";
 import type {
   inPlayCardDigestSchema,
   visibleCardDigestSchema,
@@ -50,6 +51,7 @@ import {
   ThumbnailChipCounter,
   useChipSelector,
 } from "../chips";
+import { colors } from "../colors";
 import {
   useChoice,
   useDialog,
@@ -234,16 +236,20 @@ const DetailCardAction = (props: {
  * ### DetailCardChipSelect
  ******************************************************************************/
 const DetailCardChipSelect = (props: { chipIds: string[] }) => {
-  const { numSelected, numRemaining, moreAllowed, addChip, removeChip } =
-    useChipSelector({ chipIds: props.chipIds });
+  const { numSelected, moreAllowed, addChip, removeChip } = useChipSelector({
+    chipIds: props.chipIds,
+  });
+
+  const { submit, canSubmit } = useSubmit();
 
   return (
     <ChipSelectMenu
       numSelected={numSelected}
-      numRemaining={numRemaining}
       disableIncrement={!moreAllowed}
       onIncrement={addChip}
       onDecrement={removeChip}
+      onSubmit={submit}
+      disableSubmit={!canSubmit}
     />
   );
 };
@@ -306,16 +312,17 @@ export const DetailCard = (props: { card: FaceUpCardDigest }) => {
       {cardHasChoice && (
         <CardDetailFooterContainer>
           {cardHasSelectableChips && <DetailCardChipSelect chipIds={chipIds} />}
-          {/* TODO!!! Create a new component. */}
-          <div>
-            <button
-              type="button"
+          {cardHasSelectableActions && (
+            <Button
               disabled={submitDisabled}
               onClick={submitHandler}
+              color={colors.actions.scale(0.8)}
+              height={50}
+              fontSize={20}
             >
-              Submit
-            </button>
-          </div>
+              ✓
+            </Button>
+          )}
         </CardDetailFooterContainer>
       )}
     </CardDetailContainer>

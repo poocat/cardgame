@@ -64,7 +64,6 @@ export const CardThumbnailHeaderContainer = (props: {
         width: "100%",
         height: thumbnailCardHeaderHeight,
 
-        fontSize: 10,
         textAlign: "center",
         alignContent: "end",
       }}
@@ -148,6 +147,7 @@ export const CardThumbnailHeader = (
   const commonStyleProps: CSSProperties = {
     paddingBlock: 2, // vertical
     paddingInline: 10, // horizontal
+    fontSize: 10,
 
     display: "flex",
     flexDirection: "row",

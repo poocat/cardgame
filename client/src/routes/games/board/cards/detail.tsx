@@ -26,7 +26,20 @@ export const CardDetailContainer = (props: { children?: React.ReactNode }) => {
 export const CardDetailFooterContainer = (props: {
   children?: React.ReactNode;
 }) => {
-  return <div style={{ height: detailCardFooterHeight }}>{props.children}</div>;
+  return (
+    <div
+      style={{
+        height: detailCardFooterHeight,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "start",
+        justifyContent: "end",
+        margin: 5,
+      }}
+    >
+      {props.children}
+    </div>
+  );
 };
 
 /******************************************************************************

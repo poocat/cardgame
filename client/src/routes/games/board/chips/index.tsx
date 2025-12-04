@@ -1,3 +1,4 @@
+import { Button } from "@client/components/Button";
 import type { CSSProperties } from "react";
 import { colors } from "../colors";
 import { useSelector } from "../contexts";
@@ -199,45 +200,42 @@ export function useChipSelector(args: { chipIds: string[] }): {
  ******************************************************************************/
 export const ChipSelectMenu = (props: {
   numSelected: number;
-  numRemaining: number;
-  disableIncrement: boolean;
   onIncrement: () => void;
   onDecrement: () => void;
+  onSubmit?: () => void;
+  disableIncrement?: boolean;
+  disableSubmit?: boolean;
 }) => {
+  const commonProps = {
+    height: 46,
+    fontSize: 20,
+    color: colors.chips.scale(0.8),
+  };
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
+    <div style={{ display: "flex", flexDirection: "row", gap: 3 }}>
+      <Button
+        disabled={props.numSelected < 1}
+        onClick={props.onDecrement}
+        {...commonProps}
       >
-        <div>{props.numRemaining}</div>
-        <div>{props.numSelected}</div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
+        -
+      </Button>
+      <Button
+        disabled={!!props.disableIncrement}
+        onClick={props.onIncrement}
+        {...commonProps}
       >
-        <button
-          type="button"
-          disabled={props.numSelected < 1}
-          onClick={props.onDecrement}
+        +
+      </Button>
+      {props.onSubmit && (
+        <Button
+          disabled={!!props.disableSubmit}
+          onClick={props.onSubmit}
+          {...commonProps}
         >
-          less
-        </button>
-        <button
-          type="button"
-          disabled={props.disableIncrement}
-          onClick={props.onIncrement}
-        >
-          more
-        </button>
-      </div>
+          ✓
+        </Button>
+      )}
     </div>
   );
 };

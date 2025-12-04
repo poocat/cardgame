@@ -16,10 +16,12 @@ const defaultButtonStyleProps: CSSProperties = {
 export const ButtonBase = (props: {
   children: React.ReactNode;
   onClick: () => void;
+  disabled?: boolean;
 }) => {
   return (
     <button
       type="button"
+      disabled={!!props.disabled}
       style={defaultButtonStyleProps}
       onClick={props.onClick}
     >
