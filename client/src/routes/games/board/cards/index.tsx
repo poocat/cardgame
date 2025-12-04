@@ -63,7 +63,7 @@ import {
   CardDetailAction,
   CardDetailContainer,
   CardDetailFooterContainer,
-} from "./details";
+} from "./detail";
 import {
   CardThumbnailBodyContainer,
   CardThumbnailContainer,
@@ -71,8 +71,8 @@ import {
   CardThumbnailHeader,
   CardThumbnailHeaderContainer,
   CardThumbnailHighlight,
-} from "./thumbnails";
-import type { ThumbnailCardHighlightVariant } from "./thumbnails/types";
+} from "./thumbnail";
+import type { ThumbnailCardHighlightVariant } from "./types";
 
 type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
