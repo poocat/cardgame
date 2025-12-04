@@ -2,7 +2,7 @@ import { Dialog } from "@client/components/Dialog";
 import type { gameDigestSchema } from "@common/api/digests";
 import type { choiceTypes } from "@common/game/enums";
 import type z from "zod";
-import { DetailedCard, FaceUpThumbnailCard } from "./cards";
+import { DetailCard, FaceUpThumbnailCard } from "./cards";
 import { ChipSelectMenu, DetailChipCounter, useChipSelector } from "./chips";
 import { colors } from "./colors";
 import {
@@ -328,9 +328,6 @@ export const GameBoard = (props: { game: GameDigest }) => {
                   chipIds={observingPlayer.chipsInReserve.map(({ id }) => id)}
                 />
               </GameBoardPlayerChipContainerBody>
-              {/* <DetailedChipCounter
-                count={observingPlayer.chipsInReserve.length}
-              /> */}
             </GameBoardPlayerChipContainer>
             <GameBoardPlayerHandArea>
               {observingPlayer.cardsInHand.map((card) => (
@@ -353,7 +350,7 @@ export const GameBoard = (props: { game: GameDigest }) => {
         <GameBoardFooter />
         <Dialog isOpen={dialogContext.isOpen} onClose={dialogContext.close}>
           {dialogContext.value?.type === "card" && (
-            <DetailedCard card={dialogContext.value.card} />
+            <DetailCard card={dialogContext.value.card} />
           )}
         </Dialog>
       </GameBoardContainer>

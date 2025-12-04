@@ -120,7 +120,7 @@ const DetailChipBase = (props: {
 };
 
 /******************************************************************************
- * ### DetailedChipCounter
+ * ### DetailChipCounter
  *
  * Larger chip counters, used on detail-sized cards or larger chip pools.
  ******************************************************************************/

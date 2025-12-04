@@ -211,7 +211,7 @@ export const FaceUpThumbnailCard = (
 ////////////////////////////////////////////////////////////////////////////////
 
 // TODO!!! Memoize?
-const DetailedCardAction = (props: {
+const DetailCardAction = (props: {
   disabled: boolean;
   actionType: string;
   actionId: string;
@@ -249,9 +249,11 @@ const DetailCardChipSelect = (props: { chipIds: string[] }) => {
 };
 
 /******************************************************************************
- * ### DetailedCard
+ * ### DetailCard
+ *
+ * Complete composition of a card in the detail form-factor.
  ******************************************************************************/
-export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
+export const DetailCard = (props: { card: FaceUpCardDigest }) => {
   const choice = useChoice();
   const selector = useSelector();
   const dialog = useDialog();
@@ -284,7 +286,7 @@ export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
       <CardDetail>
         <div>{props.card.name}</div>
         {props.card.actions.map((action) => (
-          <DetailedCardAction
+          <DetailCardAction
             key={action.id}
             actionId={action.id}
             actionType={action.type}
