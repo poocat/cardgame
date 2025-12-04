@@ -58,56 +58,6 @@ export const CardDetailAction = (props: {
 };
 
 /******************************************************************************
- * ### CardDetailChipSelect
- *
- * Chip selection is not done on a chip-by-chip basis.
- ******************************************************************************/
-export const CardDetailChipSelect = (props: {
-  numSelected: number;
-  numRemaining: number;
-  disableIncrement: boolean;
-  onIncrement: () => void;
-  onDecrement: () => void;
-}) => {
-  return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <div>{props.numRemaining}</div>
-        <div>{props.numSelected}</div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <button
-          type="button"
-          disabled={props.numSelected < 1}
-          onClick={props.onDecrement}
-        >
-          less
-        </button>
-        <button
-          type="button"
-          disabled={props.disableIncrement}
-          onClick={props.onIncrement}
-        >
-          more
-        </button>
-      </div>
-    </div>
-  );
-};
-
-/******************************************************************************
  * ### CardDetail
  ******************************************************************************/
 export const CardDetail = (props: { children: React.ReactNode }) => {

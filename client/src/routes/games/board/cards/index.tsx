@@ -45,8 +45,10 @@ import { useMemo } from "react";
 import type z from "zod";
 import {
   ChipCounterBadge,
-  DetailedChipCounter,
+  ChipSelectMenu,
+  DetailChipCounter,
   ThumbnailChipCounter,
+  useChipSelector,
 } from "../chips";
 import {
   useChoice,
@@ -59,7 +61,6 @@ import type { FaceUpCardDigest } from "../types";
 import {
   CardDetail,
   CardDetailAction,
-  CardDetailChipSelect,
   CardDetailContainer,
   CardDetailFooterContainer,
 } from "./details";
@@ -114,6 +115,9 @@ export const FaceUpThumbnailCard = (
 
   const selector = useSelector();
   const cardSelected = selector.checkValueSelected(cardId);
+
+  const chipIds = props.card.chips.map(({ id }) => id);
+  const { numSelected: numSelectedChips } = useChipSelector({ chipIds });
 
   const select = useValueSelect(cardId);
   const cardSelectable = !select.disabled;
@@ -190,7 +194,10 @@ export const FaceUpThumbnailCard = (
           />
           {props.card.chips.length > 0 && (
             <ChipCounterBadge>
-              <ThumbnailChipCounter count={props.card.chips.length} />
+              <ThumbnailChipCounter
+                count={chipIds.length}
+                numSelected={numSelectedChips}
+              />
             </ChipCounterBadge>
           )}
         </CardThumbnailBodyContainer>
@@ -223,32 +230,20 @@ const DetailedCardAction = (props: {
   );
 };
 
+/******************************************************************************
+ * ### DetailCardChipSelect
+ ******************************************************************************/
 const DetailCardChipSelect = (props: { chipIds: string[] }) => {
-  const selector = useSelector();
-  const selected = selector.selectedValues;
-  const remaining = props.chipIds.filter(
-    (chipId) => !selected.includes(chipId),
-  );
-
-  const handleAddChip = () => {
-    if (selector.moreValuesAllowed && remaining.length > 0) {
-      selector.addValue(remaining[0]);
-    }
-  };
-
-  const handleRemoveChip = () => {
-    if (selector.selectedValues.length > 0) {
-      selector.removeValue(selected[0]);
-    }
-  };
+  const { numSelected, numRemaining, moreAllowed, addChip, removeChip } =
+    useChipSelector({ chipIds: props.chipIds });
 
   return (
-    <CardDetailChipSelect
-      numSelected={selected.length}
-      numRemaining={remaining.length}
-      disableIncrement={!selector.moreValuesAllowed}
-      onIncrement={handleAddChip}
-      onDecrement={handleRemoveChip}
+    <ChipSelectMenu
+      numSelected={numSelected}
+      numRemaining={numRemaining}
+      disableIncrement={!moreAllowed}
+      onIncrement={addChip}
+      onDecrement={removeChip}
     />
   );
 };
@@ -274,6 +269,7 @@ export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
     cardHasChoice && choice.choiceType === "chipId";
 
   const chipIds = props.card.chips.map(({ id }) => id);
+  const { numSelected: numSelectedChips } = useChipSelector({ chipIds });
 
   // Disable the submit button if nothing from this card was selected.
   const submitDisabled = !canSubmit || selectedValuesOnCard.length < 1;
@@ -297,9 +293,14 @@ export const DetailedCard = (props: { card: FaceUpCardDigest }) => {
           />
         ))}
       </CardDetail>
-      <ChipCounterBadge>
-        <DetailedChipCounter count={chipIds.length} />
-      </ChipCounterBadge>
+      {chipIds.length > 0 && (
+        <ChipCounterBadge>
+          <DetailChipCounter
+            count={chipIds.length}
+            numSelected={numSelectedChips}
+          />
+        </ChipCounterBadge>
+      )}
       {cardHasChoice && (
         <CardDetailFooterContainer>
           {cardHasSelectableChips && <DetailCardChipSelect chipIds={chipIds} />}

@@ -66,6 +66,7 @@ export const CardThumbnailHeaderContainer = (props: {
 
         fontSize: 10,
         textAlign: "center",
+        alignContent: "end",
       }}
     >
       {props.children}

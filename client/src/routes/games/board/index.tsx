@@ -3,10 +3,11 @@ import type { gameDigestSchema } from "@common/api/digests";
 import type { choiceTypes } from "@common/game/enums";
 import type z from "zod";
 import { DetailedCard, FaceUpThumbnailCard } from "./cards";
-import { DetailedChipCounter } from "./chips";
+import { ChipSelectMenu, DetailChipCounter, useChipSelector } from "./chips";
 import { colors } from "./colors";
 import {
   DialogContext,
+  useChoice,
   useDialogContext,
   useSubmit,
   useValueSelect,
@@ -158,6 +159,43 @@ const GameBoardPlayerPlayArea = (props: { children?: React.ReactNode }) => {
 };
 
 /******************************************************************************
+ * ### GameBoardPlayerChipContainerMenu
+ *
+ * Composition of a chip counter and a menu for selecting chips from the given
+ * pool.
+ *
+ * Intended as a child of
+ ******************************************************************************/
+const GameBoardPlayerChipContainerMenu = (props: { chipIds: string[] }) => {
+  const choice = useChoice();
+
+  const selectableChips = props.chipIds.filter((chipId) =>
+    choice.checkValue(chipId),
+  );
+
+  const { numSelected, numRemaining, moreAllowed, addChip, removeChip } =
+    useChipSelector({ chipIds: props.chipIds });
+
+  return (
+    <>
+      <DetailChipCounter
+        count={props.chipIds.length}
+        numSelected={numSelected}
+      />
+      {choice.forObserver && selectableChips.length > 0 && (
+        <ChipSelectMenu
+          numSelected={numSelected}
+          numRemaining={numRemaining}
+          disableIncrement={!moreAllowed}
+          onIncrement={addChip}
+          onDecrement={removeChip}
+        />
+      )}
+    </>
+  );
+};
+
+/******************************************************************************
  * ### GameBoardChoiceMenuValueSelect
  *
  * TODO!!! Memoize?
@@ -263,7 +301,7 @@ export const GameBoard = (props: { game: GameDigest }) => {
                 Reserve
               </GameBoardPlayerChipContainerHeading>
               <GameBoardPlayerChipContainerBody>
-                <DetailedChipCounter count={player.chipsInReserve.length} />
+                <DetailChipCounter count={player.chipsInReserve.length} />
               </GameBoardPlayerChipContainerBody>
             </GameBoardPlayerChipContainer>
           </GameBoardPlayerArea>
@@ -285,9 +323,14 @@ export const GameBoard = (props: { game: GameDigest }) => {
               <GameBoardPlayerChipContainerHeading>
                 Reserve
               </GameBoardPlayerChipContainerHeading>
-              <DetailedChipCounter
+              <GameBoardPlayerChipContainerBody>
+                <GameBoardPlayerChipContainerMenu
+                  chipIds={observingPlayer.chipsInReserve.map(({ id }) => id)}
+                />
+              </GameBoardPlayerChipContainerBody>
+              {/* <DetailedChipCounter
                 count={observingPlayer.chipsInReserve.length}
-              />
+              /> */}
             </GameBoardPlayerChipContainer>
             <GameBoardPlayerHandArea>
               {observingPlayer.cardsInHand.map((card) => (
