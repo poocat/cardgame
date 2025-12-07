@@ -1,4 +1,4 @@
-import { Button } from "@client/components/Button";
+import { Button } from "@client/components";
 import type { CSSProperties } from "react";
 import { colors } from "../colors";
 import { useSelector } from "../contexts";
@@ -32,7 +32,7 @@ export const ChipCounterBadge = (props: { children: React.ReactNode }) => {
         style={{
           position: "absolute",
           bottom: 0,
-          left: "15%",
+          left: "12%",
           transform: "translateY(50%)",
         }}
       >

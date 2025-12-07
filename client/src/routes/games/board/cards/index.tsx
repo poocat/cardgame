@@ -37,7 +37,7 @@
  *
  */
 
-import { Button } from "@client/components/Button";
+import { Button } from "@client/components";
 import type {
   inPlayCardDigestSchema,
   visibleCardDigestSchema,

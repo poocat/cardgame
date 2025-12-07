@@ -1,4 +1,4 @@
-import { Dialog } from "@client/components/Dialog";
+import { Dialog } from "@client/components";
 import type { gameDigestSchema } from "@common/api/digests";
 import type { choiceTypes } from "@common/game/enums";
 import type z from "zod";
