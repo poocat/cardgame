@@ -70,10 +70,12 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
         },
       });
       next.currentChoice = nextActionChoices[0] ?? nullChoice();
-      const remaining: NextChoiceData[] = nextActionChoices.map((choice) => ({
-        type: "independent",
-        choice,
-      }));
+      const remaining: NextChoiceData[] = nextActionChoices
+        .slice(1)
+        .map((choice) => ({
+          type: "independent",
+          choice,
+        }));
       next.nextChoices = [...remaining, ...next.nextChoices];
     } else {
       next.currentChoice = nextChoice.choice;
