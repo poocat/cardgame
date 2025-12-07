@@ -109,7 +109,7 @@ export const Room = () => {
     } catch (error) {
       console.error(error);
     }
-  }, [startGameDisabled, roomId]);
+  }, [startGameDisabled, roomId, playerId]);
 
   return (
     <div>
@@ -134,7 +134,11 @@ export const Room = () => {
       {playerIsHost && (
         <div>
           <div>
-            <button disabled={startGameDisabled} onClick={handleStartGame}>
+            <button
+              type="button"
+              disabled={startGameDisabled}
+              onClick={handleStartGame}
+            >
               Start game
             </button>
           </div>
@@ -150,6 +154,7 @@ export const Room = () => {
           </div>
           <div>
             <button
+              type="button"
               onClick={handleSubmitGuest}
               disabled={playerIsHost || !guestName}
             >
