@@ -1,8 +1,10 @@
 import {
   ChoiceContext,
+  DialogContext,
   SelectorContext,
   SubmitContext,
   useChoiceContext,
+  useDialogContext,
   useSelectorContext,
 } from "@client/routes/games/board/contexts";
 import { usePoller } from "@client/utils/usePoller";
@@ -60,6 +62,7 @@ export const Game = () => {
 
   const selectorContext = useSelectorContext(game);
   const choiceContext = useChoiceContext(game);
+  const dialogContext = useDialogContext();
 
   // Submission:
   const submitChoices = useCallback(async () => {
@@ -86,9 +89,10 @@ export const Game = () => {
         },
       })
         .catch((reason) => console.error(reason))
-        .finally(() => {
+        .then(() => {
           poller.fetchOnce();
           selectorContext.clearValues();
+          dialogContext.close();
         });
     }
   }, [
@@ -97,6 +101,7 @@ export const Game = () => {
     game,
     selectorContext.selectedValues,
     selectorContext.clearValues,
+    dialogContext.close,
     ovservingPlayerChoosing,
     poller.fetchOnce,
     url,
@@ -127,9 +132,11 @@ export const Game = () => {
       {game && (
         <SelectorContext.Provider value={selectorContext}>
           <ChoiceContext.Provider value={choiceContext}>
-            <SubmitContext.Provider value={submitContext}>
-              <GameBoard game={game} />
-            </SubmitContext.Provider>
+            <DialogContext.Provider value={dialogContext}>
+              <SubmitContext.Provider value={submitContext}>
+                <GameBoard game={game} />
+              </SubmitContext.Provider>
+            </DialogContext.Provider>
           </ChoiceContext.Provider>
         </SelectorContext.Provider>
       )}
