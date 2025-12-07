@@ -1,3 +1,5 @@
+import { SelectButton } from "@client/components";
+import { colors } from "../colors";
 import {
   detailCardFooterHeight,
   detailCardHeight,
@@ -13,6 +15,23 @@ export const CardDetailContainer = (props: { children?: React.ReactNode }) => {
       style={{
         width: detailCardWidth,
         height: detailCardHeight + detailCardFooterHeight,
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+export const CardDetailActionContainer = (props: {
+  children?: React.ReactNode;
+}) => {
+  return (
+    <div
+      style={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
       }}
     >
       {props.children}
@@ -43,30 +62,27 @@ export const CardDetailFooterContainer = (props: {
 };
 
 /******************************************************************************
- * ### CardDetailActionSelect
+ * ### CardDetailAction
  ******************************************************************************/
 export const CardDetailAction = (props: {
-  value: string;
   label: string;
   selected: boolean;
   disabled: boolean;
   onChange: () => void;
 }) => {
-  const { value, label, selected, disabled, onChange } = props;
+  const { label, selected, disabled, onChange } = props;
 
   return (
-    <div>
-      <span>
-        <input
-          id={value}
-          type="checkbox"
-          disabled={disabled}
-          checked={selected}
-          onChange={onChange}
-        />
-        {label && <label htmlFor={value}>{label}</label>}
-      </span>
-    </div>
+    <SelectButton
+      selected={selected}
+      onClick={onChange}
+      fontSize={16}
+      color={colors.actions.alpha(0.5)}
+      disabled={disabled}
+      label={label}
+      fullWidth
+      minHeight={50}
+    />
   );
 };
 

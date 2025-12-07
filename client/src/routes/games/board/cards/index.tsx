@@ -63,6 +63,7 @@ import type { FaceUpCardDigest } from "../types";
 import {
   CardDetail,
   CardDetailAction,
+  CardDetailActionContainer,
   CardDetailContainer,
   CardDetailFooterContainer,
 } from "./detail";
@@ -224,7 +225,6 @@ const DetailCardAction = (props: {
   return (
     <CardDetailAction
       label={`[${props.actionType}] ${props.instructions}`}
-      value={props.actionId}
       selected={selected}
       disabled={disabled || props.disabled}
       onChange={toggle}
@@ -282,7 +282,7 @@ export const DetailCard = (props: { card: FaceUpCardDigest }) => {
   // Disable the submit button if nothing from this card was selected.
   const submitDisabled = !canSubmit || selectedValuesOnCard.length < 1;
 
-  const submitHandler = () => {
+  const handleSubmit = () => {
     submit();
     dialog.close();
   };
@@ -291,15 +291,17 @@ export const DetailCard = (props: { card: FaceUpCardDigest }) => {
     <CardDetailContainer>
       <CardDetail>
         <div>{props.card.name}</div>
-        {props.card.actions.map((action) => (
-          <DetailCardAction
-            key={action.id}
-            actionId={action.id}
-            actionType={action.type}
-            instructions={action.instructions}
-            disabled={!cardHasSelectableActions}
-          />
-        ))}
+        <CardDetailActionContainer>
+          {props.card.actions.map((action) => (
+            <DetailCardAction
+              key={action.id}
+              actionId={action.id}
+              actionType={action.type}
+              instructions={action.instructions}
+              disabled={!cardHasSelectableActions}
+            />
+          ))}
+        </CardDetailActionContainer>
       </CardDetail>
       {chipIds.length > 0 && (
         <ChipCounterBadge>
@@ -312,10 +314,9 @@ export const DetailCard = (props: { card: FaceUpCardDigest }) => {
       {cardHasChoice && (
         <CardDetailFooterContainer>
           {cardHasSelectableChips && <DetailCardChipSelect chipIds={chipIds} />}
-          {cardHasSelectableActions && (
+          {cardHasSelectableActions && !submitDisabled && (
             <Button
-              disabled={submitDisabled}
-              onClick={submitHandler}
+              onClick={handleSubmit}
               color={colors.actions.scale(0.8)}
               height={50}
               fontSize={20}
