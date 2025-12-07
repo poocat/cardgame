@@ -117,11 +117,13 @@ export const Game = () => {
   return (
     <div>
       <hr />
-      {poller.polling ? (
-        <div>Polled {poller.pollCount} times..</div>
-      ) : (
-        <div>Not polling... {poller.error && `(${poller.error})`}</div>
-      )}
+      <div style={{ padding: 10 }}>
+        {poller.polling ? (
+          <span>Polled {poller.pollCount} times..</span>
+        ) : (
+          <span>Not polling... {poller.error && `(${poller.error})`}</span>
+        )}
+      </div>
       {game && (
         <SelectorContext.Provider value={selectorContext}>
           <ChoiceContext.Provider value={choiceContext}>

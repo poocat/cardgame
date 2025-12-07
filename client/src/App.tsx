@@ -6,12 +6,12 @@ import { Link, Outlet, Route, Routes } from "react-router";
 
 const Layout = () => {
   return (
-    <div>
-      <div>
-        <span style={{ marginRight: 10 }}>
+    <div style={{}}>
+      <div style={{ padding: 5 }}>
+        <span style={{ padding: 5 }}>
           <Link to="/">Cardgame</Link>
         </span>
-        <span style={{ marginRight: 10 }}>
+        <span style={{ padding: 5 }}>
           <Link to="/games">Games</Link>
         </span>
       </div>
@@ -22,20 +22,18 @@ const Layout = () => {
 
 function App() {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<NewRoom />} />
-          <Route path="/games">
-            <Route index element={<GameList />} />
-            <Route path=":gameId" element={<Game />} />
-          </Route>
-          <Route path="/rooms">
-            <Route path=":roomId" element={<Room />} />
-          </Route>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<NewRoom />} />
+        <Route path="/games">
+          <Route index element={<GameList />} />
+          <Route path=":gameId" element={<Game />} />
         </Route>
-      </Routes>
-    </>
+        <Route path="/rooms">
+          <Route path=":roomId" element={<Room />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }
 
