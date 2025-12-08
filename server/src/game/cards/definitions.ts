@@ -4,7 +4,7 @@
  * One day, will come up with a schema to replace callbacks with serializable
  * objects...
  */
-import { CardDef } from "@server/game/types";
+import type { CardDef } from "@server/game/types";
 
 export const CARDS: CardDef[] = [
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -16,6 +16,7 @@ export const CARDS: CardDef[] = [
     actions: {
       play: {},
       ability: {
+        instructions: "Move up to one chip from your reserve to this card.",
         sequence: {
           choices: [
             {
@@ -235,7 +236,7 @@ export const CARDS: CardDef[] = [
                   playerId,
                 });
                 decisions
-                  .getValues({ name: "targetCard", playerId })
+                  .getValues({ name: "targetConsumer", playerId })
                   .forEach((cardId) => {
                     mutator.moveChips({
                       ids: chipIds,
