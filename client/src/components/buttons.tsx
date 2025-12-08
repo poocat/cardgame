@@ -40,25 +40,26 @@ export const Button = (props: {
   fontSize: number;
   color: string;
   disabled?: boolean;
+  horizontalPadding?: number;
 }) => {
   const borderRadius = props.height / 2;
+  const styleProps: CSSProperties = {
+    height: props.height,
+    minWidth: props.height,
+    fontSize: props.fontSize,
+    backgroundColor: props.color,
+    alignItems: "center",
+    alignContent: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    borderRadius: borderRadius,
+  };
+  if (props.horizontalPadding) {
+    styleProps.paddingInline = props.horizontalPadding;
+  }
   return (
     <ButtonBase onClick={props.onClick} disabled={!!props.disabled}>
-      <div
-        style={{
-          height: props.height,
-          minWidth: props.height,
-          fontSize: props.fontSize,
-          backgroundColor: props.color,
-          alignItems: "center",
-          alignContent: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          borderRadius: borderRadius,
-        }}
-      >
-        {props.children}
-      </div>
+      <div style={styleProps}>{props.children}</div>
     </ButtonBase>
   );
 };

@@ -1,4 +1,4 @@
-import { Dialog } from "@client/components";
+import { Button, Dialog, SelectButton } from "@client/components";
 import type { gameDigestSchema } from "@common/api/digests";
 import type { choiceTypes } from "@common/game/enums";
 import type z from "zod";
@@ -10,7 +10,7 @@ import { useChoice, useDialog, useSubmit, useValueSelect } from "./contexts";
 type ChoiceType = (typeof choiceTypes)[number];
 type GameDigest = z.infer<typeof gameDigestSchema>;
 
-const floatingChoiceBoxHeight = 100;
+const floatingChoiceBoxHeight = 125;
 
 /******************************************************************************
  * ### GameBoardContainer
@@ -164,8 +164,6 @@ const GameBoardPlayerPlayArea = (props: { children?: React.ReactNode }) => {
  *
  * Composition of a chip counter and a menu for selecting chips from the given
  * pool.
- *
- * Intended as a child of
  ******************************************************************************/
 const GameBoardPlayerChipContainerMenu = (props: { chipIds: string[] }) => {
   const choice = useChoice();
@@ -206,25 +204,36 @@ const GameBoardPlayerChipContainerMenu = (props: { chipIds: string[] }) => {
  * TODO!!! Memoize?
  ******************************************************************************/
 const GameBoardChoiceMenuValueSelect = (props: {
+  choiceType: ChoiceType;
   value: string;
   label: string;
 }) => {
   const { value, label } = props;
   const { selected, disabled, toggle } = useValueSelect(value);
 
+  let color = colors.board.alpha(1);
+  switch (props.choiceType) {
+    case "actionId":
+      color = colors.actions.alpha(0.8);
+      break;
+    case "cardId":
+      color = colors.cards.alpha(0.8);
+      break;
+    case "chipId":
+      color = colors.chips.alpha(0.8);
+      break;
+  }
+
   return (
-    <div>
-      <span>
-        <input
-          id={value}
-          type="checkbox"
-          disabled={disabled}
-          checked={selected}
-          onChange={toggle}
-        />
-        {label && <label htmlFor={value}>{label}</label>}
-      </span>
-    </div>
+    <SelectButton
+      label={label}
+      disabled={disabled}
+      selected={selected}
+      onClick={toggle}
+      minHeight={30}
+      fontSize={12}
+      color={color}
+    />
   );
 };
 
@@ -234,7 +243,7 @@ const GameBoardChoiceMenuValueSelect = (props: {
 const GameBoardChoiceMenu = (props: {
   instructions: string;
   choiceType: ChoiceType;
-  values: string[];
+  values: { value: string; label: string }[];
 }) => {
   const { submit, canSubmit } = useSubmit();
 
@@ -250,25 +259,47 @@ const GameBoardChoiceMenu = (props: {
         left: 0,
         maxHeight: floatingChoiceBoxHeight,
         height: floatingChoiceBoxHeight,
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
         overflowY: "auto",
       }}
     >
-      <div style={{ padding: 3, margin: 3 }}>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          padding: 3,
+          gap: 3,
+        }}
+      >
         <div>{props.instructions}</div>
-        {props.values.map((value) => (
-          <GameBoardChoiceMenuValueSelect
-            key={value}
-            value={value}
-            label={`[${props.choiceType}] ${value}`}
-          />
-        ))}
         <div>
-          <button type="button" disabled={!canSubmit} onClick={submit}>
+          <Button
+            height={40}
+            fontSize={16}
+            horizontalPadding={10}
+            color={colors.board.alpha(1)}
+            disabled={!canSubmit}
+            onClick={submit}
+          >
             Submit Choices
-          </button>
+          </Button>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            overflowX: "auto",
+            gap: 3,
+          }}
+        >
+          {props.values.map(({ value, label }) => (
+            <GameBoardChoiceMenuValueSelect
+              key={value}
+              value={value}
+              label={label}
+              choiceType={props.choiceType}
+            />
+          ))}
         </div>
       </div>
     </div>
@@ -338,7 +369,10 @@ export const GameBoard = (props: { game: GameDigest }) => {
         <GameBoardChoiceMenu
           instructions={props.game.activity.choice.instructions}
           choiceType={props.game.activity.choice.type}
-          values={props.game.activity.choice.values.map(({ value }) => value)}
+          values={props.game.activity.choice.values.map(({ value }) => ({
+            value,
+            label: value,
+          }))}
         />
       )}
       <GameBoardFooter />

@@ -6,12 +6,12 @@ import { Link, Outlet, Route, Routes } from "react-router";
 
 const Layout = () => {
   return (
-    <div style={{}}>
+    <div>
       <div style={{ padding: 5 }}>
-        <span style={{ padding: 5 }}>
+        <span style={{ paddingRight: 5 }}>
           <Link to="/">Cardgame</Link>
         </span>
-        <span style={{ padding: 5 }}>
+        <span style={{ paddingRight: 5 }}>
           <Link to="/games">Games</Link>
         </span>
       </div>

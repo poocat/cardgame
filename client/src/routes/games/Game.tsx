@@ -122,7 +122,7 @@ export const Game = () => {
   return (
     <div>
       <hr />
-      <div style={{ padding: 10 }}>
+      <div style={{ padding: 5 }}>
         {poller.polling ? (
           <span>Polled {poller.pollCount} times..</span>
         ) : (
