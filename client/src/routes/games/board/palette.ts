@@ -2,11 +2,12 @@ import { Color } from "@client/utils/colors";
 
 export const colors = {
   board: new Color({ r: 235, g: 220, b: 200 }),
-  cards: new Color({ r: 0, g: 200, b: 200 }),
-  actions: new Color({ r: 125, g: 125, b: 200 }),
-  chips: new Color({ r: 250, g: 125, b: 150 }),
+  cards: new Color({ r: 125, g: 200, b: 200 }),
+  actions: new Color({ r: 150, g: 150, b: 200 }),
+  chips: new Color({ r: 250, g: 150, b: 175 }),
 } as const satisfies Record<string, Color>;
 
+// TODO!!! Use these colors...
 const playerColors: Color[] = [
   new Color({ r: 225, g: 125, b: 125 }),
   new Color({ r: 225, g: 175, b: 0 }),

@@ -15,16 +15,16 @@ const thumbnailCardHighlightVariantStyles = {
     backgroundColor: "inherit",
   },
   observerCanChooseCard: {
-    backgroundColor: colors.cards.alpha(0.25),
-  },
-  observerHasChosenCard: {
     backgroundColor: colors.cards.alpha(0.5),
   },
+  observerHasChosenCard: {
+    backgroundColor: colors.cards.alpha(1),
+  },
   observerCanChooseActionOnCard: {
-    backgroundColor: colors.actions.alpha(0.25),
+    backgroundColor: colors.actions.alpha(0.5),
   },
   observerCanChooseChipOnCard: {
-    backgroundColor: colors.chips.alpha(0.25),
+    backgroundColor: colors.chips.alpha(0.5),
   },
   otherPlayerChoosing: {
     backgroundColor: "rgba(0, 0, 0, 0.25)",
