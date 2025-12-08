@@ -4,8 +4,8 @@ import type { choiceTypes } from "@common/game/enums";
 import type z from "zod";
 import { DetailCard, FaceUpThumbnailCard } from "./cards";
 import { ChipSelectMenu, DetailChipCounter, useChipSelector } from "./chips";
-import { colors } from "./colors";
 import { useChoice, useDialog, useSubmit, useValueSelect } from "./contexts";
+import { colors } from "./palette";
 
 type ChoiceType = (typeof choiceTypes)[number];
 type GameDigest = z.infer<typeof gameDigestSchema>;
@@ -211,16 +211,16 @@ const GameBoardChoiceMenuValueSelect = (props: {
   const { value, label } = props;
   const { selected, disabled, toggle } = useValueSelect(value);
 
-  let color = colors.board.alpha(1);
+  let color = colors.board;
   switch (props.choiceType) {
     case "actionId":
-      color = colors.actions.alpha(0.8);
+      color = colors.actions;
       break;
     case "cardId":
-      color = colors.cards.alpha(0.8);
+      color = colors.cards;
       break;
     case "chipId":
-      color = colors.chips.alpha(0.8);
+      color = colors.chips;
       break;
   }
 
@@ -277,7 +277,7 @@ const GameBoardChoiceMenu = (props: {
             height={40}
             fontSize={16}
             horizontalPadding={10}
-            color={colors.board.alpha(1)}
+            color={colors.board}
             disabled={!canSubmit}
             onClick={submit}
           >

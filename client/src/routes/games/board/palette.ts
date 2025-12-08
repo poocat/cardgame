@@ -1,42 +1,9 @@
-type Rgb = { r: number; g: number; b: number };
-
-export class Color {
-  private rgb: Rgb;
-
-  private lim(rgb: Rgb): Rgb {
-    const { r, g, b } = rgb;
-    return {
-      r: Math.min(r, 255),
-      g: Math.min(g, 255),
-      b: Math.min(b, 255),
-    };
-  }
-
-  private rgba(rgb: Rgb, a: number): string {
-    const { r, g, b } = rgb;
-    return `rgba(${r}, ${g}, ${b}, ${Math.min(a, 1)})`;
-  }
-
-  constructor(args: { r: number; g: number; b: number }) {
-    this.rgb = this.lim(args);
-  }
-
-  alpha(a: number): string {
-    return this.rgba(this.rgb, a);
-  }
-
-  scale(s: number): string {
-    const scale = Math.max(0, Math.min(s, 1));
-    const { r, g, b } = this.rgb;
-    const rgb = { r: r * scale, g: g * scale, b: b * scale };
-    return this.rgba(rgb, 1);
-  }
-}
+import { Color } from "@client/utils/colors";
 
 export const colors = {
   board: new Color({ r: 235, g: 220, b: 200 }),
   cards: new Color({ r: 0, g: 200, b: 200 }),
-  actions: new Color({ r: 100, g: 100, b: 200 }),
+  actions: new Color({ r: 125, g: 125, b: 200 }),
   chips: new Color({ r: 250, g: 125, b: 150 }),
 } as const satisfies Record<string, Color>;
 

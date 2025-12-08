@@ -1,6 +1,6 @@
 import { ButtonBase } from "@client/components";
 import { type CSSProperties, useCallback } from "react";
-import { colors } from "../colors";
+import { colors } from "../palette";
 import {
   thumbnailCardContainerHeight,
   thumbnailCardContainerWidth,

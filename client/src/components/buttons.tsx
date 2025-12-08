@@ -1,3 +1,4 @@
+import type { Color } from "@client/utils/colors";
 import type { CSSProperties } from "react";
 
 const buttonBaseStyleProps: CSSProperties = {
@@ -38,7 +39,7 @@ export const Button = (props: {
   children: React.ReactNode;
   height: number;
   fontSize: number;
-  color: string;
+  color: Color;
   disabled?: boolean;
   horizontalPadding?: number;
 }) => {
@@ -47,13 +48,16 @@ export const Button = (props: {
     height: props.height,
     minWidth: props.height,
     fontSize: props.fontSize,
-    backgroundColor: props.color,
+    backgroundColor: props.color.alpha(1),
     alignItems: "center",
     alignContent: "center",
     justifyContent: "center",
     textAlign: "center",
     borderRadius: borderRadius,
   };
+  if (props.disabled) {
+    styleProps.color = props.color.scale(0.75);
+  }
   if (props.horizontalPadding) {
     styleProps.paddingInline = props.horizontalPadding;
   }
@@ -73,17 +77,18 @@ export const SelectButton = (props: {
   label: string;
   minHeight: number;
   fontSize: number;
-  color: string;
+  color: Color;
   disabled?: boolean;
   fullWidth?: boolean;
+  horizontalPadding?: number;
 }) => {
   const borderRadius = props.minHeight / 2;
   const symbol = props.selected ? "☑" : "☐";
-  const style: CSSProperties = {
+  const styleProps: CSSProperties = {
     minHeight: props.minHeight,
     minWidth: props.minHeight,
     fontSize: props.fontSize,
-    backgroundColor: props.color,
+    backgroundColor: props.color.alpha(1),
     alignItems: "center",
     alignContent: "center",
     justifyContent: "center",
@@ -92,9 +97,15 @@ export const SelectButton = (props: {
     clipPath: "circle(80%)",
     paddingInline: 10,
   };
+  if (props.disabled) {
+    styleProps.color = props.color.scale(0.75);
+  }
+  if (props.horizontalPadding) {
+    styleProps.paddingInline = props.horizontalPadding;
+  }
   return (
     <ButtonBase onClick={props.onClick} disabled={!!props.disabled}>
-      <div style={style}>
+      <div style={styleProps}>
         <div>
           {symbol} {props.label}
         </div>

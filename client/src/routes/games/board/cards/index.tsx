@@ -51,7 +51,6 @@ import {
   ThumbnailChipCounter,
   useChipSelector,
 } from "../chips";
-import { colors } from "../colors";
 import {
   useChoice,
   useDialog,
@@ -59,6 +58,7 @@ import {
   useSubmit,
   useValueSelect,
 } from "../contexts";
+import { colors } from "../palette";
 import type { FaceUpCardDigest } from "../types";
 import {
   CardDetail,
@@ -317,7 +317,7 @@ export const DetailCard = (props: { card: FaceUpCardDigest }) => {
           {cardHasSelectableActions && !submitDisabled && (
             <Button
               onClick={handleSubmit}
-              color={colors.actions.scale(0.8)}
+              color={colors.actions}
               height={50}
               fontSize={20}
             >

@@ -1,7 +1,7 @@
 import { Button } from "@client/components";
 import type { CSSProperties } from "react";
-import { colors } from "../colors";
 import { useSelector } from "../contexts";
+import { colors } from "../palette";
 
 const thumbnailChipRadius = 9;
 const thumbnailChipFontSize = 10;
@@ -209,7 +209,7 @@ export const ChipSelectMenu = (props: {
   const commonProps = {
     height: 46,
     fontSize: 20,
-    color: colors.chips.scale(0.8),
+    color: colors.chips,
   };
   return (
     <div style={{ display: "flex", flexDirection: "row", gap: 3 }}>
