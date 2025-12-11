@@ -38,12 +38,7 @@
  */
 
 import { Button } from "@client/components";
-import type {
-  inPlayCardDigestSchema,
-  visibleCardDigestSchema,
-} from "@common/api/digests";
-import { useMemo } from "react";
-import type z from "zod";
+import { memo, useCallback, useMemo } from "react";
 import {
   ChipCounterBadge,
   ChipSelectMenu,
@@ -51,15 +46,16 @@ import {
   ThumbnailChipCounter,
   useChipSelector,
 } from "../chips";
-import {
-  useChoice,
-  useDialog,
-  useSelector,
-  useSubmit,
-  useValueSelect,
-} from "../contexts";
 import { colors } from "../palette";
-import type { FaceUpCardDigest } from "../types";
+import type {
+  ChipDigest,
+  ChoiceProps,
+  DialogProps,
+  FaceUpCardDigest,
+  InPlayCardDigest,
+  SelectorProps,
+  VisibleCardDigest,
+} from "../types";
 import {
   CardDetail,
   CardDetailAction,
@@ -77,9 +73,6 @@ import {
 } from "./thumbnail";
 import type { ThumbnailCardHighlightVariant } from "./types";
 
-type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
-type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Thumbnail Form Factor
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,140 +87,142 @@ type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
  * - whether or not the card or one of its actions or chips can be chosen
  * - whether or not the card or one of its actions or chips were chosen
  *   previously in the current activity
- *
- * TODO!!! Memoize?
  ******************************************************************************/
-export const FaceUpThumbnailCard = (
-  props:
-    | {
-        variant: "inPlay";
-        card: InPlayCardDigest;
+export const FaceUpThumbnailCard = memo(
+  (
+    props: {
+      setDialog: DialogProps["set"];
+      choiceProps: ChoiceProps;
+      /** Set to null when the observing player isn't choosing, or the card has no selectable values on it. */
+      selectorProps: SelectorProps | null;
+    } & (
+      | {
+          variant: "inPlay";
+          card: InPlayCardDigest;
+        }
+      | {
+          variant: "inHand";
+          card: VisibleCardDigest;
+        }
+    ),
+  ) => {
+    const cardId = props.card.id;
+    const choiceType = props.choiceProps.choiceType;
+    const selectDisabled = props.selectorProps === null;
+    const cardHasChoosableValue = props.choiceProps.checkValueOnCard(cardId);
+    const cardIsChoosableValue = props.choiceProps.checkValue(cardId);
+    const cardWasChosenPreviously =
+      props.choiceProps.checkPreviousValue(cardId);
+
+    const cardSelected =
+      props.selectorProps?.checkValueSelected(cardId) ?? false;
+
+    const chipIds = props.card.chips.map(({ id }) => id);
+    const selectedChipIds =
+      props.selectorProps?.selectedValues.filter((v) => chipIds.includes(v)) ??
+      [];
+
+    const handleClick = useCallback(() => {
+      props.setDialog({ type: "card", card: props.card });
+    }, [props.card, props.setDialog]);
+    const handleSelect = useCallback(() => {
+      props.selectorProps?.addValue(cardId);
+    }, [cardId, props.selectorProps?.addValue]);
+    const handleDeselect = useCallback(() => {
+      props.selectorProps?.removeValue(cardId);
+    }, [cardId, props.selectorProps?.removeValue]);
+
+    /**
+     * Determine the variant:
+     * - Check if the card (or any of its chips or actions) are part of the
+     *   current choice.
+     *   - If so, check if the observing player is choosing.
+     *     - If so, variant is `observerChoosing_____`.
+     *     - If not, variant is `otherPlayerChoosing`.
+     *   - If not, check if card (or any of its chips or actions) were chosen
+     *     earlier in the activity.
+     *     - If so, variant is `chosenPreviously`.
+     *     - If not, variant is `default`.
+     */
+    const variant: ThumbnailCardHighlightVariant = useMemo(() => {
+      if (cardHasChoosableValue || cardIsChoosableValue) {
+        if (!selectDisabled) {
+          if (choiceType === "actionId" && cardHasChoosableValue)
+            return "observerCanChooseActionOnCard";
+          if (choiceType === "chipId" && cardHasChoosableValue)
+            return "observerCanChooseChipOnCard";
+          if (choiceType === "cardId" && cardSelected)
+            return "observerHasChosenCard";
+          if (choiceType === "cardId" && cardIsChoosableValue)
+            return "observerCanChooseCard";
+        } else {
+          return "otherPlayerChoosing";
+        }
+      } else if (cardWasChosenPreviously) {
+        return "chosenPreviously";
       }
-    | {
-        variant: "inHand";
-        card: VisibleCardDigest;
-      },
-) => {
-  const cardId = props.card.id;
-  const choice = useChoice();
-  const choiceType = choice.choiceType;
-  const choiceIsForObserver = choice.forObserver;
-  const cardHasChoosableValue = choice.getValuesOnCard(cardId).length > 0;
-  const cardIsChoosableValue = choice.checkValue(cardId);
-  const cardWasChosenPreviously = choice.checkPreviousValue(cardId);
+      return "default";
+    }, [
+      choiceType,
+      selectDisabled,
+      cardSelected,
+      cardHasChoosableValue,
+      cardIsChoosableValue,
+      cardWasChosenPreviously,
+    ]);
 
-  const selector = useSelector();
-  const cardSelected = selector.checkValueSelected(cardId);
-
-  const chipIds = props.card.chips.map(({ id }) => id);
-  const { numSelected: numSelectedChips } = useChipSelector({ chipIds });
-
-  const select = useValueSelect(cardId);
-  const cardSelectable = !select.disabled;
-
-  const dialog = useDialog();
-
-  const handleClick = () => {
-    dialog.set({ type: "card", card: props.card });
-  };
-  const handleSelect = () => {
-    selector.addValue(cardId);
-  };
-  const handleDeselect = () => {
-    selector.removeValue(cardId);
-  };
-
-  /**
-   * Determine the variant:
-   * - Check if the card (or any of its chips or actions) are part of the
-   *   current choice.
-   *   - If so, check if the observing player is choosing.
-   *     - If so, variant is `observerChoosing_____`.
-   *     - If not, variant is `otherPlayerChoosing`.
-   *   - If not, check if card (or any of its chips or actions) were chosen
-   *     earlier in the activity.
-   *     - If so, variant is `chosenPreviously`.
-   *     - If not, variant is `default`.
-   */
-  const variant: ThumbnailCardHighlightVariant = useMemo(() => {
-    if (cardHasChoosableValue || cardIsChoosableValue) {
-      if (choiceIsForObserver) {
-        if (choiceType === "actionId" && cardHasChoosableValue)
-          return "observerCanChooseActionOnCard";
-        if (choiceType === "chipId" && cardHasChoosableValue)
-          return "observerCanChooseChipOnCard";
-        if (choiceType === "cardId" && cardSelected)
-          return "observerHasChosenCard";
-        if (choiceType === "cardId" && cardIsChoosableValue)
-          return "observerCanChooseCard";
-      } else {
-        return "otherPlayerChoosing";
-      }
-    } else if (cardWasChosenPreviously) {
-      return "chosenPreviously";
-    }
-    return "default";
-  }, [
-    choiceType,
-    choiceIsForObserver,
-    cardSelected,
-    cardHasChoosableValue,
-    cardIsChoosableValue,
-    cardWasChosenPreviously,
-  ]);
-
-  return (
-    <CardThumbnailContainer>
-      <CardThumbnailHighlight variant={variant}>
-        <CardThumbnailHeaderContainer>
-          <CardThumbnailHeader
-            cardId={props.card.id}
-            cardName={props.card.name}
-            cardSelectable={cardSelectable}
-            cardSelected={cardSelected}
-            onSelect={handleSelect}
-            onDeselect={handleDeselect}
-          />
-        </CardThumbnailHeaderContainer>
-        <CardThumbnailBodyContainer>
-          <CardThumbnailFaceUp
-            cardType={props.card.type}
-            numChips={props.card.chips.length}
-            onClick={handleClick}
-          />
-          {props.card.chips.length > 0 && (
-            <ChipCounterBadge>
-              <ThumbnailChipCounter
-                count={chipIds.length}
-                numSelected={numSelectedChips}
-              />
-            </ChipCounterBadge>
-          )}
-        </CardThumbnailBodyContainer>
-      </CardThumbnailHighlight>
-    </CardThumbnailContainer>
-  );
-};
+    return (
+      <CardThumbnailContainer>
+        <CardThumbnailHighlight variant={variant}>
+          <CardThumbnailHeaderContainer>
+            <CardThumbnailHeader
+              cardId={props.card.id}
+              cardName={props.card.name}
+              cardSelected={cardSelected}
+              selectDisabled={!cardIsChoosableValue || selectDisabled}
+              onSelect={handleSelect}
+              onDeselect={handleDeselect}
+            />
+          </CardThumbnailHeaderContainer>
+          <CardThumbnailBodyContainer>
+            <CardThumbnailFaceUp
+              cardType={props.card.type}
+              numChips={props.card.chips.length}
+              onClick={handleClick}
+            />
+            {props.card.chips.length > 0 && (
+              <ChipCounterBadge>
+                <ThumbnailChipCounter
+                  count={chipIds.length}
+                  numSelected={selectedChipIds.length}
+                />
+              </ChipCounterBadge>
+            )}
+          </CardThumbnailBodyContainer>
+        </CardThumbnailHighlight>
+      </CardThumbnailContainer>
+    );
+  },
+);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Details Form Factor
 ////////////////////////////////////////////////////////////////////////////////
 
-// TODO!!! Memoize?
 const DetailCardAction = (props: {
+  selected: boolean;
   disabled: boolean;
   actionType: string;
   actionId: string;
   instructions: string;
+  onChange: () => void;
 }) => {
-  const { selected, disabled, toggle } = useValueSelect(props.actionId);
-
   return (
     <CardDetailAction
       label={`[${props.actionType}] ${props.instructions}`}
-      selected={selected}
-      disabled={disabled || props.disabled}
-      onChange={toggle}
+      selected={props.selected}
+      disabled={props.disabled}
+      onChange={props.onChange}
     />
   );
 };
@@ -235,21 +230,25 @@ const DetailCardAction = (props: {
 /******************************************************************************
  * ### DetailCardChipSelect
  ******************************************************************************/
-const DetailCardChipSelect = (props: { chipIds: string[] }) => {
-  const { numSelected, moreAllowed, addChip, removeChip } = useChipSelector({
-    chipIds: props.chipIds,
+const DetailCardChipSelect = (props: {
+  chips: ChipDigest[];
+  onSubmitChoice: () => void;
+  submitDisabled: boolean;
+  selectorProps: SelectorProps | null;
+}) => {
+  const { numSelected, addChip, removeChip } = useChipSelector({
+    chips: props.chips,
+    selectorProps: props.selectorProps,
   });
-
-  const { submit, canSubmit } = useSubmit();
 
   return (
     <ChipSelectMenu
       numSelected={numSelected}
-      disableIncrement={!moreAllowed}
+      disableIncrement={!props.selectorProps?.moreValuesAllowed}
       onIncrement={addChip}
       onDecrement={removeChip}
-      onSubmit={submit}
-      disableSubmit={!canSubmit}
+      onSubmit={props.onSubmitChoice}
+      disableSubmit={props.submitDisabled}
     />
   );
 };
@@ -259,48 +258,60 @@ const DetailCardChipSelect = (props: { chipIds: string[] }) => {
  *
  * Complete composition of a card in the detail form-factor.
  ******************************************************************************/
-export const DetailCard = (props: { card: FaceUpCardDigest }) => {
-  const choice = useChoice();
-  const selector = useSelector();
-  const dialog = useDialog();
-  const { submit, canSubmit } = useSubmit();
-
-  const valuesOnCard = choice.getValuesOnCard(props.card.id);
-  const selectedValuesOnCard = valuesOnCard.filter((v) =>
-    selector.checkValueSelected(v),
+export const DetailCard = (props: {
+  card: FaceUpCardDigest;
+  onSubmitChoice: () => void;
+  submitDisabled: boolean;
+  choiceProps: ChoiceProps;
+  selectorProps: SelectorProps | null;
+}) => {
+  const valuesOnCard = props.choiceProps.getValuesOnCard(props.card.id);
+  const selectedValues = props.selectorProps?.selectedValues ?? [];
+  const selectedValuesOnCard = selectedValues.filter((v) =>
+    valuesOnCard.includes(v),
   );
 
-  const cardHasChoice = valuesOnCard.length > 0 && choice.forObserver;
-  const cardHasSelectableActions =
-    cardHasChoice && choice.choiceType === "actionId";
-  const cardHasSelectableChips =
-    cardHasChoice && choice.choiceType === "chipId";
+  const choiceType = props.choiceProps.choiceType;
+
+  const cardHasChoice = valuesOnCard.length > 0;
+  const cardHasSelectableActions = cardHasChoice && choiceType === "actionId";
+  const cardHasSelectableChips = cardHasChoice && choiceType === "chipId";
 
   const chipIds = props.card.chips.map(({ id }) => id);
-  const { numSelected: numSelectedChips } = useChipSelector({ chipIds });
+  const numSelectedChips = cardHasSelectableChips
+    ? selectedValuesOnCard.length
+    : 0;
 
   // Disable the submit button if nothing from this card was selected.
-  const submitDisabled = !canSubmit || selectedValuesOnCard.length < 1;
-
-  const handleSubmit = () => {
-    submit();
-    dialog.close();
-  };
+  const submitDisabled =
+    props.submitDisabled || selectedValuesOnCard.length < 1;
 
   return (
     <CardDetailContainer>
       <CardDetail>
         <div>{props.card.name}</div>
         <CardDetailActionContainer>
-          {props.card.actions.map((action) => (
-            <DetailCardAction
-              key={action.id}
-              actionId={action.id}
-              actionType={action.type}
-              instructions={action.instructions}
-              disabled={!cardHasSelectableActions}
-            />
-          ))}
+          {props.card.actions.map((action) => {
+            const selected =
+              props.selectorProps?.checkValueSelected(action.id) ?? false;
+            const selectable = props.choiceProps.checkValue(action.id);
+            const toggleable =
+              props.selectorProps?.moreValuesAllowed || selected;
+            const toggle = () => props.selectorProps?.toggleValue(action.id);
+            return (
+              <DetailCardAction
+                key={action.id}
+                actionId={action.id}
+                actionType={action.type}
+                instructions={action.instructions}
+                disabled={
+                  !cardHasSelectableActions || !selectable || !toggleable
+                }
+                selected={selected}
+                onChange={toggle}
+              />
+            );
+          })}
         </CardDetailActionContainer>
       </CardDetail>
       {chipIds.length > 0 && (
@@ -313,10 +324,17 @@ export const DetailCard = (props: { card: FaceUpCardDigest }) => {
       )}
       {cardHasChoice && (
         <CardDetailFooterContainer>
-          {cardHasSelectableChips && <DetailCardChipSelect chipIds={chipIds} />}
+          {cardHasSelectableChips && (
+            <DetailCardChipSelect
+              chips={props.card.chips}
+              onSubmitChoice={props.onSubmitChoice}
+              submitDisabled={props.submitDisabled}
+              selectorProps={props.selectorProps}
+            />
+          )}
           {cardHasSelectableActions && !submitDisabled && (
             <Button
-              onClick={handleSubmit}
+              onClick={props.onSubmitChoice}
               color={colors.actions}
               height={50}
               fontSize={20}

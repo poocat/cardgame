@@ -127,9 +127,9 @@ export const CardThumbnailHeader = (
     cardId: string;
     cardName: string;
   } & (
-    | { cardSelectable: false }
+    | { selectDisabled: false }
     | {
-        cardSelectable: true;
+        selectDisabled: true;
         cardSelected: boolean;
         onSelect: () => void;
         onDeselect: () => void;
@@ -137,7 +137,7 @@ export const CardThumbnailHeader = (
   ),
 ) => {
   const clickHandler = useCallback(() => {
-    if (props.cardSelectable) {
+    if (props.selectDisabled) {
       if (props.cardSelected) {
         props.onDeselect();
       } else {
@@ -154,7 +154,7 @@ export const CardThumbnailHeader = (
     display: "flex",
     flexDirection: "row",
   };
-  return props.cardSelectable ? (
+  return props.selectDisabled ? (
     <ButtonBase onClick={clickHandler}>
       <div style={{ ...commonStyleProps }}>
         <span>{props.cardName}</span>

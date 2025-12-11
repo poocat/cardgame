@@ -1,18 +1,12 @@
-import {
-  ChoiceContext,
-  DialogContext,
-  SelectorContext,
-  SubmitContext,
-  useChoiceContext,
-  useDialogContext,
-  useSelectorContext,
-} from "@client/routes/games/board/contexts";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
 import { useCallback, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router";
 import type z from "zod";
 import { GameBoard } from "./board";
+import { useChoice } from "./board/choice";
+import { useDialog } from "./board/dialog";
+import { useSelector } from "./board/selector";
 
 type GamesGetOneResponseBody = z.infer<
   typeof ROUTES.games.methods.getOne.schemas.responseBody
@@ -58,26 +52,31 @@ export const Game = () => {
     return poller?.data?.digest;
   }, [poller.data?.updatedAt]);
 
-  const ovservingPlayerChoosing = !poller.polling;
+  const currentChoice = game?.activity.choice;
+  const currentChoiceName = currentChoice?.name;
+  const observingPlayerIsChoosing = !poller.polling;
 
-  const selectorContext = useSelectorContext(game);
-  const choiceContext = useChoiceContext(game);
-  const dialogContext = useDialogContext();
+  const dialog = useDialog();
+  const selector = useSelector({
+    min: currentChoice?.min ?? 0,
+    max: currentChoice?.max ?? 9999,
+  });
+  const choice = useChoice(currentChoice);
 
   // Submission:
-  const submitChoices = useCallback(async () => {
+  const submitChoice = useCallback(async () => {
     if (
       gameId &&
       observingPlayerId &&
-      ovservingPlayerChoosing &&
-      game &&
+      observingPlayerIsChoosing &&
+      currentChoiceName &&
       poller.fetchOnce
     ) {
       const payload: GamesPatchRequestBody = {
         decision: {
           playerId: observingPlayerId,
-          name: game.activity?.choice?.name ?? "",
-          values: selectorContext.selectedValues,
+          name: currentChoiceName,
+          values: selector.selectedValues,
         },
       };
       const body = JSON.stringify(payload);
@@ -91,33 +90,21 @@ export const Game = () => {
         .catch((reason) => console.error(reason))
         .then(() => {
           poller.fetchOnce();
-          selectorContext.clearValues();
-          dialogContext.close();
+          selector.clearValues();
+          dialog.close();
         });
     }
   }, [
     gameId,
     observingPlayerId,
-    game,
-    selectorContext.selectedValues,
-    selectorContext.clearValues,
-    dialogContext.close,
-    ovservingPlayerChoosing,
+    currentChoiceName,
+    selector.selectedValues,
+    selector.clearValues,
+    dialog.close,
+    observingPlayerIsChoosing,
     poller.fetchOnce,
     url,
   ]);
-
-  const submitContext = useMemo(
-    () => ({
-      submit: submitChoices,
-      canSubmit: choiceContext.forObserver && !selectorContext.moreValuesNeeded,
-    }),
-    [
-      submitChoices,
-      choiceContext.forObserver,
-      selectorContext.moreValuesNeeded,
-    ],
-  );
 
   return (
     <div>
@@ -130,15 +117,13 @@ export const Game = () => {
         )}
       </div>
       {game && (
-        <SelectorContext.Provider value={selectorContext}>
-          <ChoiceContext.Provider value={choiceContext}>
-            <DialogContext.Provider value={dialogContext}>
-              <SubmitContext.Provider value={submitContext}>
-                <GameBoard game={game} />
-              </SubmitContext.Provider>
-            </DialogContext.Provider>
-          </ChoiceContext.Provider>
-        </SelectorContext.Provider>
+        <GameBoard
+          game={game}
+          onSubmitChoice={submitChoice}
+          choiceProps={choice}
+          selectorProps={selector}
+          dialogProps={dialog}
+        />
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 import { Button } from "@client/components";
-import type { CSSProperties } from "react";
-import { useSelector } from "../contexts";
+import { type CSSProperties, useCallback, useMemo } from "react";
 import { colors } from "../palette";
+import type { ChipDigest, SelectorProps } from "../types";
 
 const thumbnailChipRadius = 9;
 const thumbnailChipFontSize = 10;
@@ -160,37 +160,45 @@ export const DetailChipCounter = (props: {
  * State management for components that let the player select chips from a given
  * pool.
  ******************************************************************************/
-export function useChipSelector(args: { chipIds: string[] }): {
+export function useChipSelector(args: {
+  chips: ChipDigest[];
+  selectorProps: SelectorProps | null;
+}): {
   numSelected: number;
   numRemaining: number;
-  moreAllowed: boolean;
   addChip: () => void;
   removeChip: () => void;
 } {
-  const selector = useSelector();
-  const selected = selector.selectedValues.filter((v) =>
-    args.chipIds.includes(v),
+  const chipIds = args.chips.map((c) => c.id);
+  const selectedValues = args.selectorProps?.selectedValues ?? [];
+  const selected = selectedValues.filter((v) => chipIds.includes(v));
+  const remaining = chipIds.filter((chipId) => !selected.includes(chipId));
+
+  const addChip = useCallback(() => {
+    if (args.selectorProps?.moreValuesAllowed && remaining.length > 0) {
+      args.selectorProps?.addValue(remaining[0]);
+    }
+  }, [
+    args.selectorProps?.addValue,
+    args.selectorProps?.moreValuesAllowed,
+    remaining,
+  ]);
+
+  const removeChip = useCallback(() => {
+    if (selectedValues.length > 0) {
+      args.selectorProps?.removeValue(selected[0]);
+    }
+  }, [args.selectorProps?.removeValue, selectedValues.length, selected]);
+
+  return useMemo(
+    () => ({
+      numSelected: selected.length,
+      numRemaining: remaining.length,
+      addChip,
+      removeChip,
+    }),
+    [addChip, removeChip, remaining, selected],
   );
-  const remaining = args.chipIds.filter((chipId) => !selected.includes(chipId));
-
-  const addChip = () => {
-    if (selector.moreValuesAllowed && remaining.length > 0) {
-      selector.addValue(remaining[0]);
-    }
-  };
-
-  const removeChip = () => {
-    if (selector.selectedValues.length > 0) {
-      selector.removeValue(selected[0]);
-    }
-  };
-  return {
-    numSelected: selected.length,
-    numRemaining: remaining.length,
-    moreAllowed: selector.moreValuesAllowed,
-    addChip,
-    removeChip,
-  };
 }
 
 /******************************************************************************

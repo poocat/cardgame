@@ -1,14 +1,17 @@
 import { Button, Dialog, SelectButton } from "@client/components";
-import type { gameDigestSchema } from "@common/api/digests";
-import type { choiceTypes } from "@common/game/enums";
-import type z from "zod";
+import { memo, useCallback, useMemo } from "react";
 import { DetailCard, FaceUpThumbnailCard } from "./cards";
 import { ChipSelectMenu, DetailChipCounter, useChipSelector } from "./chips";
-import { useChoice, useDialog, useSubmit, useValueSelect } from "./contexts";
 import { colors } from "./palette";
-
-type ChoiceType = (typeof choiceTypes)[number];
-type GameDigest = z.infer<typeof gameDigestSchema>;
+import type {
+  ChipDigest,
+  ChoiceProps,
+  ChoiceType,
+  ChoiceValueDigest,
+  DialogProps,
+  GameDigest,
+  SelectorProps,
+} from "./types";
 
 const floatingChoiceBoxHeight = 125;
 
@@ -165,51 +168,65 @@ const GameBoardPlayerPlayArea = (props: { children?: React.ReactNode }) => {
  * Composition of a chip counter and a menu for selecting chips from the given
  * pool.
  ******************************************************************************/
-const GameBoardPlayerChipContainerMenu = (props: { chipIds: string[] }) => {
-  const choice = useChoice();
+const GameBoardPlayerChipContainerMenu = memo(
+  (props: {
+    chips: ChipDigest[];
+    submitDisabled: boolean;
+    onSubmitChoice: () => void;
+    choiceProps: ChoiceProps;
+    selectorProps: SelectorProps | null;
+  }) => {
+    const selectableChipIds = useMemo(
+      () =>
+        props.chips
+          .filter((c) => props.choiceProps.checkValue(c.id))
+          .map((c) => c.id),
+      [props.chips, props.choiceProps.checkValue],
+    );
 
-  const selectableChips = props.chipIds.filter((chipId) =>
-    choice.checkValue(chipId),
-  );
+    const { numSelected, addChip, removeChip } = useChipSelector({
+      chips: props.chips,
+      selectorProps: props.selectorProps,
+    });
 
-  const { numSelected, moreAllowed, addChip, removeChip } = useChipSelector({
-    chipIds: props.chipIds,
-  });
-
-  const { submit, canSubmit } = useSubmit();
-
-  return (
-    <>
-      <DetailChipCounter
-        count={props.chipIds.length}
-        numSelected={numSelected}
-      />
-      {choice.forObserver && selectableChips.length > 0 && (
-        <ChipSelectMenu
+    return (
+      <>
+        <DetailChipCounter
+          count={props.chips.length}
           numSelected={numSelected}
-          onIncrement={addChip}
-          onDecrement={removeChip}
-          onSubmit={submit}
-          disableIncrement={!moreAllowed}
-          disableSubmit={!canSubmit}
         />
-      )}
-    </>
-  );
-};
+        {props.selectorProps && selectableChipIds.length > 0 && (
+          <ChipSelectMenu
+            numSelected={numSelected}
+            onIncrement={addChip}
+            onDecrement={removeChip}
+            onSubmit={props.onSubmitChoice}
+            disableIncrement={!props.selectorProps.moreValuesAllowed}
+            disableSubmit={props.submitDisabled}
+          />
+        )}
+      </>
+    );
+  },
+);
 
 /******************************************************************************
  * ### GameBoardChoiceMenuValueSelect
  *
- * TODO!!! Memoize?
+ * A toggle button that represents any arbitrary selectable value.
  ******************************************************************************/
-const GameBoardChoiceMenuValueSelect = (props: {
-  choiceType: ChoiceType;
-  value: string;
-  label: string;
-}) => {
-  const { value, label } = props;
-  const { selected, disabled, toggle } = useValueSelect(value);
+const GameBoardChoiceMenuValueSelect = (
+  props: {
+    choiceType: ChoiceType;
+    value: string;
+    label: string;
+    disabled: boolean;
+    selected: boolean;
+  } & Pick<SelectorProps, "toggleValue">,
+) => {
+  const toggle = useCallback(() => {
+    props.toggleValue(props.value);
+  }, [props.toggleValue, props.value]);
 
   let color = colors.board;
   switch (props.choiceType) {
@@ -226,9 +243,9 @@ const GameBoardChoiceMenuValueSelect = (props: {
 
   return (
     <SelectButton
-      label={label}
-      disabled={disabled}
-      selected={selected}
+      label={props.label}
+      disabled={props.disabled}
+      selected={props.selected}
       onClick={toggle}
       minHeight={30}
       fontSize={12}
@@ -240,81 +257,117 @@ const GameBoardChoiceMenuValueSelect = (props: {
 /******************************************************************************
  * ### GameBoardChoiceMenu
  ******************************************************************************/
-const GameBoardChoiceMenu = (props: {
-  instructions: string;
-  choiceType: ChoiceType;
-  values: { value: string; label: string }[];
-}) => {
-  const { submit, canSubmit } = useSubmit();
+const GameBoardChoiceMenu = memo(
+  (
+    props: {
+      instructions: string;
+      choiceType: ChoiceType;
+      values: ChoiceValueDigest[];
+      onSubmitChoice: () => void;
+      submitDisabled: boolean;
+    } & Pick<
+      SelectorProps,
+      "checkValueSelected" | "toggleValue" | "moreValuesAllowed"
+    >,
+  ) => {
+    const values = props.values.map(({ value }) => ({
+      value,
+      label: `${props.choiceType} ${value}`,
+    }));
 
-  return (
-    <div
-      style={{
-        backgroundColor: "white",
-        position: "fixed",
-        borderTop: "1px solid",
-        width: "100%",
-        bottom: 0,
-        right: 0,
-        left: 0,
-        maxHeight: floatingChoiceBoxHeight,
-        height: floatingChoiceBoxHeight,
-        overflowY: "auto",
-      }}
-    >
+    return (
       <div
         style={{
+          backgroundColor: "white",
+          position: "fixed",
+          borderTop: "1px solid",
           width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          padding: 3,
-          gap: 3,
+          bottom: 0,
+          right: 0,
+          left: 0,
+          maxHeight: floatingChoiceBoxHeight,
+          height: floatingChoiceBoxHeight,
+          overflowY: "auto",
         }}
       >
-        <div>{props.instructions}</div>
-        <div>
-          <Button
-            height={40}
-            fontSize={16}
-            horizontalPadding={10}
-            color={colors.board}
-            disabled={!canSubmit}
-            onClick={submit}
-          >
-            Submit Choices
-          </Button>
-        </div>
         <div
           style={{
+            width: "100%",
             display: "flex",
-            flexDirection: "row",
-            overflowX: "auto",
+            flexDirection: "column",
+            padding: 3,
             gap: 3,
           }}
         >
-          {props.values.map(({ value, label }) => (
-            <GameBoardChoiceMenuValueSelect
-              key={value}
-              value={value}
-              label={label}
-              choiceType={props.choiceType}
-            />
-          ))}
+          <div>{props.instructions}</div>
+          <div>
+            <Button
+              height={40}
+              fontSize={16}
+              horizontalPadding={10}
+              color={colors.board}
+              disabled={props.submitDisabled}
+              onClick={props.onSubmitChoice}
+            >
+              Submit Choices
+            </Button>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              overflowX: "auto",
+              gap: 3,
+            }}
+          >
+            {values.map(({ value, label }) => {
+              const selected = props.checkValueSelected(value);
+              const disabled = !selected && !props.moreValuesAllowed;
+              return (
+                <GameBoardChoiceMenuValueSelect
+                  key={value}
+                  value={value}
+                  label={label}
+                  selected={selected}
+                  disabled={disabled}
+                  choiceType={props.choiceType}
+                  toggleValue={props.toggleValue}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  },
+);
 
 /******************************************************************************
  * ### GameBoard
  ******************************************************************************/
-export const GameBoard = (props: { game: GameDigest }) => {
+export const GameBoard = (props: {
+  game: GameDigest;
+  onSubmitChoice: () => void;
+  dialogProps: DialogProps;
+  selectorProps: SelectorProps;
+  choiceProps: ChoiceProps;
+}) => {
   const observingPlayer = props.game.observingPlayer;
   const choosingPlayerId = props.game.activity.choice.choosingPlayerId;
   const observingPlayerIsChoosing = observingPlayer?.id === choosingPlayerId;
+  const submitDisabled = props.selectorProps.moreValuesNeeded;
 
-  const dialog = useDialog();
+  const cardSelectEnabled = useCallback(
+    (cardId: string) =>
+      observingPlayerIsChoosing && props.choiceProps.checkValueOnCard(cardId),
+    [observingPlayerIsChoosing, props.choiceProps.checkValueOnCard],
+  );
+
+  const someChipsSelectable = useCallback(
+    (chips: ChipDigest[]) =>
+      chips.some((c) => props.choiceProps.checkValue(c.id)),
+    [props.choiceProps.checkValue],
+  );
 
   return (
     <GameBoardContainer>
@@ -324,7 +377,16 @@ export const GameBoard = (props: { game: GameDigest }) => {
           <GameBoardPlayerHeader playerName={player.name} />
           <GameBoardPlayerPlayArea>
             {player.cardsInPlay.map((card) => (
-              <FaceUpThumbnailCard key={card.id} variant="inPlay" card={card} />
+              <FaceUpThumbnailCard
+                key={card.id}
+                variant="inPlay"
+                card={card}
+                setDialog={props.dialogProps.set}
+                choiceProps={props.choiceProps}
+                selectorProps={
+                  cardSelectEnabled(card.id) ? props.selectorProps : null
+                }
+              />
             ))}
           </GameBoardPlayerPlayArea>
           <GameBoardPlayerChipContainer>
@@ -333,7 +395,15 @@ export const GameBoard = (props: { game: GameDigest }) => {
             </GameBoardPlayerChipContainerHeading>
             <GameBoardPlayerChipContainerBody>
               <GameBoardPlayerChipContainerMenu
-                chipIds={player.chipsInReserve.map(({ id }) => id)}
+                chips={player.chipsInReserve}
+                choiceProps={props.choiceProps}
+                onSubmitChoice={props.onSubmitChoice}
+                submitDisabled={submitDisabled}
+                selectorProps={
+                  someChipsSelectable(player.chipsInReserve)
+                    ? props.selectorProps
+                    : null
+                }
               />
             </GameBoardPlayerChipContainerBody>
           </GameBoardPlayerChipContainer>
@@ -345,7 +415,16 @@ export const GameBoard = (props: { game: GameDigest }) => {
           <GameBoardPlayerHeader playerName={observingPlayer.name} />
           <GameBoardPlayerPlayArea>
             {observingPlayer.cardsInPlay.map((card) => (
-              <FaceUpThumbnailCard key={card.id} variant="inPlay" card={card} />
+              <FaceUpThumbnailCard
+                key={card.id}
+                variant="inPlay"
+                card={card}
+                setDialog={props.dialogProps.set}
+                choiceProps={props.choiceProps}
+                selectorProps={
+                  cardSelectEnabled(card.id) ? props.selectorProps : null
+                }
+              />
             ))}
           </GameBoardPlayerPlayArea>
           <GameBoardPlayerChipContainer>
@@ -354,13 +433,30 @@ export const GameBoard = (props: { game: GameDigest }) => {
             </GameBoardPlayerChipContainerHeading>
             <GameBoardPlayerChipContainerBody>
               <GameBoardPlayerChipContainerMenu
-                chipIds={observingPlayer.chipsInReserve.map(({ id }) => id)}
+                chips={observingPlayer.chipsInReserve}
+                choiceProps={props.choiceProps}
+                onSubmitChoice={props.onSubmitChoice}
+                submitDisabled={submitDisabled}
+                selectorProps={
+                  someChipsSelectable(observingPlayer.chipsInReserve)
+                    ? props.selectorProps
+                    : null
+                }
               />
             </GameBoardPlayerChipContainerBody>
           </GameBoardPlayerChipContainer>
           <GameBoardPlayerHandArea>
             {observingPlayer.cardsInHand.map((card) => (
-              <FaceUpThumbnailCard key={card.id} variant="inHand" card={card} />
+              <FaceUpThumbnailCard
+                key={card.id}
+                variant="inHand"
+                card={card}
+                setDialog={props.dialogProps.set}
+                choiceProps={props.choiceProps}
+                selectorProps={
+                  cardSelectEnabled(card.id) ? props.selectorProps : null
+                }
+              />
             ))}
           </GameBoardPlayerHandArea>
         </GameBoardPlayerArea>
@@ -369,16 +465,31 @@ export const GameBoard = (props: { game: GameDigest }) => {
         <GameBoardChoiceMenu
           instructions={props.game.activity.choice.instructions}
           choiceType={props.game.activity.choice.type}
-          values={props.game.activity.choice.values.map(({ value }) => ({
-            value,
-            label: value,
-          }))}
+          values={props.game.activity.choice.values}
+          onSubmitChoice={props.onSubmitChoice}
+          submitDisabled={submitDisabled}
+          toggleValue={props.selectorProps.toggleValue}
+          checkValueSelected={props.selectorProps.checkValueSelected}
+          moreValuesAllowed={props.selectorProps.moreValuesAllowed}
         />
       )}
       <GameBoardFooter />
-      <Dialog isOpen={dialog.isOpen} onClose={dialog.close}>
-        {dialog.value?.type === "card" && (
-          <DetailCard card={dialog.value.card} />
+      <Dialog
+        isOpen={props.dialogProps.isOpen}
+        onClose={props.dialogProps.close}
+      >
+        {props.dialogProps.value?.type === "card" && (
+          <DetailCard
+            card={props.dialogProps.value.card}
+            onSubmitChoice={props.onSubmitChoice}
+            submitDisabled={submitDisabled}
+            choiceProps={props.choiceProps}
+            selectorProps={
+              cardSelectEnabled(props.dialogProps.value.card.id)
+                ? props.selectorProps
+                : null
+            }
+          />
         )}
       </Dialog>
     </GameBoardContainer>

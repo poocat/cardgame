@@ -43,7 +43,7 @@ export const actionDigestSchema = z.strictObject({
   instructions: z.string(),
 });
 
-const chipDigestSchema = z.strictObject({
+export const chipDigestSchema = z.strictObject({
   id: idSchema,
 });
 
