@@ -173,6 +173,7 @@ export const CardThumbnailHeader = (
 export const CardThumbnailFaceUp = (props: {
   cardType: string;
   numChips: number;
+  exhausted: boolean;
   onClick: () => void;
 }) => {
   return (
@@ -185,7 +186,7 @@ export const CardThumbnailFaceUp = (props: {
           border: "1px solid",
           borderRadius: 5,
 
-          backgroundColor: "white",
+          backgroundColor: props.exhausted ? colors.board.scale(0.9) : "white",
 
           fontSize: 10,
         }}

@@ -188,6 +188,9 @@ export const FaceUpThumbnailCard = memo(
             <CardThumbnailFaceUp
               cardType={props.card.type}
               numChips={props.card.chips.length}
+              exhausted={
+                props.variant === "inPlay" ? props.card.exhausted : false
+              }
               onClick={handleClick}
             />
             {props.card.chips.length > 0 && (
