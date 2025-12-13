@@ -364,6 +364,15 @@ export const GameBoard = (props: {
     [props.choiceProps.checkValue],
   );
 
+  const dialogTitle = useMemo(() => {
+    switch (props.dialogProps.value?.type) {
+      case "card":
+        return `Details for Card: "${props.dialogProps.value.card.name}"`;
+      default:
+        return "";
+    }
+  }, [props.dialogProps.value]);
+
   return (
     <GameBoardContainer>
       {props.game.otherPlayers.map((player) => (
@@ -470,6 +479,8 @@ export const GameBoard = (props: {
       )}
       <GameBoardFooter />
       <Dialog
+        title={dialogTitle}
+        description=""
         isOpen={props.dialogProps.isOpen}
         onClose={props.dialogProps.close}
       >
