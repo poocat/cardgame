@@ -22,6 +22,7 @@ export const choiceValueDigestSchema = z.strictObject({
   value: z.string(),
   // All actions and some chips can be associated with a card.
   onCardId: z.string().nullable(),
+  label: z.string(),
 });
 
 export const activityDigestSchema = z.strictObject({

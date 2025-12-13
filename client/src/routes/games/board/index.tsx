@@ -270,11 +270,6 @@ const GameBoardChoiceMenu = memo(
       "checkValueSelected" | "toggleValue" | "moreValuesAllowed"
     >,
   ) => {
-    const values = props.values.map(({ value }) => ({
-      value,
-      label: `${props.choiceType} ${value}`,
-    }));
-
     return (
       <div
         style={{
@@ -320,7 +315,7 @@ const GameBoardChoiceMenu = memo(
               gap: 3,
             }}
           >
-            {values.map(({ value, label }) => {
+            {props.values.map(({ value, label }) => {
               const selected = props.checkValueSelected(value);
               const disabled = !selected && !props.moreValuesAllowed;
               return (

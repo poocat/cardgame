@@ -11,7 +11,7 @@ import type {
 } from "@common/api/digests";
 import type { RoomDoc } from "@server/db/types";
 import type { CardData, Decision, GameData, Id } from "@server/types";
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 import type z from "zod";
 
 type RoomData = RoomDoc["data"];
@@ -96,36 +96,58 @@ export function digestGameData({
   const choiceValues = gameData.activity.currentChoice.values;
   const choiceValuesDigest: ChoiceValuesDigest[] = [];
   switch (gameData.activity.currentChoice.type) {
-    case "arbitrary":
-    case "cardId":
+    case "arbitrary": {
       choiceValuesDigest.push(
-        ...choiceValues.map((v) => ({ value: v, onCardId: null })),
+        ...choiceValues.map((v) => ({ value: v, onCardId: null, label: v })),
       );
       break;
-    case "playerId":
+    }
+    case "cardId": {
       choiceValuesDigest.push(
-        ...choiceValues.map((playerId) => ({
-          value: anonymizedPlayerIdMap[playerId],
-          onCardId: null,
-        })),
+        ...choiceValues.map((v) => {
+          const card = gameData.cards.find((c) => c.id === v);
+          const label =
+            card?.location.type === "inDeck"
+              ? "Card in Deck"
+              : (card?.name ?? v);
+          return { value: v, onCardId: null, label };
+        }),
       );
       break;
-    case "actionId":
+    }
+    case "playerId": {
+      choiceValuesDigest.push(
+        ...choiceValues.map((playerId) => {
+          const player = gameData.players.find((p) => p.id === playerId);
+          const label = player?.name ?? playerId;
+          return {
+            value: anonymizedPlayerIdMap[playerId],
+            onCardId: null,
+            label,
+          };
+        }),
+      );
+      break;
+    }
+    case "actionId": {
       gameData.actions
         .filter((a) => choiceValues.includes(a.id))
         .forEach((a) => {
-          choiceValuesDigest.push({ value: a.id, onCardId: a.card.id });
+          const label = `[${a.type}] ${a.card.name}`;
+          choiceValuesDigest.push({ value: a.id, onCardId: a.card.id, label });
         });
       break;
-    case "chipId":
+    }
+    case "chipId": {
       gameData.chips
         .filter((c) => choiceValues.includes(c.id))
         .forEach((c) => {
           const onCardId =
             c.location.type === "onCard" ? c.location.cardId : null;
-          choiceValuesDigest.push({ value: c.id, onCardId });
+          choiceValuesDigest.push({ value: c.id, onCardId, label: "Chip" });
         });
       break;
+    }
   }
 
   const digest: GameDigest = {

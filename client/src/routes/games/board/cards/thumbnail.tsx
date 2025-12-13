@@ -1,5 +1,5 @@
 import { ButtonBase } from "@client/components";
-import { type CSSProperties, useCallback } from "react";
+import type { CSSProperties } from "react";
 import { colors } from "../palette";
 import {
   thumbnailCardContainerHeight,
@@ -122,30 +122,13 @@ export const CardThumbnailHighlight = (props: {
  * The part above the card that is clickable when the card itself is part of
  * the current choice.
  ******************************************************************************/
-export const CardThumbnailHeader = (
-  props: {
-    cardId: string;
-    cardName: string;
-  } & (
-    | { selectDisabled: false }
-    | {
-        selectDisabled: true;
-        cardSelected: boolean;
-        onSelect: () => void;
-        onDeselect: () => void;
-      }
-  ),
-) => {
-  const clickHandler = useCallback(() => {
-    if (props.selectDisabled) {
-      if (props.cardSelected) {
-        props.onDeselect();
-      } else {
-        props.onSelect();
-      }
-    }
-  }, [props]);
-
+export const CardThumbnailHeader = (props: {
+  cardId: string;
+  cardName: string;
+  selectDisabled: boolean;
+  cardSelected: boolean;
+  onChange: () => void;
+}) => {
   const commonStyleProps: CSSProperties = {
     paddingBlock: 2, // vertical
     paddingInline: 10, // horizontal
@@ -154,8 +137,8 @@ export const CardThumbnailHeader = (
     display: "flex",
     flexDirection: "row",
   };
-  return props.selectDisabled ? (
-    <ButtonBase onClick={clickHandler}>
+  return !props.selectDisabled ? (
+    <ButtonBase onClick={props.onChange}>
       <div style={{ ...commonStyleProps }}>
         <span>{props.cardName}</span>
       </div>

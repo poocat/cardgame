@@ -122,15 +122,13 @@ export const FaceUpThumbnailCard = memo(
       props.selectorProps?.selectedValues.filter((v) => chipIds.includes(v)) ??
       [];
 
-    const handleClick = useCallback(() => {
+    const expand = useCallback(() => {
       props.setDialog({ type: "card", card: props.card });
     }, [props.card, props.setDialog]);
-    const handleSelect = useCallback(() => {
-      props.selectorProps?.addValue(cardId);
-    }, [cardId, props.selectorProps?.addValue]);
-    const handleDeselect = useCallback(() => {
-      props.selectorProps?.removeValue(cardId);
-    }, [cardId, props.selectorProps?.removeValue]);
+
+    const toggleCardSelect = useCallback(() => {
+      props.selectorProps?.toggleValue(cardId);
+    }, [cardId, props.selectorProps?.toggleValue]);
 
     /**
      * Determine the variant:
@@ -180,8 +178,7 @@ export const FaceUpThumbnailCard = memo(
               cardName={props.card.name}
               cardSelected={cardSelected}
               selectDisabled={!cardIsChoosableValue || selectDisabled}
-              onSelect={handleSelect}
-              onDeselect={handleDeselect}
+              onChange={toggleCardSelect}
             />
           </CardThumbnailHeaderContainer>
           <CardThumbnailBodyContainer>
@@ -191,7 +188,7 @@ export const FaceUpThumbnailCard = memo(
               exhausted={
                 props.variant === "inPlay" ? props.card.exhausted : false
               }
-              onClick={handleClick}
+              onClick={expand}
             />
             {props.card.chips.length > 0 && (
               <ChipCounterBadge>
