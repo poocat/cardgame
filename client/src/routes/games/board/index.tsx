@@ -354,8 +354,14 @@ export const GameBoard = (props: {
 
   const cardSelectEnabled = useCallback(
     (cardId: string) =>
-      observingPlayerIsChoosing && props.choiceProps.checkValueOnCard(cardId),
-    [observingPlayerIsChoosing, props.choiceProps.checkValueOnCard],
+      observingPlayerIsChoosing &&
+      (props.choiceProps.checkValueOnCard(cardId) ||
+        props.choiceProps.checkValue(cardId)),
+    [
+      observingPlayerIsChoosing,
+      props.choiceProps.checkValue,
+      props.choiceProps.checkValueOnCard,
+    ],
   );
 
   const someChipsSelectable = useCallback(
