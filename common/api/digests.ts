@@ -36,6 +36,7 @@ export const activityDigestSchema = z.strictObject({
     choosingPlayerId: idSchema,
     instructions: z.string(),
   }),
+  previouslyChosenValues: z.array(z.string()),
 });
 
 export const actionDigestSchema = z.strictObject({

@@ -10,9 +10,8 @@ type GameDigest = z.infer<typeof gameDigestSchema>;
  *
  * A utility for examining the current choice.
  ******************************************************************************/
-export function useChoice(
-  choice?: GameDigest["activity"]["choice"],
-): ChoiceProps {
+export function useChoice(activity?: GameDigest["activity"]): ChoiceProps {
+  const choice = activity?.choice;
   const choiceType = choice?.type ?? null;
   const minValues = choice?.min ?? 0;
   const maxValues = choice?.max ?? null;
@@ -44,15 +43,13 @@ export function useChoice(
     [choice],
   );
 
-  const checkPreviousValue = useCallback(() => {
-    /**
-     * TODO!!!
-     *
-     * Currently, there is not enough data to indicate any values that were
-     * chosen previously in the current activity.
-     */
-    return false;
-  }, []);
+  const checkPreviousValue = useCallback(
+    (value: string) => {
+      const vals = activity?.previouslyChosenValues ?? [];
+      return vals.includes(value);
+    },
+    [activity?.previouslyChosenValues],
+  );
 
   return useMemo(
     () => ({

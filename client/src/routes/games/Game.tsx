@@ -61,7 +61,7 @@ export const Game = () => {
     min: currentChoice?.min ?? 0,
     max: currentChoice?.max ?? 9999,
   });
-  const choice = useChoice(currentChoice);
+  const choice = useChoice(game?.activity);
 
   // Submission:
   const submitChoice = useCallback(async () => {

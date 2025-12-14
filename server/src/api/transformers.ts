@@ -163,6 +163,9 @@ export function digestGameData({
           ],
         instructions: gameData.activity.currentChoice.instructions,
       },
+      previouslyChosenValues: gameData.activity.previousDecisions.flatMap(
+        (d) => d.values,
+      ),
     },
     otherPlayers: otherPlayerData.map((playerData) => {
       return {
