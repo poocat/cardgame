@@ -1,8 +1,12 @@
-import { usePoller } from "@client/hooks/usePoller";
+import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
-import { memo, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router";
 import type z from "zod";
+import { GameBoard } from "./board";
+import { useChoice } from "./board/choice";
+import { useDialog } from "./board/dialog";
+import { useSelector } from "./board/selector";
 
 type GamesGetOneResponseBody = z.infer<
   typeof ROUTES.games.methods.getOne.schemas.responseBody
@@ -15,14 +19,12 @@ export const Game = () => {
   const { gameId } = useParams();
 
   const [query] = useSearchParams();
-  const playerId = query.get("playerId");
+  const observingPlayerId = query.get("playerId");
 
-  const url = useMemo(() => {
-    const base = `/api/games/${gameId}`;
-    return playerId ? `${base}?playerId=${playerId}` : base;
-  }, [gameId, playerId]);
-
-  const [choices, setChoices] = useState<string[]>([]);
+  const baseUrl = `/api/games/${gameId}`;
+  const url = observingPlayerId
+    ? `${baseUrl}?playerId=${observingPlayerId}`
+    : baseUrl;
 
   // Polling:
   const poller = usePoller<GamesGetOneResponseBody>({
@@ -41,7 +43,7 @@ export const Game = () => {
       }
     },
     getPollingEnabled: (data) =>
-      data.digest.activity.choice.choosingPlayerId !== playerId,
+      data.digest.activity.choice.choosingPlayerId !== observingPlayerId,
   });
 
   // Memoize the game data, as is only changes with the "last updated" time.
@@ -49,16 +51,32 @@ export const Game = () => {
   const game = useMemo(() => {
     return poller?.data?.digest;
   }, [poller.data?.updatedAt]);
-  const choosing = useMemo(() => !poller.polling, [poller.polling]);
+
+  const currentChoice = game?.activity.choice;
+  const currentChoiceName = currentChoice?.name;
+  const observingPlayerIsChoosing = !poller.polling;
+
+  const dialog = useDialog();
+  const selector = useSelector({
+    min: currentChoice?.min ?? 0,
+    max: currentChoice?.max ?? 9999,
+  });
+  const choice = useChoice(game?.activity);
 
   // Submission:
-  const handleSubmitChoices = useCallback(async () => {
-    if (gameId && playerId && choosing && game && poller.fetchOnce) {
+  const submitChoice = useCallback(async () => {
+    if (
+      gameId &&
+      observingPlayerId &&
+      observingPlayerIsChoosing &&
+      currentChoiceName &&
+      poller.fetchOnce
+    ) {
       const payload: GamesPatchRequestBody = {
         decision: {
-          playerId: playerId,
-          name: game.activity?.choice?.name ?? "",
-          values: choices,
+          playerId: observingPlayerId,
+          name: currentChoiceName,
+          values: selector.selectedValues,
         },
       };
       const body = JSON.stringify(payload);
@@ -70,81 +88,43 @@ export const Game = () => {
         },
       })
         .catch((reason) => console.error(reason))
-        .finally(() => {
+        .then(() => {
           poller.fetchOnce();
-          setChoices([]);
+          selector.clearValues();
+          dialog.close();
         });
     }
-  }, [gameId, playerId, game, choices, choosing, poller.fetchOnce, url]);
-
-  // Choice value setters:
-  const handleAddChoice = useCallback((value: string) => {
-    setChoices((current) => [...current, value]);
-  }, []);
-  const handleRemoveChoice = useCallback((value: string) => {
-    setChoices((current) => {
-      const idx = current.indexOf(value);
-      return [...current.slice(0, idx), ...current.slice(idx)];
-    });
-  }, []);
+  }, [
+    gameId,
+    observingPlayerId,
+    currentChoiceName,
+    selector.selectedValues,
+    selector.clearValues,
+    dialog.close,
+    observingPlayerIsChoosing,
+    poller.fetchOnce,
+    url,
+  ]);
 
   return (
     <div>
-      {poller.polling ? (
-        <div>Polled {poller.pollCount} times..</div>
-      ) : (
-        <div>Not polling... {poller.error && `(${poller.error})`}</div>
-      )}
       <hr />
+      <div style={{ padding: 5 }}>
+        {poller.polling ? (
+          <span>Polled {poller.pollCount} times..</span>
+        ) : (
+          <span>Not polling... {poller.error && `(${poller.error})`}</span>
+        )}
+      </div>
       {game && (
-        <PlayArea
+        <GameBoard
           game={game}
-          choosing={choosing}
-          handleAddChoice={handleAddChoice}
-          handleRemoveChoice={handleRemoveChoice}
-          handleSubmitChoices={handleSubmitChoices}
+          onSubmitChoice={submitChoice}
+          choiceProps={choice}
+          selectorProps={selector}
+          dialogProps={dialog}
         />
       )}
     </div>
   );
 };
-
-const PlayArea = memo(
-  (props: {
-    game: GamesGetOneResponseBody["digest"];
-    choosing: boolean;
-    handleAddChoice: (value: string) => void;
-    handleRemoveChoice: (value: string) => void;
-    handleSubmitChoices: () => void;
-  }) => {
-    return (
-      <>
-        <div>Current Activity: {JSON.stringify(props.game.activity)}</div>
-        {props.choosing && (
-          <div>
-            {(props.game.activity?.choice?.values ?? []).map((v) => (
-              <div key={v}>
-                <input
-                  id={v}
-                  value={v}
-                  type="checkbox"
-                  onChange={(e) =>
-                    e.target.checked
-                      ? props.handleAddChoice(v)
-                      : props.handleRemoveChoice(v)
-                  }
-                />
-                <label htmlFor={v}>{v}</label>
-              </div>
-            ))}
-            <div>
-              <button type="button" onClick={props.handleSubmitChoices}>
-                Submit Choices
-              </button>
-            </div>
-          </div>
-        )}
-      </>
-    );
-  },
-);

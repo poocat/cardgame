@@ -1,6 +1,6 @@
 {
     "Comment Header 1": {
-        "scope": "javascript,typescript",
+        "scope": "javascript,typescript,typescriptreact",
         "prefix": "chead1",
         "body": [
             "/******************************************************************************",
@@ -10,7 +10,7 @@
         "description": "Use only from first column in line to make a comment header."
     },
     "Comment Header 2": {
-        "scope": "javascript,typescript",
+        "scope": "javascript,typescript,typescriptreact",
         "prefix": "chead2",
         "body": [
             "/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ",
@@ -20,7 +20,7 @@
         "description": "Use only when indented 2 spaces to make a comment header."
     },
     "Comment Divider": {
-        "scope": "javascript,typescript",
+        "scope": "javascript,typescript,typescriptreact",
         "prefix": "cdiv1",
         "body": [
             "////////////////////////////////////////////////////////////////////////////////",

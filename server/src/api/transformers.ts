@@ -3,6 +3,7 @@
  */
 
 import type {
+  choiceValueDigestSchema,
   gameDigestSchema,
   inPlayCardDigestSchema,
   roomDigestSchema,
@@ -10,13 +11,14 @@ import type {
 } from "@common/api/digests";
 import type { RoomDoc } from "@server/db/types";
 import type { CardData, Decision, GameData, Id } from "@server/types";
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 import type z from "zod";
 
 type RoomData = RoomDoc["data"];
 
 type GameDigest = z.infer<typeof gameDigestSchema>;
 type RoomDigest = z.infer<typeof roomDigestSchema>;
+type ChoiceValuesDigest = z.infer<typeof choiceValueDigestSchema>;
 
 function anonymizeId(id: string, salt: string): string {
   const base = `${id}:${salt}`;
@@ -57,8 +59,6 @@ export function digestGameData({
       p.id === playerId ? p.id : anonymizeId(p.id, anonymizationSalt);
   });
 
-  const valueMap = { ...anonymizedPlayerIdMap };
-
   const otherPlayerData = gameData.players.filter((p) => p.id !== playerId);
   const observingPlayerData = gameData.players.find((p) => p.id === playerId);
 
@@ -91,21 +91,81 @@ export function digestGameData({
     };
   }
 
+  // The values for the current choice are anonymized and checked for
+  // associations with cards.
+  const choiceValues = gameData.activity.currentChoice.values;
+  const choiceValuesDigest: ChoiceValuesDigest[] = [];
+  switch (gameData.activity.currentChoice.type) {
+    case "arbitrary": {
+      choiceValuesDigest.push(
+        ...choiceValues.map((v) => ({ value: v, onCardId: null, label: v })),
+      );
+      break;
+    }
+    case "cardId": {
+      choiceValuesDigest.push(
+        ...choiceValues.map((v) => {
+          const card = gameData.cards.find((c) => c.id === v);
+          const label =
+            card?.location.type === "inDeck"
+              ? "Card in Deck"
+              : (card?.name ?? v);
+          return { value: v, onCardId: null, label };
+        }),
+      );
+      break;
+    }
+    case "playerId": {
+      choiceValuesDigest.push(
+        ...choiceValues.map((playerId) => {
+          const player = gameData.players.find((p) => p.id === playerId);
+          const label = player?.name ?? playerId;
+          return {
+            value: anonymizedPlayerIdMap[playerId],
+            onCardId: null,
+            label,
+          };
+        }),
+      );
+      break;
+    }
+    case "actionId": {
+      gameData.actions
+        .filter((a) => choiceValues.includes(a.id))
+        .forEach((a) => {
+          const label = `[${a.type}] ${a.card.name}`;
+          choiceValuesDigest.push({ value: a.id, onCardId: a.card.id, label });
+        });
+      break;
+    }
+    case "chipId": {
+      gameData.chips
+        .filter((c) => choiceValues.includes(c.id))
+        .forEach((c) => {
+          const onCardId =
+            c.location.type === "onCard" ? c.location.cardId : null;
+          choiceValuesDigest.push({ value: c.id, onCardId, label: "Chip" });
+        });
+      break;
+    }
+  }
+
   const digest: GameDigest = {
     playerTakingTurnId: gameData.playerTakingTurnId,
     activity: {
       type: gameData.activity.type,
       choice: {
         ...gameData.activity.currentChoice,
-        values: gameData.activity.currentChoice.values.map(
-          (v) => valueMap[v] ?? v,
-        ),
+        values: choiceValuesDigest,
         choosingPlayerId:
           anonymizedPlayerIdMap[
             gameData.activity.currentChoice.choosingPlayerId
           ],
         instructions: gameData.activity.currentChoice.instructions,
       },
+      previouslyChosenValues: gameData.activity.previousDecisions.flatMap(
+        (d) => d.values,
+      ),
     },
     otherPlayers: otherPlayerData.map((playerData) => {
       return {

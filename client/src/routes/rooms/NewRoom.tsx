@@ -1,6 +1,6 @@
+import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { ROUTES } from "@common/api/routes";
 
 export const NewRoom = () => {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export const NewRoom = () => {
         <input value={hostName} onChange={(e) => setHostName(e.target.value)} />
       </div>
       <div>
-        <button disabled={!hostName} onClick={handleSubmit}>
+        <button type="button" disabled={!hostName} onClick={handleSubmit}>
           Open New Room
         </button>
       </div>
