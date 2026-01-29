@@ -69,6 +69,7 @@ export function digestGameData({
       id: cardData.id,
       name: cardData.name,
       type: cardData.type,
+      lastMovedOnTick: cardData.lastMovedOnTick,
       actions: gameData.actions
         .filter((a) => a.card.id === cardData.id)
         .map((a) => ({ id: a.id, type: a.type, instructions: a.instructions })),
