@@ -39,6 +39,7 @@ export function initGameData(
         name: c.name,
         type: c.type,
         location: { type: "inDeck" },
+        lastMovedOnTick: 0,
         ownerId: id,
       }));
       shuffle(playerCards);
@@ -77,6 +78,7 @@ export function initGameData(
     return actions;
   })(cardData);
   const data: GameData = {
+    tick: 0,
     players: playerData,
     cards: cardData,
     chips: chipData,

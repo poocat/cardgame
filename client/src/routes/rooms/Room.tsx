@@ -1,3 +1,5 @@
+import { usePoller } from "@client/utils/usePoller";
+import { ROUTES } from "@common/api/routes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Link,
@@ -6,9 +8,7 @@ import {
   useParams,
   useSearchParams,
 } from "react-router";
-import z from "zod";
-import { usePoller } from "@client/hooks/usePoller";
-import { ROUTES } from "@common/api/routes";
+import type z from "zod";
 
 type RoomsGetOneResponseBody = z.infer<
   typeof ROUTES.rooms.methods.getOne.schemas.responseBody
@@ -109,7 +109,7 @@ export const Room = () => {
     } catch (error) {
       console.error(error);
     }
-  }, [startGameDisabled, roomId]);
+  }, [startGameDisabled, roomId, playerId]);
 
   return (
     <div>
@@ -134,7 +134,11 @@ export const Room = () => {
       {playerIsHost && (
         <div>
           <div>
-            <button disabled={startGameDisabled} onClick={handleStartGame}>
+            <button
+              type="button"
+              disabled={startGameDisabled}
+              onClick={handleStartGame}
+            >
               Start game
             </button>
           </div>
@@ -150,6 +154,7 @@ export const Room = () => {
           </div>
           <div>
             <button
+              type="button"
               onClick={handleSubmitGuest}
               disabled={playerIsHost || !guestName}
             >

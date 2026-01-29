@@ -29,6 +29,8 @@ export class Next {
   }
 
   finish(): GameData {
+    // Increment the game tick.
+    this.gameData.tick += 1;
     return this.gameData;
   }
 }

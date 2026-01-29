@@ -1,5 +1,5 @@
-import { ChoiceValue, Decision, Id } from "@server/types";
-import { DeepReadonly, IDecisions } from "@server/game/types";
+import type { DeepReadonly, IDecisions } from "@server/game/types";
+import type { ChoiceValue, Decision, Id } from "@server/types";
 
 /******************************************************************************
  * ### Decisions
@@ -23,7 +23,9 @@ export class Decisions implements IDecisions {
       decisions = decisions.filter((d) => d.playerId === args.playerId);
     }
     const values: ChoiceValue[] = [];
-    decisions.forEach((d) => values.push(...d.values));
+    decisions.forEach((d) => {
+      values.push(...d.values);
+    });
     return values;
   }
 

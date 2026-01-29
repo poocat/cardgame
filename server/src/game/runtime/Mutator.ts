@@ -26,6 +26,7 @@ export class Mutator implements IMutator {
         this.gameData.cards.unshift(match);
     }
     match.location = args.location;
+    match.lastMovedOnTick = this.gameData.tick;
   }
 
   moveChips(args: MutatorArgs["moveChips"]) {

@@ -1,6 +1,6 @@
-import { ActionType } from "@server/types";
 import { CARDS } from "@server/game/cards/definitions";
-import { ActionDef, CardDef } from "@server/game/types";
+import type { ActionDef, CardDef } from "@server/game/types";
+import type { ActionType } from "@server/types";
 
 const cardMap = Object.fromEntries(CARDS.map((c) => [c.name, c]));
 
