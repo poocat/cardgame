@@ -61,11 +61,15 @@ export function usePoller<TData extends object>(args: {
         etag.current && polling
           ? { "If-None-Match": etag.current.toString() }
           : undefined;
-      const response = await fetch(args.url, { method: "GET", headers });
-      etag.current = response.headers.get("ETag");
+      const response = await fetch(args.url, {
+        method: "GET",
+        cache: "no-store",
+        headers,
+      });
       if (response.status === 304) {
         // Not modified.
       } else if (response.ok) {
+        etag.current = response.headers.get("ETag");
         const newData = await args.getData(response);
         setData(newData);
       } else {
