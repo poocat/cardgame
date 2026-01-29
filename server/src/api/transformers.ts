@@ -92,6 +92,11 @@ export function digestGameData({
     };
   }
 
+  // Cards should be ordered based on how long they have been at their current
+  // location.
+  const allCards = [...gameData.cards];
+  allCards.sort((a, b) => a.lastMovedOnTick - b.lastMovedOnTick);
+
   // The values for the current choice are anonymized and checked for
   // associations with cards.
   const choiceValues = gameData.activity.currentChoice.values;
@@ -106,7 +111,7 @@ export function digestGameData({
     case "cardId": {
       choiceValuesDigest.push(
         ...choiceValues.map((v) => {
-          const card = gameData.cards.find((c) => c.id === v);
+          const card = allCards.find((c) => c.id === v);
           const label =
             card?.location.type === "inDeck"
               ? "Card in Deck"
@@ -172,21 +177,21 @@ export function digestGameData({
       return {
         id: anonymizedPlayerIdMap[playerData.id],
         name: playerData.name,
-        cardsInDeck: gameData.cards
+        cardsInDeck: allCards
           .filter(
             (c) => c.ownerId === playerData.id && c.location.type === "inDeck",
           )
           .map((c) => ({
             id: c.id,
           })),
-        cardsInHand: gameData.cards
+        cardsInHand: allCards
           .filter(
             (c) => c.ownerId === playerData.id && c.location.type === "inHand",
           )
           .map((c) => ({
             id: c.id,
           })),
-        cardsInPlay: gameData.cards
+        cardsInPlay: allCards
           .filter(
             (c) => c.ownerId === playerData.id && c.location.type === "inPlay",
           )
@@ -205,7 +210,7 @@ export function digestGameData({
     digest.observingPlayer = {
       id: observingPlayerData.id,
       name: observingPlayerData.name,
-      cardsInDeck: gameData.cards
+      cardsInDeck: allCards
         .filter(
           (c) =>
             c.ownerId === observingPlayerData.id &&
@@ -214,14 +219,14 @@ export function digestGameData({
         .map((c) => ({
           id: c.id,
         })),
-      cardsInHand: gameData.cards
+      cardsInHand: allCards
         .filter(
           (c) =>
             c.ownerId === observingPlayerData.id &&
             c.location.type === "inHand",
         )
         .map((c) => visibleCardDigest(c)),
-      cardsInPlay: gameData.cards
+      cardsInPlay: allCards
         .filter(
           (c) =>
             c.ownerId === observingPlayerData.id &&
