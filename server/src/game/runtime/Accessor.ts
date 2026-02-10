@@ -1,14 +1,15 @@
-import {
+import type { DeepReadonly, IAccessor } from "@server/game/types";
+import type {
   ActionData,
   CardData,
   CardLocationType,
   CardType,
   ChipData,
+  ChipLocationType,
   GameData,
   Id,
   PlayerData,
 } from "@server/types";
-import { DeepReadonly, IAccessor } from "@server/game/types";
 
 /******************************************************************************
  * ### Accessor
@@ -91,13 +92,13 @@ export class Accessor implements IAccessor {
       if (args.playerIds !== undefined && !args.playerIds.includes(c.ownerId)) {
         return false;
       }
-      if (args.excludeIds !== undefined && args.excludeIds.includes(c.id)) {
+      if (args.excludeIds?.includes(c.id)) {
         return false;
       }
       if (args.minChips !== undefined || args.maxChips !== undefined) {
         const min = args.minChips ?? 0;
         const max = args.maxChips ?? 9999;
-        const numChipsOnCard = this.getChipsOnCard({ cardId: c.id }).length;
+        const numChipsOnCard = this.getChips({ cardIds: [c.id] }).length;
         if (numChipsOnCard < min || numChipsOnCard > max) {
           return false;
         }
@@ -106,16 +107,33 @@ export class Accessor implements IAccessor {
     });
   }
 
-  getPlayerChipsInReserve(args: { playerId: Id }) {
-    return this.gameData.chips.filter(
-      (c) => c.ownerId === args.playerId && c.location.type === "inReserve",
-    );
-  }
-
-  getChipsOnCard(args: { cardId: Id }) {
-    return this.gameData.chips.filter(
-      (chip) =>
-        chip.location.type === "onCard" && chip.location.cardId === args.cardId,
-    );
+  getChips(args: {
+    playerIds?: Id[];
+    locationTypes?: ChipLocationType[];
+    cardIds?: Id[];
+    excludeIds?: Id[];
+  }) {
+    return this.gameData.chips.filter((c) => {
+      if (
+        args.locationTypes !== undefined &&
+        !args.locationTypes.includes(c.location.type)
+      ) {
+        return false;
+      }
+      if (args.playerIds !== undefined && !args.playerIds.includes(c.ownerId)) {
+        return false;
+      }
+      if (args.excludeIds?.includes(c.id)) {
+        return false;
+      }
+      if (
+        args.cardIds !== undefined &&
+        (c.location.type !== "onCard" ||
+          !args.cardIds.includes(c.location.cardId))
+      ) {
+        return false;
+      }
+      return true;
+    });
   }
 }

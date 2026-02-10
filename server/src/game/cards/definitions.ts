@@ -28,8 +28,8 @@ export const CARDS: CardDef[] = [
               max: 1,
               getValues: ({ accessor, context }) => {
                 return accessor
-                  .getPlayerChipsInReserve({
-                    playerId: context.choosingPlayerId,
+                  .getChips({
+                    playerIds: [context.choosingPlayerId],
                   })
                   .map((c) => c.id);
               },
@@ -148,7 +148,7 @@ export const CARDS: CardDef[] = [
               max: 1,
               getValues: ({ accessor, context }) => {
                 return accessor
-                  .getChipsOnCard({ cardId: context.cardId })
+                  .getChips({ cardIds: [context.cardId] })
                   .map((c) => c.id);
               },
             },
@@ -188,8 +188,9 @@ export const CARDS: CardDef[] = [
               getChoosingPlayers: ({ accessor }) =>
                 accessor.players
                   .filter((p) => {
-                    const chipsInReserve = accessor.getPlayerChipsInReserve({
-                      playerId: p.id,
+                    const chipsInReserve = accessor.getChips({
+                      playerIds: [p.id],
+                      locationTypes: ["inReserve"],
                     });
                     const consumersInPlay = accessor.getCards({
                       playerIds: [p.id],
@@ -203,8 +204,9 @@ export const CARDS: CardDef[] = [
                   .map((p) => p.id),
               getValues: ({ accessor, context }) => {
                 return accessor
-                  .getPlayerChipsInReserve({
-                    playerId: context.choosingPlayerId,
+                  .getChips({
+                    playerIds: [context.choosingPlayerId],
+                    locationTypes: ["inReserve"],
                   })
                   .map((c) => c.id);
               },
@@ -269,8 +271,9 @@ export const CARDS: CardDef[] = [
               max: 1,
               getValues: ({ accessor, context }) => {
                 return accessor
-                  .getPlayerChipsInReserve({
-                    playerId: context.choosingPlayerId,
+                  .getChips({
+                    playerIds: [context.choosingPlayerId],
+                    locationTypes: ["inReserve"],
                   })
                   .map((c) => c.id);
               },
@@ -330,7 +333,7 @@ export const CARDS: CardDef[] = [
               max: 1,
               getValues: ({ accessor, context }) => {
                 return accessor
-                  .getChipsOnCard({ cardId: context.cardId })
+                  .getChips({ cardIds: [context.cardId] })
                   .map((c) => c.id);
               },
             },
@@ -351,7 +354,7 @@ export const CARDS: CardDef[] = [
       instructions:
         "Whenever the last chip is removed from this card, discard it.",
       affect: ({ next, context, mutator }) => {
-        if (next.getChipsOnCard({ cardId: context.cardId }).length < 1) {
+        if (next.getChips({ cardIds: [context.cardId] }).length < 1) {
           mutator.moveCard({
             id: context.cardId,
             location: { type: "inDiscard" },
