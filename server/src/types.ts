@@ -156,6 +156,11 @@ export type ActivityData = _DiscriminatedUnionFromArray<
   }
 >;
 
+export type WinData = {
+  playerId: Id;
+  onTick: Tick;
+};
+
 export type GameData = {
   /** An integer count of how many times the game state has been updated, since the beginning of the game. */
   tick: Tick;
@@ -167,4 +172,5 @@ export type GameData = {
   players: PlayerData[];
   cards: CardData[];
   chips: ChipData[];
+  wins: WinData[];
 };

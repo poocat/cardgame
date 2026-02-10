@@ -9,6 +9,7 @@ Production readiness (backend):
 - [x] Support moving cards back into the deck.
 - [x] Enable linting and address warnings.
 - [x] Keep track of when a card arrived at its current location.
+- [x] Add win conditions.
 - [ ] Switch from "multi player choices" to "multi player sequences".
 - [ ] Write helpers for defining common actions for cards.
 - [ ] Write unit tests for game logic.

@@ -103,6 +103,7 @@ export function initGameData(
       },
       nextChoices: [],
     },
+    wins: [],
   };
   return data;
 }

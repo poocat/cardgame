@@ -9,6 +9,7 @@ import type {
   CardType,
   ChipData,
   ChipLocationData,
+  ChipLocationType,
   ChoiceType,
   ChoiceValue,
   Decision,
@@ -41,8 +42,7 @@ const accessorTypes = [
   "getActionById",
   "getCardById",
   "getCards",
-  "getChipsOnCard",
-  "getPlayerChipsInReserve",
+  "getChips",
   "getPlayerTakingTurn",
 ] as const;
 type AccessorType = (typeof accessorTypes)[number];
@@ -58,8 +58,12 @@ type _AccessorArgs = {
     maxChips?: number;
     excludeIds?: Id[];
   };
-  getChipsOnCard: { cardId: Id };
-  getPlayerChipsInReserve: { playerId: Id };
+  getChips: {
+    playerIds?: Id[];
+    locationTypes?: ChipLocationType[];
+    cardIds?: Id[];
+    excludeIds?: Id[];
+  };
   getPlayerTakingTurn: undefined;
 };
 export type AccessorArgs = {
@@ -85,8 +89,12 @@ export interface IAccessor extends AccessorMethods<unknown> {
     maxChips?: number;
     excludeIds?: Id[];
   }): DeepReadonly<CardData>[];
-  getChipsOnCard(args: { cardId: Id }): DeepReadonly<ChipData>[];
-  getPlayerChipsInReserve(args: { playerId: Id }): DeepReadonly<ChipData>[];
+  getChips(args: {
+    playerIds?: Id[];
+    locationTypes?: ChipLocationType[];
+    cardIds?: Id[];
+    excludeIds?: Id[];
+  }): DeepReadonly<ChipData>[];
   getPlayerTakingTurn(): DeepReadonly<PlayerData>;
 }
 
@@ -99,6 +107,7 @@ const mutationTypes = [
   "exhaustCard",
   "passTurn",
   "setActivity",
+  "addWin",
 ] as const;
 type MutatorType = (typeof mutationTypes)[number];
 // TODO!!! No actions should have access to `passTurn` and `setActivity`
@@ -109,6 +118,7 @@ type _MutatorArgs = {
   exhaustCard: { id: Id; value: boolean };
   passTurn: { from: Id; to: Id };
   setActivity: { activity: ActivityData };
+  addWin: { playerId: Id };
 };
 export type MutatorArgs = {
   [K in MutatorType]: _MutatorArgs[K];

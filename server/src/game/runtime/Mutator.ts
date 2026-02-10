@@ -61,4 +61,16 @@ export class Mutator implements IMutator {
   setActivity(args: MutatorArgs["setActivity"]) {
     this.gameData.activity = args.activity;
   }
+
+  addWin(args: MutatorArgs["addWin"]) {
+    const alreadyWon = this.gameData.wins.some(
+      (w) => w.playerId === args.playerId,
+    );
+    if (!alreadyWon) {
+      this.gameData.wins.push({
+        playerId: args.playerId,
+        onTick: this.gameData.tick,
+      });
+    }
+  }
 }
