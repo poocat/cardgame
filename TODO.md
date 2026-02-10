@@ -8,9 +8,11 @@ Production readiness (backend):
 - [x] Add slowdown and rate limiting.
 - [x] Support moving cards back into the deck.
 - [x] Enable linting and address warnings.
-- [ ] Write test suite.
+- [x] Keep track of when a card arrived at its current location.
+- [ ] Switch from "multi player choices" to "multi player sequences".
 - [ ] Write helpers for defining common actions for cards.
+- [ ] Write unit tests for game logic.
+- [ ] Write end-to-end tests for API.
 
 One day:
 - [ ] Set up messaging system that supports different languages.
-- [ ] Support serializable card definitions.

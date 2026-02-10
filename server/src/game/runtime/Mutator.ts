@@ -27,6 +27,7 @@ export class Mutator implements IMutator {
     }
     match.location = args.location;
     match.lastMovedOnTick = this.gameData.tick;
+    match.lastMovedOnTurn = this.gameData.turn;
   }
 
   moveChips(args: MutatorArgs["moveChips"]) {
@@ -54,6 +55,7 @@ export class Mutator implements IMutator {
       currentPlayer.turnCount += 1;
     }
     this.gameData.playerTakingTurnId = args.to;
+    this.gameData.turn += 1;
   }
 
   setActivity(args: MutatorArgs["setActivity"]) {

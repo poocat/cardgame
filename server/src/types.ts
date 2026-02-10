@@ -37,6 +37,7 @@ type _DiscriminatedUnionFromArray<
 
 export type Id = string;
 export type Tick = number;
+export type Turn = number;
 
 export type ActionType = _UnionFromArray<typeof actionTypes>;
 export type ActionTypeMap<T> = _MapFromArray<typeof actionTypes, T>;
@@ -98,6 +99,7 @@ export type CardData = _DiscriminatedUnionFromArray<
     ownerId: Id;
     location: CardLocationData;
     lastMovedOnTick: Tick;
+    lastMovedOnTurn: Turn;
   }
 >;
 
@@ -157,6 +159,8 @@ export type ActivityData = _DiscriminatedUnionFromArray<
 export type GameData = {
   /** An integer count of how many times the game state has been updated, since the beginning of the game. */
   tick: Tick;
+  /** An integer count of how many times the turn has been passed from one player to another. */
+  turn: Turn;
   playerTakingTurnId: Id;
   activity: ActivityData;
   actions: ActionData[];
