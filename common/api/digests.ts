@@ -54,6 +54,7 @@ export const visibleCardDigestSchema = z.strictObject({
   name: z.string(),
   type: z.union(cardTypes.map((t) => z.literal(t))),
   lastMovedOnTick: z.number().int(),
+  lastMovedOnTurn: z.number().int(),
   actions: z.array(actionDigestSchema),
   chips: z.array(chipDigestSchema),
 });
