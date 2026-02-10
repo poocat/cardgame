@@ -1,6 +1,6 @@
 import { CONSTANTS } from "@common/game/constants";
 import type { Accessor } from "@server/game/runtime";
-import type { Id } from "@server/types";
+import type { PlayerData } from "@server/types";
 
 /**
  * Called each time the state machine produces a new state.
@@ -12,8 +12,8 @@ import type { Id } from "@server/types";
  * - A player has at N or more chips on a single "consumer" type card
  * - A player has all of their chips on "consumer" type cards.
  */
-export function getWinners(accessor: Accessor): Id[] {
-  const winningPlayers: Id[] = [];
+export function getWinners(accessor: Accessor): PlayerData[] {
+  const winningPlayers: PlayerData[] = [];
   accessor.players.forEach((p) => {
     const candidatesConsumers = accessor.getCards({
       playerIds: [p.id],
@@ -21,7 +21,7 @@ export function getWinners(accessor: Accessor): Id[] {
       minChips: CONSTANTS.numChipsOnConsumersToWin,
     });
     if (candidatesConsumers.length < 0) {
-      winningPlayers.push(p.id);
+      winningPlayers.push(p);
       return;
     }
     // Look for chips not on consumer cards.
@@ -39,7 +39,7 @@ export function getWinners(accessor: Accessor): Id[] {
           !allPlayerConsumerIds.includes(c.location.cardId),
       );
     if (!looseChips) {
-      winningPlayers.push(p.id);
+      winningPlayers.push(p);
       return;
     }
   });

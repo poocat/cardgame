@@ -107,6 +107,7 @@ const mutationTypes = [
   "exhaustCard",
   "passTurn",
   "setActivity",
+  "addWin",
 ] as const;
 type MutatorType = (typeof mutationTypes)[number];
 // TODO!!! No actions should have access to `passTurn` and `setActivity`
@@ -117,6 +118,7 @@ type _MutatorArgs = {
   exhaustCard: { id: Id; value: boolean };
   passTurn: { from: Id; to: Id };
   setActivity: { activity: ActivityData };
+  addWin: { playerId: Id };
 };
 export type MutatorArgs = {
   [K in MutatorType]: _MutatorArgs[K];

@@ -6,6 +6,7 @@ import {
   triggeredEffects,
 } from "@server/game/rules";
 import { Accessor, Decisions, Next } from "@server/game/runtime";
+import { getWinners } from "@server/game/winConditions";
 import { logger } from "@server/logger";
 import type { Decision, GameData } from "@server/types";
 
@@ -165,5 +166,10 @@ export function makeDecision(args: {
       // the updated game data, activity, decisions.
     } while (currentActivity.currentChoice.max === 0);
   }
+  // Finally, check for any winners, and log them in game data.
+  getWinners(currentAccessor).forEach((p) => {
+    next.mutatorQueue.addWin({ playerId: p.id });
+  });
+  next.dequeueMutations();
   return next.finish();
 }

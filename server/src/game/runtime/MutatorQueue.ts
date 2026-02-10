@@ -34,6 +34,10 @@ export class MutatorQueue implements IMutator {
     this.queue.push({ method: "setActivity", args });
   }
 
+  addWin(args: MutatorArgs["addWin"]) {
+    this.queue.push({ method: "addWin", args });
+  }
+
   apply(mutator: IMutator) {
     this.queue.slice(this.index).forEach((item) => {
       switch (item.method) {
