@@ -1,5 +1,5 @@
-import { getCardDefinition } from "@server/game/cards/utils";
-import { IAccessor, IMutator } from "@server/game/types";
+import { getCardDefinition } from "@server/game/cards/registry";
+import type { IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ### Custom Trigger Effects for Cards in Play
