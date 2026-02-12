@@ -1,15 +1,13 @@
+import { CONSTANTS } from "@common/game/constants";
 import {
   extendCardRegistry,
   resetCardRegistry,
 } from "@server/game/cards/registry";
 import { makeDecision } from "@server/game/stateMachine";
+import type { GameData } from "@server/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testCards } from "../fixtures/cards";
-import {
-  buildBasicGame,
-  findActionId,
-  GameBuilder,
-} from "../helpers/GameBuilder";
+import { GameBuilder } from "../helpers/GameBuilder";
 
 beforeAll(() => {
   extendCardRegistry({ cards: Object.values(testCards) });
@@ -18,6 +16,56 @@ beforeAll(() => {
 afterAll(() => {
   resetCardRegistry();
 });
+
+/******************************************************************************
+ * ### buildBasicGame
+ *
+ * Builds a minimal game between two players, "alice" and "bob", that starts
+ * with alice ready to draw her first card.
+ ******************************************************************************/
+function buildBasicGame(): GameData {
+  const builder = new GameBuilder()
+    .addPlayer("alice")
+    .addPlayer("bob")
+    .setPlayerTakingTurn("alice");
+
+  for (const player of ["alice", "bob"]) {
+    for (const cardDef of Object.values(testCards)) {
+      builder.addCard({
+        owner: player,
+        name: cardDef.name,
+        location: { type: "inDeck" },
+      });
+    }
+    builder.addChipsInReserve(player, CONSTANTS.numChipsPerPlayer);
+  }
+
+  // Build without activity first to get actual card IDs
+  const game = builder.build();
+
+  // Find alice's first card in deck
+  const aliceFirstCard = game.cards.find(
+    (c) => c.ownerId === "alice" && c.location.type === "inDeck",
+  );
+
+  // Set up initial drawing activity with the actual card ID
+  game.activity = {
+    type: "drawingCards",
+    currentChoice: {
+      name: "cardToDraw",
+      type: "cardId",
+      values: aliceFirstCard ? [aliceFirstCard.id] : [],
+      min: 1,
+      max: 1,
+      choosingPlayerId: "alice",
+      instructions: "Choose your first card to draw.",
+    },
+    nextChoices: [],
+    previousDecisions: [],
+  };
+
+  return game;
+}
 
 describe("makeDecision", () => {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -252,37 +300,20 @@ describe("makeDecision", () => {
           owner: "alice",
           name: testCards.basicProducer.name,
           location: { type: "inHand" },
+          actionIdMap: { play: "c1-play" },
         })
         .addChipsInReserve("alice", 5)
         .addChipsInReserve("bob", 5)
         .setPlayerTakingTurn("alice")
+        .setUpActionActivity("c1-play")
         .build();
-
-      const playActionId = findActionId(game, "c1", "play");
-
-      // Set up choosingAction with the play action available
-      game.activity = {
-        type: "choosingAction",
-        playerChoosingActionId: "alice",
-        currentChoice: {
-          name: "actionToTake",
-          type: "actionId",
-          choosingPlayerId: "alice",
-          instructions: "Choose an action.",
-          values: [playActionId],
-          min: 0,
-          max: 1,
-        },
-        nextChoices: [],
-        previousDecisions: [],
-      };
 
       const result = makeDecision({
         gameData: game,
         decision: {
           name: "actionToTake",
           playerId: "alice",
-          values: [playActionId],
+          values: ["c1-play"],
         },
       });
 
@@ -309,18 +340,17 @@ describe("makeDecision", () => {
           owner: "alice",
           name: testCards.producerWithChipAbility.name,
           location: { type: "inPlay", exhausted: false },
+          actionIdMap: { ability: "c1-ability" },
         })
         .addChipsInReserve("alice", 5)
         .addChipsInReserve("bob", 5)
         .setPlayerTakingTurn("alice")
         .build();
 
-      const abilityActionId = findActionId(game, "c1", "ability");
-
       // Set up takingAction for the ability
       game.activity = {
         type: "takingAction",
-        actionId: abilityActionId,
+        actionId: "c1-ability",
         playerTakingActionId: "alice",
         currentChoice: {
           name: "targetChips",
@@ -384,6 +414,7 @@ describe("makeDecision", () => {
           owner: "alice",
           name: testCards.consumerWithTwoStepAbility.name,
           location: { type: "inPlay", exhausted: false },
+          actionIdMap: { ability: "c-cons-ability" },
         })
         .addChip({
           id: "ch1",
@@ -395,12 +426,10 @@ describe("makeDecision", () => {
         .setPlayerTakingTurn("alice")
         .build();
 
-      const abilityActionId = findActionId(game, "c-cons", "ability");
-
       // Consumer ability: move chip from consumer to a producer
       game.activity = {
         type: "takingAction",
-        actionId: abilityActionId,
+        actionId: "c-cons-ability",
         playerTakingActionId: "alice",
         currentChoice: {
           name: "targetCard",
@@ -454,6 +483,7 @@ describe("makeDecision", () => {
           owner: "alice",
           name: testCards.producerThatCanDie.name,
           location: { type: "inPlay", exhausted: false },
+          actionIdMap: { ability: "c-dying-ability" },
         })
         .addCard({
           id: "c-cons",
@@ -476,12 +506,10 @@ describe("makeDecision", () => {
         .setPlayerTakingTurn("alice")
         .build();
 
-      const abilityActionId = findActionId(game, "c-dying", "ability");
-
       // Dying producer's ability: move chip from this card to a consumer
       game.activity = {
         type: "takingAction",
-        actionId: abilityActionId,
+        actionId: "c-dying-ability",
         playerTakingActionId: "alice",
         currentChoice: {
           name: "targetCard",

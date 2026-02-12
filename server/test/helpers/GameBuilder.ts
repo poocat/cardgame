@@ -11,9 +11,8 @@
  *     .build();
  */
 
-import { CONSTANTS } from "@common/game/constants";
+import { actionTypes } from "@common/game/enums";
 import { getCardDefinition } from "@server/game/cards/registry";
-import { testCards } from "../fixtures/cards";
 import type {
   ActionData,
   ActionType,
@@ -27,12 +26,15 @@ import type {
   PlayerData,
 } from "@server/types";
 
+type ActionIdMap = Partial<Record<ActionType, string>>;
+
 type CardSpec = {
   name: string;
   owner: Id;
   location: CardLocationData;
   /** If omitted, an id will be generated from the name, owner, and insert order. */
   id?: Id;
+  actionIdMap?: ActionIdMap;
 };
 
 type ChipSpec = {
@@ -49,8 +51,7 @@ type ActivitySpec =
     }
   | {
       type: "action";
-      cardId: Id;
-      actionType: ActionType;
+      actionId: Id;
     };
 
 /******************************************************************************
@@ -98,6 +99,9 @@ export class GameBuilder {
    * Adds a card to the game.
    *
    * If no id provided, will generate one automatically when the game is built.
+   *
+   * If an action id map is given, will assign the given ids to the actions
+   * with the given types.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   addCard(spec: CardSpec): this {
     this.cardSpecs.push(spec);
@@ -128,7 +132,7 @@ export class GameBuilder {
    * Use to specify the activity of the game to the given value.
    *
    * If no activity is set, the default will be a "choosingAction" activity for
-   * the first player added to the game.
+   * the player currently taking their turn, but with no values to choose from.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   setActivity(activity: ActivityData): this {
     this.activitySpec = { type: "literal", activity };
@@ -136,14 +140,14 @@ export class GameBuilder {
   }
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Use to specify the activity of the game to a "takingAction" activity,
-   * based on the given card id and action type.
+   * Use to set up a "choosingAction" activity, for the player currently taking
+   * their turn, with a single value to choose from, being the given action id.
    *
    * If no activity is set, the default will be a "choosingAction" activity for
-   * the first player added to the game.
+   * the player currently taking their turn, but with no values to choose from.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  setUpActionActivity(cardId: Id, actionType: ActionType): this {
-    this.activitySpec = { type: "action", cardId, actionType };
+  setUpActionActivity(actionId: Id): this {
+    this.activitySpec = { type: "action", actionId };
     return this;
   }
 
@@ -169,15 +173,22 @@ export class GameBuilder {
     const playerData = [...this.players.values()];
     const playerTakingTurnId = this.playerTakingTurnId ?? playerData[0].id;
 
-    // Build cards
+    const actionIdMap: Map<Id, ActionIdMap> = new Map();
+
+    // Build cards.
     const cards: CardData[] = this.cardSpecs.map((spec) => {
       const cardDef = getCardDefinition(spec.name);
       if (!cardDef) {
         throw new Error(`Unknown card name: "${spec.name}".`);
       }
-      const id = spec.id ?? `card-${cardCount++}-${spec.owner}-${spec.name}`;
+      const cardId =
+        spec.id ?? `card-${cardCount++}-${spec.owner}-${spec.name}`;
+      // Be sure to update the action id map.
+      if (spec.actionIdMap) {
+        actionIdMap.set(cardId, spec.actionIdMap);
+      }
       return {
-        id,
+        id: cardId,
         name: spec.name,
         type: cardDef.type,
         ownerId: spec.owner,
@@ -201,15 +212,21 @@ export class GameBuilder {
     const actions: ActionData[] = [];
     for (const card of cards) {
       const cardDef = getCardDefinition(card.name);
-      if (!cardDef) continue;
-      for (const [actionType, actionDef] of Object.entries(cardDef.actions)) {
-        if (!actionDef) continue;
-        actions.push({
-          id: `action-${actionCount++}`,
-          type: actionType as ActionType,
-          card: { id: card.id, name: card.name, ownerId: card.ownerId },
-          instructions: actionDef.instructions ?? "",
-        });
+      if (cardDef) {
+        for (const actionType of actionTypes) {
+          const actionDef = cardDef.actions[actionType];
+          if (actionDef) {
+            const actionId =
+              actionIdMap.get(card.id)?.[actionType] ??
+              `action-${actionCount++}`;
+            actions.push({
+              id: actionId,
+              type: actionType as ActionType,
+              card: { id: card.id, name: card.name, ownerId: card.ownerId },
+              instructions: actionDef.instructions ?? "",
+            });
+          }
+        }
       }
     }
 
@@ -221,24 +238,15 @@ export class GameBuilder {
           return this.activitySpec.activity;
         }
         case "action": {
-          const { cardId, actionType } = this.activitySpec;
-          const action = actions.find(
-            (a) => a.card.id === cardId && a.type === actionType,
-          );
-          if (!action) {
-            throw new Error(
-              `Could not find action ${actionType} on card ${cardId}.`,
-            );
-          }
           return {
             type: "choosingAction",
-            playerChoosingActionId: "alice",
+            playerChoosingActionId: playerTakingTurnId,
             currentChoice: {
               name: "actionToTake",
               type: "actionId",
-              choosingPlayerId: "alice",
+              choosingPlayerId: playerTakingTurnId,
               instructions: "Choose an action.",
-              values: [action.id],
+              values: [this.activitySpec.actionId],
               min: 0,
               max: 1,
             },
@@ -278,72 +286,4 @@ export class GameBuilder {
       wins: [],
     };
   }
-}
-
-/******************************************************************************
- * ### buildBasicGame
- *
- * Builds a minimal, 2-player game with alice ready to draw her first card.
- ******************************************************************************/
-export function buildBasicGame(): GameData {
-  const builder = new GameBuilder()
-    .addPlayer("alice")
-    .addPlayer("bob")
-    .setPlayerTakingTurn("alice");
-
-  for (const player of ["alice", "bob"]) {
-    for (const cardDef of Object.values(testCards)) {
-      builder.addCard({
-        owner: player,
-        name: cardDef.name,
-        location: { type: "inDeck" },
-      });
-    }
-    builder.addChipsInReserve(player, CONSTANTS.numChipsPerPlayer);
-  }
-
-  // Build without activity first to get actual card IDs
-  const game = builder.build();
-
-  // Find alice's first card in deck
-  const aliceFirstCard = game.cards.find(
-    (c) => c.ownerId === "alice" && c.location.type === "inDeck",
-  );
-
-  // Set up initial drawing activity with the actual card ID
-  game.activity = {
-    type: "drawingCards",
-    currentChoice: {
-      name: "cardToDraw",
-      type: "cardId",
-      values: aliceFirstCard ? [aliceFirstCard.id] : [],
-      min: 1,
-      max: 1,
-      choosingPlayerId: "alice",
-      instructions: "Choose your first card to draw.",
-    },
-    nextChoices: [],
-    previousDecisions: [],
-  };
-
-  return game;
-}
-
-/******************************************************************************
- * ### findActionId
- *
- * Helper to find an action id in game data given a card id and action type.
- ******************************************************************************/
-export function findActionId(
-  gameData: GameData,
-  cardId: string,
-  actionType: ActionType,
-): string {
-  const action = gameData.actions.find(
-    (a) => a.card.id === cardId && a.type === actionType,
-  );
-  if (!action) {
-    throw new Error(`No ${actionType} action found for card ${cardId}`);
-  }
-  return action.id;
 }
