@@ -56,6 +56,9 @@ export class MutatorQueue implements IMutator {
         case "setActivity":
           mutator.setActivity(item.args);
           break;
+        case "addWin":
+          mutator.addWin(item.args);
+          break;
         default:
           throw new Error(`Could not apply mutation: ${item}`);
       }

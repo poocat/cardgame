@@ -1,4 +1,4 @@
-import { getActionDefinition } from "@server/game/cards/utils";
+import { getActionDefinition } from "@server/game/cards/registry";
 import type { IAccessor, IDecisions } from "@server/game/types";
 import type {
   ActivityData,

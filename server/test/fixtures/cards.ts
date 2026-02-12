@@ -1,17 +1,136 @@
-/**
- * Serves as the master list of all cards in the game.
- *
- * One day, will come up with a schema to replace callbacks with serializable
- * objects...
- */
 import type { CardDef } from "@server/game/types";
 
-export const CARDS: CardDef[] = [
+type CardMap = { [key: string]: CardDef };
+
+export const testCards = {
+  dummyProducer: {
+    name: "Dummy Producer",
+    type: "producer",
+    actions: {},
+  },
+  dummyConsumer: {
+    name: "Dummy Consumer",
+    type: "consumer",
+    actions: {},
+  },
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   *
+   * A producer that can be brought into play without any conditions, can be
+   * discarded, and has an action that is always available (so long as the card
+   * is in play), and does not affect the game state.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  {
-    name: "Example Producer",
+  basicProducer: {
+    name: "Playable Producer",
+    type: "producer",
+    actions: {
+      play: {},
+      ability: {
+        instructions: "Choose this card and do nothing.",
+        sequence: {
+          choices: [
+            {
+              type: "cardId",
+              name: "cardId",
+              instructions: "Choose this card.",
+              min: 1,
+              max: 1,
+              getValues: ({ context }) => [context.cardId],
+            },
+          ],
+          affect: () => {},
+        },
+      },
+      discard: {},
+    },
+  },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Use to test a simple "trigger" for producer-type cards that mimics the
+   * rules for consumer-type cards, in that they must have at least one chip
+   * on them to stay in play.
+   * Has an ability to move chips from this card to a consumer (to trigger death).
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  producerThatCanDie: {
+    name: "Producer That Can Die",
+    type: "producer",
+    actions: {
+      ability: {
+        instructions: "Move one chip from this card to one of your consumers.",
+        sequence: {
+          check: ({ accessor, context }) => {
+            const candidates = accessor.getCards({
+              playerIds: [context.playerTakingActionId],
+              locationTypes: ["inPlay"],
+              types: ["consumer"],
+            });
+            if (candidates.length > 0) {
+              return { ok: true };
+            } else {
+              return {
+                ok: false,
+                reasons: ["No consumers in play."],
+              };
+            }
+          },
+          choices: [
+            {
+              type: "cardId",
+              name: "targetCard",
+              instructions: "Choose one of your consumer cards.",
+              min: 1,
+              max: 1,
+              getValues: ({ accessor, context }) => {
+                return accessor
+                  .getCards({
+                    playerIds: [context.playerTakingActionId],
+                    locationTypes: ["inPlay"],
+                    types: ["consumer"],
+                  })
+                  .map((c) => c.id);
+              },
+            },
+            {
+              type: "chipId",
+              name: "targetChips",
+              instructions: "Choose a chip from this card.",
+              min: 1,
+              max: 1,
+              getValues: ({ accessor, context }) => {
+                return accessor
+                  .getChips({ cardIds: [context.cardId] })
+                  .map((c) => c.id);
+              },
+            },
+          ],
+          affect: ({ decisions, mutator }) => {
+            const chosenCardId = decisions.getValues({ name: "targetCard" })[0];
+            if (chosenCardId) {
+              mutator.moveChips({
+                ids: decisions.getValues({ name: "targetChips" }),
+                location: { type: "onCard", cardId: chosenCardId },
+              });
+            }
+          },
+        },
+      },
+    },
+    trigger: {
+      instructions:
+        "Whenever the last chip is removed from this card, discard it.",
+      affect: ({ next, context, mutator }) => {
+        if (next.getChips({ cardIds: [context.cardId] }).length < 1) {
+          mutator.moveCard({
+            id: context.cardId,
+            location: { type: "inDiscard" },
+          });
+        }
+      },
+    },
+  },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * A producer with an ability that moves chips from reserve to the card.
+   * Tests: ability with optional chip choice (min=0, max=1).
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  producerWithChipAbility: {
+    name: "Producer With Chip Ability",
     type: "producer",
     actions: {
       play: {},
@@ -30,6 +149,7 @@ export const CARDS: CardDef[] = [
                 return accessor
                   .getChips({
                     playerIds: [context.choosingPlayerId],
+                    locationTypes: ["inReserve"],
                   })
                   .map((c) => c.id);
               },
@@ -43,14 +163,15 @@ export const CARDS: CardDef[] = [
           },
         },
       },
-      // discard: {},
     },
   },
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   *
+   * A consumer with a play action that has a check (requires producer with
+   * chips) and moves a chip from a producer to itself.
+   * Tests: play with check function + chip transfer sequence.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  {
-    name: "Example Consumer",
+  consumerWithPlayCheck: {
+    name: "Consumer With Play Check",
     type: "consumer",
     actions: {
       play: {
@@ -60,6 +181,7 @@ export const CARDS: CardDef[] = [
             const candidates = accessor.getCards({
               playerIds: [context.playerTakingActionId],
               types: ["producer"],
+              locationTypes: ["inPlay"],
               minChips: 1,
             });
             if (candidates.length > 0) {
@@ -84,14 +206,50 @@ export const CARDS: CardDef[] = [
                   .getCards({
                     playerIds: [context.choosingPlayerId],
                     types: ["producer"],
+                    locationTypes: ["inPlay"],
                   })
                   .map((c) => c.id);
-                return accessor.chips
-                  .filter(
-                    (c) =>
-                      c.location.type === "onCard" &&
-                      producersInPlayIds.includes(c.location.cardId),
-                  )
+                return accessor
+                  .getChips({ cardIds: producersInPlayIds })
+                  .map((c) => c.id);
+              },
+            },
+          ],
+          affect: ({ context, decisions, mutator }) => {
+            mutator.moveChips({
+              ids: decisions.getValues({ name: "targetChips" }),
+              location: { type: "onCard", cardId: context.cardId },
+            });
+          },
+        },
+      },
+    },
+  },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * A consumer with a two-step ability: choose a target producer, then choose
+   * a chip from this card to move to that producer.
+   * Tests: dependent choices (second choice depends on first).
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  consumerWithTwoStepAbility: {
+    name: "Consumer With Two-Step Ability",
+    type: "consumer",
+    actions: {
+      play: {
+        instructions: "Bring into play with 1 chip from your reserve.",
+        sequence: {
+          choices: [
+            {
+              type: "chipId",
+              name: "targetChips",
+              instructions: "Choose a chip from your reserve.",
+              min: 1,
+              max: 1,
+              getValues: ({ accessor, context }) => {
+                return accessor
+                  .getChips({
+                    playerIds: [context.choosingPlayerId],
+                    locationTypes: ["inReserve"],
+                  })
                   .map((c) => c.id);
               },
             },
@@ -119,7 +277,7 @@ export const CARDS: CardDef[] = [
             } else {
               return {
                 ok: false,
-                reasons: ["No other producers in play."],
+                reasons: ["No producers in play."],
               };
             }
           },
@@ -167,16 +325,18 @@ export const CARDS: CardDef[] = [
     },
   },
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   *
+   * A producer with an ability that involves all players. Each player with
+   * chips in reserve and consumers in play can move a chip to their consumer.
+   * Tests: getChoosingPlayers returning multiple players.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  {
-    name: "Example Producer that Involves All Players",
+  producerWithMultiPlayerAbility: {
+    name: "Producer With Multi-Player Ability",
     type: "producer",
     actions: {
       play: {},
       ability: {
         instructions:
-          "Each player may move up to 1 of their chips from their reserve to one of their consumers in play.",
+          "Each player may move up to 1 chip from their reserve to one of their consumers in play.",
         sequence: {
           choices: [
             {
@@ -251,116 +411,4 @@ export const CARDS: CardDef[] = [
       },
     },
   },
-  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Producers don't need chips on them to remain alive after the conclusion of
-   * an activity. To make an exception, set up a trigger.
-   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  {
-    name: "Example Producer that Can Die",
-    type: "producer",
-    actions: {
-      play: {
-        instructions: "Bring into play with up to 1 chip from your reserve.",
-        sequence: {
-          choices: [
-            {
-              name: "targetChips",
-              type: "chipId",
-              instructions: "Choose up to 1 of the chips in your reserve.",
-              min: 0,
-              max: 1,
-              getValues: ({ accessor, context }) => {
-                return accessor
-                  .getChips({
-                    playerIds: [context.choosingPlayerId],
-                    locationTypes: ["inReserve"],
-                  })
-                  .map((c) => c.id);
-              },
-            },
-          ],
-          affect: ({ decisions, mutator, context }) => {
-            mutator.moveChips({
-              ids: decisions.getValues({ name: "targetChips" }),
-              location: { type: "onCard", cardId: context.cardId },
-            });
-          },
-        },
-      },
-      ability: {
-        instructions:
-          "Move one chip from this card to one of your other consumers in play.",
-        sequence: {
-          check: ({ accessor, context }) => {
-            const candidates = accessor.getCards({
-              playerIds: [context.playerTakingActionId],
-              locationTypes: ["inPlay"],
-              types: ["consumer"],
-              excludeIds: [context.cardId],
-            });
-            if (candidates.length > 0) {
-              return { ok: true };
-            } else {
-              return {
-                ok: false,
-                reasons: ["No other consumers in play."],
-              };
-            }
-          },
-          choices: [
-            {
-              type: "cardId",
-              name: "targetCard",
-              instructions: "Choose one of your consumer cards.",
-              min: 1,
-              max: 1,
-              getValues: ({ accessor, context }) => {
-                return accessor
-                  .getCards({
-                    playerIds: [context.playerTakingActionId],
-                    locationTypes: ["inPlay"],
-                    types: ["consumer"],
-                    excludeIds: [context.cardId],
-                  })
-                  .map((c) => c.id);
-              },
-            },
-            {
-              type: "chipId",
-              name: "targetChips",
-              instructions: "Choose a chip from this card.",
-              min: 1,
-              max: 1,
-              getValues: ({ accessor, context }) => {
-                return accessor
-                  .getChips({ cardIds: [context.cardId] })
-                  .map((c) => c.id);
-              },
-            },
-          ],
-          affect: ({ decisions, mutator }) => {
-            const chosenCardId = decisions.getValues({ name: "targetCard" })[0];
-            if (chosenCardId) {
-              mutator.moveChips({
-                ids: decisions.getValues({ name: "targetChips" }),
-                location: { type: "onCard", cardId: chosenCardId },
-              });
-            }
-          },
-        },
-      },
-    },
-    trigger: {
-      instructions:
-        "Whenever the last chip is removed from this card, discard it.",
-      affect: ({ next, context, mutator }) => {
-        if (next.getChips({ cardIds: [context.cardId] }).length < 1) {
-          mutator.moveCard({
-            id: context.cardId,
-            location: { type: "inDiscard" },
-          });
-        }
-      },
-    },
-  },
-];
+} as const satisfies CardMap;

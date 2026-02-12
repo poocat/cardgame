@@ -1,6 +1,6 @@
-import { ActivityTypeMap } from "@server/types";
+import type { IAccessor, IMutator } from "@server/game/types";
+import type { ActivityTypeMap } from "@server/types";
 import { cardTypeTriggeredEffects } from "./cardTriggers";
-import { IAccessor, IMutator } from "@server/game/types";
 
 /******************************************************************************
  * ## Activity Type Triggers
@@ -35,7 +35,9 @@ export const activityTypeTriggeredEffects: ActivityTypeMap<
         locationTypes: ["inPlay"],
         exhausted: true,
       })
-      .forEach((c) => mutator.exhaustCard({ id: c.id, value: false }));
+      .forEach((c) => {
+        mutator.exhaustCard({ id: c.id, value: false });
+      });
   },
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -55,13 +57,13 @@ export const activityTypeTriggeredEffects: ActivityTypeMap<
   takingAction: ({ current, next, mutator }) => {
     const cardsInPlay = current.getCards({ locationTypes: ["inPlay"] });
     // Trigger effects based on card type.
-    cardsInPlay.forEach((cardData) =>
+    cardsInPlay.forEach((cardData) => {
       cardTypeTriggeredEffects[cardData.type]({
         cardData,
         accessor: next,
         mutator,
-      }),
-    );
+      });
+    });
     // Clean up any chips that are located on cards that are no longer in play.
     const cardsInPlayIds = cardsInPlay.map((c) => c.id);
     const strayChipIds = current.chips
