@@ -126,17 +126,6 @@ export const testCards = {
     },
   },
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * A consumer with a "play" action that does not result in any chips being
-   * moved onto it, which should result in the immediate "death" of the card.
-   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  stillbornConsumer: {
-    name: "Stillborn Consumer",
-    type: "consumer",
-    actions: {
-      play: {},
-    },
-  },
-  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * A producer with an ability that moves chips from reserve to the card.
    * Tests: ability with optional chip choice (min=0, max=1).
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -152,7 +141,8 @@ export const testCards = {
             {
               type: "chipId",
               name: "targetChips",
-              instructions: "Move up to one chip from your reserve to this card.",
+              instructions:
+                "Move up to one chip from your reserve to this card.",
               min: 0,
               max: 1,
               getValues: ({ accessor, context }) => {
@@ -367,7 +357,9 @@ export const testCards = {
                       locationTypes: ["inPlay"],
                       types: ["consumer"],
                     });
-                    return chipsInReserve.length > 0 && consumersInPlay.length > 0;
+                    return (
+                      chipsInReserve.length > 0 && consumersInPlay.length > 0
+                    );
                   })
                   .map((p) => p.id),
               getValues: ({ accessor, context }) => {
@@ -398,20 +390,22 @@ export const testCards = {
             },
           ],
           affect: ({ decisions, mutator }) => {
-            decisions.getPlayerIds({ name: "targetChip" }).forEach((playerId) => {
-              const chipIds = decisions.getValues({
-                name: "targetChip",
-                playerId,
-              });
-              decisions
-                .getValues({ name: "targetConsumer", playerId })
-                .forEach((cardId) => {
-                  mutator.moveChips({
-                    ids: chipIds,
-                    location: { type: "onCard", cardId: cardId },
-                  });
+            decisions
+              .getPlayerIds({ name: "targetChip" })
+              .forEach((playerId) => {
+                const chipIds = decisions.getValues({
+                  name: "targetChip",
+                  playerId,
                 });
-            });
+                decisions
+                  .getValues({ name: "targetConsumer", playerId })
+                  .forEach((cardId) => {
+                    mutator.moveChips({
+                      ids: chipIds,
+                      location: { type: "onCard", cardId: cardId },
+                    });
+                  });
+              });
           },
         },
       },

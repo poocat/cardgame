@@ -5,7 +5,7 @@
  *   const game = new GameBuilder()
  *     .addPlayer("alice")
  *     .addPlayer("bob")
- *     .addCard({ owner: "alice", name: "Example Producer", location: { type: "inHand" } })
+ *     .addCard({ owner: "alice", name: "...", location: { type: "inHand" } })
  *     .addChip({ owner: "alice", location: { type: "inReserve" } })
  *     .setActivity({ ... })
  *     .build();
@@ -73,7 +73,7 @@ export class GameBuilder {
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Add a player to the game.The given nickname can be used to refer to this
-   * player in sebsequent method calls.
+   * player in subsequent method calls.
    *
    * Also serves as the unique id of the player, and thus should be different
    * for different players.

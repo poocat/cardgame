@@ -10,10 +10,10 @@ Production readiness (backend):
 - [x] Enable linting and address warnings.
 - [x] Keep track of when a card arrived at its current location.
 - [x] Add win conditions.
+- [x] Add unit tests for gameplay mechanics.
 - [ ] Switch from "multi player choices" to "multi player sequences".
 - [ ] Write helpers for defining common actions for cards.
-- [ ] Write unit tests for game logic.
-- [ ] Write end-to-end tests for API.
+- [ ] Add unit tests for API.
 
 One day:
-- [ ] Set up messaging system that supports different languages.
+- [ ] Support different language translations of game instructions.
