@@ -2,7 +2,7 @@ import { CONSTANTS } from "@common/game/constants";
 import { CARDS, getCardDefinition } from "@server/game/cards/registry";
 import { logger } from "@server/logger";
 import type { ActionType, GameData } from "@server/types";
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 function makeId(): string {
   return randomUUID().toString();

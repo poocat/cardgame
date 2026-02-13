@@ -1,3 +1,8 @@
+/**
+ * A collection of cards defined solely for the purposes of testing various
+ * mechanics that could be implemented in the cards' actions.
+ */
+
 import type { CardDef } from "@server/game/types";
 
 type CardMap = { [key: string]: CardDef };

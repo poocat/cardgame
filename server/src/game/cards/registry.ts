@@ -1,3 +1,9 @@
+/**
+ * The global registry of cards that can be used in the game.
+ *
+ * Can be extended at runtime, for the purpose of testing.
+ */
+
 import type { ActionDef, CardDef } from "@server/game/types";
 import type { ActionType } from "@server/types";
 import { exampleConsumer } from "./definitions/exampleConsumer";
@@ -8,7 +14,7 @@ import { exampleProducerThatInvolvesAllPlayers } from "./definitions/exampleProd
 type CardMap = { [key: string]: CardDef };
 
 /******************************************************************************
- * The master list of cards defined for the game.
+ * The master set of cards defined for the game.
  ******************************************************************************/
 export const CARDS = {
   exampleConsumer,

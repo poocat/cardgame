@@ -1,5 +1,12 @@
 /**
- * Contains transformations of database models into "digests" that will
+ * Transformers modify data on their way into and out of the API layer.
+ *
+ * For instance:
+ * - Game data, which is relatively "flat", is transformed to a nested object
+ *   that more easily corresponds to how the game data is presented.
+ * - Private user ids need to be anonymized, to prevent cheating.
+ * - Anonymized ids need to be deanonymized before being passed to the state
+ *   machine.
  */
 
 import type {

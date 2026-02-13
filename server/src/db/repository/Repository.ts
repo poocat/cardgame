@@ -9,6 +9,12 @@ import type {
 import { makeChildLogger } from "@server/logger";
 import type { Collection, DeleteResult, UpdateResult } from "mongodb";
 
+/******************************************************************************
+ * ### Repository
+ *
+ * Provides CRUD operations on a MongoDB collection based on a particular
+ * schema for document metadata.
+ ******************************************************************************/
 export class Repository<TData> implements IRepository<TData> {
   queries: Queries<TData>;
   private logger;

@@ -35,7 +35,7 @@ There are different types of actions available on cards:
   - These actions can only be taken from cards in play.
   - Taking an ability action exhausts the card.
 
-# Dev
+## Development
 
 - Prerequisites:
   - Install Node (e.g. [download](https://nodejs.org/en/download/) an installer...)
@@ -52,7 +52,7 @@ There are different types of actions available on cards:
     ```
     npm install
     ```
-  - Run a monkey test on the state machine using js runtime (`/server`):
+  - Run tests (`/server`):
     ```
     npm run test
     ```
