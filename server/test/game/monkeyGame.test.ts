@@ -1,3 +1,10 @@
+/**
+ * A stress-test of the game and the cards intended for production.
+ *
+ * Sets up a game, and randomly selects values for each choice, until the given
+ * number of choices is met, or an error occurs.
+ */
+
 import { CONSTANTS } from "@common/game/constants";
 import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
@@ -28,10 +35,12 @@ function seededShuffle<T>(array: T[], rng: () => number): T[] {
   return copy;
 }
 
-// =============================================================================
-// Invariant Checks
-// =============================================================================
-
+/******************************************************************************
+ * ### assertInvariants
+ *
+ * Check invariant aspects of a game, such as the total number of chips per
+ * player, the locations of cards and chips, the feasibility of the choice.
+ ******************************************************************************/
 function assertInvariants(gameData: GameData, label: string) {
   // 1. Total chip count is conserved
   const expectedChipCount =

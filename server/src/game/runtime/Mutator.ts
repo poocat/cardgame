@@ -4,7 +4,7 @@ import type { GameData } from "@server/types";
 /******************************************************************************
  * ### Mutator
  *
- * Use to mutate the game data passed to the constructor.
+ * Use to mutate the game data passed to the constructor in place.
  ******************************************************************************/
 export class Mutator implements IMutator {
   private gameData: GameData;

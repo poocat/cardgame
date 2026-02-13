@@ -11,7 +11,9 @@ import { logger } from "@server/logger";
 import type { Decision, GameData } from "@server/types";
 
 /******************************************************************************
- * ### Main Game "Loop"
+ * ### makeDecision
+ *
+ * Comprises the main Game "Loop".
  *
  * At all times the game is waiting for a single player to make a "choice" for
  * the current "activity".

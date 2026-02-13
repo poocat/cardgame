@@ -1,6 +1,4 @@
 /**
- * ## Transitions
- *
  * All rules that manage state transitions between activities.
  */
 

@@ -17,8 +17,8 @@ import type {
  * The accessor is a read-only version of the given game data, which does not
  * include the current activity.
  *
- * Includes a number of concise "getter" methods ease the definition of rules
- * and cards.
+ * Includes a number of "getter" methods used across the state machine and card
+ * definitions to find and filter entities within the given game data.
  ******************************************************************************/
 export class Accessor implements IAccessor {
   private gameData: DeepReadonly<GameData>;
