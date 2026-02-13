@@ -1,5 +1,5 @@
-import { CardData, CardTypeMap } from "@server/types";
-import { IAccessor, IMutator } from "@server/game/types";
+import type { IAccessor, IMutator } from "@server/game/types";
+import type { CardData, CardTypeMap } from "@server/types";
 
 /******************************************************************************
  * ### Card Type Triggers

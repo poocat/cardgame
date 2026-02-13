@@ -1,9 +1,7 @@
-import { IQueries, OrderByMeta } from "@server/db/types";
-import { Document, Sort } from "mongodb";
+import type { IQueries, OrderByMeta } from "@server/db/types";
+import type { Document, Sort } from "mongodb";
 
 export class Queries<TData = unknown> implements IQueries<TData> {
-  constructor() {}
-
   private metaOnlyProjection: Document = {
     meta: true,
     _id: false,

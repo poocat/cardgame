@@ -1,5 +1,5 @@
-import { ActionTypeMap } from "@server/types";
-import { ActionContext, IMutator } from "@server/game/types";
+import type { ActionContext, IMutator } from "@server/game/types";
+import type { ActionTypeMap } from "@server/types";
 
 /******************************************************************************
  * ### Action Effects
