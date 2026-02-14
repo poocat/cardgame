@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  /***************************************************************************
+    Reset & Base
+  ***************************************************************************/
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /***************************************************************************
+    Design Tokens
+  ***************************************************************************/
+
+  :root {
+    /* Colors */
+    --color-white: #ffffee;
+    --color-white-translucent: #ffffeebb;
+    --color-black: #222222;
+    --color-night: #444488;
+    --color-chip: #ffff00;
+    --color-chip-selected: #ffff0077;
+
+    /* Player colors */
+    --color-player-red: #ff8888;
+    --color-player-yellow: #ffff88;
+    --color-player-green: #71d989;
+    --color-player-blue: #8888ff;
+
+    /* Spacing */
+    --space-xs: 2px;
+    --space-sm: 5px;
+    --space-md: 15px;
+    --space-lg: 18px;
+
+    /* Card dimensions (5:7 aspect ratio) */
+    --card-width: 60px;
+    --card-height: 84px;
+    --card-width-lg: 250px;
+    --card-height-lg: 350px;
+
+    /* Chip dimensions */
+    --chip-size: 20px;
+
+    /* Typography */
+    --font-family: "Rockwell", serif;
+    --font-size-sm: 10px;
+    --font-size-md: 14px;
+  }
+
+  body {
+    width: 100%;
+    background: var(--color-white);
+    font-family: var(--font-family);
+    color: var(--color-black);
+  }
+
+  /***************************************************************************
+    Layout: View
+  ***************************************************************************/
+
+  .view {
+    width: 1000px;
+    min-width: 1000px;
+    height: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+  }
+
+  .background {
+    position: absolute;
+    top: 0;
+    z-index: -1;
+  }
+
+  .foreground {
+    position: relative;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  /*
+    The "window" is the dark area in the middle where consumer cards appear.
+  */
+  .background-window {
+    position: relative;
+    top: 50px;
+    width: 350px;
+    height: 1200px;
+    background: var(--color-night);
+    outline: 4px double var(--color-black);
+    border-radius: 175px 175px 0 0 / 150px 150px 0 0;
+  }
+
+  .header-spacer {
+    position: relative;
+    height: 200px;
+  }
+
+  /***************************************************************************
+    Layout: Player Area
+  ***************************************************************************/
+
+  /*
+    The player-area spans the full width. It can be oriented left or right,
+    which determines which side the player-tablet appears on.
+  */
+  .player-area {
+    width: 100%;
+    height: 250px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  /* Left/right orientation */
+  .player-area--left {
+    text-align: left;
+    flex-direction: row;
+  }
+
+  .player-area--right {
+    text-align: right;
+    flex-direction: row-reverse;
+  }
+
+  /***************************************************************************
+    Layout: Player Tablet
+  ***************************************************************************/
+
+  /*
+    The player-tablet displays player info and their in-play relic cards,
+    on a colored background.
+  */
+  .player-tablet {
+    width: 35%;
+    height: 100%;
+    border: 4px double var(--color-black);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* Player color variants */
+  .player-tablet--red    { background: var(--color-player-red); }
+  .player-tablet--yellow { background: var(--color-player-yellow); }
+  .player-tablet--green  { background: var(--color-player-green); }
+  .player-tablet--blue   { background: var(--color-player-blue); }
+
+  .player-tablet__header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .player-tablet__footer {
+    width: 100%;
+    display: flex;
+  }
+
+  .player-tablet__name {
+    font-size: var(--font-size-md);
+  }
+
+  /* Flex direction for tablet internals based on player orientation */
+  .player-area--left .player-tablet__header,
+  .player-area--left .tablet-card-area {
+    flex-direction: row;
+  }
+
+  .player-area--right .player-tablet__header,
+  .player-area--right .tablet-card-area {
+    flex-direction: row-reverse;
+  }
+
+  /*
+    The tablet-card-area holds the player's in-play relic cards (up to 3).
+  */
+  .tablet-card-area {
+    width: 200px;
+    display: flex;
+  }
+
+  /***************************************************************************
+    Layout: Play Area
+  ***************************************************************************/
+
+  /*
+    The play-area is the central column where consumer cards are displayed.
+  */
+  .play-area {
+    width: 30%;
+    height: 100%;
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .play-area__cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  /* Flex direction for play area based on player orientation */
+  .player-area--left .play-area__cards {
+    flex-direction: row;
+  }
+
+  .player-area--right .play-area__cards {
+    flex-direction: row-reverse;
+  }
+
+  /***************************************************************************
+    Layout: Hand Area
+  ***************************************************************************/
+
+  /*
+    The hand area is below the tablet area. Kind of weird because it attaches
+    to the outside of the "player area".
+  */
+  .player-area .player-hand-container {
+    width: 300px;
+    height: 200px;
+    position: relative;
+    top: 100%;
+    padding: var(--space-sm);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .player-area--right .player-hand-container {
+    margin-left: -300px;
+    flex-direction: row-reverse;
+  }
+  
+  .player-area--left .player-hand-container {
+    margin-right: -300px;
+    flex-direction: row;
+  }
+
+  /***************************************************************************
+    Component: Chip Area
+  ***************************************************************************/
+
+  .chip-area-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Alignment based on player orientation */
+  .player-area--left .chip-area-container {
+    align-items: flex-start;
+  }
+
+  .player-area--right .chip-area-container {
+    align-items: flex-end;
+  }
+
+  .player-area--right .chip-area {
+    flex-direction: row-reverse;
+  }
+
+  .chip-area__label {
+    font-size: var(--font-size-sm);
+  }
+
+  /* Play area variant: light text */
+  .play-area .chip-area__label {
+    color: var(--color-white-translucent);
+  }
+
+  .chip-area {
+    width: 70px;
+    height: 30px;
+    padding: var(--space-sm);
+    border: 2px double var(--color-black);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Expanded width when selector buttons are shown */
+  .chip-area--with-selector {
+    width: 100%;
+  }
+
+  /* Play area variant: light border */
+  .play-area .chip-area {
+    border-color: var(--color-white-translucent);
+  }
+
+  .chip-area__counter {
+    display: flex;                                                                                                                                                                                           
+    align-items: center; 
+  }
+
+  .player-area--right .chip-area__counter {
+    flex-direction: row-reverse;
+  }
+
+  .chip-area__selector {
+    display: flex;
+    flex-direction: row; /* Always left-to-right, regardless of player orientation */
+  }
+
+  /***************************************************************************
+    Component: Chip Icon
+  ***************************************************************************/
+
+  .chip-icon {
+    width: var(--chip-size);
+    height: var(--chip-size);
+    margin-left: 1px;
+    background-color: var(--color-chip);
+    border: 1px solid var(--color-black);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+    padding-top: 3px; /* Optical alignment for text */
+  }
+
+  /* Variant of a chip, used to indicate how many chips have been selected from the given pool. */
+  .chip-icon.selected {
+    background-color: var(--color-chip-selected);
+  }
+
+  /***************************************************************************
+    Component: Arrow Icon
+  ***************************************************************************/
+
+  /*
+    A simple CSS arrow used to indicate direction of chip movement.
+    Faces right for left-side players, left for right-side players.
+  */
+  .arrow-icon {
+    width: 0;
+    height: 0;
+    margin: 0 var(--space-sm);
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+
+  .player-area--left .arrow-icon {
+    border-left: 6px solid var(--color-black);
+    border-right: none;
+  }
+
+  .player-area--right .arrow-icon {
+    border-right: 6px solid var(--color-black);
+    border-left: none;
+  }
+
+  /* Light variant for play area */
+  .play-area .arrow-icon {
+    border-left-color: var(--color-white-translucent);
+    border-right-color: var(--color-white-translucent);
+  }
+
+  /***************************************************************************
+    Component: Card
+  ***************************************************************************/
+
+  .card {
+    width: var(--card-width);
+    height: var(--card-width);
+    margin: var(--space-xs);
+    border: 1px solid;
+    border-radius: 2px;
+    padding: var(--space-xs);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    /* Default */
+    border-color: var(--color-black);
+    color: var(--color-black);
+  }
+
+  /* Producer cards always have a dark background. */
+  .card.producer {
+    background-color: var(--color-white);
+  }
+
+  /* Consumer cards always have a light background. */
+  .card.consumer {
+    background-color: var(--color-night);
+  }
+
+  .play-area .card {
+    border-color: var(--color-white-translucent);
+    color: var(--color-white-translucent)
+  }
+
+  .card.placeholder {
+    background-color: var(--color-white);
+    border-color: var(--color-black);
+    color: var(--color-black);
+  }
+
+  .card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .consumer .card__image {
+    filter: invert(100%);
+  }
+
+  /***************************************************************************
+    Component: Card Dialog
+  ***************************************************************************/
+
+  /*
+    The card dialog is a modal that shows an expanded view of a card.
+  */
+  .card-dialog__backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    cursor: pointer;
+  }
+
+  .card-dialog__backdrop.is-open {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card-dialog__card {
+    width: var(--card-width-lg);
+    height: var(--card-height-lg);
+    border-radius: 12px;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Tablet variant: light background */
+  .card-dialog__card--producer {
+    background: var(--color-white);
+    border: 3px solid var(--color-black);
+  }
+
+  /* Play variant: dark background */
+  .card-dialog__card--consumer {
+    background: var(--color-night);
+    border: 2px solid var(--color-white);
+  }
+
+  .card-dialog__card--consumer .card__image {
+    filter: invert(100%);
+  }
+
+  .card-dialog__card .card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 9px;
+  }
+
+</style>
+</head>
+<body>
+  <div class="view">
+    <div class="background">
+      <div class="background-window"></div>
+    </div>
+    <div class="foreground">
+      <div class="header-spacer"></div>
+
+      <!-- Player 1 -->
+      <div class="player-area player-area--left">
+        <div class="player-hand-container">
+          <div class="card">
+            <div>Hand</div>
+            <div>3</div>
+          </div>
+        </div>
+        <div class="player-tablet player-tablet--red">
+          <div class="player-tablet__header">
+            <span class="player-tablet__name">Alice</span>
+            <div class="tablet-card-area">
+              <div class="card producer">
+                <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+              </div>
+              <div class="card placeholder"></div>
+              <div class="card placeholder"></div>
+            </div>
+          </div>
+          <div class="player-tablet__footer">
+            <div class="chip-area-container">
+              <div class="chip-area__label">In Reserve</div>
+              <div class="chip-area chip-area--with-selector">
+                <div class="chip-area__counter">
+                  <div class="chip-icon">7</div>
+                  <div class="arrow-icon"></div>
+                  <div class="chip-icon selected">3</div>
+                  <div class="chip-icon selected">2</div>
+                </div>
+                <div class="chip-area__selector">
+                  <div class="chip-icon">-</div>
+                  <div class="chip-icon">+</div>
+                  <div class="chip-icon">ok</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="play-area">
+          <div class="play-area__cards">
+            <div class="card consumer">
+              <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+            </div>
+          </div>
+          <div class="chip-area-container">
+            <div class="chip-area__label">In Transit</div>
+            <div class="chip-area">
+              <div class="chip-area__counter">
+                <div class="chip-icon">7</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player 2 -->
+      <div class="player-area player-area--right">
+        <div class="player-hand-container">
+          <div class="card">
+            <div>Hand</div>
+            <div>3</div>
+          </div>
+        </div>
+        <div class="player-tablet player-tablet--yellow">
+          <div class="player-tablet__header">
+            <span class="player-tablet__name">Bob</span>
+            <div class="tablet-card-area">
+              <div class="card producer">
+                <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+              </div>
+              <div class="card producer">
+                <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+              </div>
+              <div class="card placeholder"></div>
+            </div>
+          </div>
+          <div class="player-tablet__footer">
+            <div class="chip-area-container">
+              <div class="chip-area__label">In Reserve</div>
+              <div class="chip-area">
+                <div class="chip-area__counter">
+                  <div class="chip-icon">7</div>
+                  <div class="arrow-icon"></div>
+                  <div class="chip-icon selected">1</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="play-area">
+          <div class="play-area__cards">
+            <div class="card consumer">
+              <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+            </div>
+          </div>
+          <div class="chip-area-container">
+            <div class="chip-area__label">In Transit</div>
+            <div class="chip-area chip-area--with-selector">
+              <div class="chip-area__counter">
+                <div class="chip-icon">8</div>
+                <div class="arrow-icon"></div>
+                <div class="chip-icon selected">1</div>
+              </div>
+              <div class="chip-area__selector">
+                <div class="chip-icon">-</div>
+                <div class="chip-icon">+</div>
+                <div class="chip-icon">ok</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player 3 -->
+      <div class="player-area player-area--left">
+        <div class="player-hand-container">
+          <div class="card producer">
+            <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+          </div>
+          <div class="card consumer">
+            <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+          </div>
+          <div class="card consumer">
+            <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+          </div>
+          <div class="card consumer">
+            <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+          </div>
+          <div class="card consumer">
+            <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+          </div>
+          <div class="card producer">
+            <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+          </div>
+        </div>
+        <div class="player-tablet player-tablet--green">
+          <div class="player-tablet__header">
+            <span class="player-tablet__name">Charlie</span>
+            <div class="tablet-card-area">
+              <div class="card producer">
+                <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+              </div>
+              <div class="card producer">
+                <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+              </div>
+              <div class="card placeholder"></div>
+            </div>
+          </div>
+          <div class="player-tablet__footer">
+            <div class="chip-area-container">
+              <div class="chip-area__label">In Reserve</div>
+              <div class="chip-area">
+                <div class="chip-area__counter">
+                  <div class="chip-icon">7</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="play-area">
+          <div class="play-area__cards">
+            <div class="card consumer">
+              <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+            </div>
+            <div class="card consumer">
+              <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+            </div>
+            <div class="card consumer">
+              <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+            </div>
+            <div class="card consumer">
+              <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+            </div>
+            <div class="card consumer">
+              <img src="./images/card-frame-thumbnail.svg" class="card__image" />
+            </div>
+          </div>
+          <div class="chip-area-container">
+            <div class="chip-area__label">In Transit</div>
+            <div class="chip-area chip-area--with-selector">
+              <div class="chip-area__counter">
+                <div class="chip-icon">8</div>
+              </div>
+              <div class="chip-area__selector">
+                <div class="chip-icon">-</div>
+                <div class="chip-icon">+</div>
+                <div class="chip-icon">ok</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Dialog -->
+  <div class="card-dialog__backdrop" id="cardDialogBackdrop">
+    <div class="card-dialog__card" id="cardDialog">
+      <img src="./images/card-frame-windowed.svg" class="card__image" />
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const backdrop = document.getElementById('cardDialogBackdrop');
+      const dialog = document.getElementById('cardDialog');
+      document.querySelectorAll('.card.producer').forEach(card => {
+        card.addEventListener('click', () => {
+          dialog.classList.remove('card-dialog__card--producer', 'card-dialog__card--consumer');
+          dialog.classList.add('card-dialog__card--producer');
+          backdrop.classList.add('is-open');
+        });
+      });
+      document.querySelectorAll('.card.consumer').forEach(card => {
+        card.addEventListener('click', () => {
+          dialog.classList.remove('card-dialog__card--producer', 'card-dialog__card--consumer');
+          dialog.classList.add('card-dialog__card--consumer');
+          backdrop.classList.add('is-open');
+        });
+      });
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) {
+          backdrop.classList.remove('is-open');
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          backdrop.classList.remove('is-open');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
