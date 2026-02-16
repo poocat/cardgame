@@ -1,0 +1,28 @@
+import type { Border, Color, Size, Spacing } from "./types";
+
+type Orientation = "horizontal" | "vertical";
+
+export const Stack = (props: {
+  orientation: Orientation;
+  spacing: Spacing;
+  children: React.ReactNode;
+}) => {
+  const className = `stack stack--spacing-${props.spacing} stack--orient-${props.orientation}`;
+  return <div className={className}>{props.children}</div>;
+};
+
+export const Box = (props: {
+  spacing?: Spacing;
+  color?: Color;
+  size?: Size;
+  border?: Border;
+  children: React.ReactNode;
+}) => {
+  const classNames = ["box"];
+  if (props.spacing) classNames.push(`box--spacing-${props.spacing}`);
+  if (props.color) classNames.push(`box--col-${props.color}`);
+  if (props.border) classNames.push(`box--border-${props.border}`);
+  if (props.size) classNames.push(`box--size-${props.size}`);
+  const className = classNames.join(" ");
+  return <div className={className}>{props.children}</div>;
+};

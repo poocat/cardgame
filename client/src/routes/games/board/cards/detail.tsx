@@ -1,5 +1,4 @@
 import { SelectButton } from "@client/components";
-import { colors } from "../palette";
 import {
   detailCardFooterHeight,
   detailCardHeight,
@@ -74,14 +73,13 @@ export const CardDetailAction = (props: {
 
   return (
     <SelectButton
+      fullWidth
       selected={selected}
       onClick={onChange}
-      fontSize={16}
-      color={colors.actions}
+      size="md"
+      color="action"
       disabled={disabled}
       label={label}
-      fullWidth
-      minHeight={50}
     />
   );
 };

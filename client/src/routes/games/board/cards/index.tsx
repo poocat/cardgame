@@ -46,7 +46,6 @@ import {
   ThumbnailChipCounter,
   useChipSelector,
 } from "../chips";
-import { colors } from "../palette";
 import type {
   ChipDigest,
   ChoiceProps,
@@ -333,12 +332,7 @@ export const DetailCard = (props: {
             />
           )}
           {cardHasSelectableActions && !submitDisabled && (
-            <Button
-              onClick={props.onSubmitChoice}
-              color={colors.actions}
-              height={50}
-              fontSize={20}
-            >
+            <Button rounded onClick={props.onSubmitChoice} color="action">
               ✓
             </Button>
           )}

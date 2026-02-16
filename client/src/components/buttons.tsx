@@ -1,18 +1,10 @@
-import type { Color } from "@client/utils/colors";
-import type { CSSProperties } from "react";
-
-const buttonBaseStyleProps: CSSProperties = {
-  font: "inherit",
-  color: "inherit",
-  border: "none",
-  backgroundColor: "transparent",
-  padding: 0,
-};
+import "./styles.css";
+import type { Border, Color, Size } from "./types";
 
 /******************************************************************************
  * ### ButtonBase
  *
- * Common styling (or lack of styling) for buttons and button-like elements.
+ * Reset styles for buttons. Use as a wrapper for custom button content.
  ******************************************************************************/
 export const ButtonBase = (props: {
   children: React.ReactNode;
@@ -22,8 +14,8 @@ export const ButtonBase = (props: {
   return (
     <button
       type="button"
+      className="btn-base"
       disabled={!!props.disabled}
-      style={buttonBaseStyleProps}
       onClick={props.onClick}
     >
       {props.children}
@@ -33,82 +25,63 @@ export const ButtonBase = (props: {
 
 /******************************************************************************
  * ### Button
+ *
+ * Standard button with rounded ends and customizable appearance.
  ******************************************************************************/
 export const Button = (props: {
   onClick: () => void;
   children: React.ReactNode;
-  height: number;
-  fontSize: number;
-  color: Color;
+  size?: Size;
+  color?: Color;
+  border?: Border;
+  rounded?: boolean;
+  fullWidth?: boolean;
   disabled?: boolean;
-  horizontalPadding?: number;
 }) => {
-  const borderRadius = props.height / 2;
-  const styleProps: CSSProperties = {
-    height: props.height,
-    minWidth: props.height,
-    fontSize: props.fontSize,
-    backgroundColor: props.color.alpha(1),
-    alignItems: "center",
-    alignContent: "center",
-    justifyContent: "center",
-    textAlign: "center",
-    borderRadius: borderRadius,
-  };
-  if (props.disabled) {
-    styleProps.color = props.color.scale(0.75);
-  }
-  if (props.horizontalPadding) {
-    styleProps.paddingInline = props.horizontalPadding;
-  }
+  const classNames = ["btn"];
+  if (props.size) classNames.push(`btn--size-${props.size}`);
+  if (props.color) classNames.push(`btn--col-${props.color}`);
+  if (props.border) classNames.push(`btn--border-${props.border}`);
+  if (props.rounded) classNames.push(`btn--rounded`);
+  if (props.fullWidth) classNames.push(`btn--fullwidth`);
+  const className = classNames.join(" ");
+
   return (
     <ButtonBase onClick={props.onClick} disabled={!!props.disabled}>
-      <div style={styleProps}>{props.children}</div>
+      <div className={className}>{props.children}</div>
     </ButtonBase>
   );
 };
 
 /******************************************************************************
- * ### ToggleButton
+ * ### SelectButton
+ *
+ * Toggle button with checkbox symbol for selection states.
  ******************************************************************************/
 export const SelectButton = (props: {
   selected: boolean;
   onClick: () => void;
   label: string;
-  minHeight: number;
-  fontSize: number;
-  color: Color;
-  disabled?: boolean;
+  size?: Size;
+  color?: Color;
+  border?: Border;
+  rounded?: boolean;
   fullWidth?: boolean;
-  horizontalPadding?: number;
+  disabled?: boolean;
 }) => {
-  const borderRadius = props.minHeight / 2;
   const symbol = props.selected ? "☑" : "☐";
-  const styleProps: CSSProperties = {
-    minHeight: props.minHeight,
-    minWidth: props.minHeight,
-    fontSize: props.fontSize,
-    backgroundColor: props.color.alpha(1),
-    alignItems: "center",
-    alignContent: "center",
-    justifyContent: "center",
-    textAlign: "center",
-    borderRadius: borderRadius,
-    clipPath: "circle(80%)",
-    paddingInline: 10,
-  };
-  if (props.disabled) {
-    styleProps.color = props.color.scale(0.75);
-  }
-  if (props.horizontalPadding) {
-    styleProps.paddingInline = props.horizontalPadding;
-  }
+  const classNames = ["select-btn"];
+  if (props.size) classNames.push(`select-btn--size-${props.size}`);
+  if (props.color) classNames.push(`select-btn--col-${props.color}`);
+  if (props.border) classNames.push(`select-btn--border-${props.border}`);
+  if (props.rounded) classNames.push(`select-btn--rounded`);
+  if (props.fullWidth) classNames.push(`btn--fullwidth`);
+  const className = classNames.join(" ");
+
   return (
     <ButtonBase onClick={props.onClick} disabled={!!props.disabled}>
-      <div style={styleProps}>
-        <div>
-          {symbol} {props.label}
-        </div>
+      <div className={className}>
+        {symbol} {props.label}
       </div>
     </ButtonBase>
   );

@@ -1,0 +1,78 @@
+/***************************************************************************
+  Reset
+
+  Minimal reset for consistent cross-browser defaults.
+***************************************************************************/
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/***************************************************************************
+  Design Tokens
+
+  These variables define the visual language of the app.
+  Use them everywhere to maintain consistency.
+***************************************************************************/
+
+:root {
+  /* Colors: Core */
+  --color-white: #ffffee;
+  --color-white-translucent: #ffffeebb;
+  --color-brown: #ddccbb;
+  --color-black: #222222;
+  --color-night: #444488;
+
+  /* Colors: Chips */
+  --color-chip: #ffff00;
+  --color-chip-selected: #ffff0077;
+
+  /* Colors: Players */
+  --color-player-red: #ff8888;
+  --color-player-yellow: #ffff88;
+  --color-player-green: #71d989;
+  --color-player-blue: #8888ff;
+
+  /* Spacing */
+  --space-xs: 2px;
+  --space-sm: 5px;
+  --space-md: 15px;
+  --space-lg: 18px;
+
+  /* Sizing */
+  --control-size-sm: 25px;
+  --control-size-md: 45px;
+  --control-size-lg: 75px;
+
+  /* Card Dimensions */
+  --card-width: 60px;
+  --card-height: 60px;
+  --card-width-lg: 250px;
+  --card-height-lg: 350px;
+
+  /* Chip Dimensions */
+  --chip-size: 20px;
+
+  /* Typography */
+  --font-family: "Rockwell", serif;
+  --font-size-sm: 10px;
+  --font-size-md: 16px;
+  --font-size-lg: 24px;
+}
+
+/***************************************************************************
+  Base Styles
+
+  Default styles applied to the document.
+***************************************************************************/
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  color: var(--color-black);
+  background: var(--color-white);
+}

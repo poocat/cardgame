@@ -1,4 +1,5 @@
 import { Button, Dialog, SelectButton } from "@client/components";
+import type { Color } from "@client/components/types";
 import { memo, useCallback, useMemo } from "react";
 import { DetailCard, FaceUpThumbnailCard } from "./cards";
 import { ChipSelectMenu, DetailChipCounter, useChipSelector } from "./chips";
@@ -228,28 +229,28 @@ const GameBoardChoiceMenuValueSelect = (
     props.toggleValue(props.value);
   }, [props.toggleValue, props.value]);
 
-  let color = colors.board;
+  let color: Color = "primary";
   switch (props.choiceType) {
     case "actionId":
-      color = colors.actions;
+      color = "action";
       break;
     case "cardId":
-      color = colors.cards;
+      color = "card";
       break;
     case "chipId":
-      color = colors.chips;
+      color = "chip";
       break;
   }
 
   return (
     <SelectButton
+      size="md"
+      border="dark"
+      color={color}
       label={props.label}
       disabled={props.disabled}
       selected={props.selected}
       onClick={toggle}
-      minHeight={30}
-      fontSize={12}
-      color={color}
     />
   );
 };
@@ -297,10 +298,9 @@ const GameBoardChoiceMenu = memo(
           <div>{props.instructions}</div>
           <div>
             <Button
-              height={40}
-              fontSize={16}
-              horizontalPadding={10}
-              color={colors.board}
+              border="dark"
+              color="secondary"
+              size="md"
               disabled={props.submitDisabled}
               onClick={props.onSubmitChoice}
             >

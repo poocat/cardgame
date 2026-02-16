@@ -214,32 +214,33 @@ export const ChipSelectMenu = (props: {
   disableIncrement?: boolean;
   disableSubmit?: boolean;
 }) => {
-  const commonProps = {
-    height: 46,
-    fontSize: 20,
-    color: colors.chips,
-  };
   return (
     <div style={{ display: "flex", flexDirection: "row", gap: 3 }}>
       <Button
+        rounded
+        color="chip"
+        size="md"
         disabled={props.numSelected < 1}
         onClick={props.onDecrement}
-        {...commonProps}
       >
         -
       </Button>
       <Button
+        rounded
+        color="chip"
+        size="md"
         disabled={!!props.disableIncrement}
         onClick={props.onIncrement}
-        {...commonProps}
       >
         +
       </Button>
       {props.onSubmit && (
         <Button
+          rounded
+          color="chip"
+          size="md"
           disabled={!!props.disableSubmit}
           onClick={props.onSubmit}
-          {...commonProps}
         >
           ✓
         </Button>
