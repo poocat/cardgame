@@ -117,16 +117,19 @@
 .game-chip--size-sm {
   width: var(--control-size-sm);
   height: var(--control-size-sm);
+  font-size: var(--font-size-sm);
 }
 
 .game-chip--size-md {
   width: var(--control-size-md);
   height: var(--control-size-md);
+  font-size: var(--font-size-md);
 }
 
 .game-chip--size-lg {
   width: var(--control-size-lg);
   height: var(--control-size-lg);
+  font-size: var(--font-size-lg);
 }
 
 /***************************************************************************
