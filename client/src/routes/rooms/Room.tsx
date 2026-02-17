@@ -1,3 +1,5 @@
+import { Button, Input } from "@client/components";
+import { Box, Stack } from "@client/components/layout";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -56,10 +58,10 @@ export const Room = () => {
   useEffect(() => {
     if (gameId) {
       let gameUrl = `/games/${gameId}`;
-      if (playerId) gameUrl = gameUrl + `?` + new URLSearchParams({ playerId });
+      if (playerId) gameUrl = `${gameUrl}?${new URLSearchParams({ playerId })}`;
       navigate(gameUrl);
     }
-  }, [gameId]);
+  }, [gameId, navigate, playerId]);
 
   const submitGuestDisabled = playerIsHost || !guestName;
   const handleSubmitGuest = useCallback(async () => {
@@ -84,7 +86,7 @@ export const Room = () => {
     } catch (error) {
       console.error(error);
     }
-  }, [url, guestName, submitGuestDisabled]);
+  }, [url, guestName, setQuery, submitGuestDisabled]);
 
   const startGameDisabled = !playerIsHost || !roomId;
   const handleStartGame = useCallback(async () => {
@@ -112,57 +114,82 @@ export const Room = () => {
   }, [startGameDisabled, roomId, playerId]);
 
   return (
-    <div>
-      <div>
-        Share: <Link to={location.pathname}>{location.pathname}</Link>
-      </div>
-      {poller.polling ? (
-        <div>Polled {poller.pollCount} times..</div>
-      ) : (
-        <div>Not polling... {poller.error && `(${poller.error})`}</div>
-      )}
-      {poller.data && (
-        <div>
-          <hr />
-          <div>Host: {poller.data.digest.host.name}</div>
-          <div>
-            Guests:{" "}
-            {poller.data.digest.guests.map((guest) => guest.name).join(", ")}
-          </div>
-        </div>
-      )}
-      {playerIsHost && (
-        <div>
-          <div>
-            <button
-              type="button"
-              disabled={startGameDisabled}
-              onClick={handleStartGame}
-            >
-              Start game
-            </button>
-          </div>
-        </div>
-      )}
-      {!playerId && (
-        <div>
-          <div>
-            <input
-              value={guestName}
-              onChange={(e) => setGuestName(e.target.value)}
-            />
-          </div>
-          <div>
-            <button
-              type="button"
-              onClick={handleSubmitGuest}
-              disabled={playerIsHost || !guestName}
-            >
-              Join game
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    <Box spacing="lg">
+      <Stack orientation="vertical" spacing="lg">
+        {poller.polling ? (
+          <div>Polled {poller.pollCount} times..</div>
+        ) : (
+          <div>Not polling... {poller.error && `(${poller.error})`}</div>
+        )}
+        <Box border="dark" color="secondary" spacing="md">
+          <Stack orientation="vertical" spacing="sm">
+            <Box>
+              Share: <Link to={location.pathname}>{location.pathname}</Link>
+            </Box>
+            {playerIsHost && (
+              <Box>
+                (If playing against yourself, open the link in a new window, add
+                a player to the room, then return here to start the game.)
+              </Box>
+            )}
+          </Stack>
+        </Box>
+        <Box color="primary" spacing="md">
+          Players:
+          <Stack orientation="vertical" spacing="md">
+            {poller.data && (
+              <>
+                <Box border="dark" size="md" spacing="sm" color="secondary">
+                  Host: {poller.data.digest.host.name}
+                </Box>
+                {poller.data.digest.guests.map((guest) => (
+                  <Box
+                    border="dark"
+                    key={guest.id}
+                    spacing="sm"
+                    color="secondary"
+                    size="md"
+                  >
+                    Guest: {guest.name}
+                  </Box>
+                ))}
+              </>
+            )}
+            {/* If no player id, user has option to join the game. */}
+            {!playerId && (
+              <Box border="dark" size="md" spacing="md" color="secondary">
+                <Stack spacing="lg" orientation="horizontal">
+                  <Input
+                    size="md"
+                    placeholder="your name"
+                    value={guestName}
+                    onChange={(value) => setGuestName(value)}
+                  />
+                  <Button
+                    border="dark"
+                    color="primary"
+                    size="md"
+                    disabled={playerIsHost || !guestName}
+                    onClick={handleSubmitGuest}
+                  >
+                    Join Game
+                  </Button>
+                </Stack>
+              </Box>
+            )}
+          </Stack>
+        </Box>
+        {playerIsHost && (
+          <Button
+            border="dark"
+            color="chip"
+            size="lg"
+            onClick={handleStartGame}
+          >
+            Start Game
+          </Button>
+        )}
+      </Stack>
+    </Box>
   );
 };

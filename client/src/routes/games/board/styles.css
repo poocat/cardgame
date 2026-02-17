@@ -1,0 +1,332 @@
+.game {
+  --player-area-height: 250px;
+  --background-window-extra-height: 300px;
+}
+
+/***************************************************************************
+  Layout
+***************************************************************************/
+.game-container {
+  width: 1000px;
+  min-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+}
+
+.game-container--size-2 {
+  height: calc(var(--player-area-height) * 2);
+}
+
+.game-container--size-3 {
+  height: calc(var(--player-area-height) * 3);
+}
+
+.game-container--size-4 {
+  height: calc(var(--player-area-height) * 4);
+}
+
+.game-background {
+  position: absolute;
+  top: 0;
+  z-index: -1;
+}
+
+.game-foreground {
+  position: relative;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/*
+  The "window" is the dark area in the middle where consumer cards appear.
+*/
+.game-background-window {
+  position: relative;
+  top: 50px;
+  width: 350px;
+  background: var(--color-night);
+  outline: 4px double var(--color-black);
+  border-radius: 175px 175px 0 0 / 150px 150px 0 0;
+}
+
+.game-background-window--size-2 {
+  height: calc(var(--player-area-height) * 2 + var(--background-window-extra-height));
+}
+
+.game-background-window--size-3 {
+  height: calc(var(--player-area-height) * 3 + var(--background-window-extra-height));
+}
+
+.game-background-window--size-4 {
+  height: calc(var(--player-area-height) * 4 + var(--background-window-extra-height));
+}
+
+.game-header-spacer {
+  position: relative;
+  height: 200px;
+}
+
+/***************************************************************************
+  Player Area Layout
+***************************************************************************/
+/*
+  The player-area spans the full width. It can be oriented left or right,
+  which determines which side the player-tablet appears on.
+*/
+.game-player-area {
+  width: 100%;
+  height: var(--player-area-height);
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+/* Left/right orientation */
+.game-player-area--left {
+  text-align: left;
+  flex-direction: row;
+}
+
+.game-player-area--right {
+  text-align: right;
+  flex-direction: row-reverse;
+}
+
+/***************************************************************************
+  Tablet Layout
+***************************************************************************/
+.game-player-tablet {
+  width: 35%;
+  height: 100%;
+  border: 4px double var(--color-black);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.game-player-tablet--red    { background: var(--color-player-red); }
+.game-player-tablet--yellow { background: var(--color-player-yellow); }
+.game-player-tablet--green  { background: var(--color-player-green); }
+.game-player-tablet--blue   { background: var(--color-player-blue); }
+
+.game-player-tablet__header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.game-player-tablet__footer {
+  width: 100%;
+  display: flex;
+}
+
+.game-player-tablet__name {
+  font-size: var(--font-size-md);
+}
+
+/*
+  The tablet-card-area holds the player's in-play relic cards (up to 3).
+*/
+.game-player-tablet__card-area {
+  width: 200px;
+  display: flex;
+}
+
+/* Flex direction for tablet internals based on player orientation */
+.game-player-area--left .game-player-tablet__header,
+.game-player-area--left .game-player-tablet__footer,
+.game-player-area--left .game-player-tablet__card-area {
+  flex-direction: row;
+}
+
+.game-player-area--right .game-player-tablet__header,
+.game-player-area--right .game-player-tablet__footer,
+.game-player-area--right .game-player-tablet__card-area {
+  flex-direction: row-reverse;
+}
+
+/***************************************************************************
+  Central Area Layout
+***************************************************************************/
+.game-player-center {
+    width: 30%;
+    height: 100%;
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+.game-player-center__cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.game-player-area--left .game-player-center__cards {
+  flex-direction: row;
+}
+
+.game-player-area--right .game-player-center__cards {
+  flex-direction: row-reverse;
+}
+
+/***************************************************************************
+  Hand Layout
+***************************************************************************/
+.game-player-hand {
+  width: 300px;
+  height: 200px;
+  position: relative;
+  top: 100%;
+  padding: var(--space-sm);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: flex-start;
+  align-items: flex-start;
+}
+
+.game-player-area--right .game-player-hand {
+  margin-left: -300px;
+  flex-direction: row-reverse;
+}
+
+.game-player-area--left .game-player-hand {
+  margin-right: -300px;
+  flex-direction: row;
+}
+
+/***************************************************************************
+  Chip Layout
+***************************************************************************/
+.game-chip-area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Alignment based on player orientation */
+.game-player-area--left .game-chip-area {
+  align-items: flex-start;
+}
+
+.game-player-area--right .game-chip-area {
+  align-items: flex-end;
+}
+
+.game-chip-area__label {
+  font-size: var(--font-size-sm);
+}
+
+.game-player-center .game-chip-area__label {
+  color: var(--color-white-translucent);
+}
+
+.game-chip-display {
+  width: 70px;
+  height: 30px;
+  padding: var(--space-sm);
+  border: 2px double var(--color-black);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-player-center .game-chip-display {
+  border-color: var(--color-white-translucent);
+}
+
+.game-player-area--right .game-chip-display {
+  flex-direction: row-reverse;
+}
+
+/* Play area variant: light text */
+.game-player-center .game-chip-display__label {
+  color: var(--color-white-translucent);
+}
+
+/* Play area variant: light border */
+.game-player-center .chip-display {
+  border-color: var(--color-white-translucent);
+}
+
+/* Expanded width when selector buttons are shown */
+.game-chip-display--fullwidth {
+  width: 100%;
+}
+
+.game-chip-display__counter {
+  display: flex;                                                                                                                                                                                     
+  align-items: center;
+}
+
+.game-player-area--right .game-chip-display__counter {
+  flex-direction: row-reverse;
+}
+
+.game-chip-display__selector {
+  display: flex;
+  flex-direction: row; /* Always left-to-right, regardless of player orientation */
+}
+
+/***************************************************************************
+  Chip
+***************************************************************************/
+
+.game-chip {
+  width: var(--chip-size);
+  height: var(--chip-size);
+  margin-left: 1px;
+  background-color: var(--color-chip);
+  border: 1px solid var(--color-black);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  padding-top: 3px; /* Optical alignment for text */
+}
+
+/* Variant of a chip, used to indicate how many chips have been selected from the given pool. */
+.game-chip--selected {
+  background-color: var(--color-chip-selected);
+}
+
+/***************************************************************************
+  Arrow
+***************************************************************************/
+
+/*
+  A simple CSS arrow used to indicate direction of chip movement.
+  Faces right for left-side players, left for right-side players.
+*/
+.game-arrow {
+  width: 0;
+  height: 0;
+  margin: 0 var(--space-sm);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+.game-player-area--left .game-arrow {
+  border-left: 6px solid var(--color-black);
+  border-right: none;
+}
+
+.game-player-area--right .game-arrow {
+  border-right: 6px solid var(--color-black);
+  border-left: none;
+}
+
+/* Light variant for play area */
+.game-player-center .game-arrow {
+  border-left-color: var(--color-white-translucent);
+  border-right-color: var(--color-white-translucent);
+}

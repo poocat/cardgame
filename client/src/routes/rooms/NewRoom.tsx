@@ -1,3 +1,5 @@
+import { Button, Input } from "@client/components";
+import { Box, Stack } from "@client/components/layout";
 import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
 import { useNavigate } from "react-router";
@@ -32,15 +34,27 @@ export const NewRoom = () => {
   };
 
   return (
-    <div>
-      <div>
-        <input value={hostName} onChange={(e) => setHostName(e.target.value)} />
-      </div>
-      <div>
-        <button type="button" disabled={!hostName} onClick={handleSubmit}>
-          Open New Room
-        </button>
-      </div>
-    </div>
+    <Box spacing="lg">
+      <Stack spacing="lg" orientation="vertical">
+        <Box size="lg" border="dark" spacing="md" color="secondary">
+          <Stack spacing="lg" orientation="horizontal">
+            <Input
+              size="lg"
+              value={hostName}
+              placeholder="your name"
+              onChange={(value) => setHostName(value)}
+            />
+            <Button
+              color="primary"
+              size="lg"
+              disabled={!hostName}
+              onClick={handleSubmit}
+            >
+              Create Room
+            </Button>
+          </Stack>
+        </Box>
+      </Stack>
+    </Box>
   );
 };

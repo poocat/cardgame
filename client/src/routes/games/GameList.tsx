@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { z } from "zod";
 import { ROUTES } from "@common/api/routes";
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import type { z } from "zod";
 
 type GamesGetManyResponseBody = z.infer<
   typeof ROUTES.games.methods.getMany.schemas.responseBody
@@ -37,7 +37,7 @@ export const GameList = () => {
     <div>
       <div>Games:</div>
       {error && <div>{error}</div>}
-      {data?.games?.map((g: any) => (
+      {data?.games?.map((g) => (
         <div key={g.gameId}>
           <Link to={`/games/${g.gameId}`}>{g.gameId}</Link>
         </div>

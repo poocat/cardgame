@@ -1,6 +1,7 @@
 import { Button } from "@client/components";
 import { type CSSProperties, useCallback, useMemo } from "react";
 import { colors } from "../palette";
+import "../styles.css";
 import type { ChipDigest, SelectorProps } from "../types";
 
 const thumbnailChipRadius = 9;
