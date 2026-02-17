@@ -1,3 +1,4 @@
+import { Box } from "@client/components/layout";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
 import { useCallback, useMemo } from "react";
@@ -107,15 +108,12 @@ export const Game = () => {
   ]);
 
   return (
-    <div>
-      <hr />
-      <div style={{ padding: 5 }}>
-        {poller.polling ? (
-          <span>Polled {poller.pollCount} times..</span>
-        ) : (
-          <span>Not polling... {poller.error && `(${poller.error})`}</span>
-        )}
-      </div>
+    <Box spacing="lg">
+      {poller.polling ? (
+        <span>Polled {poller.pollCount} times..</span>
+      ) : (
+        <span>Not polling... {poller.error && `(${poller.error})`}</span>
+      )}
       {game && (
         <GameBoard
           game={game}
@@ -125,6 +123,6 @@ export const Game = () => {
           dialogProps={dialog}
         />
       )}
-    </div>
+    </Box>
   );
 };

@@ -1,15 +1,31 @@
 .game {
+  --total-width: 1000px;
+
   --player-area-height: 250px;
-  --background-window-extra-height: 300px;
-  --footer-menu-max-height: 300px;
+  --footer-menu-max-height: 200px;
+  
+  --tablet-width: 350px;
+  --tablet-card-area-width: 200px;
+
+  --hand-width: 300px;
+  --hand-height: 200px;
+
+  --bgwin-width: 350px;
+  --bgwin-hradius: calc(var(--bgwin-width) / 2);
+  --bgwin-vradius: 150px;
+  --bgwin-offset: 20px;
+
+  --vertical-padding-top: calc(var(--bgwin-offset) + var(--bgwin-vradius));
+  --total-vertical-padding: calc(var(--vertical-padding-top) + var(--hand-height) + var(--footer-menu-max-height))
 }
 
 /***************************************************************************
   Layout
 ***************************************************************************/
 .game-container {
-  width: 1000px;
-  min-width: 1000px;
+  position: relative;
+  width: var(--total-width);
+  min-width: var(--total-width);
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -17,21 +33,50 @@
 }
 
 .game-container--size-2 {
-  height: calc(var(--player-area-height) * 2);
+  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 2);
 }
 
 .game-container--size-3 {
-  height: calc(var(--player-area-height) * 3);
+  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 3);
 }
 
 .game-container--size-4 {
-  height: calc(var(--player-area-height) * 4);
+  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 4);
 }
 
-.game-background {
-  position: absolute;
-  top: 0;
+.game-background {                                                                                                                                                                                                
+  position: absolute;                                                                                                                                                                                             
+  top: 0;                                                                                                                                                                                                         
+  left: 0;                                                                                                                                                                                                        
+  right: 0;
+  display: flex;
+  justify-content: center;
   z-index: -1;
+  pointer-events: none;
+} 
+
+/*
+  The "window" is the dark area in the middle where consumer are played.
+*/
+.game-background-window {
+  position: relative;
+  top: var(--bgwin-offset);
+  width: var(--bgwin-width);
+  background: var(--color-night);
+  outline: 4px double var(--color-black);
+  border-radius: var(--bgwin-hradius) var(--bgwin-hradius) 0 0 / var(--bgwin-vradius) var(--bgwin-vradius) 0 0;
+}
+
+.game-background-window--size-2 {
+  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 2);
+}
+
+.game-background-window--size-3 {
+  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 3);
+}
+
+.game-background-window--size-4 {
+  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 4);
 }
 
 .game-foreground {
@@ -42,33 +87,9 @@
   z-index: 1;
 }
 
-/*
-  The "window" is the dark area in the middle where consumer cards appear.
-*/
-.game-background-window {
-  position: relative;
-  top: 50px;
-  width: 350px;
-  background: var(--color-night);
-  outline: 4px double var(--color-black);
-  border-radius: 175px 175px 0 0 / 150px 150px 0 0;
-}
-
-.game-background-window--size-2 {
-  height: calc(var(--player-area-height) * 2 + var(--background-window-extra-height));
-}
-
-.game-background-window--size-3 {
-  height: calc(var(--player-area-height) * 3 + var(--background-window-extra-height));
-}
-
-.game-background-window--size-4 {
-  height: calc(var(--player-area-height) * 4 + var(--background-window-extra-height));
-}
-
 .game-header-spacer {
   position: relative;
-  height: 200px;
+  height: var(--vertical-padding-top);
 }
 
 .game-footer-menu {
@@ -113,7 +134,7 @@
   Tablet Layout
 ***************************************************************************/
 .game-player-tablet {
-  width: 35%;
+  width: var(--tablet-width);
   height: 100%;
   border: 4px double var(--color-black);
   padding: var(--space-md);
@@ -146,7 +167,7 @@
   The tablet-card-area holds the player's in-play relic cards (up to 3).
 */
 .game-player-tablet__card-area {
-  width: 200px;
+  width: var(--tablet-card-area-width);
   display: flex;
 }
 
@@ -194,8 +215,8 @@
   Hand Layout
 ***************************************************************************/
 .game-player-hand {
-  width: 300px;
-  height: 200px;
+  width: var(--hand-width);
+  height: var(--hand-height);
   position: relative;
   top: 100%;
   padding: var(--space-sm);
@@ -207,7 +228,7 @@
 }
 
 .game-player-area--right .game-player-hand {
-  margin-left: -300px;
+  margin-left: calc(var(--hand-width) * -1);
   flex-direction: row-reverse;
 }
 
