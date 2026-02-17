@@ -3,9 +3,10 @@
 ***************************************************************************/
 
 .game-card-container {
-  padding: var(--space-xs);
+  /* Padding is necessary to ensure that the highlight is visible. */
+  padding: 3px;
   border-radius: 3px;
-  margin: var(--space-xs);
+  margin: 1px;
 }
 
 .game-card-container--selectable {
@@ -37,20 +38,25 @@
   justify-content: center;
   text-align: center;
   font-size: var(--font-size-xs);
-  cursor: pointer;
   /* Default */
   border-color: var(--color-black);
   color: var(--color-black);
 }
 
+.game-card--clickable {
+  cursor: pointer;
+}
+
 /* Producer cards always have a dark background. */
 .game-card--producer {
   background-color: var(--color-white);
+  color: var(--color-black);
 }
 
 /* Consumer cards always have a light background. */
 .game-card--consumer {
   background-color: var(--color-night);
+  color: var(--color-white-translucent)
 }
 
 .game-card--placeholder {
@@ -61,45 +67,32 @@
 
 .game-player-center .game-card {
   border-color: var(--color-white-translucent);
-  color: var(--color-white-translucent)
 }
 
-/* .card__image {
+.game-card__image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.consumer .card__image {
-  filter: invert(100%);
-} */
-
 /***************************************************************************
   Component: Card Dialog
 ***************************************************************************/
 
-/*
-  The card dialog is a modal that shows an expanded view of a card.
-*/
-.card-dialog__backdrop {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
+.game-dialog__card-container {
+  width: var(--card-width-lg);
+  height: calc(var(--card-height-lg) + 50px);
+}
+
+.game-dialog__card-menu {
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 1000;
-  cursor: pointer;
-}
-
-.card-dialog__backdrop.is-open {
+  height: 50px;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: end;
+  justify-items: end;
 }
 
-.card-dialog__card {
+.game-dialog__card {
   width: var(--card-width-lg);
   height: var(--card-height-lg);
   border-radius: 12px;
@@ -109,25 +102,20 @@
   align-items: center;
   justify-content: start;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--color-black);
 }
 
-/* Tablet variant: light background */
-.card-dialog__card--producer {
+.game-dialog__card--producer {
   background: var(--color-white);
-  border: 3px solid var(--color-black);
+  color: var(--color-black);
 }
 
-/* Play variant: dark background */
-.card-dialog__card--consumer {
+.game-dialog__card--consumer {
   background: var(--color-night);
-  border: 2px solid var(--color-white);
+  color: var(--color-white);
 }
 
-.card-dialog__card--consumer .card__image {
-  filter: invert(100%);
-}
-
-.card-dialog__card .card__image {
+.game-dialog__card__image {
   width: 100%;
   height: 100%;
   object-fit: cover;

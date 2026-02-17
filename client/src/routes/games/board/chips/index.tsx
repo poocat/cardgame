@@ -143,7 +143,7 @@ export const ChipDisplaySelector = (props: {
 export const ChipCounterBadge = (props: { children: React.ReactNode }) => {
   return (
     <div className="game-chip-edge">
-      <div className="game-chip-edge__container">{props.children}</div>
+      <div className={`game-chip-edge__container`}>{props.children}</div>
     </div>
   );
 };

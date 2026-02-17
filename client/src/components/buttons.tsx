@@ -75,7 +75,7 @@ export const SelectButton = (props: {
   if (props.color) classNames.push(`select-btn--col-${props.color}`);
   if (props.border) classNames.push(`select-btn--border-${props.border}`);
   if (props.rounded) classNames.push(`select-btn--rounded`);
-  if (props.fullWidth) classNames.push(`btn--fullwidth`);
+  if (props.fullWidth) classNames.push(`select-btn--fullwidth`);
   const className = classNames.join(" ");
 
   return (

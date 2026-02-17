@@ -1,60 +1,28 @@
 import { SelectButton } from "@client/components";
-import {
-  detailCardFooterHeight,
-  detailCardHeight,
-  detailCardWidth,
-} from "./constants";
+import { detailCardHeight, detailCardWidth } from "./constants";
 
 /******************************************************************************
  * ### CardDetailContainer
  ******************************************************************************/
 export const CardDetailContainer = (props: { children?: React.ReactNode }) => {
-  return (
-    <div
-      style={{
-        width: detailCardWidth,
-        height: detailCardHeight + detailCardFooterHeight,
-      }}
-    >
-      {props.children}
-    </div>
-  );
-};
-
-export const CardDetailActionContainer = (props: {
-  children?: React.ReactNode;
-}) => {
-  return (
-    <div
-      style={{
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-      }}
-    >
-      {props.children}
-    </div>
-  );
+  return <div className="game-dialog__card-container">{props.children}</div>;
 };
 
 /******************************************************************************
- * ### CardDetailFooterContainer
+ * ### CardDetailMenuContainer
  ******************************************************************************/
-export const CardDetailFooterContainer = (props: {
+export const CardDetailMenuContainer = (props: {
+  children?: React.ReactNode;
+}) => {
+  return <div className="game-dialog__card-menu">{props.children}</div>;
+};
+
+export const CardDetailBody = (props: {
+  type: "producer" | "consumer";
   children?: React.ReactNode;
 }) => {
   return (
-    <div
-      style={{
-        height: detailCardFooterHeight,
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "start",
-        justifyContent: "end",
-        margin: 5,
-      }}
-    >
+    <div className={`game-dialog__card game-dialog__card--${props.type}`}>
       {props.children}
     </div>
   );
@@ -74,6 +42,7 @@ export const CardDetailAction = (props: {
   return (
     <SelectButton
       fullWidth
+      border="dark"
       selected={selected}
       onClick={onChange}
       size="md"

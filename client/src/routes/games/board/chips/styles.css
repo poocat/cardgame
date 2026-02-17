@@ -38,13 +38,8 @@
   transform: translateY(50%);
 }
 
-.game-player-area--left .game-chip-edge__container {
-  left: 5%;
-}
-
-.game-player-area--right .game-chip-edge__container {
-  right: 5%;
-}
+.game-player-area--left .game-chip-edge__container { left: 5%; }
+.game-player-area--right .game-chip-edge__container { right: 5%; }
 
 .game-chip-display {
   width: 70px;

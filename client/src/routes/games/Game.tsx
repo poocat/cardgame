@@ -38,9 +38,9 @@ export const Game = () => {
       if (elapsedTimeMs < 1 * 60 * 1000) {
         return 1000; // Once per second for the first minute.
       } else if (elapsedTimeMs < 5 * 60 * 1000) {
-        return 10000; // Once every 10 s for after the first minute.
+        return 5000; // Once every 5 s after the first minute.
       } else {
-        return 60000; // Once every minute after first 5 minutes.
+        return 10000; // Once every 10 s after first 5 minutes.
       }
     },
     getPollingEnabled: (data) =>

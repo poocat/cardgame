@@ -30,11 +30,8 @@ export const Thumbnail = (props: {
   variant: "producer" | "consumer" | "placeholder";
   label?: React.ReactNode;
 }) => {
-  /**
-   * TODO!!! The `game-card` class always points a pointer over it. This should
-   * be conditional.
-   */
   const classNames = ["game-card", `game-card--${props.variant}`];
+  if (props.onClick) classNames.push("game-card--clickable");
   const className = classNames.join(" ");
 
   const content = <div className={className}>{props.label}</div>;

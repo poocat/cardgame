@@ -346,10 +346,10 @@ export const GameBoard = memo(
               <ThumbnailPlaceholder
                 highlight="none"
                 label={
-                  <>
+                  <div>
                     <div>Hand</div>
                     <div>{player.cardsInHand.length}</div>
-                  </>
+                  </div>
                 }
               />
             </GameBoardPlayerHandArea>
