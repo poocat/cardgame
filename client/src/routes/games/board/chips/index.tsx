@@ -1,23 +1,129 @@
 import { Button } from "@client/components";
-import { type CSSProperties, useCallback, useMemo } from "react";
-import { colors } from "../palette";
-import "../styles.css";
+import type { Size } from "@client/components/types";
+import { useCallback, useMemo } from "react";
 import type { ChipDigest, SelectorProps } from "../types";
+import "./styles.css";
 
-const thumbnailChipRadius = 9;
-const thumbnailChipFontSize = 10;
-const thumbnailChipHighlightWidth = 3;
-const detailChipRadius = 19;
-const detailChipFontSize = 18;
-const detailChipHighlightWidth = 5;
+/******************************************************************************
+ * ### Chip
+ *
+ * Basic chip icon, with a number inside of it.
+ ******************************************************************************/
+const Chip = (props: { count: number; size: Size; selected?: boolean }) => {
+  const classNames = ["game-chip", `game-chip--size-${props.size}`];
+  if (props.selected) classNames.push("game-chip--selected");
+  const className = classNames.join(" ");
+  return <div className={className}>{props.count}</div>;
+};
 
-const commonChipCounterProps: CSSProperties = {
-  alignItems: "center",
-  alignContent: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  borderRadius: "50%",
-  backgroundColor: colors.chips.alpha(1),
+const ChipCounter = (props: {
+  size: Size;
+  baseCount: number;
+  selectedCount: number;
+}) => {
+  return (
+    <>
+      <Chip count={props.baseCount} size={props.size} />
+      {props.selectedCount > 0 && (
+        <>
+          <div className="game-arrow"></div>
+          <Chip selected count={props.selectedCount} size={props.size} />
+        </>
+      )}
+    </>
+  );
+};
+
+/******************************************************************************
+ * ### ChipArea
+ ******************************************************************************/
+export const ChipArea = (props: { children?: React.ReactNode }) => {
+  return <div className="game-chip-area">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### ChipAreaLabel
+ ******************************************************************************/
+export const ChipAreaLabel = (props: { children?: React.ReactNode }) => {
+  return <div className="game-chip-area__label">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### ChipDisplay
+ ******************************************************************************/
+export const ChipDisplay = (props: {
+  fullWidth?: boolean;
+  children?: React.ReactNode;
+}) => {
+  const classNames = ["game-chip-display"];
+  if (props.fullWidth) classNames.push("game-chip-display--fullwidth");
+  const className = classNames.join(" ");
+  return <div className={className}>{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### ChipDisplayCounter
+ ******************************************************************************/
+export const ChipDisplayCounter = (props: {
+  size: Size;
+  baseCount: number;
+  selectedCount: number;
+}) => {
+  return (
+    <div className="game-chip-display__counter">
+      <ChipCounter {...props} />
+    </div>
+  );
+};
+
+/******************************************************************************
+ * ### ChipDisplaySelector
+ ******************************************************************************/
+export const ChipDisplaySelector = (props: {
+  size: Size;
+  numSelected: number;
+  onIncrement: () => void;
+  onDecrement: () => void;
+  onSubmit?: () => void;
+  disableIncrement?: boolean;
+  disableSubmit?: boolean;
+}) => {
+  return (
+    <div className="game-chip-display__selector">
+      <Button
+        rounded
+        border="dark"
+        color="chip"
+        size={props.size}
+        disabled={props.numSelected < 1}
+        onClick={props.onDecrement}
+      >
+        -
+      </Button>
+      <Button
+        rounded
+        border="dark"
+        color="chip"
+        size={props.size}
+        disabled={!!props.disableIncrement}
+        onClick={props.onIncrement}
+      >
+        +
+      </Button>
+      {props.onSubmit && (
+        <Button
+          rounded
+          border="dark"
+          color="chip"
+          size={props.size}
+          disabled={!!props.disableSubmit}
+          onClick={props.onSubmit}
+        >
+          ok
+        </Button>
+      )}
+    </div>
+  );
 };
 
 /******************************************************************************
@@ -28,130 +134,9 @@ const commonChipCounterProps: CSSProperties = {
  ******************************************************************************/
 export const ChipCounterBadge = (props: { children: React.ReactNode }) => {
   return (
-    <div style={{ width: "100%", height: 0, position: "relative", top: 0 }}>
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: "12%",
-          transform: "translateY(50%)",
-        }}
-      >
-        {props.children}
-      </div>
+    <div className="game-chip-edge">
+      <div className="game-chip-edge__x">{props.children}</div>
     </div>
-  );
-};
-
-////////////////////////////////////////////////////////////////////////////////
-// Thumnail Form Factor
-////////////////////////////////////////////////////////////////////////////////
-const ThumbnailChipBase = (props: {
-  children?: React.ReactNode;
-  styleProps?: CSSProperties;
-}) => {
-  return (
-    <div
-      style={{
-        width: thumbnailChipRadius * 2,
-        height: thumbnailChipRadius * 2,
-        fontSize: thumbnailChipFontSize,
-        ...commonChipCounterProps,
-        ...props.styleProps,
-      }}
-    >
-      {props.children}
-    </div>
-  );
-};
-
-/******************************************************************************
- * ### ThumbnailChipCounter
- *
- * A small chip counter, used for thumbnail-sized cards.
- ******************************************************************************/
-export const ThumbnailChipCounter = (props: {
-  count: number;
-  numSelected?: number;
-}) => {
-  const counter = <ThumbnailChipBase>{props.count}</ThumbnailChipBase>;
-  return props.numSelected ? (
-    <div
-      style={{
-        minWidth: thumbnailChipRadius * 2,
-        height: thumbnailChipRadius * 2,
-        borderRadius: thumbnailChipRadius + thumbnailChipHighlightWidth,
-        padding: thumbnailChipHighlightWidth,
-        display: "flex",
-        flexDirection: "row",
-        gap: 3,
-        backgroundColor: colors.chips.scale(0.9),
-      }}
-    >
-      {counter}
-      <ThumbnailChipBase styleProps={{ backgroundColor: "transparent" }}>
-        {"→ "}
-        {props.numSelected}
-      </ThumbnailChipBase>
-    </div>
-  ) : (
-    counter
-  );
-};
-
-////////////////////////////////////////////////////////////////////////////////
-// Detail Form Factor
-////////////////////////////////////////////////////////////////////////////////
-const DetailChipBase = (props: {
-  children?: React.ReactNode;
-  styleProps?: CSSProperties;
-}) => {
-  return (
-    <div
-      style={{
-        width: detailChipRadius * 2,
-        height: detailChipRadius * 2,
-        fontSize: detailChipFontSize,
-        ...commonChipCounterProps,
-        ...props.styleProps,
-      }}
-    >
-      {props.children}
-    </div>
-  );
-};
-
-/******************************************************************************
- * ### DetailChipCounter
- *
- * Larger chip counters, used on detail-sized cards or larger chip pools.
- ******************************************************************************/
-export const DetailChipCounter = (props: {
-  count: number;
-  numSelected?: number;
-}) => {
-  const counter = <DetailChipBase>{props.count}</DetailChipBase>;
-  return props.numSelected ? (
-    <div
-      style={{
-        minWidth: detailChipRadius * 2,
-        height: detailChipRadius * 2,
-        borderRadius: detailChipRadius + detailChipHighlightWidth,
-        padding: detailChipHighlightWidth,
-        display: "flex",
-        flexDirection: "row",
-        gap: 3,
-        backgroundColor: colors.chips.scale(0.9),
-      }}
-    >
-      {counter}
-      <DetailChipBase styleProps={{ backgroundColor: "transparent" }}>
-        {"→ "}
-        {props.numSelected}
-      </DetailChipBase>
-    </div>
-  ) : (
-    counter
   );
 };
 
@@ -201,51 +186,3 @@ export function useChipSelector(args: {
     [addChip, removeChip, remaining, selected],
   );
 }
-
-/******************************************************************************
- * ### ChipSelectMenu
- *
- * Chip selection is not done on a chip-by-chip basis.
- ******************************************************************************/
-export const ChipSelectMenu = (props: {
-  numSelected: number;
-  onIncrement: () => void;
-  onDecrement: () => void;
-  onSubmit?: () => void;
-  disableIncrement?: boolean;
-  disableSubmit?: boolean;
-}) => {
-  return (
-    <div style={{ display: "flex", flexDirection: "row", gap: 3 }}>
-      <Button
-        rounded
-        color="chip"
-        size="md"
-        disabled={props.numSelected < 1}
-        onClick={props.onDecrement}
-      >
-        -
-      </Button>
-      <Button
-        rounded
-        color="chip"
-        size="md"
-        disabled={!!props.disableIncrement}
-        onClick={props.onIncrement}
-      >
-        +
-      </Button>
-      {props.onSubmit && (
-        <Button
-          rounded
-          color="chip"
-          size="md"
-          disabled={!!props.disableSubmit}
-          onClick={props.onSubmit}
-        >
-          ✓
-        </Button>
-      )}
-    </div>
-  );
-};

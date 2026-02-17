@@ -1,0 +1,162 @@
+/***************************************************************************
+  Chip Layout
+***************************************************************************/
+.game-chip-area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Alignment based on player orientation */
+.game-player-area--left .game-chip-area {
+  align-items: flex-start;
+}
+
+.game-player-area--right .game-chip-area {
+  align-items: flex-end;
+}
+
+.game-chip-area__label {
+  font-size: var(--font-size-sm);
+}
+
+.game-player-center .game-chip-area__label {
+  color: var(--color-white-translucent);
+}
+
+/* Used to put chips on the edge of another element */
+.game-chip-edge {
+  /* { width: "100%", height: 0, position: "relative", top: 0 } */
+  width: 100%;
+  height: 0;
+  top: 0;
+  position: relative;
+}
+
+.game-chip-edge__x {
+  position: absolute;
+  bottom: 0;
+  left: 12%;
+  transform: translateY(50%);
+}
+
+.game-chip-display {
+  width: 70px;
+  height: 30px;
+  padding: var(--space-sm);
+  border: 2px double var(--color-black);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-chip-edge .game-chip-display {
+  border-style: none;
+}
+
+.game-player-center .game-chip-display {
+  border-color: var(--color-white-translucent);
+}
+
+.game-player-area--right .game-chip-display {
+  flex-direction: row-reverse;
+}
+
+/* Play area variant: light text */
+.game-player-center .game-chip-display__label {
+  color: var(--color-white-translucent);
+}
+
+/* Play area variant: light border */
+.game-player-center .game-chip-display {
+  border-color: var(--color-white-translucent);
+}
+
+/* Expanded width when selector buttons are shown */
+.game-chip-display--fullwidth {
+  width: 100%;
+}
+
+.game-chip-display__counter {
+  display: flex;                                                                                                                                                                                     
+  align-items: center;
+}
+
+.game-player-area--right .game-chip-display__counter {
+  flex-direction: row-reverse;
+}
+
+.game-chip-display__selector {
+  display: flex;
+  flex-direction: row; /* Always left-to-right, regardless of player orientation */
+}
+
+/***************************************************************************
+  Chip
+***************************************************************************/
+
+.game-chip {
+  width: var(--control-size-sm);
+  height: var(--chip-size);
+  margin-left: 1px;
+  background-color: var(--color-chip);
+  border: 1px solid var(--color-black);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  padding-top: 3px; /* Optical alignment for text */
+}
+
+/* Variant of a chip, used to indicate how many chips have been selected from the given pool. */
+.game-chip--selected {
+  background-color: var(--color-chip-selected);
+}
+
+.game-chip--size-sm {
+  width: var(--control-size-sm);
+  height: var(--control-size-sm);
+}
+
+.game-chip--size-md {
+  width: var(--control-size-md);
+  height: var(--control-size-md);
+}
+
+.game-chip--size-lg {
+  width: var(--control-size-lg);
+  height: var(--control-size-lg);
+}
+
+/***************************************************************************
+  Arrow
+***************************************************************************/
+
+/*
+  A simple CSS arrow used to indicate direction of chip movement.
+  Faces right for left-side players, left for right-side players.
+*/
+.game-arrow {
+  width: 0;
+  height: 0;
+  margin: 0 var(--space-sm);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+.game-player-area--left .game-arrow {
+  border-left: 6px solid var(--color-black);
+  border-right: none;
+}
+
+.game-player-area--right .game-arrow {
+  border-right: 6px solid var(--color-black);
+  border-left: none;
+}
+
+/* Light variant for play area */
+.game-player-center .game-arrow {
+  border-left-color: var(--color-white-translucent);
+  border-right-color: var(--color-white-translucent);
+}

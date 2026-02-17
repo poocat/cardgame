@@ -1,5 +1,5 @@
 const thumnailCardAspectRatio = 5 / 7;
-export const thumbnailCardHeight = 105;
+export const thumbnailCardHeight = 70;
 export const thumbnailCardWidth = Math.floor(
   thumbnailCardHeight * thumnailCardAspectRatio,
 );

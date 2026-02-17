@@ -41,9 +41,9 @@ import { Button } from "@client/components";
 import { memo, useCallback, useMemo } from "react";
 import {
   ChipCounterBadge,
-  ChipSelectMenu,
-  DetailChipCounter,
-  ThumbnailChipCounter,
+  ChipDisplay,
+  ChipDisplayCounter,
+  ChipDisplaySelector,
   useChipSelector,
 } from "../chips";
 import type {
@@ -191,10 +191,13 @@ export const FaceUpThumbnailCard = memo(
             />
             {props.card.chips.length > 0 && (
               <ChipCounterBadge>
-                <ThumbnailChipCounter
-                  count={chipIds.length}
-                  numSelected={selectedChipIds.length}
-                />
+                <ChipDisplay fullWidth={true}>
+                  <ChipDisplayCounter
+                    size="sm"
+                    baseCount={chipIds.length}
+                    selectedCount={selectedChipIds.length}
+                  />
+                </ChipDisplay>
               </ChipCounterBadge>
             )}
           </CardThumbnailBodyContainer>
@@ -241,7 +244,8 @@ const DetailCardChipSelect = (props: {
   });
 
   return (
-    <ChipSelectMenu
+    <ChipDisplaySelector
+      size="md"
       numSelected={numSelected}
       disableIncrement={!props.selectorProps?.moreValuesAllowed}
       onIncrement={addChip}
@@ -315,10 +319,13 @@ export const DetailCard = (props: {
       </CardDetail>
       {chipIds.length > 0 && (
         <ChipCounterBadge>
-          <DetailChipCounter
-            count={chipIds.length}
-            numSelected={numSelectedChips}
-          />
+          <ChipDisplay fullWidth={true}>
+            <ChipDisplayCounter
+              size="md"
+              baseCount={chipIds.length}
+              selectedCount={numSelectedChips}
+            />
+          </ChipDisplay>
         </ChipCounterBadge>
       )}
       {cardHasChoice && (

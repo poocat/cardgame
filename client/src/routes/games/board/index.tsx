@@ -1,9 +1,17 @@
 import { Button, Dialog, SelectButton } from "@client/components";
+import { Box, Stack } from "@client/components/layout";
 import type { Color } from "@client/components/types";
 import type React from "react";
 import { memo, useCallback, useMemo } from "react";
 import { DetailCard, FaceUpThumbnailCard } from "./cards";
-import { useChipSelector } from "./chips";
+import {
+  ChipArea,
+  ChipAreaLabel,
+  ChipDisplay,
+  ChipDisplayCounter,
+  ChipDisplaySelector,
+  useChipSelector,
+} from "./chips";
 import "./styles.css";
 import type {
   ChipDigest,
@@ -14,8 +22,6 @@ import type {
   GameDigest,
   SelectorProps,
 } from "./types";
-
-const floatingChoiceBoxHeight = 125;
 
 type Side = "left" | "right";
 
@@ -49,26 +55,6 @@ const GameBoardContainer = (props: {
         <div className="game-header-spacer"></div>
         {props.children}
       </div>
-    </div>
-  );
-};
-
-/******************************************************************************
- * ### GameBoardFooter
- *
- * The footer is mostly a blank space to put at the bottom of the game board,
- * so that when the player scrolls all the way to the bottom, the floating
- * dialog will not cover anything.
- ******************************************************************************/
-const GameBoardFooter = (props: { children?: React.ReactNode }) => {
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: floatingChoiceBoxHeight,
-      }}
-    >
-      {props.children}
     </div>
   );
 };
@@ -174,63 +160,31 @@ const GameBoardChipMenu = memo(
     });
 
     // TODO!!! This should be false if the observing player is not the one selecting!!!
-    const selecting = props.selectorProps && selectableChipIds.length > 0;
-
-    const chipDisplayClassNames = ["game-chip-display"];
-    if (selecting) chipDisplayClassNames.push("game-chip-display--fullwidth");
-    const chipDisplayClassName = chipDisplayClassNames.join(" ");
+    const selecting =
+      props.selectorProps !== null && selectableChipIds.length > 0;
 
     return (
-      <div className="game-chip-area">
-        <div className="game-chip-area__label">{props.label}</div>
-        <div className={chipDisplayClassName}>
-          <div className="game-chip-display__counter">
-            <div className="game-chip">{props.chips.length}</div>
-            {numSelected > 0 && (
-              <>
-                <div className="game-arrow"></div>
-                <div className="game-chip game-chip--selected">
-                  {numSelected}
-                </div>
-              </>
-            )}
-          </div>
+      // TODO!!! Move fullwidth to <ChipArea/>???
+      <ChipArea>
+        <ChipAreaLabel>{props.label}</ChipAreaLabel>
+        <ChipDisplay fullWidth={selecting}>
+          <ChipDisplayCounter
+            size="sm"
+            baseCount={props.chips.length}
+            selectedCount={numSelected}
+          />
           {selecting && (
-            // TODO!!! Create special buttons for chip inc/dec/submit!!!
-            <div className="game-chip-display__selector">
-              <Button
-                rounded
-                border="dark"
-                color="chip"
-                size="sm"
-                onClick={removeChip}
-              >
-                -
-              </Button>
-              <Button
-                rounded
-                color="chip"
-                border="dark"
-                size="sm"
-                disabled={!props.selectorProps?.moreValuesAllowed}
-                onClick={addChip}
-              >
-                +
-              </Button>
-              <Button
-                rounded
-                color="chip"
-                border="dark"
-                size="sm"
-                disabled={props.submitDisabled}
-                onClick={props.onSubmitChoice}
-              >
-                ok
-              </Button>
-            </div>
+            <ChipDisplaySelector
+              size="sm"
+              numSelected={numSelected}
+              onIncrement={addChip}
+              onDecrement={removeChip}
+              onSubmit={props.onSubmitChoice}
+              disableSubmit={props.submitDisabled}
+            />
           )}
-        </div>
-      </div>
+        </ChipDisplay>
+      </ChipArea>
     );
   },
 );
@@ -296,31 +250,10 @@ const GameBoardChoiceMenu = memo(
     >,
   ) => {
     return (
-      <div
-        style={{
-          backgroundColor: "white",
-          position: "fixed",
-          borderTop: "1px solid",
-          width: "100%",
-          bottom: 0,
-          right: 0,
-          left: 0,
-          maxHeight: floatingChoiceBoxHeight,
-          height: floatingChoiceBoxHeight,
-          overflowY: "auto",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            padding: 3,
-            gap: 3,
-          }}
-        >
-          <div>{props.instructions}</div>
-          <div>
+      <div className="game-footer-menu">
+        <Stack spacing="sm" orientation="vertical">
+          <Box spacing="sm">{props.instructions}</Box>
+          <Box spacing="sm">
             <Button
               border="dark"
               color="secondary"
@@ -330,32 +263,27 @@ const GameBoardChoiceMenu = memo(
             >
               Submit Choices
             </Button>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              overflowX: "auto",
-              gap: 3,
-            }}
-          >
-            {props.values.map(({ value, label }) => {
-              const selected = props.checkValueSelected(value);
-              const disabled = !selected && !props.moreValuesAllowed;
-              return (
-                <GameBoardChoiceMenuValueSelect
-                  key={value}
-                  value={value}
-                  label={label}
-                  selected={selected}
-                  disabled={disabled}
-                  choiceType={props.choiceType}
-                  toggleValue={props.toggleValue}
-                />
-              );
-            })}
-          </div>
-        </div>
+          </Box>
+          <Box spacing="sm">
+            <Stack spacing="sm" orientation="horizontal">
+              {props.values.map(({ value, label }) => {
+                const selected = props.checkValueSelected(value);
+                const disabled = !selected && !props.moreValuesAllowed;
+                return (
+                  <GameBoardChoiceMenuValueSelect
+                    key={value}
+                    value={value}
+                    label={label}
+                    selected={selected}
+                    disabled={disabled}
+                    choiceType={props.choiceType}
+                    toggleValue={props.toggleValue}
+                  />
+                );
+              })}
+            </Stack>
+          </Box>
+        </Stack>
       </div>
     );
   },
@@ -553,7 +481,7 @@ export const GameBoard = memo(
             <GameBoardPlayerCenter>
               <GameBoardPlayerCenterCards>
                 {observingPlayer.cardsInPlay
-                  .filter((card) => card.type === "producer")
+                  .filter((card) => card.type === "consumer")
                   .map((card) => (
                     <FaceUpThumbnailCard
                       key={card.id}
@@ -595,7 +523,6 @@ export const GameBoard = memo(
             moreValuesAllowed={props.selectorProps.moreValuesAllowed}
           />
         )}
-        <GameBoardFooter />
         <Dialog
           title={dialogTitle}
           description=""
