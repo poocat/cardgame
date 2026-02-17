@@ -8,7 +8,51 @@ import {
   thumbnailCardHeight,
   thumbnailCardWidth,
 } from "./constants";
+import "./styles.css";
 import type { ThumbnailCardHighlightVariant } from "./types";
+
+export type ThumbnailHighlight = "selectable" | "selected" | "none";
+
+export const ThumbnailContainer = (props: {
+  highlight: ThumbnailHighlight;
+  children?: React.ReactNode;
+}) => {
+  const classNames = [
+    "game-card-container",
+    `game-card-container--${props.highlight}`,
+  ];
+  const className = classNames.join(" ");
+  return <div className={className}>{props.children}</div>;
+};
+
+export const Thumbnail = (props: {
+  onClick?: () => void;
+  variant: "producer" | "consumer" | "placeholder";
+  label?: React.ReactNode;
+}) => {
+  /**
+   * TODO!!! The `game-card` class always points a pointer over it. This should
+   * be conditional.
+   */
+  const classNames = ["game-card", `game-card--${props.variant}`];
+  const className = classNames.join(" ");
+
+  const content = <div className={className}>{props.label}</div>;
+  return props.onClick ? (
+    <ButtonBase onClick={props.onClick}>{content}</ButtonBase>
+  ) : (
+    content
+  );
+};
+
+//
+//
+//
+//
+//
+//
+//
+//
 
 const thumbnailCardHighlightVariantStyles = {
   default: {
@@ -194,27 +238,6 @@ export const CardThumbnailFaceDown = () => {
         borderRadius: 3,
 
         backgroundColor: "gray",
-
-        fontSize: 10,
-      }}
-    />
-  );
-};
-
-/******************************************************************************
- * ### CardThumbnailPlaceholder
- ******************************************************************************/
-export const CardThumbnailPlaceholder = () => {
-  return (
-    <div
-      style={{
-        width: thumbnailCardWidth,
-        height: thumbnailCardHeight,
-
-        border: "1px dashed",
-        borderRadius: 3,
-
-        backgroundColor: "transparent",
 
         fontSize: 10,
       }}

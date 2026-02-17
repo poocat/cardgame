@@ -1,0 +1,135 @@
+/***************************************************************************
+  Component: Card
+***************************************************************************/
+
+.game-card-container {
+  padding: var(--space-xs);
+  border-radius: 3px;
+  margin: var(--space-xs);
+}
+
+.game-card-container--selectable {
+  background-color: var(--color-lowlight);
+}
+
+.game-card-container--selected {
+  outline: var(--color-lowlight);
+}
+
+.game-player-center .game-card-container--selectable {
+  background-color: var(--color-highlight);
+}
+
+.game-player-center .game-card-container--selected {
+  outline: 1px solid var(--color-highlight);
+}
+
+.game-card {
+  width: var(--card-width-sm);
+  height: var(--card-width-sm);
+  /* margin: var(--space-xs); */
+  border: 1px solid;
+  border-radius: 2px;
+  padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  /* Default */
+  border-color: var(--color-black);
+  color: var(--color-black);
+}
+
+/* Producer cards always have a dark background. */
+.game-card--producer {
+  background-color: var(--color-white);
+}
+
+/* Consumer cards always have a light background. */
+.game-card--consumer {
+  background-color: var(--color-night);
+}
+
+.game-card--placeholder {
+  background-color: var(--color-white);
+  border-color: var(--color-black);
+  color: var(--color-black);
+}
+
+.game-player-center .game-card {
+  border-color: var(--color-white-translucent);
+  color: var(--color-white-translucent)
+}
+
+/* .card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.consumer .card__image {
+  filter: invert(100%);
+} */
+
+/***************************************************************************
+  Component: Card Dialog
+***************************************************************************/
+
+/*
+  The card dialog is a modal that shows an expanded view of a card.
+*/
+.card-dialog__backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.card-dialog__backdrop.is-open {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-dialog__card {
+  width: var(--card-width-lg);
+  height: var(--card-height-lg);
+  border-radius: 12px;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Tablet variant: light background */
+.card-dialog__card--producer {
+  background: var(--color-white);
+  border: 3px solid var(--color-black);
+}
+
+/* Play variant: dark background */
+.card-dialog__card--consumer {
+  background: var(--color-night);
+  border: 2px solid var(--color-white);
+}
+
+.card-dialog__card--consumer .card__image {
+  filter: invert(100%);
+}
+
+.card-dialog__card .card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 9px;
+}

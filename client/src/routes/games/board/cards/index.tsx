@@ -38,7 +38,7 @@
  */
 
 import { Button } from "@client/components";
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback } from "react";
 import {
   ChipCounterBadge,
   ChipDisplay,
@@ -62,22 +62,29 @@ import {
   CardDetailContainer,
   CardDetailFooterContainer,
 } from "./detail";
-import {
-  CardThumbnailBodyContainer,
-  CardThumbnailContainer,
-  CardThumbnailFaceUp,
-  CardThumbnailHeader,
-  CardThumbnailHeaderContainer,
-  CardThumbnailHighlight,
-} from "./thumbnail";
-import type { ThumbnailCardHighlightVariant } from "./types";
+import type { ThumbnailHighlight } from "./thumbnail";
+import { Thumbnail, ThumbnailContainer } from "./thumbnail";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Thumbnail Form Factor
 ////////////////////////////////////////////////////////////////////////////////
 
 /******************************************************************************
- * ### FaceUpThumbnailCard
+ * ### ThumbnailPlaceholder
+ ******************************************************************************/
+export const ThumbnailPlaceholder = (props: {
+  label?: React.ReactNode;
+  highlight: ThumbnailHighlight;
+}) => {
+  return (
+    <ThumbnailContainer highlight={props.highlight}>
+      <Thumbnail variant="placeholder" label={props.label} />
+    </ThumbnailContainer>
+  );
+};
+
+/******************************************************************************
+ * ### FaceUpThumbnail
  *
  * A complete component for displaying a card in play in the "thumbnail" form
  * factor, within its own container, which takes on different styles depending
@@ -87,7 +94,7 @@ import type { ThumbnailCardHighlightVariant } from "./types";
  * - whether or not the card or one of its actions or chips were chosen
  *   previously in the current activity
  ******************************************************************************/
-export const FaceUpThumbnailCard = memo(
+export const FaceUpThumbnail = memo(
   (
     props: {
       setDialog: DialogProps["set"];
@@ -106,15 +113,15 @@ export const FaceUpThumbnailCard = memo(
     ),
   ) => {
     const cardId = props.card.id;
-    const choiceType = props.choiceProps.choiceType;
-    const selectDisabled = props.selectorProps === null;
+    // const choiceType = props.choiceProps.choiceType;
+    // const selectDisabled = props.selectorProps === null;
     const cardHasChoosableValue = props.choiceProps.checkValueOnCard(cardId);
     const cardIsChoosableValue = props.choiceProps.checkValue(cardId);
     const cardWasChosenPreviously =
       props.choiceProps.checkPreviousValue(cardId);
 
-    const cardSelected =
-      props.selectorProps?.checkValueSelected(cardId) ?? false;
+    // const cardSelected =
+    //   props.selectorProps?.checkValueSelected(cardId) ?? false;
 
     const chipIds = props.card.chips.map(({ id }) => id);
     const selectedChipIds =
@@ -125,84 +132,36 @@ export const FaceUpThumbnailCard = memo(
       props.setDialog({ type: "card", card: props.card });
     }, [props.card, props.setDialog]);
 
-    const toggleCardSelect = useCallback(() => {
-      props.selectorProps?.toggleValue(cardId);
-    }, [cardId, props.selectorProps?.toggleValue]);
+    // const toggleCardSelect = useCallback(() => {
+    //   props.selectorProps?.toggleValue(cardId);
+    // }, [cardId, props.selectorProps?.toggleValue]);
 
-    /**
-     * Determine the variant:
-     * - Check if the card (or any of its chips or actions) are part of the
-     *   current choice.
-     *   - If so, check if the observing player is choosing.
-     *     - If so, variant is `observerChoosing_____`.
-     *     - If not, variant is `otherPlayerChoosing`.
-     *   - If not, check if card (or any of its chips or actions) were chosen
-     *     earlier in the activity.
-     *     - If so, variant is `chosenPreviously`.
-     *     - If not, variant is `default`.
-     */
-    const variant: ThumbnailCardHighlightVariant = useMemo(() => {
-      if (cardHasChoosableValue || cardIsChoosableValue) {
-        if (!selectDisabled) {
-          if (choiceType === "actionId" && cardHasChoosableValue)
-            return "observerCanChooseActionOnCard";
-          if (choiceType === "chipId" && cardHasChoosableValue)
-            return "observerCanChooseChipOnCard";
-          if (choiceType === "cardId" && cardSelected)
-            return "observerHasChosenCard";
-          if (choiceType === "cardId" && cardIsChoosableValue)
-            return "observerCanChooseCard";
-        } else {
-          return "otherPlayerChoosing";
-        }
-      } else if (cardWasChosenPreviously) {
-        return "chosenPreviously";
-      }
-      return "default";
-    }, [
-      choiceType,
-      selectDisabled,
-      cardSelected,
-      cardHasChoosableValue,
-      cardIsChoosableValue,
-      cardWasChosenPreviously,
-    ]);
+    const highlight: ThumbnailHighlight =
+      cardHasChoosableValue || cardIsChoosableValue
+        ? "selectable"
+        : cardWasChosenPreviously
+          ? "selected"
+          : "none";
 
     return (
-      <CardThumbnailContainer>
-        <CardThumbnailHighlight variant={variant}>
-          <CardThumbnailHeaderContainer>
-            <CardThumbnailHeader
-              cardId={props.card.id}
-              cardName={props.card.name}
-              cardSelected={cardSelected}
-              selectDisabled={!cardIsChoosableValue || selectDisabled}
-              onChange={toggleCardSelect}
-            />
-          </CardThumbnailHeaderContainer>
-          <CardThumbnailBodyContainer>
-            <CardThumbnailFaceUp
-              cardType={props.card.type}
-              numChips={props.card.chips.length}
-              exhausted={
-                props.variant === "inPlay" ? props.card.exhausted : false
-              }
-              onClick={expand}
-            />
-            {props.card.chips.length > 0 && (
-              <ChipCounterBadge>
-                <ChipDisplay fullWidth={true}>
-                  <ChipDisplayCounter
-                    size="sm"
-                    baseCount={chipIds.length}
-                    selectedCount={selectedChipIds.length}
-                  />
-                </ChipDisplay>
-              </ChipCounterBadge>
-            )}
-          </CardThumbnailBodyContainer>
-        </CardThumbnailHighlight>
-      </CardThumbnailContainer>
+      <ThumbnailContainer highlight={highlight}>
+        <Thumbnail
+          label={props.card.name}
+          variant={props.card.type}
+          onClick={expand}
+        />
+        {props.card.chips.length > 0 && (
+          <ChipCounterBadge>
+            <ChipDisplay fullWidth={true}>
+              <ChipDisplayCounter
+                size="sm"
+                baseCount={chipIds.length}
+                selectedCount={selectedChipIds.length}
+              />
+            </ChipDisplay>
+          </ChipCounterBadge>
+        )}
+      </ThumbnailContainer>
     );
   },
 );
@@ -245,7 +204,7 @@ const DetailCardChipSelect = (props: {
 
   return (
     <ChipDisplaySelector
-      size="md"
+      size="lg"
       numSelected={numSelected}
       disableIncrement={!props.selectorProps?.moreValuesAllowed}
       onIncrement={addChip}
@@ -268,6 +227,10 @@ export const DetailCard = (props: {
   choiceProps: ChoiceProps;
   selectorProps: SelectorProps | null;
 }) => {
+  /**
+   * TODO!!! When card is selectable, add a button at the bottom that adds the
+   * card to the current list of selected values, and close the dialog.
+   */
   const valuesOnCard = props.choiceProps.getValuesOnCard(props.card.id);
   const selectedValues = props.selectorProps?.selectedValues ?? [];
   const selectedValuesOnCard = selectedValues.filter((v) =>
@@ -321,7 +284,7 @@ export const DetailCard = (props: {
         <ChipCounterBadge>
           <ChipDisplay fullWidth={true}>
             <ChipDisplayCounter
-              size="md"
+              size="lg"
               baseCount={chipIds.length}
               selectedCount={numSelectedChips}
             />
@@ -339,7 +302,12 @@ export const DetailCard = (props: {
             />
           )}
           {cardHasSelectableActions && !submitDisabled && (
-            <Button rounded onClick={props.onSubmitChoice} color="action">
+            <Button
+              rounded
+              size="md"
+              onClick={props.onSubmitChoice}
+              color="action"
+            >
               ✓
             </Button>
           )}

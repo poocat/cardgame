@@ -3,7 +3,7 @@ import { Box, Stack } from "@client/components/layout";
 import type { Color } from "@client/components/types";
 import type React from "react";
 import { memo, useCallback, useMemo } from "react";
-import { DetailCard, FaceUpThumbnailCard } from "./cards";
+import { DetailCard, FaceUpThumbnail, ThumbnailPlaceholder } from "./cards";
 import {
   ChipArea,
   ChipAreaLabel,
@@ -169,13 +169,13 @@ const GameBoardChipMenu = memo(
         <ChipAreaLabel>{props.label}</ChipAreaLabel>
         <ChipDisplay fullWidth={selecting}>
           <ChipDisplayCounter
-            size="sm"
+            size="md"
             baseCount={props.chips.length}
             selectedCount={numSelected}
           />
           {selecting && (
             <ChipDisplaySelector
-              size="sm"
+              size="md"
               numSelected={numSelected}
               onIncrement={addChip}
               onDecrement={removeChip}
@@ -343,15 +343,15 @@ export const GameBoard = memo(
         {props.game.otherPlayers.map((player, ix) => (
           <GameBoardPlayerArea playerIndex={ix} key={player.id}>
             <GameBoardPlayerHandArea>
-              <div
-                style={{
-                  height: "50px",
-                  width: "50px",
-                  border: "1px solid black",
-                }}
-              >
-                {player.cardsInHand.length}
-              </div>
+              <ThumbnailPlaceholder
+                highlight="none"
+                label={
+                  <>
+                    <div>Hand</div>
+                    <div>{player.cardsInHand.length}</div>
+                  </>
+                }
+              />
             </GameBoardPlayerHandArea>
             <GameBoardPlayerTablet playerIndex={ix}>
               <GameBoardPlayerTabletHeader>
@@ -360,7 +360,7 @@ export const GameBoard = memo(
                   {player.cardsInPlay
                     .filter((card) => card.type === "producer")
                     .map((card) => (
-                      <FaceUpThumbnailCard
+                      <FaceUpThumbnail
                         key={card.id}
                         variant="inPlay"
                         card={card}
@@ -395,7 +395,7 @@ export const GameBoard = memo(
                 {player.cardsInPlay
                   .filter((card) => card.type === "consumer")
                   .map((card) => (
-                    <FaceUpThumbnailCard
+                    <FaceUpThumbnail
                       key={card.id}
                       variant="inPlay"
                       card={card}
@@ -427,7 +427,7 @@ export const GameBoard = memo(
           <GameBoardPlayerArea playerIndex={observingPlayerIndex}>
             <GameBoardPlayerHandArea>
               {observingPlayer.cardsInHand.map((card) => (
-                <FaceUpThumbnailCard
+                <FaceUpThumbnail
                   key={card.id}
                   variant="inHand"
                   card={card}
@@ -448,7 +448,7 @@ export const GameBoard = memo(
                   {observingPlayer.cardsInPlay
                     .filter((card) => card.type === "producer")
                     .map((card) => (
-                      <FaceUpThumbnailCard
+                      <FaceUpThumbnail
                         key={card.id}
                         variant="inPlay"
                         card={card}
@@ -483,7 +483,7 @@ export const GameBoard = memo(
                 {observingPlayer.cardsInPlay
                   .filter((card) => card.type === "consumer")
                   .map((card) => (
-                    <FaceUpThumbnailCard
+                    <FaceUpThumbnail
                       key={card.id}
                       variant="inPlay"
                       card={card}
