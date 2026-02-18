@@ -1,19 +1,18 @@
 # TODO:
 
-Production readiness (backend):
-- [x] Transform data for front end views, redact values that users shouldn't see, and anonymize player ids.
-- [x] Persist games and rooms with database.
-- [x] Set up logging utility.
-- [x] Send instructions in game digest.
-- [x] Add slowdown and rate limiting.
-- [x] Support moving cards back into the deck.
-- [x] Enable linting and address warnings.
-- [x] Keep track of when a card arrived at its current location.
-- [x] Add win conditions.
-- [x] Add unit tests for gameplay mechanics.
+- [ ] UI/UX
+- [ ] Add unit tests for API.
 - [ ] Switch from "multi player choices" to "multi player sequences".
 - [ ] Write helpers for defining common actions for cards.
-- [ ] Add unit tests for API.
-
-One day:
 - [ ] Support different language translations of game instructions.
+- [x] Add unit tests for gameplay mechanics.
+- [x] Add win conditions.
+- [x] Keep track of when a card arrived at its current location.
+- [x] Enable linting and address warnings.
+- [x] Support moving cards back into the deck.
+- [x] Add slowdown and rate limiting.
+- [x] Send instructions in game digest.
+- [x] Set up logging utility.
+- [x] Persist games and rooms with database.
+- [x] Transform data for front end views, redact values that users shouldn't see, and anonymize player ids.
+
