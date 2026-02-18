@@ -57,7 +57,6 @@ import type {
   VisibleCardDigest,
 } from "../types";
 import {
-  CardDetailAction,
   CardDetailBody,
   CardDetailContainer,
   CardDetailMenuContainer,
@@ -180,11 +179,15 @@ const DetailCardAction = (props: {
   onChange: () => void;
 }) => {
   return (
-    <CardDetailAction
-      label={`[${props.actionType}] ${props.instructions}`}
+    <SelectButton
+      fullWidth
+      border="dark"
       selected={props.selected}
+      onClick={props.onChange}
+      size="md"
+      color="action"
       disabled={props.disabled}
-      onChange={props.onChange}
+      label={props.instructions}
     />
   );
 };

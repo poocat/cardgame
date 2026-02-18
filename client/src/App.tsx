@@ -3,18 +3,17 @@ import { GameList } from "@client/routes/games/GameList";
 import { NewRoom } from "@client/routes/rooms/NewRoom";
 import { Room } from "@client/routes/rooms/Room";
 import { Link, Outlet, Route, Routes } from "react-router";
+import { Box, Stack } from "./components/layout";
 
 const Layout = () => {
   return (
     <div>
-      <div style={{ padding: 5 }}>
-        <span style={{ paddingRight: 5 }}>
+      <Box spacing="md" color="secondary">
+        <Stack spacing="md" orientation="horizontal">
           <Link to="/">Cardgame</Link>
-        </span>
-        <span style={{ paddingRight: 5 }}>
           <Link to="/games">Games</Link>
-        </span>
-      </div>
+        </Stack>
+      </Box>
       <Outlet />
     </div>
   );
