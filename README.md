@@ -44,11 +44,11 @@ A game is stored as a JSON object, containing arrays of players, cards, chips, a
 
 The object of the game is to be the first player to accumulate a certain number of "chips" onto a certain type of card that is in play.
 
-On a player's turn, they first draw cards from their decks into to their hands, then take any number of available actions from their cards to affect the game state. The possible effects include:
+On a player's turn, they first draw cards from their decks into their hands, then take any number of available actions from their cards to affect the game state. The possible effects include:
 - Moving cards to different locations 
   - E.g. to/from the player's deck, hand, play area, or discard area
 - Changing a card's "exhausted" state
-  - Player's can only take actions from cards in play that are not exhausted
+  - Players can only take actions from cards in play that are not exhausted
   - Taking an action from a card in play exhausts the card
   - Exhausted cards are unexhausted automatically at the beginning of their owners' next turn.
 - Moving "chips" to different locations
