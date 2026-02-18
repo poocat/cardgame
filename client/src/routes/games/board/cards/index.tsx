@@ -1,42 +1,3 @@
-/**
- * Cards
- *
- * All cards are displayed with the "thumbnail" form factor, and up to one
- * card is displayed in the "full" form factor as a pop-up dialog.
- *
- * The thumbnail should display the following information:
- * - The type of card
- * - The chips on it
- * - The set of action types available
- *
- * The thumbnail should always be presented in a container that leaves room for:
- * - The card name, above the card
- * - A checkbox (when the card is selectable) to the left of the name
- *
- * The thumbnail container will also be used to highlight the card, using
- * different colors/hues/etc for the following cases:
- * - The card is selectable (choice type is "cardId")
- * - The card has chips on it that are selectable (choice type is "chipId")
- * - The card has actions on it that are selectable (choice type is "actionId")
- *
- * (There should maybe be a specific color for each of these entities?)
- *
- * Choosing chips on a card or an action on a card requires expanding the card
- * to its "full" form factor.
- *
- * The full form factor should also be displayed in its own container, which
- * leaves room at the bottom for controls, such as:
- * - A submit button.
- * - When selecting cards, a sort of "checkbox".
- * - When selecting chips from the card, increment/decrement buttons.
- *
- * If the player has selected chips/actions from the card, if no other
- * chips/actions are selectable on any other card, then the player should not
- * be able to close the "full" view until they have submitted their choices,
- * or unselect them.
- *
- */
-
 import { Button, SelectButton } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
 import { memo, useCallback } from "react";
@@ -113,15 +74,10 @@ export const FaceUpThumbnail = memo(
     ),
   ) => {
     const cardId = props.card.id;
-    // const choiceType = props.choiceProps.choiceType;
-    // const selectDisabled = props.selectorProps === null;
     const cardHasChoosableValue = props.choiceProps.checkValueOnCard(cardId);
     const cardIsChoosableValue = props.choiceProps.checkValue(cardId);
     const cardWasChosenPreviously =
       props.choiceProps.checkPreviousValue(cardId);
-
-    // const cardSelected =
-    //   props.selectorProps?.checkValueSelected(cardId) ?? false;
 
     const chipIds = props.card.chips.map(({ id }) => id);
     const selectedChipIds =
@@ -131,10 +87,6 @@ export const FaceUpThumbnail = memo(
     const expand = useCallback(() => {
       props.setDialog({ type: "card", card: props.card });
     }, [props.card, props.setDialog]);
-
-    // const toggleCardSelect = useCallback(() => {
-    //   props.selectorProps?.toggleValue(cardId);
-    // }, [cardId, props.selectorProps?.toggleValue]);
 
     const highlight: ThumbnailHighlight =
       cardHasChoosableValue || cardIsChoosableValue
@@ -152,7 +104,7 @@ export const FaceUpThumbnail = memo(
         />
         {props.card.chips.length > 0 && (
           <ChipCounterBadge>
-            <ChipDisplay fullWidth={true}>
+            <ChipDisplay side="left" inverted={false} fullWidth={true}>
               <ChipDisplayCounter
                 size="sm"
                 baseCount={chipIds.length}
@@ -178,6 +130,7 @@ const DetailCardAction = (props: {
   instructions: string;
   onChange: () => void;
 }) => {
+  const label = `[${props.actionType}] ${props.instructions}`;
   return (
     <SelectButton
       fullWidth
@@ -187,7 +140,7 @@ const DetailCardAction = (props: {
       size="md"
       color="action"
       disabled={props.disabled}
-      label={props.instructions}
+      label={label}
     />
   );
 };
@@ -232,12 +185,13 @@ export const DetailCard = (props: {
   selectorProps: SelectorProps | null;
 }) => {
   /**
-   * TODO!!! When card is selectable, add a button at the bottom that adds the
-   * card to the current list of selected values, and close the dialog.
+   * TODO!!! When card is selectable, would be nice to combine "select" and
+   * "submit" into a single click.
    */
   /**
-   * TODO!!! When the actions are selectable, if the user has selected an
-   * action, then closes the dialog, the action should become un-selected.
+   * TODO!!! When actions are selectable, and user has selected an action,
+   * but clicks away instead of submitting, would be nice if the action was
+   * de-selected.
    */
   const valuesOnCard = props.choiceProps.getValuesOnCard(props.card.id);
   const selectedValues = props.selectorProps?.selectedValues ?? [];
@@ -261,7 +215,6 @@ export const DetailCard = (props: {
   const submitDisabled =
     props.submitDisabled || selectedValuesOnCard.length < 1;
 
-  // game-card-dialog__menu
   return (
     <CardDetailContainer>
       <CardDetailBody type={props.card.type}>
@@ -294,7 +247,7 @@ export const DetailCard = (props: {
       </CardDetailBody>
       {chipIds.length > 0 && (
         <ChipCounterBadge>
-          <ChipDisplay fullWidth={true}>
+          <ChipDisplay side="left" inverted={false} fullWidth={true}>
             <ChipDisplayCounter
               size="lg"
               baseCount={chipIds.length}

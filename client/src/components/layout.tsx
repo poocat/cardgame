@@ -20,7 +20,7 @@ export const Box = (props: {
 }) => {
   const classNames = ["box"];
   if (props.spacing) classNames.push(`box--spacing-${props.spacing}`);
-  if (props.color) classNames.push(`box--col-${props.color}`);
+  if (props.color) classNames.push(`box--color-${props.color}`);
   if (props.border) classNames.push(`box--border-${props.border}`);
   if (props.size) classNames.push(`box--size-${props.size}`);
   const className = classNames.join(" ");

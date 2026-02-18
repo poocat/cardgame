@@ -10,11 +10,15 @@ export const ButtonBase = (props: {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
+  fullWidth?: boolean;
 }) => {
+  const classNames = ["btn-base"];
+  if (props.fullWidth) classNames.push("btn-base--fullwidth");
+  const className = classNames.join(" ");
   return (
     <button
       type="button"
-      className="btn-base"
+      className={className}
       disabled={!!props.disabled}
       onClick={props.onClick}
     >
@@ -40,7 +44,7 @@ export const Button = (props: {
 }) => {
   const classNames = ["btn"];
   if (props.size) classNames.push(`btn--size-${props.size}`);
-  if (props.color) classNames.push(`btn--col-${props.color}`);
+  if (props.color) classNames.push(`btn--color-${props.color}`);
   if (props.border) classNames.push(`btn--border-${props.border}`);
   if (props.rounded) classNames.push(`btn--rounded`);
   if (props.fullWidth) classNames.push(`btn--fullwidth`);
@@ -72,14 +76,18 @@ export const SelectButton = (props: {
   const symbol = props.selected ? "☑" : "☐";
   const classNames = ["select-btn"];
   if (props.size) classNames.push(`select-btn--size-${props.size}`);
-  if (props.color) classNames.push(`select-btn--col-${props.color}`);
+  if (props.color) classNames.push(`select-btn--color-${props.color}`);
   if (props.border) classNames.push(`select-btn--border-${props.border}`);
   if (props.rounded) classNames.push(`select-btn--rounded`);
   if (props.fullWidth) classNames.push(`select-btn--fullwidth`);
   const className = classNames.join(" ");
 
   return (
-    <ButtonBase onClick={props.onClick} disabled={!!props.disabled}>
+    <ButtonBase
+      fullWidth={props.fullWidth}
+      onClick={props.onClick}
+      disabled={!!props.disabled}
+    >
       <div className={className}>
         {symbol} {props.label}
       </div>

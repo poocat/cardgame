@@ -2,7 +2,7 @@ import { Button, Dialog, SelectButton } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
 import type { Color } from "@client/components/types";
 import type React from "react";
-import { memo, useCallback, useMemo } from "react";
+import { Fragment, memo, useCallback, useMemo } from "react";
 import { DetailCard, FaceUpThumbnail, ThumbnailPlaceholder } from "./cards";
 import {
   ChipArea,
@@ -20,36 +20,24 @@ import type {
   ChoiceValueDigest,
   DialogProps,
   GameDigest,
+  ObserverPlayerDigest,
+  OtherPlayerDigest,
+  PlayerSide,
   SelectorProps,
 } from "./types";
 
-type Side = "left" | "right";
-
-const playerColors = ["red", "yellow", "green", "blue"] as const;
-type PlayerColor = (typeof playerColors)[number];
-
-function getPlayerSide(playerIndex: number): Side {
+function getPlayerSide(playerIndex: number): PlayerSide {
   return playerIndex % 2 > 0 ? "right" : "left";
-}
-function getPlayerColor(playerIndex: number): PlayerColor {
-  return playerColors[playerIndex];
 }
 
 /******************************************************************************
  * ### GameBoardContainer
  ******************************************************************************/
-const GameBoardContainer = (props: {
-  numPlayers: number;
-  children?: React.ReactNode;
-}) => {
+const GameBoardContainer = (props: { children?: React.ReactNode }) => {
   return (
-    <div
-      className={`game game-container game-container--size-${props.numPlayers}`}
-    >
+    <div className={`game game-container`}>
       <div className="game-background">
-        <div
-          className={`game-background-window game-background-window--size-${props.numPlayers}`}
-        ></div>
+        <div className={`game-background__cutout`}></div>
       </div>
       <div className="game-foreground">
         <div className="game-header-spacer"></div>
@@ -63,72 +51,115 @@ const GameBoardContainer = (props: {
  * ### GameBoardPlayerArea
  ******************************************************************************/
 const GameBoardPlayerArea = (props: {
-  playerIndex: number;
+  side: PlayerSide;
   children: React.ReactNode;
 }) => {
-  const side = getPlayerSide(props.playerIndex);
-  const className = `game-player-area game-player-area--${side}`;
+  const className = `game-player-area game-player-area--side-${props.side}`;
   return <div className={className}>{props.children}</div>;
 };
 
+/******************************************************************************
+ * ### GameBoardPlayerTablet
+ ******************************************************************************/
 const GameBoardPlayerTablet = (props: {
-  playerIndex: number;
+  index: number;
   children: React.ReactNode;
 }) => {
-  const playerColor = getPlayerColor(props.playerIndex);
-  const className = `game-player-tablet game-player-tablet--${playerColor}`;
+  const className = `game-player-tablet game-player-tablet--player-${props.index}`;
   return <div className={className}>{props.children}</div>;
 };
 
 /******************************************************************************
  * ### GameBoardPlayerTabletHeader
  ******************************************************************************/
-const GameBoardPlayerTabletHeader = (props: { children: React.ReactNode }) => {
-  return <div className="game-player-tablet__header">{props.children}</div>;
-};
-
-/******************************************************************************
- * ### GameBoardPlayerTabletHeaderName
- ******************************************************************************/
-const GameBoardPlayerTabletHeaderName = (props: { playerName: string }) => {
-  return <div className="game-player-tablet__name">{props.playerName}</div>;
+const GameBoardPlayerTabletHeader = (props: {
+  playerName: string;
+  playerOnTurn: boolean;
+}) => {
+  return (
+    <div className="game-player-tablet__header">
+      <div className="game-player-tablet__name">{props.playerName}</div>
+      {props.playerOnTurn && <div className="game-player-tablet__indicator" />}
+    </div>
+  );
 };
 
 /******************************************************************************
  * ### GameBoardPlayerTabletHeaderCardArea
  ******************************************************************************/
-const GameBoardPlayerTabletHeaderCardArea = (props: {
+const GameBoardPlayerTabletCardArea = (props: {
   children: React.ReactNode;
 }) => {
-  return <div className="game-player-tablet__card-area">{props.children}</div>;
+  return (
+    <div className="game-player-tablet__body">
+      <div className="game-player-tablet__card-area">{props.children}</div>
+    </div>
+  );
 };
 
 /******************************************************************************
- * ### GameBoardPlayerTabletHeader
+ * ### GameBoardPlayerTabletFooter
  ******************************************************************************/
 const GameBoardPlayerTabletFooter = (props: { children: React.ReactNode }) => {
   return <div className="game-player-tablet__footer">{props.children}</div>;
 };
 
 /******************************************************************************
- * ### GameBoardPlayerHandArea
+ * ### GameBoardPlayerAbutment
+ *
+ * An area that is attached to the bottom edge of the player area, used to
+ * hold representations of other players' hands, discard areas, et cetera.
+ *
+ * For the
  ******************************************************************************/
-const GameBoardPlayerHandArea = (props: { children?: React.ReactNode }) => {
-  return <div className="game-player-hand">{props.children}</div>;
+const GameBoardPlayerAbutment = (props: { children?: React.ReactNode }) => {
+  return <div className={`game-player-abutment`}>{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### GameBoardPlayerHand
+ *
+ * Only used for the observing player at the bottom of the game board.
+ ******************************************************************************/
+const GameBoardPlayerHand = (props: {
+  side: PlayerSide;
+  children?: React.ReactNode;
+}) => {
+  return (
+    <div
+      className={`game-player-hand-container game-player-hand-container--side-${props.side}`}
+    >
+      <div className={`game-player-hand game-player-hand--side-${props.side}`}>
+        {props.children}
+      </div>
+    </div>
+  );
 };
 
 /******************************************************************************
  * ### GameBoardPlayerCenter
  ******************************************************************************/
-const GameBoardPlayerCenter = (props: { children?: React.ReactNode }) => {
-  return <div className="game-player-center">{props.children}</div>;
+const GameBoardPlayerCenter = (props: {
+  side: PlayerSide;
+  children?: React.ReactNode;
+}) => {
+  return (
+    <div
+      className={`game-player-center game-player-center--side-${props.side}`}
+    >
+      {props.children}
+    </div>
+  );
 };
 
 /******************************************************************************
  * ### GameBoardPlayerCenter
  ******************************************************************************/
-const GameBoardPlayerCenterCards = (props: { children?: React.ReactNode }) => {
-  return <div className="game-player-center__cards">{props.children}</div>;
+const GameBoardPlayerCenterCards = (props: {
+  side: PlayerSide;
+  children?: React.ReactNode;
+}) => {
+  return <div className="game-player-center__card-area">{props.children}</div>;
 };
 
 /******************************************************************************
@@ -140,6 +171,8 @@ const GameBoardPlayerCenterCards = (props: { children?: React.ReactNode }) => {
 const GameBoardChipMenu = memo(
   (props: {
     label: string;
+    inverted: boolean;
+    side: PlayerSide;
     chips: ChipDigest[];
     submitDisabled: boolean;
     onSubmitChoice: () => void;
@@ -159,15 +192,17 @@ const GameBoardChipMenu = memo(
       selectorProps: props.selectorProps,
     });
 
-    // TODO!!! This should be false if the observing player is not the one selecting!!!
     const selecting =
       props.selectorProps !== null && selectableChipIds.length > 0;
 
     return (
-      // TODO!!! Move fullwidth to <ChipArea/>???
-      <ChipArea>
+      <ChipArea inverted={props.inverted} side={props.side}>
         <ChipAreaLabel>{props.label}</ChipAreaLabel>
-        <ChipDisplay fullWidth={selecting}>
+        <ChipDisplay
+          inverted={props.inverted}
+          side={props.side}
+          fullWidth={selecting}
+        >
           <ChipDisplayCounter
             size="md"
             baseCount={props.chips.length}
@@ -251,39 +286,41 @@ const GameBoardChoiceMenu = memo(
   ) => {
     return (
       <div className="game-footer-menu">
-        <Stack spacing="sm" orientation="vertical">
-          <Box spacing="sm">{props.instructions}</Box>
-          <Box spacing="sm">
-            <Button
-              border="dark"
-              color="secondary"
-              size="md"
-              disabled={props.submitDisabled}
-              onClick={props.onSubmitChoice}
-            >
-              Submit Choices
-            </Button>
-          </Box>
-          <Box spacing="sm">
-            <Stack spacing="sm" orientation="horizontal">
-              {props.values.map(({ value, label }) => {
-                const selected = props.checkValueSelected(value);
-                const disabled = !selected && !props.moreValuesAllowed;
-                return (
-                  <GameBoardChoiceMenuValueSelect
-                    key={value}
-                    value={value}
-                    label={label}
-                    selected={selected}
-                    disabled={disabled}
-                    choiceType={props.choiceType}
-                    toggleValue={props.toggleValue}
-                  />
-                );
-              })}
-            </Stack>
-          </Box>
-        </Stack>
+        <Box spacing="sm">
+          <Stack spacing="sm" orientation="vertical">
+            <Box spacing="sm">{props.instructions}</Box>
+            <Box spacing="sm">
+              <Button
+                border="dark"
+                color="secondary"
+                size="md"
+                disabled={props.submitDisabled}
+                onClick={props.onSubmitChoice}
+              >
+                Submit Choices
+              </Button>
+            </Box>
+            <Box spacing="sm">
+              <Stack spacing="sm" orientation="horizontal">
+                {props.values.map(({ value, label }) => {
+                  const selected = props.checkValueSelected(value);
+                  const disabled = !selected && !props.moreValuesAllowed;
+                  return (
+                    <GameBoardChoiceMenuValueSelect
+                      key={value}
+                      value={value}
+                      label={label}
+                      selected={selected}
+                      disabled={disabled}
+                      choiceType={props.choiceType}
+                      toggleValue={props.toggleValue}
+                    />
+                  );
+                })}
+              </Stack>
+            </Box>
+          </Stack>
+        </Box>
       </div>
     );
   },
@@ -333,71 +370,124 @@ export const GameBoard = memo(
       }
     }, [props.dialogProps.value]);
 
-    // TODO!!! Might be nice to just have this number on hand...
-    const observingPlayerIndex = props.game.otherPlayers.length;
-    const numPlayers =
-      observingPlayerIndex + (props.game.observingPlayer ? 1 : 0);
+    // Gather all players into a single list, discriminating the observer from
+    // the others at the end.
+    const allPlayers: (
+      | { isObserver: true; player: ObserverPlayerDigest }
+      | { isObserver: false; player: OtherPlayerDigest }
+    )[] = props.game.otherPlayers.map((player) => ({
+      player,
+      isObserver: false,
+    }));
+    if (props.game.observingPlayer) {
+      allPlayers.push({ player: props.game.observingPlayer, isObserver: true });
+    }
 
     return (
-      <GameBoardContainer numPlayers={numPlayers}>
-        {props.game.otherPlayers.map((player, ix) => (
-          <GameBoardPlayerArea playerIndex={ix} key={player.id}>
-            <GameBoardPlayerHandArea>
-              <ThumbnailPlaceholder
-                highlight="none"
-                label={
-                  <div>
-                    <div>Hand</div>
-                    <div>{player.cardsInHand.length}</div>
-                  </div>
-                }
-              />
-            </GameBoardPlayerHandArea>
-            <GameBoardPlayerTablet playerIndex={ix}>
-              <GameBoardPlayerTabletHeader>
-                <GameBoardPlayerTabletHeaderName playerName={player.name} />
-                <GameBoardPlayerTabletHeaderCardArea>
-                  {player.cardsInPlay
-                    .filter((card) => card.type === "producer")
-                    .map((card) => (
-                      <FaceUpThumbnail
-                        key={card.id}
-                        variant="inPlay"
-                        card={card}
-                        setDialog={props.dialogProps.set}
-                        choiceProps={props.choiceProps}
-                        selectorProps={
-                          cardSelectEnabled(card.id)
-                            ? props.selectorProps
-                            : null
-                        }
-                      />
-                    ))}
-                </GameBoardPlayerTabletHeaderCardArea>
-              </GameBoardPlayerTabletHeader>
-              <GameBoardPlayerTabletFooter>
-                <GameBoardChipMenu
-                  label="In Reserve"
-                  chips={player.chipsInReserve}
-                  choiceProps={props.choiceProps}
-                  onSubmitChoice={props.onSubmitChoice}
-                  submitDisabled={submitDisabled}
-                  selectorProps={
-                    someChipsSelectable(player.chipsInReserve)
-                      ? props.selectorProps
-                      : null
-                  }
-                />
-              </GameBoardPlayerTabletFooter>
-            </GameBoardPlayerTablet>
-            <GameBoardPlayerCenter>
-              <GameBoardPlayerCenterCards>
-                {player.cardsInPlay
-                  .filter((card) => card.type === "consumer")
-                  .map((card) => (
+      <GameBoardContainer>
+        {allPlayers.map(({ player, isObserver }, ix) => {
+          const side = getPlayerSide(ix);
+          const onTurn = props.game.playerTakingTurnId === player.id;
+          return (
+            <Fragment key={player.id}>
+              <GameBoardPlayerArea side={side}>
+                {/* Abutment not displayed for observing player. */}
+                {!isObserver && (
+                  <GameBoardPlayerAbutment>
+                    <ThumbnailPlaceholder
+                      highlight="none"
+                      label={
+                        <div>
+                          <div>Hand</div>
+                          <div>{player.cardsInHand.length}</div>
+                        </div>
+                      }
+                    />
+                  </GameBoardPlayerAbutment>
+                )}
+                <GameBoardPlayerTablet index={ix}>
+                  <GameBoardPlayerTabletHeader
+                    playerName={player.name}
+                    playerOnTurn={onTurn}
+                  />
+                  <GameBoardPlayerTabletCardArea>
+                    {player.cardsInPlay
+                      .filter((card) => card.type === "producer")
+                      .map((card) => (
+                        <FaceUpThumbnail
+                          key={card.id}
+                          variant="inPlay"
+                          card={card}
+                          setDialog={props.dialogProps.set}
+                          choiceProps={props.choiceProps}
+                          selectorProps={
+                            cardSelectEnabled(card.id)
+                              ? props.selectorProps
+                              : null
+                          }
+                        />
+                      ))}
+                  </GameBoardPlayerTabletCardArea>
+                  <GameBoardPlayerTabletFooter>
+                    <GameBoardChipMenu
+                      label="In Reserve"
+                      inverted={false}
+                      side={side}
+                      chips={player.chipsInReserve}
+                      choiceProps={props.choiceProps}
+                      onSubmitChoice={props.onSubmitChoice}
+                      submitDisabled={submitDisabled}
+                      selectorProps={
+                        someChipsSelectable(player.chipsInReserve)
+                          ? props.selectorProps
+                          : null
+                      }
+                    />
+                  </GameBoardPlayerTabletFooter>
+                </GameBoardPlayerTablet>
+                <GameBoardPlayerCenter side={side}>
+                  <GameBoardPlayerCenterCards side={side}>
+                    {player.cardsInPlay
+                      .filter((card) => card.type === "consumer")
+                      .map((card) => (
+                        <FaceUpThumbnail
+                          key={card.id}
+                          variant="inPlay"
+                          card={card}
+                          setDialog={props.dialogProps.set}
+                          choiceProps={props.choiceProps}
+                          selectorProps={
+                            cardSelectEnabled(card.id)
+                              ? props.selectorProps
+                              : null
+                          }
+                        />
+                      ))}
+                  </GameBoardPlayerCenterCards>
+                  <GameBoardChipMenu
+                    label="In Transit"
+                    inverted={true}
+                    side={side}
+                    chips={[]}
+                    choiceProps={props.choiceProps}
+                    onSubmitChoice={props.onSubmitChoice}
+                    submitDisabled={submitDisabled}
+                    selectorProps={null}
+                    // selectorProps={
+                    //   someChipsSelectable(player.chipsInReserve)
+                    //     ? props.selectorProps
+                    //     : null
+                    // }
+                  />
+                </GameBoardPlayerCenter>
+              </GameBoardPlayerArea>
+              {/* Face-up hand only displayed for observer player. */}
+              {isObserver && (
+                <GameBoardPlayerHand side={side}>
+                  {player.cardsInHand.map((card) => (
                     <FaceUpThumbnail
                       key={card.id}
-                      variant="inPlay"
+                      variant="inHand"
                       card={card}
                       setDialog={props.dialogProps.set}
                       choiceProps={props.choiceProps}
@@ -406,122 +496,25 @@ export const GameBoard = memo(
                       }
                     />
                   ))}
-              </GameBoardPlayerCenterCards>
-              <GameBoardChipMenu
-                label="In Transit"
-                chips={[]}
-                choiceProps={props.choiceProps}
-                onSubmitChoice={props.onSubmitChoice}
-                submitDisabled={submitDisabled}
-                selectorProps={null}
-                // selectorProps={
-                //   someChipsSelectable(player.chipsInReserve)
-                //     ? props.selectorProps
-                //     : null
-                // }
-              />
-            </GameBoardPlayerCenter>
-          </GameBoardPlayerArea>
-        ))}
-        {observingPlayer && (
-          <GameBoardPlayerArea playerIndex={observingPlayerIndex}>
-            <GameBoardPlayerHandArea>
-              {observingPlayer.cardsInHand.map((card) => (
-                <FaceUpThumbnail
-                  key={card.id}
-                  variant="inHand"
-                  card={card}
-                  setDialog={props.dialogProps.set}
-                  choiceProps={props.choiceProps}
-                  selectorProps={
-                    cardSelectEnabled(card.id) ? props.selectorProps : null
-                  }
-                />
-              ))}
-            </GameBoardPlayerHandArea>
-            <GameBoardPlayerTablet playerIndex={observingPlayerIndex}>
-              <GameBoardPlayerTabletHeader>
-                <GameBoardPlayerTabletHeaderName
-                  playerName={observingPlayer.name}
-                />
-                <GameBoardPlayerTabletHeaderCardArea>
-                  {observingPlayer.cardsInPlay
-                    .filter((card) => card.type === "producer")
-                    .map((card) => (
-                      <FaceUpThumbnail
-                        key={card.id}
-                        variant="inPlay"
-                        card={card}
-                        setDialog={props.dialogProps.set}
-                        choiceProps={props.choiceProps}
-                        selectorProps={
-                          cardSelectEnabled(card.id)
-                            ? props.selectorProps
-                            : null
-                        }
-                      />
-                    ))}
-                </GameBoardPlayerTabletHeaderCardArea>
-              </GameBoardPlayerTabletHeader>
-              <GameBoardPlayerTabletFooter>
-                <GameBoardChipMenu
-                  label="In Reserve"
-                  chips={observingPlayer.chipsInReserve}
-                  choiceProps={props.choiceProps}
-                  onSubmitChoice={props.onSubmitChoice}
-                  submitDisabled={submitDisabled}
-                  selectorProps={
-                    someChipsSelectable(observingPlayer.chipsInReserve)
-                      ? props.selectorProps
-                      : null
-                  }
-                />
-              </GameBoardPlayerTabletFooter>
-            </GameBoardPlayerTablet>
-            <GameBoardPlayerCenter>
-              <GameBoardPlayerCenterCards>
-                {observingPlayer.cardsInPlay
-                  .filter((card) => card.type === "consumer")
-                  .map((card) => (
-                    <FaceUpThumbnail
-                      key={card.id}
-                      variant="inPlay"
-                      card={card}
-                      setDialog={props.dialogProps.set}
-                      choiceProps={props.choiceProps}
-                      selectorProps={
-                        cardSelectEnabled(card.id) ? props.selectorProps : null
-                      }
-                    />
-                  ))}
-              </GameBoardPlayerCenterCards>
-              <GameBoardChipMenu
-                label="In Transit"
-                chips={[]}
-                choiceProps={props.choiceProps}
-                onSubmitChoice={props.onSubmitChoice}
-                submitDisabled={submitDisabled}
-                selectorProps={null}
-                // selectorProps={
-                //   someChipsSelectable(player.chipsInReserve)
-                //     ? props.selectorProps
-                //     : null
-                // }
-              />
-            </GameBoardPlayerCenter>
-          </GameBoardPlayerArea>
-        )}
+                </GameBoardPlayerHand>
+              )}
+            </Fragment>
+          );
+        })}
         {observingPlayerIsChoosing && (
-          <GameBoardChoiceMenu
-            instructions={props.game.activity.choice.instructions}
-            choiceType={props.game.activity.choice.type}
-            values={props.game.activity.choice.values}
-            onSubmitChoice={props.onSubmitChoice}
-            submitDisabled={submitDisabled}
-            toggleValue={props.selectorProps.toggleValue}
-            checkValueSelected={props.selectorProps.checkValueSelected}
-            moreValuesAllowed={props.selectorProps.moreValuesAllowed}
-          />
+          <>
+            <div className="game-footer-spacer"></div>
+            <GameBoardChoiceMenu
+              instructions={props.game.activity.choice.instructions}
+              choiceType={props.game.activity.choice.type}
+              values={props.game.activity.choice.values}
+              onSubmitChoice={props.onSubmitChoice}
+              submitDisabled={submitDisabled}
+              toggleValue={props.selectorProps.toggleValue}
+              checkValueSelected={props.selectorProps.checkValueSelected}
+              moreValuesAllowed={props.selectorProps.moreValuesAllowed}
+            />
+          </>
         )}
         <Dialog
           title={dialogTitle}

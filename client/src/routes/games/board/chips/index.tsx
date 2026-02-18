@@ -1,7 +1,7 @@
 import { ButtonBase } from "@client/components";
 import type { Size } from "@client/components/types";
 import { useCallback, useMemo } from "react";
-import type { ChipDigest, SelectorProps } from "../types";
+import type { ChipDigest, PlayerSide, SelectorProps } from "../types";
 import "./styles.css";
 
 /******************************************************************************
@@ -28,7 +28,7 @@ const ChipCounter = (props: {
   selectedCount: number;
 }) => {
   /**
-   * TODO!!! Need a `prevSelectedCount` to account for multi-choice activities
+   * TODO!!! Add a `prevSelectedCount` to account for multi-choice activities
    * where chips are selected from the same pool.
    */
   return (
@@ -49,8 +49,15 @@ const ChipCounter = (props: {
  *
  * A container with a border used to display a named chip pool (e.g. "reserve").
  ******************************************************************************/
-export const ChipArea = (props: { children?: React.ReactNode }) => {
-  return <div className="game-chip-area">{props.children}</div>;
+export const ChipArea = (props: {
+  inverted: boolean;
+  side: PlayerSide;
+  children?: React.ReactNode;
+}) => {
+  const classNames = ["game-chip-area", `game-chip-area--side-${props.side}`];
+  if (props.inverted) classNames.push("game-chip-area--inverted");
+  const className = classNames.join(" ");
+  return <div className={className}>{props.children}</div>;
 };
 
 /******************************************************************************
@@ -70,10 +77,16 @@ export const ChipAreaLabel = (props: { children?: React.ReactNode }) => {
  * Can be used as a child of `<ChipArea/>`, or elsewhere.
  ******************************************************************************/
 export const ChipDisplay = (props: {
+  side: PlayerSide;
+  inverted: boolean;
   fullWidth?: boolean;
   children?: React.ReactNode;
 }) => {
-  const classNames = ["game-chip-display"];
+  const classNames = [
+    "game-chip-display",
+    `game-chip-display--side-${props.side}`,
+  ];
+  if (props.inverted) classNames.push(`game-chip-display--inverted`);
   if (props.fullWidth) classNames.push("game-chip-display--fullwidth");
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;

@@ -3,6 +3,8 @@ import type {
   choiceValueDigestSchema,
   gameDigestSchema,
   inPlayCardDigestSchema,
+  observingPlayerDigestSchema,
+  otherPlayerDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
 import type { choiceTypes } from "@common/game/enums";
@@ -17,6 +19,8 @@ export type FaceUpCardDigest = VisibleCardDigest & Partial<InPlayCardDigest>;
 export type GameDigest = z.infer<typeof gameDigestSchema>;
 export type ChoiceValueDigest = z.infer<typeof choiceValueDigestSchema>;
 export type ChipDigest = z.infer<typeof chipDigestSchema>;
+export type ObserverPlayerDigest = z.infer<typeof observingPlayerDigestSchema>;
+export type OtherPlayerDigest = z.infer<typeof otherPlayerDigestSchema>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Choice
@@ -81,3 +85,8 @@ export type DialogProps = {
   /** Stable. */
   set: (value: DialogValue) => void;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// Layout
+////////////////////////////////////////////////////////////////////////////////
+export type PlayerSide = "left" | "right";

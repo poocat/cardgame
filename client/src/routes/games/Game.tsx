@@ -108,12 +108,14 @@ export const Game = () => {
   ]);
 
   return (
-    <Box spacing="lg">
-      {poller.polling ? (
-        <span>Polled {poller.pollCount} times..</span>
-      ) : (
-        <span>Not polling... {poller.error && `(${poller.error})`}</span>
-      )}
+    <div>
+      <Box spacing="md">
+        {poller.polling ? (
+          <span>Polled {poller.pollCount} times..</span>
+        ) : (
+          <span>Not polling... {poller.error && `(${poller.error})`}</span>
+        )}
+      </Box>
       {game && (
         <GameBoard
           game={game}
@@ -123,6 +125,6 @@ export const Game = () => {
           dialogProps={dialog}
         />
       )}
-    </Box>
+    </div>
   );
 };

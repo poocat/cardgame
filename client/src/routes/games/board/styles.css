@@ -5,18 +5,18 @@
   --footer-menu-max-height: 200px;
   
   --tablet-width: 350px;
-  --tablet-card-area-width: 200px;
 
   --hand-width: 300px;
   --hand-height: 200px;
 
-  --bgwin-width: 350px;
-  --bgwin-hradius: calc(var(--bgwin-width) / 2);
-  --bgwin-vradius: 150px;
-  --bgwin-offset: 20px;
+  --cutout-width: 350px;
+  --cutout-hradius: calc(var(--cutout-width) / 2);
+  --cutout-vradius: 150px;
+  
+  --margin-top: 20px;
+  --margin-bottom: 25px;
 
-  --vertical-padding-top: calc(var(--bgwin-offset) + var(--bgwin-vradius));
-  --total-vertical-padding: calc(var(--vertical-padding-top) + var(--hand-height) + var(--footer-menu-max-height))
+  --vertical-padding-top: calc(var(--margin-top) + var(--cutout-vradius));
 }
 
 /***************************************************************************
@@ -26,22 +26,12 @@
   position: relative;
   width: var(--total-width);
   min-width: var(--total-width);
+  min-height: 100vh;
   margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: start;
-}
-
-.game-container--size-2 {
-  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 2);
-}
-
-.game-container--size-3 {
-  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 3);
-}
-
-.game-container--size-4 {
-  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 4);
+  overflow: hidden;
 }
 
 .game-background {                                                                                                                                                                                                
@@ -49,42 +39,30 @@
   top: 0;                                                                                                                                                                                                         
   left: 0;                                                                                                                                                                                                        
   right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
   z-index: -1;
   pointer-events: none;
+  overflow-y: hidden;
 } 
 
-/*
-  The "window" is the dark area in the middle where consumer are played.
-*/
-.game-background-window {
+/* The "cutout" is the dark area in the middle where consumer cards are played. */
+.game-background__cutout {
   position: relative;
-  top: var(--bgwin-offset);
-  width: var(--bgwin-width);
+  width: var(--cutout-width);
+  height: 9999px;  /* Should get cropped when used in the game background. */
+  padding-top: var(--margin-top);
   background: var(--color-night);
-  outline: 4px double var(--color-black);
-  border-radius: var(--bgwin-hradius) var(--bgwin-hradius) 0 0 / var(--bgwin-vradius) var(--bgwin-vradius) 0 0;
-}
-
-.game-background-window--size-2 {
-  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 2);
-}
-
-.game-background-window--size-3 {
-  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 3);
-}
-
-.game-background-window--size-4 {
-  height: calc(var(--total-vertical-padding) + var(--player-area-height) * 4);
+  border-radius: var(--cutout-hradius) var(--cutout-hradius) 0 0 / var(--cutout-vradius) var(--cutout-vradius) 0 0;
 }
 
 .game-foreground {
   position: relative;
   top: 0;
   width: 100%;
-  height: 100%;
   z-index: 1;
+  margin-bottom: var(--margin-bottom);
 }
 
 .game-header-spacer {
@@ -92,25 +70,29 @@
   height: var(--vertical-padding-top);
 }
 
+.game-footer-spacer {
+  width: 100%;
+  height: var(--footer-menu-max-height);
+}
+
+/* Fixed at the bottom of the screen, to ensure that all possible choices are visible in some way. */
 .game-footer-menu {
-  background-color: var(--color-white-translucent);
   position: fixed;
   width: 100%;
-  border-top: 1px solid var(--color-black);
+  max-height: var(--footer-menu-max-height);
   bottom: 0;
   right: 0;
   left: 0;
-  max-height: var(--footer-menu-max-height);
+  border-top: 1px solid var(--color-black);
+  background-color: var(--color-white-translucent);
   overflow-y: auto;
 }
 
 /***************************************************************************
   Player Area Layout
 ***************************************************************************/
-/*
-  The player-area spans the full width. It can be oriented left or right,
-  which determines which side the player-tablet appears on.
-*/
+
+/* Players get entire rows on the game board. */
 .game-player-area {
   width: 100%;
   height: var(--player-area-height);
@@ -119,20 +101,19 @@
   align-items: flex-start;
 }
 
-/* Left/right orientation */
-.game-player-area--left {
-  text-align: left;
+.game-player-area--side-left {
   flex-direction: row;
 }
 
-.game-player-area--right {
-  text-align: right;
+.game-player-area--side-right {
   flex-direction: row-reverse;
 }
 
 /***************************************************************************
   Tablet Layout
 ***************************************************************************/
+
+/* Player name and producer cards are presented on a "tablet" to the right or left of the center column. */
 .game-player-tablet {
   width: var(--tablet-width);
   height: 100%;
@@ -143,10 +124,10 @@
   justify-content: space-between;
 }
 
-.game-player-tablet--red    { background: var(--color-player-red); }
-.game-player-tablet--yellow { background: var(--color-player-yellow); }
-.game-player-tablet--green  { background: var(--color-player-green); }
-.game-player-tablet--blue   { background: var(--color-player-blue); }
+.game-player-tablet--player-0 { background: var(--color-player-red); }
+.game-player-tablet--player-1 { background: var(--color-player-yellow); }
+.game-player-tablet--player-2 { background: var(--color-player-green); }
+.game-player-tablet--player-3 { background: var(--color-player-blue); }
 
 .game-player-tablet__header {
   width: 100%;
@@ -154,67 +135,81 @@
   justify-content: space-between;
 }
 
+.game-player-tablet__name {
+  font-size: var(--font-size-md);
+}
+
+.game-player-tablet__indicator {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  outline: 4px double var(--color-black);
+}
+
 .game-player-tablet__footer {
   width: 100%;
   display: flex;
 }
 
-.game-player-tablet__name {
-  font-size: var(--font-size-md);
+.game-player-tablet__body {
+  width: 100%;
+  display: flex;
 }
 
-/*
-  The tablet-card-area holds the player's in-play relic cards (up to 3).
-*/
 .game-player-tablet__card-area {
-  width: var(--tablet-card-area-width);
   display: flex;
 }
 
 /* Flex direction for tablet internals based on player orientation */
-.game-player-area--left .game-player-tablet__header,
-.game-player-area--left .game-player-tablet__footer,
-.game-player-area--left .game-player-tablet__card-area {
+.game-player-area--side-right .game-player-tablet__body,
+.game-player-area--side-left .game-player-tablet__header,
+.game-player-area--side-left .game-player-tablet__footer,
+.game-player-area--side-left .game-player-tablet__card-area {
   flex-direction: row;
 }
 
-.game-player-area--right .game-player-tablet__header,
-.game-player-area--right .game-player-tablet__footer,
-.game-player-area--right .game-player-tablet__card-area {
+.game-player-area--side-left .game-player-tablet__body,
+.game-player-area--side-right .game-player-tablet__header,
+.game-player-area--side-right .game-player-tablet__footer,
+.game-player-area--side-right .game-player-tablet__card-area {
   flex-direction: row-reverse;
 }
 
 /***************************************************************************
   Central Area Layout
 ***************************************************************************/
-.game-player-center {
-    width: 30%;
-    height: 100%;
-    padding: var(--space-lg);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
 
-.game-player-center__cards {
+.game-player-center {
+  width: 30%;
+  height: 100%;
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.game-player-center__card-area {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: flex-start;
 }
 
-.game-player-area--left .game-player-center__cards {
+.game-player-area--side-left .game-player-center__card-area {
   flex-direction: row;
 }
 
-.game-player-area--right .game-player-center__cards {
+.game-player-area--side-right .game-player-center__card-area {
   flex-direction: row-reverse;
 }
 
 /***************************************************************************
-  Hand Layout
+  Edge Layout
+
+  Defines a container that lies outside of the player area.
 ***************************************************************************/
-.game-player-hand {
+
+.game-player-abutment {
   width: var(--hand-width);
   height: var(--hand-height);
   position: relative;
@@ -227,13 +222,47 @@
   align-items: flex-start;
 }
 
-.game-player-area--right .game-player-hand {
+.game-player-area--side-left .game-player-abutment {
+  margin-right: -300px;
+  flex-direction: row;
+}
+
+.game-player-area--side-right .game-player-abutment {
   margin-left: calc(var(--hand-width) * -1);
   flex-direction: row-reverse;
 }
 
-.game-player-area--left .game-player-hand {
-  margin-right: -300px;
+/***************************************************************************
+  Hand Layout
+***************************************************************************/
+.game-player-hand-container {
+  width: 100%;
+  display: flex;
+}
+
+.game-player-hand-container--side-left {
+  justify-content: flex-start;
+}
+
+.game-player-hand-container--side-right {
+  justify-content: flex-end;
+}
+
+.game-player-hand {
+  width: var(--hand-width);;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: flex-start;
+  align-items: flex-start;
+}
+
+.game-player-hand--side-left {
   flex-direction: row;
 }
+
+.game-player-hand--side-right {
+  flex-direction: row-reverse;
+}
+
 

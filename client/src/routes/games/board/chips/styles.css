@@ -7,20 +7,15 @@
   flex-direction: column;
 }
 
-/* Alignment based on player orientation */
-.game-player-area--left .game-chip-area {
-  align-items: flex-start;
-}
-
-.game-player-area--right .game-chip-area {
-  align-items: flex-end;
-}
+.game-chip-area--inverted { color: var(--color-white-translucent); }
+.game-chip-area--side-left { align-items: flex-start; }
+.game-chip-area--side-right { align-items: flex-end; }
 
 .game-chip-area__label {
   font-size: var(--font-size-sm);
 }
 
-.game-player-center .game-chip-area__label {
+.game-chip-area--inverted .game-chip-area__label {
   color: var(--color-white-translucent);
 }
 
@@ -36,10 +31,8 @@
   position: absolute;
   bottom: 0;
   transform: translateY(50%);
+  left: 5%;
 }
-
-.game-player-area--left .game-chip-edge__container { left: 5%; }
-.game-player-area--right .game-chip-edge__container { right: 5%; }
 
 .game-chip-display {
   width: 70px;
@@ -51,26 +44,11 @@
   align-items: center;
 }
 
+.game-chip-display--inverted { border-color: var(--color-white-translucent); }
+.game-chip-display--side-right { flex-direction: row-reverse; }
+
 .game-chip-edge .game-chip-display {
   border-style: none;
-}
-
-.game-player-center .game-chip-display {
-  border-color: var(--color-white-translucent);
-}
-
-.game-player-area--right .game-chip-display {
-  flex-direction: row-reverse;
-}
-
-/* Play area variant: light text */
-.game-player-center .game-chip-display__label {
-  color: var(--color-white-translucent);
-}
-
-/* Play area variant: light border */
-.game-player-center .game-chip-display {
-  border-color: var(--color-white-translucent);
 }
 
 /* Expanded width when selector buttons are shown */
@@ -83,7 +61,7 @@
   align-items: center;
 }
 
-.game-player-area--right .game-chip-display__counter {
+.game-chip-display--side-right .game-chip-display__counter {
   flex-direction: row-reverse;
 }
 
@@ -107,6 +85,7 @@
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-sm);
+  color: var(--color-black);
   padding-top: 3px; /* Optical alignment for text */
 }
 
@@ -166,14 +145,14 @@
 /* Direction based on player orientation */                                                                                                                                                                       
 .game-arrow--size-sm { border-left: 4px solid var(--color-black); }                                                                                                                       
 .game-arrow--size-md { border-left: 6px solid var(--color-black); }                                                                                                                       
-.game-arrow--size-lg { border-left: 8px solid var(--color-black); }                                                                                                                       
+.game-arrow--size-lg { border-left: 8px solid var(--color-black); }                                                                                                                     
                                                                                                                                                                                                                   
-.game-player-area--right .game-arrow--size-sm { border-right: 4px solid var(--color-black); border-left: none; }                                                                                                                     
-.game-player-area--right .game-arrow--size-md { border-right: 6px solid var(--color-black); border-left: none; }                                                                                                                     
-.game-player-area--right .game-arrow--size-lg { border-right: 8px solid var(--color-black); border-left: none; }                                                                                                                     
+.game-chip-display--side-right .game-arrow--size-sm { border-right: 4px solid var(--color-black); border-left: none; }                                                                                                                     
+.game-chip-display--side-right .game-arrow--size-md { border-right: 6px solid var(--color-black); border-left: none; }                                                                                                                     
+.game-chip-display--side-right .game-arrow--size-lg { border-right: 8px solid var(--color-black); border-left: none; }                                                                                                                     
                                                                                                                                                                                                                   
 /* Light variant for play area */                                                                                                                                                                                 
-.game-player-center .game-arrow {                                                                                                                                                                                 
+.game-chip-display--inverted .game-arrow {                                                                                                                                                                                 
   border-left-color: var(--color-white-translucent);                                                                                                                                                              
   border-right-color: var(--color-white-translucent);                                                                                                                                                             
 }   
