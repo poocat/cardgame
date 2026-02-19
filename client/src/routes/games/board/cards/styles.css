@@ -56,7 +56,7 @@
 /* Consumer cards always have a light background. */
 .game-card--consumer {
   background-color: var(--color-night);
-  color: var(--color-white-translucent)
+  color: var(--color-white-translucent);
 }
 
 .game-card--placeholder {

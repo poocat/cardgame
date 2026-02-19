@@ -3,7 +3,7 @@
 
   --player-area-height: 250px;
   --footer-menu-max-height: 200px;
-  
+
   --tablet-width: 350px;
 
   --hand-width: 300px;
@@ -12,7 +12,7 @@
   --cutout-width: 350px;
   --cutout-hradius: calc(var(--cutout-width) / 2);
   --cutout-vradius: 150px;
-  
+
   --margin-top: 20px;
   --margin-bottom: 25px;
 
@@ -34,10 +34,10 @@
   overflow: hidden;
 }
 
-.game-background {                                                                                                                                                                                                
-  position: absolute;                                                                                                                                                                                             
-  top: 0;                                                                                                                                                                                                         
-  left: 0;                                                                                                                                                                                                        
+.game-background {
+  position: absolute;
+  top: 0;
+  left: 0;
   right: 0;
   bottom: 0;
   display: flex;
@@ -45,16 +45,18 @@
   z-index: -1;
   pointer-events: none;
   overflow-y: hidden;
-} 
+}
 
 /* The "cutout" is the dark area in the middle where consumer cards are played. */
 .game-background__cutout {
   position: relative;
   width: var(--cutout-width);
-  height: 9999px;  /* Should get cropped when used in the game background. */
+  height: 9999px; /* Should get cropped when used in the game background. */
   padding-top: var(--margin-top);
   background: var(--color-night);
-  border-radius: var(--cutout-hradius) var(--cutout-hradius) 0 0 / var(--cutout-vradius) var(--cutout-vradius) 0 0;
+  border-radius:
+    var(--cutout-hradius) var(--cutout-hradius) 0 0 / var(--cutout-vradius)
+    var(--cutout-vradius) 0 0;
 }
 
 .game-foreground {
@@ -124,10 +126,18 @@
   justify-content: space-between;
 }
 
-.game-player-tablet--player-0 { background: var(--color-player-red); }
-.game-player-tablet--player-1 { background: var(--color-player-yellow); }
-.game-player-tablet--player-2 { background: var(--color-player-green); }
-.game-player-tablet--player-3 { background: var(--color-player-blue); }
+.game-player-tablet--player-0 {
+  background: var(--color-player-red);
+}
+.game-player-tablet--player-1 {
+  background: var(--color-player-yellow);
+}
+.game-player-tablet--player-2 {
+  background: var(--color-player-green);
+}
+.game-player-tablet--player-3 {
+  background: var(--color-player-blue);
+}
 
 .game-player-tablet__header {
   width: 100%;
@@ -249,7 +259,7 @@
 }
 
 .game-player-hand {
-  width: var(--hand-width);;
+  width: var(--hand-width);
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -264,5 +274,3 @@
 .game-player-hand--side-right {
   flex-direction: row-reverse;
 }
-
-

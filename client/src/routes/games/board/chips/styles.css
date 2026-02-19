@@ -7,9 +7,15 @@
   flex-direction: column;
 }
 
-.game-chip-area--inverted { color: var(--color-white-translucent); }
-.game-chip-area--side-left { align-items: flex-start; }
-.game-chip-area--side-right { align-items: flex-end; }
+.game-chip-area--inverted {
+  color: var(--color-white-translucent);
+}
+.game-chip-area--side-left {
+  align-items: flex-start;
+}
+.game-chip-area--side-right {
+  align-items: flex-end;
+}
 
 .game-chip-area__label {
   font-size: var(--font-size-sm);
@@ -44,8 +50,12 @@
   align-items: center;
 }
 
-.game-chip-display--inverted { border-color: var(--color-white-translucent); }
-.game-chip-display--side-right { flex-direction: row-reverse; }
+.game-chip-display--inverted {
+  border-color: var(--color-white-translucent);
+}
+.game-chip-display--side-right {
+  flex-direction: row-reverse;
+}
 
 .game-chip-edge .game-chip-display {
   border-style: none;
@@ -57,7 +67,7 @@
 }
 
 .game-chip-display__counter {
-  display: flex;                                                                                                                                                                                     
+  display: flex;
   align-items: center;
 }
 
@@ -120,39 +130,54 @@
   A simple CSS arrow used to indicate direction of chip movement.
   Faces right for left-side players, left for right-side players.
 */
-.game-arrow {                                                                                                                                                                                                     
-  width: 0;                                                                                                                                                                                                       
-  height: 0;                                                                                                                                                                                                      
-  margin: 0 var(--space-sm);                                                                                                                                                                                      
-}                                                                                                                                                                                                                 
-                                                                                                                                                                                                                  
-/* Size variants */                                                                                                                                                                                               
-.game-arrow--size-sm {                                                                                                                                                                                            
-  border-top: 3px solid transparent;                                                                                                                                                                              
-  border-bottom: 3px solid transparent;                                                                                                                                                                           
-}                                                                                                                                                                                                                 
-                                                                                                                                                                                                                  
-.game-arrow--size-md {                                                                                                                                                                                            
-  border-top: 5px solid transparent;                                                                                                                                                                              
-  border-bottom: 5px solid transparent;                                                                                                                                                                           
-}                                                                                                                                                                                                                 
-                                                                                                                                                                                                                  
-.game-arrow--size-lg {                                                                                                                                                                                            
-  border-top: 7px solid transparent;                                                                                                                                                                              
-  border-bottom: 7px solid transparent;                                                                                                                                                                           
-}                                                                                                                                                                                                                 
-                                                                                                                                                                                                                  
-/* Direction based on player orientation */                                                                                                                                                                       
-.game-arrow--size-sm { border-left: 4px solid var(--color-black); }                                                                                                                       
-.game-arrow--size-md { border-left: 6px solid var(--color-black); }                                                                                                                       
-.game-arrow--size-lg { border-left: 8px solid var(--color-black); }                                                                                                                     
-                                                                                                                                                                                                                  
-.game-chip-display--side-right .game-arrow--size-sm { border-right: 4px solid var(--color-black); border-left: none; }                                                                                                                     
-.game-chip-display--side-right .game-arrow--size-md { border-right: 6px solid var(--color-black); border-left: none; }                                                                                                                     
-.game-chip-display--side-right .game-arrow--size-lg { border-right: 8px solid var(--color-black); border-left: none; }                                                                                                                     
-                                                                                                                                                                                                                  
-/* Light variant for play area */                                                                                                                                                                                 
-.game-chip-display--inverted .game-arrow {                                                                                                                                                                                 
-  border-left-color: var(--color-white-translucent);                                                                                                                                                              
-  border-right-color: var(--color-white-translucent);                                                                                                                                                             
-}   
+.game-arrow {
+  width: 0;
+  height: 0;
+  margin: 0 var(--space-sm);
+}
+
+/* Size variants */
+.game-arrow--size-sm {
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+}
+
+.game-arrow--size-md {
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+.game-arrow--size-lg {
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+}
+
+/* Direction based on player orientation */
+.game-arrow--size-sm {
+  border-left: 4px solid var(--color-black);
+}
+.game-arrow--size-md {
+  border-left: 6px solid var(--color-black);
+}
+.game-arrow--size-lg {
+  border-left: 8px solid var(--color-black);
+}
+
+.game-chip-display--side-right .game-arrow--size-sm {
+  border-right: 4px solid var(--color-black);
+  border-left: none;
+}
+.game-chip-display--side-right .game-arrow--size-md {
+  border-right: 6px solid var(--color-black);
+  border-left: none;
+}
+.game-chip-display--side-right .game-arrow--size-lg {
+  border-right: 8px solid var(--color-black);
+  border-left: none;
+}
+
+/* Light variant for play area */
+.game-chip-display--inverted .game-arrow {
+  border-left-color: var(--color-white-translucent);
+  border-right-color: var(--color-white-translucent);
+}
