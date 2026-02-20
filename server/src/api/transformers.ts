@@ -165,7 +165,7 @@ export function digestGameData({
   }
 
   const digest: GameDigest = {
-    playerTakingTurnId: gameData.playerTakingTurnId,
+    playerTakingTurnId: anonymizedPlayerIdMap[gameData.playerTakingTurnId],
     activity: {
       type: gameData.activity.type,
       choice: {
