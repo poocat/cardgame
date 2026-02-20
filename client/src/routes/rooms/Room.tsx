@@ -25,6 +25,8 @@ export const Room = () => {
   const [query, setQuery] = useSearchParams();
   const playerId = query.get("playerId");
 
+  const [gameStarting, setGameStarting] = useState(false);
+
   const url = useMemo(() => {
     const base = `/api/rooms/${roomId}`;
     return playerId ? `${base}?playerId=${playerId}` : base;
@@ -41,9 +43,9 @@ export const Room = () => {
       if (elapsedTimeMs < 1 * 60 * 1000) {
         return 1000; // Once per second for the first minute.
       } else if (elapsedTimeMs < 5 * 60 * 1000) {
-        return 10000; // Once every 10 s for after the first minute.
+        return 5000; // Once every 5 s for after the first minute.
       } else {
-        return 60000; // Once every minute after first 5 minutes.
+        return 10000; // Once every 10 s after first 5 minutes.
       }
     },
     getPollingEnabled: () => true, // Poll constantly
@@ -90,6 +92,11 @@ export const Room = () => {
 
   const startGameDisabled = !playerIsHost || !roomId;
   const handleStartGame = useCallback(async () => {
+    /**
+     * Does not immediately start a game. Instead makes request to start the
+     * game. When the game is ready, it will be reflected in the room data,
+     * which won't arrive until the next poll.
+     */
     if (startGameDisabled) return;
     try {
       const payload = ROUTES.games.methods.post.schemas.requestBody.parse({
@@ -111,6 +118,7 @@ export const Room = () => {
     } catch (error) {
       console.error(error);
     }
+    setGameStarting(true);
   }, [startGameDisabled, roomId, playerId]);
 
   return (
@@ -150,8 +158,9 @@ export const Room = () => {
             color="chip"
             size="lg"
             onClick={handleStartGame}
+            disabled={gameStarting}
           >
-            Start Game
+            {gameStarting ? "Starting..." : "Start Game"}
           </Button>
         ) : playerId ? (
           <Box>Waiting for host to start...</Box>
