@@ -75,11 +75,11 @@ const playerDigestCommonSchema = z.strictObject({
   chipsInReserve: z.array(chipDigestSchema),
 });
 
-const observingPlayerDigestSchema = playerDigestCommonSchema.extend({
+export const observingPlayerDigestSchema = playerDigestCommonSchema.extend({
   cardsInHand: z.array(visibleCardDigestSchema),
 });
 
-const otherPlayerDigestSchema = playerDigestCommonSchema.extend({
+export const otherPlayerDigestSchema = playerDigestCommonSchema.extend({
   cardsInHand: z.array(hiddenCardDigestSchema),
 });
 

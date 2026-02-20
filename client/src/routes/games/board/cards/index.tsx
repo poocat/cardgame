@@ -1,52 +1,13 @@
-/**
- * Cards
- *
- * All cards are displayed with the "thumbnail" form factor, and up to one
- * card is displayed in the "full" form factor as a pop-up dialog.
- *
- * The thumbnail should display the following information:
- * - The type of card
- * - The chips on it
- * - The set of action types available
- *
- * The thumbnail should always be presented in a container that leaves room for:
- * - The card name, above the card
- * - A checkbox (when the card is selectable) to the left of the name
- *
- * The thumbnail container will also be used to highlight the card, using
- * different colors/hues/etc for the following cases:
- * - The card is selectable (choice type is "cardId")
- * - The card has chips on it that are selectable (choice type is "chipId")
- * - The card has actions on it that are selectable (choice type is "actionId")
- *
- * (There should maybe be a specific color for each of these entities?)
- *
- * Choosing chips on a card or an action on a card requires expanding the card
- * to its "full" form factor.
- *
- * The full form factor should also be displayed in its own container, which
- * leaves room at the bottom for controls, such as:
- * - A submit button.
- * - When selecting cards, a sort of "checkbox".
- * - When selecting chips from the card, increment/decrement buttons.
- *
- * If the player has selected chips/actions from the card, if no other
- * chips/actions are selectable on any other card, then the player should not
- * be able to close the "full" view until they have submitted their choices,
- * or unselect them.
- *
- */
-
-import { Button } from "@client/components";
-import { memo, useCallback, useMemo } from "react";
+import { Button, SelectButton } from "@client/components";
+import { Box, Stack } from "@client/components/layout";
+import { memo, useCallback } from "react";
 import {
   ChipCounterBadge,
-  ChipSelectMenu,
-  DetailChipCounter,
-  ThumbnailChipCounter,
+  ChipDisplay,
+  ChipDisplayCounter,
+  ChipDisplaySelector,
   useChipSelector,
 } from "../chips";
-import { colors } from "../palette";
 import type {
   ChipDigest,
   ChoiceProps,
@@ -57,28 +18,34 @@ import type {
   VisibleCardDigest,
 } from "../types";
 import {
-  CardDetail,
-  CardDetailAction,
-  CardDetailActionContainer,
+  CardDetailBody,
   CardDetailContainer,
-  CardDetailFooterContainer,
+  CardDetailMenuContainer,
 } from "./detail";
-import {
-  CardThumbnailBodyContainer,
-  CardThumbnailContainer,
-  CardThumbnailFaceUp,
-  CardThumbnailHeader,
-  CardThumbnailHeaderContainer,
-  CardThumbnailHighlight,
-} from "./thumbnail";
-import type { ThumbnailCardHighlightVariant } from "./types";
+import "./styles.css";
+import type { ThumbnailHighlight } from "./thumbnail";
+import { Thumbnail, ThumbnailContainer } from "./thumbnail";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Thumbnail Form Factor
 ////////////////////////////////////////////////////////////////////////////////
 
 /******************************************************************************
- * ### FaceUpThumbnailCard
+ * ### ThumbnailPlaceholder
+ ******************************************************************************/
+export const ThumbnailPlaceholder = (props: {
+  label?: React.ReactNode;
+  highlight: ThumbnailHighlight;
+}) => {
+  return (
+    <ThumbnailContainer highlight={props.highlight}>
+      <Thumbnail variant="placeholder" label={props.label} />
+    </ThumbnailContainer>
+  );
+};
+
+/******************************************************************************
+ * ### FaceUpThumbnail
  *
  * A complete component for displaying a card in play in the "thumbnail" form
  * factor, within its own container, which takes on different styles depending
@@ -88,7 +55,7 @@ import type { ThumbnailCardHighlightVariant } from "./types";
  * - whether or not the card or one of its actions or chips were chosen
  *   previously in the current activity
  ******************************************************************************/
-export const FaceUpThumbnailCard = memo(
+export const FaceUpThumbnail = memo(
   (
     props: {
       setDialog: DialogProps["set"];
@@ -107,15 +74,12 @@ export const FaceUpThumbnailCard = memo(
     ),
   ) => {
     const cardId = props.card.id;
-    const choiceType = props.choiceProps.choiceType;
-    const selectDisabled = props.selectorProps === null;
     const cardHasChoosableValue = props.choiceProps.checkValueOnCard(cardId);
     const cardIsChoosableValue = props.choiceProps.checkValue(cardId);
     const cardWasChosenPreviously =
       props.choiceProps.checkPreviousValue(cardId);
-
-    const cardSelected =
-      props.selectorProps?.checkValueSelected(cardId) ?? false;
+    const cardIsExhausted =
+      props.variant === "inPlay" ? props.card.exhausted : false;
 
     const chipIds = props.card.chips.map(({ id }) => id);
     const selectedChipIds =
@@ -126,81 +90,32 @@ export const FaceUpThumbnailCard = memo(
       props.setDialog({ type: "card", card: props.card });
     }, [props.card, props.setDialog]);
 
-    const toggleCardSelect = useCallback(() => {
-      props.selectorProps?.toggleValue(cardId);
-    }, [cardId, props.selectorProps?.toggleValue]);
-
-    /**
-     * Determine the variant:
-     * - Check if the card (or any of its chips or actions) are part of the
-     *   current choice.
-     *   - If so, check if the observing player is choosing.
-     *     - If so, variant is `observerChoosing_____`.
-     *     - If not, variant is `otherPlayerChoosing`.
-     *   - If not, check if card (or any of its chips or actions) were chosen
-     *     earlier in the activity.
-     *     - If so, variant is `chosenPreviously`.
-     *     - If not, variant is `default`.
-     */
-    const variant: ThumbnailCardHighlightVariant = useMemo(() => {
-      if (cardHasChoosableValue || cardIsChoosableValue) {
-        if (!selectDisabled) {
-          if (choiceType === "actionId" && cardHasChoosableValue)
-            return "observerCanChooseActionOnCard";
-          if (choiceType === "chipId" && cardHasChoosableValue)
-            return "observerCanChooseChipOnCard";
-          if (choiceType === "cardId" && cardSelected)
-            return "observerHasChosenCard";
-          if (choiceType === "cardId" && cardIsChoosableValue)
-            return "observerCanChooseCard";
-        } else {
-          return "otherPlayerChoosing";
-        }
-      } else if (cardWasChosenPreviously) {
-        return "chosenPreviously";
-      }
-      return "default";
-    }, [
-      choiceType,
-      selectDisabled,
-      cardSelected,
-      cardHasChoosableValue,
-      cardIsChoosableValue,
-      cardWasChosenPreviously,
-    ]);
+    const highlight: ThumbnailHighlight =
+      cardHasChoosableValue || cardIsChoosableValue
+        ? "selectable"
+        : cardWasChosenPreviously
+          ? "selected"
+          : "none";
 
     return (
-      <CardThumbnailContainer>
-        <CardThumbnailHighlight variant={variant}>
-          <CardThumbnailHeaderContainer>
-            <CardThumbnailHeader
-              cardId={props.card.id}
-              cardName={props.card.name}
-              cardSelected={cardSelected}
-              selectDisabled={!cardIsChoosableValue || selectDisabled}
-              onChange={toggleCardSelect}
-            />
-          </CardThumbnailHeaderContainer>
-          <CardThumbnailBodyContainer>
-            <CardThumbnailFaceUp
-              cardType={props.card.type}
-              numChips={props.card.chips.length}
-              exhausted={
-                props.variant === "inPlay" ? props.card.exhausted : false
-              }
-              onClick={expand}
-            />
-            {props.card.chips.length > 0 && (
-              <ChipCounterBadge>
-                <ThumbnailChipCounter
-                  count={chipIds.length}
-                  numSelected={selectedChipIds.length}
-                />
-              </ChipCounterBadge>
-            )}
-          </CardThumbnailBodyContainer>
-        </CardThumbnailHighlight>
-      </CardThumbnailContainer>
+      <ThumbnailContainer highlight={highlight} exhausted={cardIsExhausted}>
+        <Thumbnail
+          label={props.card.name}
+          variant={props.card.type}
+          onClick={expand}
+        />
+        {props.card.chips.length > 0 && (
+          <ChipCounterBadge>
+            <ChipDisplay side="left" inverted={false} fullWidth={true}>
+              <ChipDisplayCounter
+                size="sm"
+                baseCount={chipIds.length}
+                selectedCount={selectedChipIds.length}
+              />
+            </ChipDisplay>
+          </ChipCounterBadge>
+        )}
+      </ThumbnailContainer>
     );
   },
 );
@@ -217,12 +132,17 @@ const DetailCardAction = (props: {
   instructions: string;
   onChange: () => void;
 }) => {
+  const label = `[${props.actionType}] ${props.instructions}`;
   return (
-    <CardDetailAction
-      label={`[${props.actionType}] ${props.instructions}`}
+    <SelectButton
+      fullWidth
+      border="dark"
       selected={props.selected}
+      onClick={props.onChange}
+      size="md"
+      color="action"
       disabled={props.disabled}
-      onChange={props.onChange}
+      label={label}
     />
   );
 };
@@ -242,7 +162,8 @@ const DetailCardChipSelect = (props: {
   });
 
   return (
-    <ChipSelectMenu
+    <ChipDisplaySelector
+      size="lg"
       numSelected={numSelected}
       disableIncrement={!props.selectorProps?.moreValuesAllowed}
       onIncrement={addChip}
@@ -265,6 +186,15 @@ export const DetailCard = (props: {
   choiceProps: ChoiceProps;
   selectorProps: SelectorProps | null;
 }) => {
+  /**
+   * TODO!!! When card is selectable, would be nice to combine "select" and
+   * "submit" into a single click.
+   */
+  /**
+   * TODO!!! When actions are selectable, and user has selected an action,
+   * but clicks away instead of submitting, would be nice if the action was
+   * de-selected.
+   */
   const valuesOnCard = props.choiceProps.getValuesOnCard(props.card.id);
   const selectedValues = props.selectorProps?.selectedValues ?? [];
   const selectedValuesOnCard = selectedValues.filter((v) =>
@@ -273,7 +203,8 @@ export const DetailCard = (props: {
 
   const choiceType = props.choiceProps.choiceType;
 
-  const cardHasChoice = valuesOnCard.length > 0;
+  const cardIsSelectable = props.choiceProps.checkValue(props.card.id);
+  const cardHasChoice = valuesOnCard.length > 0 || cardIsSelectable;
   const cardHasSelectableActions = cardHasChoice && choiceType === "actionId";
   const cardHasSelectableChips = cardHasChoice && choiceType === "chipId";
 
@@ -288,42 +219,47 @@ export const DetailCard = (props: {
 
   return (
     <CardDetailContainer>
-      <CardDetail>
-        <div>{props.card.name}</div>
-        <CardDetailActionContainer>
-          {props.card.actions.map((action) => {
-            const selected =
-              props.selectorProps?.checkValueSelected(action.id) ?? false;
-            const selectable = props.choiceProps.checkValue(action.id);
-            const toggleable =
-              props.selectorProps?.moreValuesAllowed || selected;
-            const toggle = () => props.selectorProps?.toggleValue(action.id);
-            return (
-              <DetailCardAction
-                key={action.id}
-                actionId={action.id}
-                actionType={action.type}
-                instructions={action.instructions}
-                disabled={
-                  !cardHasSelectableActions || !selectable || !toggleable
-                }
-                selected={selected}
-                onChange={toggle}
-              />
-            );
-          })}
-        </CardDetailActionContainer>
-      </CardDetail>
+      <CardDetailBody type={props.card.type}>
+        <Box spacing="sm">
+          <Stack spacing="sm" orientation="vertical">
+            <div>{props.card.name}</div>
+            {props.card.actions.map((action) => {
+              const selected =
+                props.selectorProps?.checkValueSelected(action.id) ?? false;
+              const selectable = props.choiceProps.checkValue(action.id);
+              const toggleable =
+                props.selectorProps?.moreValuesAllowed || selected;
+              const toggle = () => props.selectorProps?.toggleValue(action.id);
+              return (
+                <DetailCardAction
+                  key={action.id}
+                  actionId={action.id}
+                  actionType={action.type}
+                  instructions={action.instructions}
+                  disabled={
+                    !cardHasSelectableActions || !selectable || !toggleable
+                  }
+                  selected={selected}
+                  onChange={toggle}
+                />
+              );
+            })}
+          </Stack>
+        </Box>
+      </CardDetailBody>
       {chipIds.length > 0 && (
         <ChipCounterBadge>
-          <DetailChipCounter
-            count={chipIds.length}
-            numSelected={numSelectedChips}
-          />
+          <ChipDisplay side="left" inverted={false} fullWidth={true}>
+            <ChipDisplayCounter
+              size="lg"
+              baseCount={chipIds.length}
+              selectedCount={numSelectedChips}
+            />
+          </ChipDisplay>
         </ChipCounterBadge>
       )}
       {cardHasChoice && (
-        <CardDetailFooterContainer>
+        <CardDetailMenuContainer>
           {cardHasSelectableChips && (
             <DetailCardChipSelect
               chips={props.card.chips}
@@ -334,15 +270,40 @@ export const DetailCard = (props: {
           )}
           {cardHasSelectableActions && !submitDisabled && (
             <Button
+              rounded
+              border="dark"
+              size="md"
               onClick={props.onSubmitChoice}
-              color={colors.actions}
-              height={50}
-              fontSize={20}
+              color="action"
             >
-              ✓
+              ok
             </Button>
           )}
-        </CardDetailFooterContainer>
+          {cardIsSelectable && (
+            <Stack orientation="horizontal" spacing="sm">
+              <SelectButton
+                rounded
+                border="dark"
+                size="md"
+                color="card"
+                label="select"
+                selected={Boolean(
+                  props.selectorProps?.checkValueSelected(props.card.id),
+                )}
+                onClick={() => props.selectorProps?.toggleValue(props.card.id)}
+              ></SelectButton>
+              <Button
+                rounded
+                border="dark"
+                size="md"
+                onClick={props.onSubmitChoice}
+                color="card"
+              >
+                ok
+              </Button>
+            </Stack>
+          )}
+        </CardDetailMenuContainer>
       )}
     </CardDetailContainer>
   );

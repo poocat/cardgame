@@ -1,0 +1,77 @@
+/***************************************************************************
+  Reset
+
+  Minimal reset for consistent cross-browser defaults.
+***************************************************************************/
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/***************************************************************************
+  Design Tokens
+***************************************************************************/
+
+:root {
+  /* Colors: Core */
+  --color-white: #ffffee;
+  --color-white-translucent: #ffffeebb;
+  --color-brown: #ddccbb;
+  --color-black: #222222;
+  --color-black-translucent: #22222288;
+  --color-night: #444488;
+  --color-highlight: #ffffee88;
+  --color-lowlight: #22222288;
+
+  /* Colors: Chips */
+  --color-chip: #ffff00;
+  --color-chip-selected: #ffff0077;
+
+  /* Colors: Players */
+  --color-player-red: #ff8888;
+  --color-player-yellow: #ffff88;
+  --color-player-green: #71d989;
+  --color-player-blue: #8888ff;
+
+  /* Spacing */
+  --space-xs: 2px;
+  --space-sm: 5px;
+  --space-md: 15px;
+  --space-lg: 18px;
+
+  /* Sizing */
+  --control-size-xs: 15px;
+  --control-size-sm: 20px;
+  --control-size-md: 35px;
+  --control-size-lg: 50px;
+
+  /* Card Dimensions */
+  --card-width-sm: 60px;
+  --card-height-sm: 60px;
+  --card-width-lg: 250px;
+  --card-height-lg: 350px;
+
+  /* Typography */
+  --font-family: "Rockwell", serif;
+  --font-size-xs: 8px;
+  --font-size-sm: 10px;
+  --font-size-md: 14px;
+  --font-size-lg: 18px;
+}
+
+/***************************************************************************
+  Base Styles
+
+  Default styles applied to the document.
+***************************************************************************/
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  color: var(--color-black);
+  background: var(--color-white);
+}

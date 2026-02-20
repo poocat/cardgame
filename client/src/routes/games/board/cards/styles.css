@@ -1,0 +1,135 @@
+/***************************************************************************
+  Card
+***************************************************************************/
+
+.game-card-container {
+  /* Padding is necessary to ensure that the highlight is visible. */
+  padding: 3px;
+  border-radius: 3px;
+  margin: 1px;
+}
+
+.game-card-container--selectable {
+  background-color: var(--color-lowlight);
+}
+
+.game-card-container--selected {
+  outline: var(--color-lowlight);
+}
+
+.game-card-container--exhausted {
+  transform: rotate(5deg);
+}
+
+.game-player-center .game-card-container--selectable {
+  background-color: var(--color-highlight);
+}
+
+.game-player-center .game-card-container--selected {
+  outline: 1px solid var(--color-highlight);
+}
+
+.game-card {
+  width: var(--card-width-sm);
+  height: var(--card-width-sm);
+  border: 1px solid;
+  border-radius: 2px;
+  padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: var(--font-size-xs);
+  /* Default */
+  border-color: var(--color-black);
+  color: var(--color-black);
+}
+
+.game-card--clickable {
+  cursor: pointer;
+}
+
+/* Producer cards always have a dark background. */
+.game-card--producer {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+/* Consumer cards always have a light background. */
+.game-card--consumer {
+  background-color: var(--color-night);
+  color: var(--color-white);
+}
+
+.game-card--placeholder {
+  background-color: var(--color-white);
+  border-color: var(--color-black);
+  color: var(--color-black);
+}
+
+.game-card-container--exhausted .game-card--producer {
+  color: var(--color-black-translucent);
+}
+
+.game-card-container--exhausted .game-card--consumer {
+  color: var(--color-white-translucent);
+}
+
+/* TODO!!! Don't inherit style from outside this file!!! */
+.game-player-center .game-card {
+  border-color: var(--color-white);
+}
+
+.game-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/***************************************************************************
+  Card Dialog
+***************************************************************************/
+
+.game-dialog__card-container {
+  width: var(--card-width-lg);
+  height: calc(var(--card-height-lg) + 50px);
+}
+
+.game-dialog__card-menu {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: end;
+  justify-items: end;
+}
+
+.game-dialog__card {
+  width: var(--card-width-lg);
+  height: var(--card-height-lg);
+  border-radius: 12px;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); */
+  border: 2px solid var(--color-black);
+}
+
+.game-dialog__card--producer {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.game-dialog__card--consumer {
+  background: var(--color-night);
+  color: var(--color-white);
+}
+
+.game-dialog__card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 9px;
+}

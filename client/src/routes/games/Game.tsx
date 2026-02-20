@@ -1,3 +1,4 @@
+import { Box } from "@client/components/layout";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
 import { useCallback, useMemo } from "react";
@@ -37,9 +38,9 @@ export const Game = () => {
       if (elapsedTimeMs < 1 * 60 * 1000) {
         return 1000; // Once per second for the first minute.
       } else if (elapsedTimeMs < 5 * 60 * 1000) {
-        return 10000; // Once every 10 s for after the first minute.
+        return 5000; // Once every 5 s after the first minute.
       } else {
-        return 60000; // Once every minute after first 5 minutes.
+        return 10000; // Once every 10 s after first 5 minutes.
       }
     },
     getPollingEnabled: (data) =>
@@ -108,14 +109,13 @@ export const Game = () => {
 
   return (
     <div>
-      <hr />
-      <div style={{ padding: 5 }}>
+      <Box spacing="md">
         {poller.polling ? (
           <span>Polled {poller.pollCount} times..</span>
         ) : (
           <span>Not polling... {poller.error && `(${poller.error})`}</span>
         )}
-      </div>
+      </Box>
       {game && (
         <GameBoard
           game={game}

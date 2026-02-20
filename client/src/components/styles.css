@@ -1,0 +1,340 @@
+/***************************************************************************
+  Box
+***************************************************************************/
+/* .box {} */
+
+.box--fullwidth {
+  width: 100%;
+}
+
+.box--size-sm {
+  width: 100px;
+}
+
+.box--size-md {
+  width: 400px;
+}
+
+.box--size-lg {
+  width: 800px;
+}
+
+.box--spacing-sm {
+  padding: var(--space-sm);
+}
+
+.box--spacing-md {
+  padding: var(--space-md);
+}
+
+.box--spacing-lg {
+  padding: var(--space-lg);
+}
+
+.box--color-primary {
+  background-color: var(--color-white);
+}
+
+.box--color-secondary {
+  background-color: var(--color-brown);
+}
+
+/* Border variants */
+.box--border-light {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--color-white);
+}
+
+.box--border-dark {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--color-black);
+}
+
+/***************************************************************************
+  Stack
+***************************************************************************/
+.stack {
+  display: flex;
+  align-items: flex-start;
+}
+
+.stack--orient-horizontal {
+  flex-direction: row;
+}
+
+.stack--orient-vertical {
+  flex-direction: column;
+}
+
+.stack--spacing-sm {
+  gap: var(--space-sm);
+}
+
+.stack--spacing-md {
+  gap: var(--space-md);
+}
+
+.stack--spacing-lg {
+  gap: var(--space-lg);
+}
+
+/***************************************************************************
+  Divider
+***************************************************************************/
+.divider {
+  width: 100%;
+  border-bottom: 1px solid var(--color-black);
+}
+
+/***************************************************************************
+  Button Base
+
+  Reset styles for all button elements.
+***************************************************************************/
+
+.btn-base {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.btn-base--fullwidth {
+  width: 100%;
+}
+
+.btn-base:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/***************************************************************************
+  Button
+***************************************************************************/
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-sm);
+}
+
+/* Size variants */
+.btn--size-sm {
+  min-height: var(--control-size-sm);
+  min-width: var(--control-size-sm);
+  font-size: var(--font-size-sm);
+  padding-inline: var(--space-sm);
+}
+
+.btn--size-md {
+  min-height: var(--control-size-md);
+  min-width: var(--control-size-md);
+  font-size: var(--font-size-md);
+  padding-inline: var(--space-md);
+}
+
+.btn--size-lg {
+  min-height: var(--control-size-lg);
+  min-width: var(--control-size-lg);
+  font-size: var(--font-size-lg);
+  padding-inline: var(--space-lg);
+}
+
+/* Color variants */
+.btn--color-primary {
+  background-color: var(--color-white);
+}
+
+.btn--color-secondary {
+  background-color: var(--color-brown);
+}
+
+.btn--color-action {
+  background-color: var(--color-action, #9696c8);
+}
+
+.btn--color-card {
+  background-color: var(--color-card, #7dc8c8);
+}
+
+.btn--color-chip {
+  background-color: var(--color-chip);
+}
+
+/* Border variants */
+.btn--border-light {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--color-white);
+}
+
+.btn--border-dark {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--color-black);
+}
+
+.btn--rounded {
+  /* Fully rounded corders */
+  border-radius: 9999px;
+}
+
+.btn--fullwidth {
+  width: 100%;
+}
+
+/***************************************************************************
+  Select Button
+
+  Toggle button with checkbox symbol for selection states.
+***************************************************************************/
+
+.select-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: start;
+  text-align: left;
+  padding: var(--space-sm);
+}
+
+/* Size variants */
+.select-btn--size-sm {
+  min-height: var(--control-size-sm);
+  min-width: var(--control-size-sm);
+  font-size: var(--font-size-sm);
+  padding-inline: var(--space-sm);
+}
+
+.select-btn--size-md {
+  min-height: var(--control-size-md);
+  min-width: var(--control-size-md);
+  font-size: var(--font-size-md);
+  padding-inline: var(--space-md);
+}
+
+.select-btn--size-lg {
+  min-height: var(--control-size-lg);
+  min-width: var(--control-size-lg);
+  font-size: var(--font-size-lg);
+  padding-inline: var(--space-lg);
+}
+
+/* Color variants */
+.select-btn--color-primary {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-black);
+}
+
+.select-btn--color-secondary {
+  background-color: var(--color-brown);
+  border: 1px solid var(--color-black);
+}
+
+.select-btn--color-action {
+  background-color: var(--color-action, #9696c8);
+}
+
+.select-btn--color-card {
+  background-color: var(--color-card, #7dc8c8);
+}
+
+.select-btn--color-chip {
+  background-color: var(--color-chip);
+}
+
+/* Border variants */
+.select-btn--border-light {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--color-white);
+}
+
+.select-btn--border-dark {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--color-black);
+}
+
+/* Boolean variants. */
+.select-btn--rounded {
+  /* Fully rounded corders */
+  border-radius: 9999px;
+}
+
+.select-btn--fullwidth {
+  width: 100%;
+}
+
+/***************************************************************************
+  Input
+
+  Text input field with consistent styling.
+***************************************************************************/
+
+/* .text-input-container {} */
+
+.text-input-container--size-sm {
+  height: var(--control-size-sm);
+  font-size: var(--font-size-sm);
+}
+
+.text-input-container--size-md {
+  height: var(--control-size-md);
+  font-size: var(--font-size-md);
+}
+
+.text-input-container--size-lg {
+  height: var(--control-size-lg);
+  font-size: var(--font-size-lg);
+}
+
+.text-input {
+  font: inherit;
+  color: var(--color-black);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-black);
+  border-radius: 4px;
+  padding: var(--space-sm);
+}
+
+.text-input:focus {
+  outline: 2px solid var(--color-night);
+  outline-offset: 1px;
+}
+
+.text-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.text-input::placeholder {
+  color: var(--color-black);
+  opacity: 0.5;
+}
+
+/***************************************************************************
+  Dialog
+
+  Modal overlay and content container.
+***************************************************************************/
+
+.dialog-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* .dialog-content {} */

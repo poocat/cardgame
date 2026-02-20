@@ -1,8 +1,13 @@
 import * as RDialog from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-
 import { type ReactNode, useCallback } from "react";
+import "./styles.css";
 
+/******************************************************************************
+ * ### Dialog
+ *
+ * Modal dialog using Radix UI primitives for accessibility.
+ ******************************************************************************/
 export const Dialog = (props: {
   children: ReactNode;
   isOpen: boolean;
@@ -20,21 +25,8 @@ export const Dialog = (props: {
   return (
     <RDialog.Root open={props.isOpen} onOpenChange={onOpenChange}>
       <RDialog.Portal>
-        <RDialog.Overlay
-          style={{
-            backgroundColor: "rgba(0,0,0,0.5)",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {/*  */}
-          <RDialog.Content>
+        <RDialog.Overlay className="dialog-overlay">
+          <RDialog.Content className="dialog-content">
             <VisuallyHidden>
               <RDialog.Title>{props.title}</RDialog.Title>
               <RDialog.Description>{props.description}</RDialog.Description>
