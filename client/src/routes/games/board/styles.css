@@ -13,10 +13,9 @@
   --cutout-hradius: calc(var(--cutout-width) / 2);
   --cutout-vradius: 150px;
 
-  --margin-top: 20px;
   --margin-bottom: 25px;
 
-  --vertical-padding-top: calc(var(--margin-top) + var(--cutout-vradius));
+  --vertical-padding-top: var(--cutout-vradius);
 }
 
 /***************************************************************************
@@ -51,9 +50,10 @@
 .game-background__cutout {
   position: relative;
   width: var(--cutout-width);
+  top: 4px; /* To account for the outline width */
   height: 9999px; /* Should get cropped when used in the game background. */
-  padding-top: var(--margin-top);
   background: var(--color-night);
+  outline: 4px double var(--color-black);
   border-radius:
     var(--cutout-hradius) var(--cutout-hradius) 0 0 / var(--cutout-vradius)
     var(--cutout-vradius) 0 0;
@@ -86,7 +86,7 @@
   right: 0;
   left: 0;
   border-top: 1px solid var(--color-black);
-  background-color: var(--color-white);
+  background-color: var(--color-white-translucent);
   overflow-y: auto;
 }
 
@@ -230,6 +230,11 @@
   justify-content: flex-start;
   align-content: flex-start;
   align-items: flex-start;
+}
+
+.game-player-abutment-spacer {
+  width: 100%;
+  height: var(--hand-height);
 }
 
 .game-player-area--side-left .game-player-abutment {

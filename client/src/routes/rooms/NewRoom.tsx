@@ -36,7 +36,7 @@ export const NewRoom = () => {
   return (
     <Box spacing="lg">
       <Stack spacing="lg" orientation="vertical">
-        <Box size="lg" border="dark" spacing="md" color="secondary">
+        <Box border="dark" spacing="md" color="secondary">
           <Stack spacing="lg" orientation="horizontal">
             <Input
               size="lg"
@@ -46,6 +46,7 @@ export const NewRoom = () => {
             />
             <Button
               color="primary"
+              border="dark"
               size="lg"
               disabled={!hostName}
               onClick={handleSubmit}

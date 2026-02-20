@@ -501,20 +501,23 @@ export const GameBoard = memo(
             </Fragment>
           );
         })}
+        {observingPlayer === undefined ? (
+          <div className="game-player-abutment-spacer" />
+        ) : (
+          // Always leave room for the footer menu if there is an observing player.
+          <div className="game-footer-spacer" />
+        )}
         {observingPlayerIsChoosing && (
-          <>
-            <div className="game-footer-spacer"></div>
-            <GameBoardChoiceMenu
-              instructions={props.game.activity.choice.instructions}
-              choiceType={props.game.activity.choice.type}
-              values={props.game.activity.choice.values}
-              onSubmitChoice={props.onSubmitChoice}
-              submitDisabled={submitDisabled}
-              toggleValue={props.selectorProps.toggleValue}
-              checkValueSelected={props.selectorProps.checkValueSelected}
-              moreValuesAllowed={props.selectorProps.moreValuesAllowed}
-            />
-          </>
+          <GameBoardChoiceMenu
+            instructions={props.game.activity.choice.instructions}
+            choiceType={props.game.activity.choice.type}
+            values={props.game.activity.choice.values}
+            onSubmitChoice={props.onSubmitChoice}
+            submitDisabled={submitDisabled}
+            toggleValue={props.selectorProps.toggleValue}
+            checkValueSelected={props.selectorProps.checkValueSelected}
+            moreValuesAllowed={props.selectorProps.moreValuesAllowed}
+          />
         )}
         <Dialog
           title={dialogTitle}

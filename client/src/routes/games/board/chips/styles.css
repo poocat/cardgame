@@ -42,7 +42,7 @@
 
 .game-chip-display {
   width: 70px;
-  height: 30px;
+  height: 28px;
   padding: var(--space-xs);
   border: 2px double var(--color-black);
   display: flex;

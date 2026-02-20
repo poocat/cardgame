@@ -16,6 +16,7 @@ export const Box = (props: {
   color?: Color;
   size?: Size;
   border?: Border;
+  fullWidth?: boolean;
   children: React.ReactNode;
 }) => {
   const classNames = ["box"];
@@ -23,6 +24,11 @@ export const Box = (props: {
   if (props.color) classNames.push(`box--color-${props.color}`);
   if (props.border) classNames.push(`box--border-${props.border}`);
   if (props.size) classNames.push(`box--size-${props.size}`);
+  if (props.fullWidth) classNames.push(`box--fullwidth`);
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;
+};
+
+export const Divider = () => {
+  return <div className="divider" />;
 };

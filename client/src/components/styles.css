@@ -1,7 +1,11 @@
 /***************************************************************************
-  Component: Box
+  Box
 ***************************************************************************/
 /* .box {} */
+
+.box--fullwidth {
+  width: 100%;
+}
 
 .box--size-sm {
   width: 100px;
@@ -49,7 +53,7 @@
 }
 
 /***************************************************************************
-  Component: Stack
+  Stack
 ***************************************************************************/
 .stack {
   display: flex;
@@ -77,7 +81,15 @@
 }
 
 /***************************************************************************
-  Component: Button Base
+  Divider
+***************************************************************************/
+.divider {
+  width: 100%;
+  border-bottom: 1px solid var(--color-black);
+}
+
+/***************************************************************************
+  Button Base
 
   Reset styles for all button elements.
 ***************************************************************************/
@@ -101,9 +113,7 @@
 }
 
 /***************************************************************************
-  Component: Button
-
-  Standard button with rounded ends.
+  Button
 ***************************************************************************/
 
 .btn {
@@ -111,7 +121,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: var(--space-md);
+  padding: var(--space-sm);
 }
 
 /* Size variants */
@@ -119,21 +129,21 @@
   min-height: var(--control-size-sm);
   min-width: var(--control-size-sm);
   font-size: var(--font-size-sm);
-  padding: var(--space-sm);
+  padding-inline: var(--space-sm);
 }
 
 .btn--size-md {
   min-height: var(--control-size-md);
   min-width: var(--control-size-md);
   font-size: var(--font-size-md);
-  padding: var(--space-md);
+  padding-inline: var(--space-md);
 }
 
 .btn--size-lg {
   min-height: var(--control-size-lg);
   min-width: var(--control-size-lg);
   font-size: var(--font-size-lg);
-  padding: var(--space-lg);
+  padding-inline: var(--space-lg);
 }
 
 /* Color variants */
@@ -180,7 +190,7 @@
 }
 
 /***************************************************************************
-  Component: Select Button
+  Select Button
 
   Toggle button with checkbox symbol for selection states.
 ***************************************************************************/
@@ -190,7 +200,7 @@
   align-items: center;
   justify-content: start;
   text-align: left;
-  padding: var(--space-md);
+  padding: var(--space-sm);
 }
 
 /* Size variants */
@@ -198,21 +208,21 @@
   min-height: var(--control-size-sm);
   min-width: var(--control-size-sm);
   font-size: var(--font-size-sm);
-  padding: var(--space-sm);
+  padding-inline: var(--space-sm);
 }
 
 .select-btn--size-md {
   min-height: var(--control-size-md);
   min-width: var(--control-size-md);
   font-size: var(--font-size-md);
-  padding: var(--space-md);
+  padding-inline: var(--space-md);
 }
 
 .select-btn--size-lg {
   min-height: var(--control-size-lg);
   min-width: var(--control-size-lg);
   font-size: var(--font-size-lg);
-  padding: var(--space-lg);
+  padding-inline: var(--space-lg);
 }
 
 /* Color variants */
@@ -262,49 +272,54 @@
 }
 
 /***************************************************************************
-  Component: Input
+  Input
 
   Text input field with consistent styling.
 ***************************************************************************/
 
-.input {
+/* .text-input-container {} */
+
+.text-input-container--size-sm {
+  height: var(--control-size-sm);
+  font-size: var(--font-size-sm);
+}
+
+.text-input-container--size-md {
+  height: var(--control-size-md);
+  font-size: var(--font-size-md);
+}
+
+.text-input-container--size-lg {
+  height: var(--control-size-lg);
+  font-size: var(--font-size-lg);
+}
+
+.text-input {
   font: inherit;
   color: var(--color-black);
   background-color: var(--color-white);
   border: 1px solid var(--color-black);
   border-radius: 4px;
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm);
 }
 
-.input:focus {
+.text-input:focus {
   outline: 2px solid var(--color-night);
   outline-offset: 1px;
 }
 
-.input:disabled {
+.text-input:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.input::placeholder {
+.text-input::placeholder {
   color: var(--color-black);
   opacity: 0.5;
 }
 
-.input--size-sm {
-  height: var(--control-size-sm);
-}
-
-.input--size-md {
-  height: var(--control-size-md);
-}
-
-.input--size-lg {
-  height: var(--control-size-lg);
-}
-
 /***************************************************************************
-  Component: Dialog
+  Dialog
 
   Modal overlay and content container.
 ***************************************************************************/

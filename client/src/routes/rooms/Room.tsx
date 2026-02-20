@@ -134,52 +134,17 @@ export const Room = () => {
             )}
           </Stack>
         </Box>
-        <Box color="primary" spacing="md">
-          Players:
-          <Stack orientation="vertical" spacing="md">
-            {poller.data && (
-              <>
-                <Box border="dark" size="md" spacing="sm" color="secondary">
-                  Host: {poller.data.digest.host.name}
-                </Box>
-                {poller.data.digest.guests.map((guest) => (
-                  <Box
-                    border="dark"
-                    key={guest.id}
-                    spacing="sm"
-                    color="secondary"
-                    size="md"
-                  >
-                    Guest: {guest.name}
-                  </Box>
-                ))}
-              </>
-            )}
-            {/* If no player id, user has option to join the game. */}
-            {!playerId && (
-              <Box border="dark" size="md" spacing="md" color="secondary">
-                <Stack spacing="lg" orientation="horizontal">
-                  <Input
-                    size="md"
-                    placeholder="your name"
-                    value={guestName}
-                    onChange={(value) => setGuestName(value)}
-                  />
-                  <Button
-                    border="dark"
-                    color="primary"
-                    size="md"
-                    disabled={playerIsHost || !guestName}
-                    onClick={handleSubmitGuest}
-                  >
-                    Join Game
-                  </Button>
-                </Stack>
-              </Box>
-            )}
-          </Stack>
+        Host:
+        <Box size="md" border="dark" spacing="md">
+          {poller.data?.digest.host.name ?? "..."}
         </Box>
-        {playerIsHost && (
+        Guests:
+        {poller.data?.digest.guests.map((guest) => (
+          <Box size="md" border="dark" key={guest.id} spacing="lg">
+            {guest.name}
+          </Box>
+        ))}
+        {playerIsHost ? (
           <Button
             border="dark"
             color="chip"
@@ -188,6 +153,28 @@ export const Room = () => {
           >
             Start Game
           </Button>
+        ) : playerId ? (
+          <Box>Waiting for host to start...</Box>
+        ) : (
+          <Box border="dark" spacing="md" color="secondary">
+            <Stack spacing="lg" orientation="horizontal">
+              <Input
+                size="md"
+                placeholder="your name"
+                value={guestName}
+                onChange={(value) => setGuestName(value)}
+              />
+              <Button
+                border="dark"
+                color="primary"
+                size="md"
+                disabled={playerIsHost || !guestName}
+                onClick={handleSubmitGuest}
+              >
+                Join Game
+              </Button>
+            </Stack>
+          </Box>
         )}
       </Stack>
     </Box>

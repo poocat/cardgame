@@ -3,7 +3,7 @@ import { GameList } from "@client/routes/games/GameList";
 import { NewRoom } from "@client/routes/rooms/NewRoom";
 import { Room } from "@client/routes/rooms/Room";
 import { Link, Outlet, Route, Routes } from "react-router";
-import { Box, Stack } from "./components/layout";
+import { Box, Divider, Stack } from "./components/layout";
 
 const Layout = () => {
   return (
@@ -14,6 +14,7 @@ const Layout = () => {
           <Link to="/games">Games</Link>
         </Stack>
       </Box>
+      <Divider />
       <Outlet />
     </div>
   );

@@ -13,17 +13,18 @@ export const Input = (props: {
   placeholder?: string;
   disabled?: boolean;
 }) => {
-  const classNames = ["input"];
-  if (props.size) classNames.push(`input--size-${props.size}`);
-  const className = classNames.join(" ");
   return (
-    <input
-      type="text"
-      className={className}
-      value={props.value}
-      onChange={(e) => props.onChange(e.target.value)}
-      placeholder={props.placeholder}
-      disabled={props.disabled}
-    />
+    <div
+      className={`text-input-container text-input-container--size-${props.size}`}
+    >
+      <input
+        type="text"
+        className="text-input"
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value)}
+        placeholder={props.placeholder}
+        disabled={props.disabled}
+      />
+    </div>
   );
 };
