@@ -8,7 +8,7 @@
 }
 
 .game-chip-area--inverted {
-  color: var(--color-white-translucent);
+  color: var(--color-white);
 }
 .game-chip-area--side-left {
   align-items: flex-start;
@@ -22,7 +22,7 @@
 }
 
 .game-chip-area--inverted .game-chip-area__label {
-  color: var(--color-white-translucent);
+  color: var(--color-white);
 }
 
 /* Used to put chips on the edge of another element */
@@ -51,7 +51,7 @@
 }
 
 .game-chip-display--inverted {
-  border-color: var(--color-white-translucent);
+  border-color: var(--color-white);
 }
 .game-chip-display--side-right {
   flex-direction: row-reverse;
@@ -178,6 +178,6 @@
 
 /* Light variant for play area */
 .game-chip-display--inverted .game-arrow {
-  border-left-color: var(--color-white-translucent);
-  border-right-color: var(--color-white-translucent);
+  border-left-color: var(--color-white);
+  border-right-color: var(--color-white);
 }

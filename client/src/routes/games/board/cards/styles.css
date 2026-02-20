@@ -17,6 +17,10 @@
   outline: var(--color-lowlight);
 }
 
+.game-card-container--exhausted {
+  transform: rotate(5deg);
+}
+
 .game-player-center .game-card-container--selectable {
   background-color: var(--color-highlight);
 }
@@ -28,7 +32,6 @@
 .game-card {
   width: var(--card-width-sm);
   height: var(--card-width-sm);
-  /* margin: var(--space-xs); */
   border: 1px solid;
   border-radius: 2px;
   padding: var(--space-xs);
@@ -56,7 +59,7 @@
 /* Consumer cards always have a light background. */
 .game-card--consumer {
   background-color: var(--color-night);
-  color: var(--color-white-translucent);
+  color: var(--color-white);
 }
 
 .game-card--placeholder {
@@ -65,8 +68,17 @@
   color: var(--color-black);
 }
 
+.game-card-container--exhausted .game-card--producer {
+  color: var(--color-black-translucent);
+}
+
+.game-card-container--exhausted .game-card--consumer {
+  color: var(--color-white-translucent);
+}
+
+/* TODO!!! Don't inherit style from outside this file!!! */
 .game-player-center .game-card {
-  border-color: var(--color-white-translucent);
+  border-color: var(--color-white);
 }
 
 .game-card__image {

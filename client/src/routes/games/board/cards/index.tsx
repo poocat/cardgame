@@ -78,6 +78,8 @@ export const FaceUpThumbnail = memo(
     const cardIsChoosableValue = props.choiceProps.checkValue(cardId);
     const cardWasChosenPreviously =
       props.choiceProps.checkPreviousValue(cardId);
+    const cardIsExhausted =
+      props.variant === "inPlay" ? props.card.exhausted : false;
 
     const chipIds = props.card.chips.map(({ id }) => id);
     const selectedChipIds =
@@ -96,7 +98,7 @@ export const FaceUpThumbnail = memo(
           : "none";
 
     return (
-      <ThumbnailContainer highlight={highlight}>
+      <ThumbnailContainer highlight={highlight} exhausted={cardIsExhausted}>
         <Thumbnail
           label={props.card.name}
           variant={props.card.type}

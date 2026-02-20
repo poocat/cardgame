@@ -5,12 +5,14 @@ export type ThumbnailHighlight = "selectable" | "selected" | "none";
 
 export const ThumbnailContainer = (props: {
   highlight: ThumbnailHighlight;
+  exhausted?: boolean;
   children?: React.ReactNode;
 }) => {
   const classNames = [
     "game-card-container",
     `game-card-container--${props.highlight}`,
   ];
+  if (props.exhausted) classNames.push(`game-card-container--exhausted`);
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;
 };
