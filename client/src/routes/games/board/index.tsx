@@ -26,6 +26,42 @@ import type {
   SelectorProps,
 } from "./types";
 
+type PlayerListItem = { index: number } & (
+  | { isObserver: true; player: ObserverPlayerDigest }
+  | { isObserver: false; player: OtherPlayerDigest }
+);
+function getPlayerList(args: {
+  playerOrder: string[];
+  otherPlayers: OtherPlayerDigest[];
+  observingPlayer?: ObserverPlayerDigest;
+}): PlayerListItem[] {
+  if (args.observingPlayer === undefined) {
+    return args.otherPlayers.map((player, index) => ({
+      player,
+      index,
+      isObserver: false,
+    }));
+  } else {
+    const observerIndex = args.playerOrder.indexOf(args.observingPlayer.id);
+    const playerList: PlayerListItem[] = [];
+    const numPlayers = args.playerOrder.length;
+    for (let i = 1; i < numPlayers; i++) {
+      const index = (observerIndex + i) % numPlayers;
+      const playerId = args.playerOrder[index];
+      const player = args.otherPlayers.find((p) => p.id === playerId);
+      if (player) {
+        playerList.push({ index, player, isObserver: false });
+      }
+    }
+    playerList.push({
+      index: observerIndex,
+      player: args.observingPlayer,
+      isObserver: true,
+    });
+    return playerList;
+  }
+}
+
 function getPlayerSide(playerIndex: number): PlayerSide {
   return playerIndex % 2 > 0 ? "right" : "left";
 }
@@ -370,23 +406,16 @@ export const GameBoard = memo(
       }
     }, [props.dialogProps.value]);
 
-    // Gather all players into a single list, discriminating the observer from
-    // the others at the end.
-    const allPlayers: (
-      | { isObserver: true; player: ObserverPlayerDigest }
-      | { isObserver: false; player: OtherPlayerDigest }
-    )[] = props.game.otherPlayers.map((player) => ({
-      player,
-      isObserver: false,
-    }));
-    if (props.game.observingPlayer) {
-      allPlayers.push({ player: props.game.observingPlayer, isObserver: true });
-    }
+    const playerList = getPlayerList({
+      playerOrder: props.game.playerOrder,
+      observingPlayer: props.game.observingPlayer,
+      otherPlayers: props.game.otherPlayers,
+    });
 
     return (
       <GameBoardContainer>
-        {allPlayers.map(({ player, isObserver }, ix) => {
-          const side = getPlayerSide(ix);
+        {playerList.map(({ player, isObserver, index }) => {
+          const side = getPlayerSide(index);
           const onTurn = props.game.playerTakingTurnId === player.id;
           return (
             <Fragment key={player.id}>
@@ -405,7 +434,7 @@ export const GameBoard = memo(
                     />
                   </GameBoardPlayerAbutment>
                 )}
-                <GameBoardPlayerTablet index={ix}>
+                <GameBoardPlayerTablet index={index}>
                   <GameBoardPlayerTabletHeader
                     playerName={player.name}
                     playerOnTurn={onTurn}
@@ -465,7 +494,7 @@ export const GameBoard = memo(
                       ))}
                   </GameBoardPlayerCenterCards>
                   <GameBoardChipMenu
-                    label="In Transit"
+                    label="In Channel"
                     inverted={true}
                     side={side}
                     chips={player.chipsinChannel}

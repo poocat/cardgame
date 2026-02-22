@@ -90,6 +90,7 @@ export const gameDigestSchema = z.strictObject({
   /** Optional because, if spectating, all players are "other players". */
   observingPlayer: observingPlayerDigestSchema.optional(),
   otherPlayers: z.array(otherPlayerDigestSchema),
+  playerOrder: z.array(idSchema),
 });
 
 /******************************************************************************

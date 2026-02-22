@@ -218,6 +218,7 @@ export function digestGameData({
           .map((c) => ({ id: c.id })),
       };
     }),
+    playerOrder: gameData.players.map((p) => anonymizedPlayerIdMap[p.id]),
   };
 
   if (observingPlayerData) {
