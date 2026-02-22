@@ -468,16 +468,15 @@ export const GameBoard = memo(
                     label="In Transit"
                     inverted={true}
                     side={side}
-                    chips={[]}
+                    chips={player.chipsinChannel}
                     choiceProps={props.choiceProps}
                     onSubmitChoice={props.onSubmitChoice}
                     submitDisabled={submitDisabled}
-                    selectorProps={null}
-                    // selectorProps={
-                    //   someChipsSelectable(player.chipsInReserve)
-                    //     ? props.selectorProps
-                    //     : null
-                    // }
+                    selectorProps={
+                      someChipsSelectable(player.chipsinChannel)
+                        ? props.selectorProps
+                        : null
+                    }
                   />
                 </GameBoardPlayerCenter>
               </GameBoardPlayerArea>

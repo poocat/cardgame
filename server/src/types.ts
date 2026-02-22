@@ -64,6 +64,7 @@ export type ChipLocationData = _DiscriminatedUnionFromArray<
   typeof chipLocationTypes,
   {
     inReserve: unknown;
+    inChannel: unknown;
     onCard: { cardId: Id };
   }
 >;

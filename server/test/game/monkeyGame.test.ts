@@ -68,7 +68,7 @@ function assertInvariants(gameData: GameData, label: string) {
         `[${label}] chip ${chip.id} is on card ${cardId} which doesn't exist`,
       ).toBe(true);
     } else {
-      expect(chip.location.type).toBe("inReserve");
+      expect(chip.location.type).toBeOneOf(["inReserve", "inChannel"]);
     }
   }
 

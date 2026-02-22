@@ -210,6 +210,12 @@ export function digestGameData({
               c.ownerId === playerData.id && c.location.type === "inReserve",
           )
           .map((c) => ({ id: c.id })),
+        chipsinChannel: gameData.chips
+          .filter(
+            (c) =>
+              c.ownerId === playerData.id && c.location.type === "inChannel",
+          )
+          .map((c) => ({ id: c.id })),
       };
     }),
   };
@@ -246,6 +252,13 @@ export function digestGameData({
           (c) =>
             c.ownerId === observingPlayerData.id &&
             c.location.type === "inReserve",
+        )
+        .map((c) => ({ id: c.id })),
+      chipsinChannel: gameData.chips
+        .filter(
+          (c) =>
+            c.ownerId === observingPlayerData.id &&
+            c.location.type === "inChannel",
         )
         .map((c) => ({ id: c.id })),
     };
