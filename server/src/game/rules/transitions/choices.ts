@@ -173,12 +173,13 @@ export function createTakingActionChoices(args: {
     cardName: args.actionData.card.name,
     actionType: args.actionData.type,
   });
-  if (!actionDef.sequence?.choices) {
+  const choices = actionDef.sequence?.choices ?? [];
+  if (choices.length < 1) {
     // Not all actions have choices (e.g. "play" or "discard" type actions).
     // In those cases, send a special choice to signal the state machine.
     return { currentChoice: nullChoice(), nextChoices: [] };
   }
-  const firstChoiceDef = actionDef.sequence.choices[0];
+  const firstChoiceDef = choices[0];
   const firstChoices = createActionChoices({
     choiceDef: firstChoiceDef,
     accessor: args.accessor,
@@ -190,7 +191,7 @@ export function createTakingActionChoices(args: {
   });
   // The rest of the choices are "dependent", because they may depend on
   // decisions made for previous choices.
-  const dependentChoices: NextChoiceData[] = actionDef.sequence.choices
+  const dependentChoices: NextChoiceData[] = choices
     .slice(1)
     .map((_, i) => ({ type: "dependent", index: i + 1 }));
   // If no viable players for first choice, send a null current choice and move
