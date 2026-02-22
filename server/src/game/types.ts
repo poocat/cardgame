@@ -221,3 +221,5 @@ export type CardDef = {
   /** Each card can have a single, custom triggered effect. The trigger is only active while the card is in play. */
   trigger?: TriggerDef;
 };
+
+export type CardMap = Record<string, CardDef>;
