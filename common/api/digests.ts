@@ -73,6 +73,7 @@ const playerDigestCommonSchema = z.strictObject({
   cardsInDeck: z.array(hiddenCardDigestSchema),
   cardsInPlay: z.array(inPlayCardDigestSchema),
   chipsInReserve: z.array(chipDigestSchema),
+  chipsinChannel: z.array(chipDigestSchema),
 });
 
 export const observingPlayerDigestSchema = playerDigestCommonSchema.extend({
@@ -89,6 +90,8 @@ export const gameDigestSchema = z.strictObject({
   /** Optional because, if spectating, all players are "other players". */
   observingPlayer: observingPlayerDigestSchema.optional(),
   otherPlayers: z.array(otherPlayerDigestSchema),
+  playerOrder: z.array(idSchema),
+  winner: z.strictObject({ id: idSchema, name: z.string() }).nullable(),
 });
 
 /******************************************************************************

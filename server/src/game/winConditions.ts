@@ -19,7 +19,7 @@ export function getWinners(accessor: Accessor): PlayerData[] {
       types: ["consumer"],
       minChips: CONSTANTS.numChipsOnConsumersToWin,
     });
-    if (candidatesConsumers.length < 0) {
+    if (candidatesConsumers.length > 0) {
       winningPlayers.push(p);
       return;
     }

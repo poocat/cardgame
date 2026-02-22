@@ -43,8 +43,11 @@ export const Game = () => {
         return 10000; // Once every 10 s after first 5 minutes.
       }
     },
+    // Stop polling when the observing player is making a choice, or when the
+    // game ends.
     getPollingEnabled: (data) =>
-      data.digest.activity.choice.choosingPlayerId !== observingPlayerId,
+      data.digest.activity.choice.choosingPlayerId !== observingPlayerId &&
+      data.digest.winner === null,
   });
 
   // Memoize the game data, as is only changes with the "last updated" time.

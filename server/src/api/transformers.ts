@@ -61,9 +61,11 @@ export function digestGameData({
   playerId?: Id;
 }): GameDigest {
   const anonymizedPlayerIdMap: Record<Id, Id> = {};
+  const playerNameMap: Record<Id, string> = {};
   gameData.players.forEach((p) => {
     anonymizedPlayerIdMap[p.id] =
       p.id === playerId ? p.id : anonymizeId(p.id, anonymizationSalt);
+    playerNameMap[p.id] = p.name;
   });
 
   const otherPlayerData = gameData.players.filter((p) => p.id !== playerId);
@@ -164,6 +166,15 @@ export function digestGameData({
     }
   }
 
+  const wins = gameData.wins.sort((a, b) => a.onTick - b.onTick);
+  const winner =
+    wins.length > 0
+      ? {
+          id: anonymizedPlayerIdMap[wins[0].playerId],
+          name: playerNameMap[wins[0].playerId],
+        }
+      : null;
+
   const digest: GameDigest = {
     playerTakingTurnId: anonymizedPlayerIdMap[gameData.playerTakingTurnId],
     activity: {
@@ -210,8 +221,16 @@ export function digestGameData({
               c.ownerId === playerData.id && c.location.type === "inReserve",
           )
           .map((c) => ({ id: c.id })),
+        chipsinChannel: gameData.chips
+          .filter(
+            (c) =>
+              c.ownerId === playerData.id && c.location.type === "inChannel",
+          )
+          .map((c) => ({ id: c.id })),
       };
     }),
+    playerOrder: gameData.players.map((p) => anonymizedPlayerIdMap[p.id]),
+    winner,
   };
 
   if (observingPlayerData) {
@@ -246,6 +265,13 @@ export function digestGameData({
           (c) =>
             c.ownerId === observingPlayerData.id &&
             c.location.type === "inReserve",
+        )
+        .map((c) => ({ id: c.id })),
+      chipsinChannel: gameData.chips
+        .filter(
+          (c) =>
+            c.ownerId === observingPlayerData.id &&
+            c.location.type === "inChannel",
         )
         .map((c) => ({ id: c.id })),
     };
