@@ -91,6 +91,7 @@ export const gameDigestSchema = z.strictObject({
   observingPlayer: observingPlayerDigestSchema.optional(),
   otherPlayers: z.array(otherPlayerDigestSchema),
   playerOrder: z.array(idSchema),
+  winner: z.strictObject({ id: idSchema, name: z.string() }).nullable(),
 });
 
 /******************************************************************************

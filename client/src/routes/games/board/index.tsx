@@ -363,6 +363,17 @@ const GameBoardChoiceMenu = memo(
 );
 
 /******************************************************************************
+ * ### GameOverMenu
+ ******************************************************************************/
+const GameOverMenu = (props: { winnerName: string }) => {
+  return (
+    <div className="game-footer-menu">
+      <Box spacing="lg">{props.winnerName} wins!</Box>
+    </div>
+  );
+};
+
+/******************************************************************************
  * ### GameBoard
  ******************************************************************************/
 export const GameBoard = memo(
@@ -373,9 +384,11 @@ export const GameBoard = memo(
     selectorProps: SelectorProps;
     choiceProps: ChoiceProps;
   }) => {
+    const gameOver = props.game.winner !== null;
     const observingPlayer = props.game.observingPlayer;
     const choosingPlayerId = props.game.activity.choice.choosingPlayerId;
-    const observingPlayerIsChoosing = observingPlayer?.id === choosingPlayerId;
+    const observingPlayerIsChoosing =
+      observingPlayer?.id === choosingPlayerId && !gameOver;
     const submitDisabled = props.selectorProps.moreValuesNeeded;
 
     const cardSelectEnabled = useCallback(
@@ -546,6 +559,9 @@ export const GameBoard = memo(
             checkValueSelected={props.selectorProps.checkValueSelected}
             moreValuesAllowed={props.selectorProps.moreValuesAllowed}
           />
+        )}
+        {gameOver && (
+          <GameOverMenu winnerName={props.game.winner?.name ?? ""} />
         )}
         <Dialog
           title={dialogTitle}
