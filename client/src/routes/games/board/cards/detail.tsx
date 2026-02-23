@@ -1,3 +1,5 @@
+import type { CardType } from "../types";
+
 /******************************************************************************
  * ### CardDetailContainer
  ******************************************************************************/
@@ -18,7 +20,7 @@ export const CardDetailMenuContainer = (props: {
  * ### CardDetailBody
  ******************************************************************************/
 export const CardDetailBody = (props: {
-  type: "producer" | "consumer";
+  type: CardType;
   children?: React.ReactNode;
 }) => {
   return (

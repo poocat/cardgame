@@ -7,7 +7,7 @@ import type {
   otherPlayerDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
-import type { choiceTypes } from "@common/game/enums";
+import type { cardTypes, choiceTypes } from "@common/game/enums";
 import type z from "zod";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,6 +27,7 @@ export type OtherPlayerDigest = z.infer<typeof otherPlayerDigestSchema>;
 ////////////////////////////////////////////////////////////////////////////////
 
 export type ChoiceType = (typeof choiceTypes)[number];
+export type CardType = (typeof cardTypes)[number];
 
 export type ChoiceProps = {
   choiceType: ChoiceType | null;

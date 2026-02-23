@@ -40,7 +40,7 @@ export const ThumbnailPlaceholder = (props: {
 }) => {
   return (
     <ThumbnailContainer highlight={props.highlight}>
-      <Thumbnail variant="placeholder">{props.children}</Thumbnail>
+      <Thumbnail>{props.children}</Thumbnail>
     </ThumbnailContainer>
   );
 };
@@ -100,8 +100,8 @@ export const FaceUpThumbnail = memo(
 
     return (
       <ThumbnailContainer highlight={highlight} exhausted={cardIsExhausted}>
-        <Thumbnail variant={props.card.type} onClick={expand}>
-          <CardImage cardName={props.card.name} />
+        <Thumbnail onClick={expand}>
+          <CardImage name={props.card.name} type={props.card.type} />
         </Thumbnail>
         {props.card.chips.length > 0 && (
           <ChipCounterBadge>

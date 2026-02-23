@@ -19,10 +19,9 @@ export const ThumbnailContainer = (props: {
 
 export const Thumbnail = (props: {
   onClick?: () => void;
-  variant: "producer" | "consumer" | "placeholder";
   children?: React.ReactNode;
 }) => {
-  const classNames = ["game-card", `game-card--${props.variant}`];
+  const classNames = ["game-card"];
   if (props.onClick) classNames.push("game-card--clickable");
   const className = classNames.join(" ");
 
