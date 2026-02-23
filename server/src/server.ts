@@ -5,7 +5,7 @@ import {
   pollSlowdown,
   sustainedLimiter,
 } from "@server/api/middleware";
-import { games, rooms } from "@server/api/routes";
+import { cards, games, rooms } from "@server/api/routes";
 import { CONFIG } from "@server/config";
 import { initDb } from "@server/db/database";
 import { logger } from "@server/logger";
@@ -40,6 +40,7 @@ export async function startServer() {
   // Routes:
   app.use(ROUTES.games.path, games);
   app.use(ROUTES.rooms.path, rooms);
+  app.use(ROUTES.cards.path, cards);
 
   // Error handling:
   app.use(errorHandler);

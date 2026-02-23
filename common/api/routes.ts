@@ -111,4 +111,8 @@ export const ROUTES = {
       },
     },
   },
+  cards: {
+    path: "/api/cards",
+    methods: {},
+  },
 } as const satisfies Routes;
