@@ -93,7 +93,7 @@
 
 .game-dialog__card-container {
   width: var(--card-width-lg);
-  height: calc(var(--card-height-lg) + 50px);
+  height: var(--card-height-lg);
 }
 
 .game-dialog__card-menu {
