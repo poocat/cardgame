@@ -12,7 +12,7 @@ export const ThumbnailCardImage = (props: { name: string; type: CardType }) => {
 
   return (
     <img
-      className={`game-card__image game-card__image--${props.type}`}
+      className="game-card__image"
       src={`/api/cards/images/thumbnail/${slugify(props.name)}.svg`}
       onError={() => setFailed(true)}
       alt={props.name}

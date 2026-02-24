@@ -7,6 +7,7 @@
   padding: 3px;
   border-radius: 3px;
   margin: 1px;
+  transition: transform 0.5s;
 }
 
 .game-card-container--selectable {
@@ -19,7 +20,6 @@
 
 .game-card-container--exhausted {
   transform: rotate(5deg);
-  transition: 0.5s;
 }
 
 .game-player-center .game-card-container--selectable {
@@ -85,6 +85,7 @@
   left: 0;
   right: 0;
   bottom: 0;
+  overflow: hidden;
 }
 
 .game-dialog__card-foreground {
