@@ -32,17 +32,21 @@ export async function startServer() {
   const app = express();
   app.use(express.json());
 
-  // Rate limiting and slowdown:
-  app.use(burstLimiter);
-  app.use(sustainedLimiter);
-  app.use(pollSlowdown);
-
-  // Routes:
-  app.use(ROUTES.games.path, games);
-  app.use(ROUTES.rooms.path, rooms);
+  // Cards (static assets):
+  app.use(ROUTES.cards.path, burstLimiter);
   app.use(ROUTES.cards.path, cards);
+  // Games:
+  app.use(ROUTES.games.path, burstLimiter);
+  app.use(ROUTES.games.path, sustainedLimiter);
+  app.use(ROUTES.games.path, pollSlowdown);
+  app.use(ROUTES.games.path, games);
+  // Rooms:
+  app.use(ROUTES.rooms.path, burstLimiter);
+  app.use(ROUTES.rooms.path, sustainedLimiter);
+  app.use(ROUTES.rooms.path, pollSlowdown);
+  app.use(ROUTES.rooms.path, rooms);
 
-  // Error handling:
+  // Global error handling:
   app.use(errorHandler);
 
   app.listen(CONFIG.port, () => {
