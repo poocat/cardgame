@@ -24,7 +24,7 @@ import {
   CardDetailForeground,
   CardDetailMenuContainer,
 } from "./detail";
-import { DetailCardImage, ThumbnailCardImage } from "./image";
+import { CardImage } from "./image";
 import "./styles.css";
 import type { ThumbnailHighlight } from "./thumbnail";
 import { Thumbnail, ThumbnailContainer } from "./thumbnail";
@@ -103,7 +103,7 @@ export const FaceUpThumbnail = memo(
     return (
       <ThumbnailContainer highlight={highlight} exhausted={cardIsExhausted}>
         <Thumbnail onClick={expand}>
-          <ThumbnailCardImage name={props.card.name} type={props.card.type} />
+          <CardImage size="thumbnail" name={props.card.name} />
         </Thumbnail>
         {props.card.chips.length > 0 && (
           <ChipCounterBadge>
@@ -222,7 +222,7 @@ export const DetailCard = (props: {
     <CardDetailContainer>
       <CardDetailBody type={props.card.type}>
         <CardDetailBackground>
-          <DetailCardImage name={props.card.name} />
+          <CardImage size="fullsize" name={props.card.name} />
         </CardDetailBackground>
         <CardDetailForeground>
           <div>{props.card.name}</div>
