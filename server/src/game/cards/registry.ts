@@ -45,8 +45,7 @@ export function getActionDefinition(args: {
 /******************************************************************************
  * ### extendCardRegistry
  *
- * Use to extend the global card registry, presumably with dummy cards used as
- * fixtures in unit tests.
+ * Use to extend the global card registry.
  ******************************************************************************/
 export function extendCardRegistry(args: { cards: CardDef[] }) {
   args.cards.forEach((c) => {
@@ -67,19 +66,22 @@ export function resetCardRegistry() {
 /******************************************************************************
  * ### useExampleCards
  *
- * Extends the card registry with example cards that are included with the base
- * repository.
+ * Resets the card registry and fills it with with cards that are included with
+ * the base repository.
  ******************************************************************************/
 export function useExampleCards() {
+  resetCardRegistry();
   extendCardRegistry({ cards: Object.values(exampleCardMap) });
 }
 
 /******************************************************************************
  * ### usePrivateCards
  *
- * Extends the card registry with cards in the private card repository.
+ * Resets the card registry and fills it with with cards in the private card
+ * submodule.
  ******************************************************************************/
 export function usePrivateCards() {
+  resetCardRegistry();
   const { cards } = require("./private/index");
   extendCardRegistry({ cards: Object.values(cards) });
 }
