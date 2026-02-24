@@ -13,7 +13,7 @@ export const CardDetailContainer = (props: { children?: React.ReactNode }) => {
 export const CardDetailMenuContainer = (props: {
   children?: React.ReactNode;
 }) => {
-  return <div className="game-dialog__card-menu">{props.children}</div>;
+  return <div className="game-dialog__menu">{props.children}</div>;
 };
 
 /******************************************************************************
@@ -28,4 +28,18 @@ export const CardDetailBody = (props: {
       {props.children}
     </div>
   );
+};
+
+/******************************************************************************
+ * ### CardDetailBackground
+ ******************************************************************************/
+export const CardDetailBackground = (props: { children?: React.ReactNode }) => {
+  return <div className="game-dialog__card-background">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### CardDetailForeground
+ ******************************************************************************/
+export const CardDetailForeground = (props: { children?: React.ReactNode }) => {
+  return <div className="game-dialog__card-foreground">{props.children}</div>;
 };

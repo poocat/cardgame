@@ -74,11 +74,32 @@
 ***************************************************************************/
 
 .game-dialog__card-container {
+  position: relative;
   width: var(--card-width-lg);
   height: var(--card-height-lg);
 }
 
-.game-dialog__card-menu {
+.game-dialog__card-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.game-dialog__card-foreground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.game-dialog__menu {
   width: 100%;
   height: 50px;
   display: flex;
@@ -95,13 +116,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); */
-  border: 2px solid var(--color-black);
+  border: 2px solid black;
 }
 
 .game-dialog__card--producer {
-  background: var(--color-white);
-  color: var(--color-black);
+  background: var(--color-gray);
+  color: var(--color-white);
 }
 
 .game-dialog__card--consumer {

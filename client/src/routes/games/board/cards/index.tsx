@@ -1,5 +1,5 @@
 import { Button, SelectButton } from "@client/components";
-import { Box, Stack } from "@client/components/layout";
+import { Stack } from "@client/components/layout";
 import { memo, useCallback } from "react";
 import {
   ChipCounterBadge,
@@ -18,11 +18,13 @@ import type {
   VisibleCardDigest,
 } from "../types";
 import {
+  CardDetailBackground,
   CardDetailBody,
   CardDetailContainer,
+  CardDetailForeground,
   CardDetailMenuContainer,
 } from "./detail";
-import { CardImage } from "./image";
+import { DetailCardImage, ThumbnailCardImage } from "./image";
 import "./styles.css";
 import type { ThumbnailHighlight } from "./thumbnail";
 import { Thumbnail, ThumbnailContainer } from "./thumbnail";
@@ -101,7 +103,7 @@ export const FaceUpThumbnail = memo(
     return (
       <ThumbnailContainer highlight={highlight} exhausted={cardIsExhausted}>
         <Thumbnail onClick={expand}>
-          <CardImage name={props.card.name} type={props.card.type} />
+          <ThumbnailCardImage name={props.card.name} type={props.card.type} />
         </Thumbnail>
         {props.card.chips.length > 0 && (
           <ChipCounterBadge>
@@ -219,9 +221,12 @@ export const DetailCard = (props: {
   return (
     <CardDetailContainer>
       <CardDetailBody type={props.card.type}>
-        <Box spacing="sm">
+        <CardDetailBackground>
+          <DetailCardImage name={props.card.name} />
+        </CardDetailBackground>
+        <CardDetailForeground>
+          <div>{props.card.name}</div>
           <Stack spacing="sm" orientation="vertical">
-            <div>{props.card.name}</div>
             {props.card.actions.map((action) => {
               const selected =
                 props.selectorProps?.checkValueSelected(action.id) ?? false;
@@ -244,7 +249,7 @@ export const DetailCard = (props: {
               );
             })}
           </Stack>
-        </Box>
+        </CardDetailForeground>
       </CardDetailBody>
       {chipIds.length > 0 && (
         <ChipCounterBadge>
