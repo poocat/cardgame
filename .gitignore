@@ -4,3 +4,7 @@ dist
 venv
 .env
 **/*.experiment*
+**/*.suggestion*
+
+# Private submodule directory:
+src/server/game/cards/private
