@@ -5,8 +5,11 @@
  * a custom set.
  */
 
+import { CONFIG } from "@server/config";
 import type { ActionDef, CardDef } from "@server/game/types";
+import { logger } from "@server/logger";
 import type { ActionType } from "@server/types";
+import path from "node:path";
 import { cards as exampleCardMap } from "./examples";
 
 const cardMap = new Map<string, CardDef>();
@@ -72,6 +75,7 @@ export function resetCardRegistry() {
 export function useExampleCards() {
   resetCardRegistry();
   extendCardRegistry({ cards: Object.values(exampleCardMap) });
+  logger.info({ count: cardMap.size }, "loaded example cards");
 }
 
 /******************************************************************************
@@ -81,9 +85,13 @@ export function useExampleCards() {
  * submodule.
  ******************************************************************************/
 export function usePrivateCards() {
+  if (!CONFIG.privateCardsPath) {
+    throw new Error("No private card path found.");
+  }
   resetCardRegistry();
-  const { cards } = require("./private/index");
+  const { cards } = require(path.join(CONFIG.privateCardsPath, "index"));
   extendCardRegistry({ cards: Object.values(cards) });
+  logger.info({ count: cardMap.size }, "loaded private cards");
 }
 
 /******************************************************************************
