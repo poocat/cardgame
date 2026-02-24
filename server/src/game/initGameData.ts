@@ -1,5 +1,8 @@
 import { CONSTANTS } from "@common/game/constants";
-import { CARDS, getCardDefinition } from "@server/game/cards/registry";
+import {
+  allRegisteredCards,
+  getCardDefinition,
+} from "@server/game/cards/registry";
 import { logger } from "@server/logger";
 import type { ActionType, GameData } from "@server/types";
 import { randomUUID } from "node:crypto";
@@ -34,7 +37,7 @@ export function initGameData(
   const cardData = ((players: GameData["players"]): GameData["cards"] => {
     const cards: GameData["cards"] = [];
     players.forEach(({ id }) => {
-      const playerCards: GameData["cards"] = Object.values(CARDS).map((c) => ({
+      const playerCards: GameData["cards"] = allRegisteredCards().map((c) => ({
         id: makeId(),
         name: c.name,
         type: c.type,

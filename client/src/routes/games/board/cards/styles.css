@@ -7,6 +7,7 @@
   padding: 3px;
   border-radius: 3px;
   margin: 1px;
+  transition: transform 0.5s;
 }
 
 .game-card-container--selectable {
@@ -42,6 +43,7 @@
   text-align: center;
   font-size: var(--font-size-xs);
   /* Default */
+  background-color: var(--color-white);
   border-color: var(--color-black);
   color: var(--color-black);
 }
@@ -50,35 +52,15 @@
   cursor: pointer;
 }
 
-/* Producer cards always have a dark background. */
-.game-card--producer {
-  background-color: var(--color-white);
-  color: var(--color-black);
-}
-
-/* Consumer cards always have a light background. */
-.game-card--consumer {
-  background-color: var(--color-night);
-  color: var(--color-white);
+.game-card-container--exhausted .game-card {
+  background-color: var(--color-white-translucent);
+  color: var(--color-black-translucent);
 }
 
 .game-card--placeholder {
   background-color: var(--color-white);
   border-color: var(--color-black);
   color: var(--color-black);
-}
-
-.game-card-container--exhausted .game-card--producer {
-  color: var(--color-black-translucent);
-}
-
-.game-card-container--exhausted .game-card--consumer {
-  color: var(--color-white-translucent);
-}
-
-/* TODO!!! Don't inherit style from outside this file!!! */
-.game-player-center .game-card {
-  border-color: var(--color-white);
 }
 
 .game-card__image {
@@ -92,11 +74,33 @@
 ***************************************************************************/
 
 .game-dialog__card-container {
+  position: relative;
   width: var(--card-width-lg);
-  height: calc(var(--card-height-lg) + 50px);
+  height: var(--card-height-lg);
 }
 
-.game-dialog__card-menu {
+.game-dialog__card-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.game-dialog__card-foreground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.game-dialog__menu {
   width: 100%;
   height: 50px;
   display: flex;
@@ -113,13 +117,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); */
-  border: 2px solid var(--color-black);
+  border: 2px solid black;
 }
 
 .game-dialog__card--producer {
-  background: var(--color-white);
-  color: var(--color-black);
+  background: var(--color-gray);
+  color: var(--color-white);
 }
 
 .game-dialog__card--consumer {

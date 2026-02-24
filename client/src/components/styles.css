@@ -101,6 +101,7 @@
   background-color: transparent;
   padding: 0;
   cursor: pointer;
+  display: flex;
 }
 
 .btn-base--fullwidth {

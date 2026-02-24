@@ -77,7 +77,6 @@ There are different types of actions available on cards:
   - Install Node (e.g. [download](https://nodejs.org/en/download/) an installer...)
     - At the time of this writing, Node was on version 22.
   - Install Docker
-
     
 - Server:
   - Bring up database (`/`):
@@ -105,4 +104,27 @@ There are different types of actions available on cards:
   - To run the site locally (`/client`):
     ```
     npm run dev
+    ```
+
+- Setting up Private Card Submodule (`/`):
+  - Init the submodule:
+    ```
+    git submodule init
+    ```
+  - Update the submodule, to get latest changes:
+    ```
+    git submodule update
+    ```
+  - Switch to a different submodule branch:
+    ```
+    cd server/src/game/cards/private
+    git checkout <branch>
+    ```
+  - Add the path to the card registry (relative to the `/server` folder) to the environment:
+    ```
+    export PRIVATE_CARDS_PATH=./src/game/cards/private
+    ```
+    Or, add a file, `server/.env` with the contents:
+    ```
+    PRIVATE_CARDS_PATH=./src/game/cards/private
     ```

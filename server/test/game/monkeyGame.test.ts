@@ -6,10 +6,21 @@
  */
 
 import { CONSTANTS } from "@common/game/constants";
+import {
+  resetCardRegistry,
+  useExampleCards,
+} from "@server/game/cards/registry";
 import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
 import type { Decision, GameData } from "@server/types";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
+beforeAll(() => {
+  useExampleCards();
+});
+afterAll(() => {
+  resetCardRegistry();
+});
 
 /**
  * Seeded pseudo-random number generator (mulberry32).

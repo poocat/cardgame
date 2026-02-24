@@ -5,11 +5,12 @@ import {
   pollSlowdown,
   sustainedLimiter,
 } from "@server/api/middleware";
-import { games, rooms } from "@server/api/routes";
+import { cards, games, rooms } from "@server/api/routes";
 import { CONFIG } from "@server/config";
 import { initDb } from "@server/db/database";
 import { logger } from "@server/logger";
 import express from "express";
+import { useExampleCards, usePrivateCards } from "./game/cards/registry";
 
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
@@ -21,19 +22,31 @@ export async function startServer() {
     process.exit(1);
   }
 
+  try {
+    usePrivateCards();
+  } catch (error) {
+    logger.warn({ error }, "could not load private card registry");
+    useExampleCards();
+  }
+
   const app = express();
   app.use(express.json());
 
-  // Rate limiting and slowdown:
-  app.use(burstLimiter);
-  app.use(sustainedLimiter);
-  app.use(pollSlowdown);
-
-  // Routes:
+  // Cards (static assets):
+  app.use(ROUTES.cards.path, burstLimiter);
+  app.use(ROUTES.cards.path, cards);
+  // Games:
+  app.use(ROUTES.games.path, burstLimiter);
+  app.use(ROUTES.games.path, sustainedLimiter);
+  app.use(ROUTES.games.path, pollSlowdown);
   app.use(ROUTES.games.path, games);
+  // Rooms:
+  app.use(ROUTES.rooms.path, burstLimiter);
+  app.use(ROUTES.rooms.path, sustainedLimiter);
+  app.use(ROUTES.rooms.path, pollSlowdown);
   app.use(ROUTES.rooms.path, rooms);
 
-  // Error handling:
+  // Global error handling:
   app.use(errorHandler);
 
   app.listen(CONFIG.port, () => {

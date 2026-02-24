@@ -436,15 +436,12 @@ export const GameBoard = memo(
                 {/* Abutment not displayed for observing player. */}
                 {!isObserver && (
                   <GameBoardPlayerAbutment>
-                    <ThumbnailPlaceholder
-                      highlight="none"
-                      label={
-                        <div>
-                          <div>Hand</div>
-                          <div>{player.cardsInHand.length}</div>
-                        </div>
-                      }
-                    />
+                    <ThumbnailPlaceholder highlight="none">
+                      <div>
+                        <div>Hand</div>
+                        <div>{player.cardsInHand.length}</div>
+                      </div>
+                    </ThumbnailPlaceholder>
                   </GameBoardPlayerAbutment>
                 )}
                 <GameBoardPlayerTablet index={index}>
