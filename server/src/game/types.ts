@@ -198,6 +198,8 @@ export type ActionDef = {
   instructions?: string;
   /** The sequence for the action's activity. If undefined, only the default effects (for the given action type) will be used. */
   sequence?: SequenceDef;
+  /** Use to skip default effects, since default effects can potentially "overwrite" custom effects. */
+  skipDefaultEffects?: boolean;
 };
 
 export type TriggerDef = {

@@ -69,7 +69,11 @@ export const activityTypeEffects: ActivityTypeMap<
       decisions: currentDecisions,
       mutator,
     });
-    // Apply default effects per action type.
-    actionTypeDefaultEffects[action.type]({ context: actionContext, mutator });
+    if (!actionDef.skipDefaultEffects) {
+      actionTypeDefaultEffects[action.type]({
+        context: actionContext,
+        mutator,
+      });
+    }
   },
 };
