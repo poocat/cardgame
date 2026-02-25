@@ -16,6 +16,7 @@ import type {
   roomDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
+import { actionTypes } from "@common/game/enums";
 import type { RoomDoc } from "@server/db/types";
 import type { CardData, Decision, GameData, Id } from "@server/types";
 import { createHash } from "node:crypto";
@@ -25,6 +26,8 @@ type RoomData = RoomDoc["data"];
 
 type GameDigest = z.infer<typeof gameDigestSchema>;
 type RoomDigest = z.infer<typeof roomDigestSchema>;
+type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
+type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type ChoiceValuesDigest = z.infer<typeof choiceValueDigestSchema>;
 
 function anonymizeId(id: string, salt: string): string {
@@ -99,18 +102,27 @@ export function digestGameData({
   const otherPlayerData = gameData.players.filter((p) => p.id !== playerId);
   const observingPlayerData = gameData.players.find((p) => p.id === playerId);
 
-  function visibleCardDigest(
-    cardData: CardData,
-  ): z.infer<typeof visibleCardDigestSchema> {
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Use to create digests for cards that are visible to the observing player.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  function visibleCardDigest(cardData: CardData): VisibleCardDigest {
+    // Actions should be displayed in order.
+    const cardActions = gameData.actions.filter(
+      (a) => a.card.id === cardData.id,
+    );
+    const actions: VisibleCardDigest["actions"] = [];
+    for (const type of actionTypes) {
+      const match = cardActions.find((a) => a.type === type);
+      if (match)
+        actions.push({ id: match.id, type, instructions: match.instructions });
+    }
     return {
       id: cardData.id,
       name: cardData.name,
       type: cardData.type,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
       lastMovedOnTick: cardData.lastMovedOnTick,
-      actions: gameData.actions
-        .filter((a) => a.card.id === cardData.id)
-        .map((a) => ({ id: a.id, type: a.type, instructions: a.instructions })),
+      actions,
       chips: gameData.chips
         .filter(
           (c) =>
@@ -120,9 +132,10 @@ export function digestGameData({
     };
   }
 
-  function cardInPlayDigest(
-    cardData: CardData,
-  ): z.infer<typeof inPlayCardDigestSchema> {
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Use to create digests for cards in play.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  function cardInPlayDigest(cardData: CardData): InPlayCardDigest {
     return {
       ...visibleCardDigest(cardData),
       exhausted:
