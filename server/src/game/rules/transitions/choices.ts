@@ -1,3 +1,4 @@
+import { CONSTANTS } from "@common/game/constants";
 import { getActionDefinition } from "@server/game/cards/registry";
 import type {
   ActionContext,
@@ -96,26 +97,31 @@ export function createDrawingCardsChoice(args: {
   playerId: Id;
   accessor: IAccessor;
 }): ChoiceData {
-  const consumers = args.accessor.getCards({
-    playerIds: [args.playerId],
-    types: ["consumer"],
-    locationTypes: ["inDeck"],
-  });
-  const producers = args.accessor.getCards({
-    playerIds: [args.playerId],
-    types: ["producer"],
-    locationTypes: ["inDeck"],
-  });
   const values = [];
-  if (producers.length > 0) values.push("producer");
-  if (consumers.length > 0) values.push("consumer");
+  const cardsInHand = args.accessor.getCards({
+    playerIds: [args.playerId],
+    locationTypes: ["inHand"],
+  });
+  if (cardsInHand.length < CONSTANTS.maxNumCardsInHand) {
+    const consumers = args.accessor.getCards({
+      playerIds: [args.playerId],
+      types: ["consumer"],
+      locationTypes: ["inDeck"],
+    });
+    const producers = args.accessor.getCards({
+      playerIds: [args.playerId],
+      types: ["producer"],
+      locationTypes: ["inDeck"],
+    });
+    if (producers.length > 0) values.push("producer");
+    if (consumers.length > 0) values.push("consumer");
+  }
   return {
     name: "deck",
     type: "deck",
     choosingPlayerId: args.playerId,
     instructions: "Choose a card to draw.",
     values,
-    // If nothing left in the deck, allow zero choices.
     min: values.length > 0 ? 1 : 0,
     max: 1,
   };
