@@ -343,6 +343,19 @@ export const testCards = {
         instructions:
           "Each player may move up to 1 chip from their reserve to one of their consumers in play.",
         sequence: {
+          getPlayers: ({ accessor }) =>
+            accessor.players.filter((p) => {
+              const chipsInReserve = accessor.getChips({
+                playerIds: [p.id],
+                locationTypes: ["inReserve"],
+              });
+              const consumersInPlay = accessor.getCards({
+                playerIds: [p.id],
+                locationTypes: ["inPlay"],
+                types: ["consumer"],
+              });
+              return chipsInReserve.length > 0 && consumersInPlay.length > 0;
+            }),
           choices: [
             {
               name: "targetChip",
@@ -350,23 +363,6 @@ export const testCards = {
               instructions: "Choose up to 1 of the chips in your reserve.",
               min: 0,
               max: 1,
-              getChoosingPlayers: ({ accessor }) =>
-                accessor.players
-                  .filter((p) => {
-                    const chipsInReserve = accessor.getChips({
-                      playerIds: [p.id],
-                      locationTypes: ["inReserve"],
-                    });
-                    const consumersInPlay = accessor.getCards({
-                      playerIds: [p.id],
-                      locationTypes: ["inPlay"],
-                      types: ["consumer"],
-                    });
-                    return (
-                      chipsInReserve.length > 0 && consumersInPlay.length > 0
-                    );
-                  })
-                  .map((p) => p.id),
               getValues: ({ accessor, context }) => {
                 return accessor
                   .getChips({
@@ -380,10 +376,8 @@ export const testCards = {
               name: "targetConsumer",
               type: "cardId",
               instructions: "Choose which consumer to move the chip to.",
-              min: 1,
+              min: 0,
               max: 1,
-              getChoosingPlayers: ({ currentDecisions }) =>
-                currentDecisions.getPlayerIds({ name: "targetChip" }),
               getValues: ({ accessor, context }) =>
                 accessor
                   .getCards({

@@ -440,7 +440,7 @@ describe("makeDecision", () => {
           min: 1,
           max: 1,
         },
-        nextChoices: [{ type: "dependent", index: 1 }],
+        nextChoices: [{ index: 1, playerId: "alice" }],
         previousDecisions: [],
       };
 
@@ -520,7 +520,7 @@ describe("makeDecision", () => {
           min: 1,
           max: 1,
         },
-        nextChoices: [{ type: "dependent", index: 1 }],
+        nextChoices: [{ index: 1, playerId: "alice" }],
         previousDecisions: [],
       };
 

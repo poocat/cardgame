@@ -261,37 +261,29 @@ describe("two-step ability with dependent choices", () => {
       .addChipsInReserve("alice", 3)
       .addChipsInReserve("bob", 3)
       .setPlayerTakingTurn("alice")
+      .setUpActionActivity("cons-1-ability")
       .build();
 
-    // Set up first choice: choose target producer card
-    game.activity = {
-      type: "takingAction",
-      actionId: "cons-1-ability",
-      playerTakingActionId: "alice",
-      currentChoice: {
-        name: "targetCard",
-        type: "cardId",
-        choosingPlayerId: "alice",
-        instructions: "Choose one of your producer cards.",
-        values: ["prod-1"],
-        min: 1,
-        max: 1,
-      },
-      nextChoices: [{ type: "dependent", index: 1 }],
-      previousDecisions: [],
-    };
-
-    // Decision 1: choose the producer
+    // Decision 1: choose the action
     let result = makeDecision({
       gameData: game,
+      decision: {
+        name: "actionToTake",
+        playerId: "alice",
+        values: ["cons-1-ability"],
+      },
+    });
+    expect(result.activity.type).toBe("takingAction");
+
+    // Decision 2: choose the producer with a chip on it
+    result = makeDecision({
+      gameData: result,
       decision: {
         name: "targetCard",
         playerId: "alice",
         values: ["prod-1"],
       },
     });
-
-    // Should still be in takingAction, now asking for chip
     expect(result.activity.type).toBe("takingAction");
 
     // Decision 2: choose the chip
@@ -348,29 +340,22 @@ describe("trigger on chip removal", () => {
       .addChipsInReserve("alice", 3)
       .addChipsInReserve("bob", 3)
       .setPlayerTakingTurn("alice")
+      .setUpActionActivity("dying-1-ability")
       .build();
 
-    // Set up the two-choice ability
-    game.activity = {
-      type: "takingAction",
-      actionId: "dying-1-ability",
-      playerTakingActionId: "alice",
-      currentChoice: {
-        name: "targetCard",
-        type: "cardId",
-        choosingPlayerId: "alice",
-        instructions: "Choose one of your consumer cards.",
-        values: ["cons-1"],
-        min: 1,
-        max: 1,
-      },
-      nextChoices: [{ type: "dependent", index: 1 }],
-      previousDecisions: [],
-    };
-
-    // Decision 1: choose consumer target
+    // Decision 1: choose the ability
     let result = makeDecision({
       gameData: game,
+      decision: {
+        name: "actionToTake",
+        playerId: "alice",
+        values: ["dying-1-ability"],
+      },
+    });
+
+    // Decision 2: choose the card
+    result = makeDecision({
+      gameData: result,
       decision: {
         name: "targetCard",
         playerId: "alice",
@@ -432,27 +417,20 @@ describe("trigger on chip removal", () => {
       .addChipsInReserve("alice", 3)
       .addChipsInReserve("bob", 3)
       .setPlayerTakingTurn("alice")
+      .setUpActionActivity("dying-1-ability")
       .build();
-
-    game.activity = {
-      type: "takingAction",
-      actionId: "dying-1-ability",
-      playerTakingActionId: "alice",
-      currentChoice: {
-        name: "targetCard",
-        type: "cardId",
-        choosingPlayerId: "alice",
-        instructions: "Choose one of your consumer cards.",
-        values: ["cons-1"],
-        min: 1,
-        max: 1,
-      },
-      nextChoices: [{ type: "dependent", index: 1 }],
-      previousDecisions: [],
-    };
 
     let result = makeDecision({
       gameData: game,
+      decision: {
+        name: "actionToTake",
+        playerId: "alice",
+        values: ["dying-1-ability"],
+      },
+    });
+
+    result = makeDecision({
+      gameData: result,
       decision: {
         name: "targetCard",
         playerId: "alice",
