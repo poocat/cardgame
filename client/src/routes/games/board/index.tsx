@@ -283,11 +283,12 @@ const GameBoardChoiceMenuValueSelect = (
     case "actionId":
       color = "action";
       break;
-    case "cardId":
-      color = "card";
-      break;
     case "chipId":
       color = "chip";
+      break;
+    case "cardId":
+    case "deck":
+      color = "card";
       break;
   }
 
