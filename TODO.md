@@ -3,11 +3,11 @@
 - [ ] Add unit tests for API.
 - [ ] Write helpers for defining common actions for cards.
 - [ ] Support different language translations of game instructions.
-- [ ] Support separate "consumer" and "producer" decks.
 - [ ] Support "development" activity.
 - [ ] Display trigger instructions on cards.
 - [ ] Limit total number of consumers.
 - [ ] Limit number of producers played per turn.
+- [x] Support separate "consumer" and "producer" decks.
 - [x] Allow card definitions to bypass automatic effects.
 - [x] Switch from "multi player choices" to "multi player sequences".
 - [x] Display winner in UI.

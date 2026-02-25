@@ -27,14 +27,23 @@ export const activityTypeEffects: ActivityTypeMap<
   }) => void
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * The effect of drawing cards is just moving cards from "in deck" to
-   * "in hand".
+   * The effect of drawing cards is just moving the top card from the chosen
+   * deck into the player's hand.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  drawingCards: ({ currentDecisions, mutator }) => {
-    const cardId = currentDecisions.decisions[0].values[0];
-    // Not guaranteed to have a card in deck at the draw step.
-    if (cardId) {
-      mutator.moveCard({ id: cardId, location: { type: "inHand" } });
+  drawingCards: ({ accessor, currentDecisions, mutator }) => {
+    const decision = currentDecisions.decisions[0];
+    const type = decision.values[0];
+    if (type === "producer" || type === "consumer") {
+      accessor
+        .getCards({
+          playerIds: [decision.playerId],
+          types: [type],
+          locationTypes: ["inDeck"],
+        })
+        .slice(0, 1)
+        .forEach((c) => {
+          mutator.moveCard({ id: c.id, location: { type: "inHand" } });
+        });
     }
   },
 

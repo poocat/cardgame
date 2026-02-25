@@ -43,22 +43,17 @@ function buildBasicGame(): GameData {
   // Build without activity first to get actual card IDs
   const game = builder.build();
 
-  // Find alice's first card in deck
-  const aliceFirstCard = game.cards.find(
-    (c) => c.ownerId === "alice" && c.location.type === "inDeck",
-  );
-
-  // Set up initial drawing activity with the actual card ID
+  // Set up initial drawing activity.
   game.activity = {
     type: "drawingCards",
     currentChoice: {
-      name: "cardToDraw",
-      type: "cardId",
-      values: aliceFirstCard ? [aliceFirstCard.id] : [],
+      name: "deck",
+      type: "deck",
+      values: ["producer", "consumer"],
       min: 1,
       max: 1,
       choosingPlayerId: "alice",
-      instructions: "Choose your first card to draw.",
+      instructions: "Choose deck.",
     },
     nextChoices: [],
     previousDecisions: [],
@@ -79,7 +74,7 @@ describe("makeDecision", () => {
         makeDecision({
           gameData: game,
           decision: {
-            name: "cardToDraw",
+            name: "deck",
             playerId: "alice",
             values: [],
           },
@@ -94,7 +89,7 @@ describe("makeDecision", () => {
         makeDecision({
           gameData: game,
           decision: {
-            name: "cardToDraw",
+            name: "deck",
             playerId: "alice",
             values: [game.activity.currentChoice.values[0], "extra"],
           },
@@ -108,7 +103,7 @@ describe("makeDecision", () => {
         makeDecision({
           gameData: game,
           decision: {
-            name: "cardToDraw",
+            name: "deck",
             playerId: "bob",
             values: [game.activity.currentChoice.values[0]],
           },
@@ -122,9 +117,9 @@ describe("makeDecision", () => {
         makeDecision({
           gameData: game,
           decision: {
-            name: "cardToDraw",
+            name: "deck",
             playerId: "alice",
-            values: ["nonexistent-card-id"],
+            values: ["not-a-deck"],
           },
         }),
       ).toThrow("values not part of the choice");
@@ -137,29 +132,30 @@ describe("makeDecision", () => {
   describe("drawingCards activity", () => {
     it("moves drawn card from deck to hand", () => {
       const game = buildBasicGame();
-      const cardId = game.activity.currentChoice.values[0];
+      let numCardsInHand = game.cards.filter(
+        (c) => c.location.type === "inHand",
+      );
+      expect(numCardsInHand.length).toBe(0);
       const result = makeDecision({
         gameData: game,
         decision: {
-          name: "cardToDraw",
+          name: "deck",
           playerId: "alice",
-          values: [cardId],
+          values: game.activity.currentChoice.values.slice(0, 1),
         },
       });
-      const card = result.cards.find((c) => c.id === cardId);
-      expect(card?.location.type).toBe("inHand");
+      numCardsInHand = result.cards.filter((c) => c.location.type === "inHand");
+      expect(numCardsInHand.length).toBe(1);
     });
 
     it("repeats drawingCards on first turn until opening hand is full", () => {
       let game = buildBasicGame();
-      // First turn, draw card — should stay in drawingCards
-      const cardId = game.activity.currentChoice.values[0];
       game = makeDecision({
         gameData: game,
         decision: {
-          name: "cardToDraw",
+          name: "deck",
           playerId: "alice",
-          values: [cardId],
+          values: game.activity.currentChoice.values.slice(0, 1),
         },
       });
       // Should still be drawing cards (opening hand needs 5 cards, only have 1)
@@ -170,14 +166,12 @@ describe("makeDecision", () => {
       let game = buildBasicGame();
       // Draw cards until activity changes from drawingCards (opening hand filled or deck empty)
       while (game.activity.type === "drawingCards") {
-        const cardId = game.activity.currentChoice.values[0];
-        if (!cardId) break;
         game = makeDecision({
           gameData: game,
           decision: {
             name: game.activity.currentChoice.name,
             playerId: "alice",
-            values: [cardId],
+            values: game.activity.currentChoice.values.slice(0, 1),
           },
         });
       }
@@ -560,9 +554,9 @@ describe("makeDecision", () => {
       const result = makeDecision({
         gameData: game,
         decision: {
-          name: "cardToDraw",
+          name: "deck",
           playerId: "alice",
-          values: [game.activity.currentChoice.values[0]],
+          values: game.activity.currentChoice.values.slice(0, 1),
         },
       });
       expect(result.tick).toBe(1);
