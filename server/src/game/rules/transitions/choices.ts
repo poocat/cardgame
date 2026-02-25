@@ -16,6 +16,23 @@ import type {
 import { actionTypeChecks } from "../checks/actionChecks";
 
 /******************************************************************************
+ * ### cycleTofront
+ *
+ * A utility for rotating an array in place until the element found by the
+ * given match function is at the beginning.
+ *
+ * If no element is found, the array is untouched.
+ ******************************************************************************/
+function cycleToFront<T>(array: T[], match: (item: T) => boolean) {
+  const matchIndex = array.findIndex(match);
+  if (matchIndex === -1) return;
+  for (let i = 0; i !== matchIndex; i++) {
+    const item = array.shift();
+    if (item) array.push(item);
+  }
+}
+
+/******************************************************************************
  * Use to generate a "null choice", which signals to the state machine that the
  * game data should be passed back through the state machine. Most relevant
  * when an action has no choices.
@@ -179,6 +196,7 @@ export function createTakingActionChoices(args: {
         },
       }),
     );
+    cycleToFront(eligiblePlayers, (player) => player.id === args.playerData.id);
   } else {
     eligiblePlayers.push(args.playerData);
   }
