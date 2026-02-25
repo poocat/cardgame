@@ -5,8 +5,8 @@
 - [ ] Support different language translations of game instructions.
 - [ ] Support "development" activity.
 - [ ] Display trigger instructions on cards.
-- [ ] Limit total number of consumers.
 - [ ] Limit number of producers played per turn.
+- [x] Limit total number of consumers.
 - [x] Support separate "consumer" and "producer" decks.
 - [x] Allow card definitions to bypass automatic effects.
 - [x] Switch from "multi player choices" to "multi player sequences".
