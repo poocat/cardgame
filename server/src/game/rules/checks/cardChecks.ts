@@ -1,6 +1,6 @@
 import { CONSTANTS } from "@common/game/constants";
-import { CardData, CardTypeMap } from "@server/types";
-import { CheckResult, IAccessor } from "@server/game/types";
+import type { CheckResult, IAccessor } from "@server/game/types";
+import type { CardData, CardTypeMap } from "@server/types";
 
 /******************************************************************************
  * ### Card Play Checks
@@ -20,7 +20,7 @@ export const cardPlayChecks: CardTypeMap<
       (c) =>
         c.location.type === "inPlay" &&
         c.type === "producer" &&
-        c.ownerId == cardData.ownerId,
+        c.ownerId === cardData.ownerId,
     );
     if (producersInPlay.length >= CONSTANTS.maxNumProducersInPlay) {
       return {

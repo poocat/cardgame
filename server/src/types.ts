@@ -121,6 +121,7 @@ export type ChoiceData = _DiscriminatedUnionFromArray<
     cardId: unknown;
     chipId: unknown;
     playerId: unknown;
+    deck: unknown;
   },
   {
     name: string;

@@ -96,18 +96,27 @@ export function createDrawingCardsChoice(args: {
   playerId: Id;
   accessor: IAccessor;
 }): ChoiceData {
-  const values = args.accessor
-    .getCards({ playerIds: [args.playerId], locationTypes: ["inDeck"] })
-    .slice(0, 1)
-    .map((c) => c.id);
+  const consumers = args.accessor.getCards({
+    playerIds: [args.playerId],
+    types: ["consumer"],
+    locationTypes: ["inDeck"],
+  });
+  const producers = args.accessor.getCards({
+    playerIds: [args.playerId],
+    types: ["producer"],
+    locationTypes: ["inDeck"],
+  });
+  const values = [];
+  if (producers.length > 0) values.push("producer");
+  if (consumers.length > 0) values.push("consumer");
   return {
-    name: "cardsToDraw",
-    type: "cardId",
+    name: "deck",
+    type: "deck",
     choosingPlayerId: args.playerId,
     instructions: "Choose a card to draw.",
     values,
     // If nothing left in the deck, allow zero choices.
-    min: Math.min(values.length, 1),
+    min: values.length > 0 ? 1 : 0,
     max: 1,
   };
 }

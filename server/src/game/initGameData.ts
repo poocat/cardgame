@@ -93,16 +93,13 @@ export function initGameData(
       type: "drawingCards",
       previousDecisions: [],
       currentChoice: {
-        name: "cardToDraw",
-        type: "cardId",
-        values: cardData
-          .filter((c) => c.ownerId === firstPlayer.id)
-          .map((c) => c.id)
-          .slice(0, 1),
+        name: "deck",
+        type: "deck",
+        values: ["producer", "consumer"],
         min: 1,
         max: 1,
         choosingPlayerId: firstPlayer.id,
-        instructions: "Choose your first card to draw.",
+        instructions: "Choose the deck to draw your first card from.",
       },
       nextChoices: [],
     },

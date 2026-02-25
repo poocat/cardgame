@@ -13,6 +13,7 @@ export const choiceTypes = [
   "cardId",
   "chipId",
   "playerId",
+  "deck",
 ] as const;
 export const activityTypes = [
   "drawingCards",
