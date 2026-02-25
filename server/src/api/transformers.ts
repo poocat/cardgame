@@ -118,6 +118,12 @@ export function digestGameData({
       );
       break;
     }
+    case "deck": {
+      choiceValuesDigest.push(
+        ...choiceValues.map((v) => ({ value: v, onCardId: null, label: v })),
+      );
+      break;
+    }
     case "cardId": {
       choiceValuesDigest.push(
         ...choiceValues.map((v) => {
