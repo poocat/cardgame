@@ -156,10 +156,7 @@ export function digestGameData({
       choiceValuesDigest.push(
         ...choiceValues.map((v) => {
           const card = allCards.find((c) => c.id === v);
-          const label =
-            card?.location.type === "inDeck"
-              ? "Card in Deck"
-              : (card?.name ?? v);
+          const label = card?.name ?? "Card";
           return { value: v, onCardId: null, label };
         }),
       );
