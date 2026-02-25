@@ -294,7 +294,7 @@ const GameBoardChoiceMenuValueSelect = (
 
   return (
     <SelectButton
-      size="md"
+      size="sm"
       border="dark"
       color={color}
       label={props.label}
