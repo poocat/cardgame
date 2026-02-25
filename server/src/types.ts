@@ -132,9 +132,7 @@ export type ChoiceData = _DiscriminatedUnionFromArray<
   }
 >;
 /** When an activity requires multiple choices, all but the first may be "dependent" on previous choices made during the activity. */
-export type NextChoiceData =
-  | { type: "dependent"; index: number }
-  | { type: "independent"; choice: ChoiceData };
+export type NextChoiceData = { index: number; playerId: Id };
 
 export type Decision = { name: string; playerId: Id; values: ChoiceValue[] };
 

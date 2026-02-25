@@ -162,12 +162,6 @@ export type ChoiceDef = {
   min: number;
   /** Use to indicate the maximum number of options the player may select from the given options. */
   max: number;
-  /** Use to determine which players must make the choice. If not included, will default to only the player taking the action. */
-  getChoosingPlayers?: (args: {
-    accessor: IAccessor;
-    currentDecisions: Decisions;
-    context: ActionContext;
-  }) => Id[];
   /** Use to retrieve the values to choose between from the game data. */
   getValues: (args: {
     accessor: IAccessor;
@@ -182,6 +176,11 @@ export type SequenceDef = {
     accessor: IAccessor;
     context: ActionContext;
   }) => CheckResult;
+  /** Use to determine which players will go through the sequence. */
+  getPlayers?: (args: {
+    accessor: IAccessor;
+    context: ActionContext;
+  }) => PlayerData[];
   /** Use to define the choices that need to be made in order to affect the game data. */
   choices: ChoiceDef[];
   /** Use to define the effect the decisions should have on the game data at the conclusion of the activity. */

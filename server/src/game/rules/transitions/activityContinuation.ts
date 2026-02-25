@@ -1,12 +1,7 @@
 import { getActionDefinition } from "@server/game/cards/registry";
 import type { IAccessor, IDecisions } from "@server/game/types";
-import type {
-  ActivityData,
-  ActivityTypeMap,
-  Decision,
-  NextChoiceData,
-} from "@server/types";
-import { createActionChoices, nullChoice } from "./choices";
+import type { ActivityData, ActivityTypeMap, Decision } from "@server/types";
+import { createActionChoice } from "./choices";
 
 /******************************************************************************
  * ### Activity Continuation Logic
@@ -31,6 +26,10 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
       `'${currentActivity.type}' activities must only have one choice`,
     );
   },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Continuing taking an action is a matter of taking the next choice and
+   * making it the current choice.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   takingAction: ({ accessor, currentActivity, currentDecisions }) => {
     if (currentActivity.type !== "takingAction") {
       throw new Error(
@@ -46,40 +45,28 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
       previousDecisions: currentDecisions.decisions as Decision[], // boo...
     };
     const nextChoice = currentActivity.nextChoices[0];
-    if (nextChoice.type === "dependent") {
-      const action = accessor.getActionById({
-        actionId: currentActivity.actionId,
-      });
-      const actionDef = getActionDefinition({
-        cardName: action.card.name,
-        actionType: action.type,
-      });
-      const choiceDef = actionDef.sequence?.choices[nextChoice.index];
-      if (!choiceDef) {
-        throw new Error(
-          `No choice for action '${action.id}' at index ${nextChoice.index}`,
-        );
-      }
-      const nextActionChoices = createActionChoices({
-        choiceDef,
-        accessor: accessor,
-        currentDecisions,
-        actionContext: {
-          cardId: action.card.id,
-          playerTakingActionId: currentActivity.playerTakingActionId,
-        },
-      });
-      next.currentChoice = nextActionChoices[0] ?? nullChoice();
-      const remaining: NextChoiceData[] = nextActionChoices
-        .slice(1)
-        .map((choice) => ({
-          type: "independent",
-          choice,
-        }));
-      next.nextChoices = [...remaining, ...next.nextChoices];
-    } else {
-      next.currentChoice = nextChoice.choice;
+    const action = accessor.getActionById({
+      actionId: currentActivity.actionId,
+    });
+    const actionDef = getActionDefinition({
+      cardName: action.card.name,
+      actionType: action.type,
+    });
+    const choiceDef = actionDef.sequence?.choices[nextChoice.index];
+    if (!choiceDef) {
+      throw new Error(
+        `No choice for action '${action.id}' at index ${nextChoice.index}`,
+      );
     }
+    next.currentChoice = createActionChoice({
+      choiceDef,
+      accessor: accessor,
+      currentDecisions,
+      actionContext: {
+        cardId: action.card.id,
+        playerTakingActionId: nextChoice.playerId,
+      },
+    });
     return next;
   },
 };
