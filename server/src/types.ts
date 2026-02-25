@@ -101,6 +101,7 @@ export type CardData = _DiscriminatedUnionFromArray<
     location: CardLocationData;
     lastMovedOnTick: Tick;
     lastMovedOnTurn: Turn;
+    triggerInstructions: string | null;
   }
 >;
 

@@ -4,8 +4,8 @@
 - [ ] Write helpers for defining common actions for cards.
 - [ ] Support different language translations of game instructions.
 - [ ] Support "development" activity.
-- [ ] Display trigger instructions on cards.
 - [ ] Limit number of producers played per turn.
+- [x] Display trigger instructions on cards.
 - [x] Limit total number of consumers.
 - [x] Support separate "consumer" and "producer" decks.
 - [x] Allow card definitions to bypass automatic effects.

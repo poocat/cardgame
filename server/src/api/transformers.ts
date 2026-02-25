@@ -119,6 +119,7 @@ export function digestGameData({
     return {
       id: cardData.id,
       name: cardData.name,
+      triggerInstructions: cardData.triggerInstructions,
       type: cardData.type,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
       lastMovedOnTick: cardData.lastMovedOnTick,
