@@ -127,9 +127,9 @@ describe("MutatorQueue", () => {
       activity: {
         type: "drawingCards",
         currentChoice: {
-          name: "cardToDraw",
-          type: "cardId",
-          values: ["c1"],
+          name: "deck",
+          type: "deck",
+          values: [""],
           min: 1,
           max: 1,
           choosingPlayerId: "alice",

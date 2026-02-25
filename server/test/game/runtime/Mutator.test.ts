@@ -3,6 +3,7 @@ import {
   resetCardRegistry,
 } from "@server/game/cards/registry";
 import { Mutator } from "@server/game/runtime/Mutator";
+import { ActivityData } from "@server/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testCards } from "../../fixtures/cards";
 import { GameBuilder } from "../../helpers/GameBuilder";
@@ -173,12 +174,12 @@ describe("Mutator", () => {
     it("replaces the current activity", () => {
       const game = buildTestGame();
       const mutator = new Mutator(game);
-      const newActivity = {
-        type: "drawingCards" as const,
+      const newActivity: ActivityData = {
+        type: "drawingCards",
         currentChoice: {
-          name: "cardToDraw",
-          type: "cardId" as const,
-          values: ["c1"],
+          name: "deck",
+          type: "deck",
+          values: [""],
           min: 1,
           max: 1,
           choosingPlayerId: "alice",
