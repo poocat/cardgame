@@ -16,6 +16,23 @@ import type {
 import { actionTypeChecks } from "../checks/actionChecks";
 
 /******************************************************************************
+ * ### cycleTofront
+ *
+ * A utility for rotating an array in place until the element found by the
+ * given match function is at the beginning.
+ *
+ * If no element is found, the array is untouched.
+ ******************************************************************************/
+function cycleToFront<T>(array: T[], match: (item: T) => boolean) {
+  const matchIndex = array.findIndex(match);
+  if (matchIndex === -1) return;
+  for (let i = 0; i !== matchIndex; i++) {
+    const item = array.shift();
+    if (item) array.push(item);
+  }
+}
+
+/******************************************************************************
  * Use to generate a "null choice", which signals to the state machine that the
  * game data should be passed back through the state machine. Most relevant
  * when an action has no choices.
@@ -47,41 +64,29 @@ export function nullChoice(): ChoiceData {
  * Zero choices might be generated if the choice definition yields no viable
  * choosing players.
  ******************************************************************************/
-export function createActionChoices(args: {
+export function createActionChoice(args: {
   choiceDef: ChoiceDef;
   accessor: IAccessor;
   currentDecisions: IDecisions;
   actionContext: ActionContext;
-}): ChoiceData[] {
-  const choosingPlayerIds: Id[] = [];
-  if (!args.choiceDef.getChoosingPlayers) {
-    // By default, the choosing player is the one taking the action.
-    choosingPlayerIds.push(args.actionContext.playerTakingActionId);
-  } else {
-    choosingPlayerIds.push(
-      ...args.choiceDef.getChoosingPlayers({
-        accessor: args.accessor,
-        currentDecisions: args.currentDecisions,
-        context: args.actionContext,
-      }),
-    );
-  }
-  return choosingPlayerIds.map((playerId) => {
-    const values = args.choiceDef.getValues({
-      accessor: args.accessor,
-      currentDecisions: args.currentDecisions,
-      context: { ...args.actionContext, choosingPlayerId: playerId },
-    });
-    return {
-      name: args.choiceDef.name,
-      type: args.choiceDef.type,
-      min: args.choiceDef.min,
-      max: args.choiceDef.max,
-      choosingPlayerId: playerId,
-      instructions: args.choiceDef.instructions,
-      values,
-    };
+}): ChoiceData {
+  const values = args.choiceDef.getValues({
+    accessor: args.accessor,
+    currentDecisions: args.currentDecisions,
+    context: {
+      ...args.actionContext,
+      choosingPlayerId: args.actionContext.playerTakingActionId,
+    },
   });
+  return {
+    name: args.choiceDef.name,
+    type: args.choiceDef.type,
+    min: args.choiceDef.min,
+    max: args.choiceDef.max,
+    choosingPlayerId: args.actionContext.playerTakingActionId,
+    instructions: args.choiceDef.instructions,
+    values,
+  };
 }
 
 /******************************************************************************
@@ -179,29 +184,44 @@ export function createTakingActionChoices(args: {
     // In those cases, send a special choice to signal the state machine.
     return { currentChoice: nullChoice(), nextChoices: [] };
   }
+  // A sequence can be repeated amongst multiple players.
+  const eligiblePlayers: PlayerData[] = [];
+  if (actionDef.sequence?.getPlayers) {
+    eligiblePlayers.push(
+      ...actionDef.sequence.getPlayers({
+        accessor: args.accessor,
+        context: {
+          cardId: args.actionData.card.id,
+          playerTakingActionId: args.playerData.id,
+        },
+      }),
+    );
+    cycleToFront(eligiblePlayers, (player) => player.id === args.playerData.id);
+  } else {
+    eligiblePlayers.push(args.playerData);
+  }
+  if (eligiblePlayers.length < 1) {
+    // If no players eligible, move on.
+    return { currentChoice: nullChoice(), nextChoices: [] };
+  }
   const firstChoiceDef = choices[0];
-  const firstChoices = createActionChoices({
+  const firstPlayer = eligiblePlayers[0];
+  const firstChoice = createActionChoice({
     choiceDef: firstChoiceDef,
     accessor: args.accessor,
     currentDecisions: args.decisions,
     actionContext: {
       cardId: args.actionData.card.id,
-      playerTakingActionId: args.playerData.id,
+      playerTakingActionId: firstPlayer.id,
     },
   });
-  // The rest of the choices are "dependent", because they may depend on
-  // decisions made for previous choices.
-  const dependentChoices: NextChoiceData[] = choices
-    .slice(1)
-    .map((_, i) => ({ type: "dependent", index: i + 1 }));
-  // If no viable players for first choice, send a null current choice and move
-  // on.
-  if (firstChoices.length < 1) {
-    return { currentChoice: nullChoice(), nextChoices: dependentChoices };
-  }
-  const nextChoices: NextChoiceData[] = firstChoices
-    .slice(1)
-    .map((choice) => ({ type: "independent", choice }));
-  nextChoices.push(...dependentChoices);
-  return { currentChoice: firstChoices[0], nextChoices };
+  const nextChoices: NextChoiceData[] = eligiblePlayers
+    .flatMap((player) =>
+      choices.map((_, i) => ({
+        index: i,
+        playerId: player.id,
+      })),
+    )
+    .slice(1);
+  return { currentChoice: firstChoice, nextChoices };
 }

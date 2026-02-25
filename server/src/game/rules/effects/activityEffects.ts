@@ -12,7 +12,11 @@ import { actionTypeDefaultEffects } from "./actionEffects";
  * ### Activity Execution Effects
  *
  * Effects that occur when an activity completes, based on activity type.
- * Co-located with action effects since they're applied in the same game loop phase.
+ * Co-located with action effects since they're applied in the same game loop
+ * phase.
+ *
+ * Note, for "takingAction" type activities, includes automatic effects such as
+ * moving cards into or out of play for "play" and "discard" type actions.
  ******************************************************************************/
 export const activityTypeEffects: ActivityTypeMap<
   (args: {
@@ -69,7 +73,11 @@ export const activityTypeEffects: ActivityTypeMap<
       decisions: currentDecisions,
       mutator,
     });
-    // Apply default effects per action type.
-    actionTypeDefaultEffects[action.type]({ context: actionContext, mutator });
+    if (!actionDef.skipDefaultEffects) {
+      actionTypeDefaultEffects[action.type]({
+        context: actionContext,
+        mutator,
+      });
+    }
   },
 };

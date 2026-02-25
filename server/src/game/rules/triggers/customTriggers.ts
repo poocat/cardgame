@@ -6,6 +6,9 @@ import type { IAccessor, IMutator } from "@server/game/types";
  *
  * Any card in play may have a custom trigger defined for it.
  * These are card-specific effects that fire after type-based triggers.
+ *
+ * Note, a trigger only becomes active in the activity following the card
+ * coming into play.
  ******************************************************************************/
 export function triggeredEffects(args: {
   current: IAccessor;
