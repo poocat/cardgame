@@ -44,6 +44,34 @@ function anonymizeId(id: string, salt: string): string {
   return uuid;
 }
 
+function createActivityExplanation(gameData: GameData): string {
+  const choosingPlayerId = gameData.activity.currentChoice.choosingPlayerId;
+  const choosingPlayer = gameData.players.find(
+    (p) => p.id === choosingPlayerId,
+  );
+  const choosingPlayerName = choosingPlayer?.name;
+  switch (gameData.activity.type) {
+    case "choosingAction": {
+      return `${choosingPlayerName} is choosing which action to take, or whether or not to pass their turn.`;
+    }
+    case "drawingCards": {
+      return `${choosingPlayerName} is choosing which deck to draw from.`;
+    }
+    case "takingAction": {
+      const actionId = gameData.activity.actionId;
+      const playerTakingActionId = gameData.activity.playerTakingActionId;
+      const playerTakingAction = gameData.players.find(
+        (p) => p.id === playerTakingActionId,
+      );
+      const action = gameData.actions.find((a) => a.id === actionId);
+      return `${playerTakingAction?.name} has chosen the ${action?.type} action from ${action?.card.name}. ${choosingPlayerName} is currently choosing values.`;
+    }
+    default: {
+      return "";
+    }
+  }
+}
+
 /******************************************************************************
  * ### digestGameData
  *
@@ -185,6 +213,7 @@ export function digestGameData({
     playerTakingTurnId: anonymizedPlayerIdMap[gameData.playerTakingTurnId],
     activity: {
       type: gameData.activity.type,
+      explanation: createActivityExplanation(gameData),
       choice: {
         ...gameData.activity.currentChoice,
         values: choiceValuesDigest,

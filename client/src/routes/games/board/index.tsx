@@ -306,6 +306,13 @@ const GameBoardChoiceMenuValueSelect = (
 };
 
 /******************************************************************************
+ * ### GameBoardFooterContainer
+ ******************************************************************************/
+const GameBoardFooterContainer = (props: { children?: React.ReactNode }) => {
+  return <div className="game-footer-menu">{props.children}</div>;
+};
+
+/******************************************************************************
  * ### GameBoardChoiceMenu
  ******************************************************************************/
 const GameBoardChoiceMenu = memo(
@@ -322,43 +329,41 @@ const GameBoardChoiceMenu = memo(
     >,
   ) => {
     return (
-      <div className="game-footer-menu">
-        <Box spacing="sm">
-          <Stack spacing="sm" orientation="vertical">
-            <Box spacing="sm">{props.instructions}</Box>
-            <Box spacing="sm">
-              <Button
-                border="dark"
-                color="secondary"
-                size="md"
-                disabled={props.submitDisabled}
-                onClick={props.onSubmitChoice}
-              >
-                Submit Choices
-              </Button>
-            </Box>
-            <Box spacing="sm">
-              <Stack spacing="sm" orientation="horizontal">
-                {props.values.map(({ value, label }) => {
-                  const selected = props.checkValueSelected(value);
-                  const disabled = !selected && !props.moreValuesAllowed;
-                  return (
-                    <GameBoardChoiceMenuValueSelect
-                      key={value}
-                      value={value}
-                      label={label}
-                      selected={selected}
-                      disabled={disabled}
-                      choiceType={props.choiceType}
-                      toggleValue={props.toggleValue}
-                    />
-                  );
-                })}
-              </Stack>
-            </Box>
-          </Stack>
-        </Box>
-      </div>
+      <Box spacing="sm">
+        <Stack spacing="sm" orientation="vertical">
+          <Box spacing="sm">{props.instructions}</Box>
+          <Box spacing="sm">
+            <Button
+              border="dark"
+              color="secondary"
+              size="md"
+              disabled={props.submitDisabled}
+              onClick={props.onSubmitChoice}
+            >
+              Submit Choices
+            </Button>
+          </Box>
+          <Box spacing="sm">
+            <Stack spacing="sm" orientation="horizontal">
+              {props.values.map(({ value, label }) => {
+                const selected = props.checkValueSelected(value);
+                const disabled = !selected && !props.moreValuesAllowed;
+                return (
+                  <GameBoardChoiceMenuValueSelect
+                    key={value}
+                    value={value}
+                    label={label}
+                    selected={selected}
+                    disabled={disabled}
+                    choiceType={props.choiceType}
+                    toggleValue={props.toggleValue}
+                  />
+                );
+              })}
+            </Stack>
+          </Box>
+        </Stack>
+      </Box>
     );
   },
 );
@@ -367,11 +372,14 @@ const GameBoardChoiceMenu = memo(
  * ### GameOverMenu
  ******************************************************************************/
 const GameOverMenu = (props: { winnerName: string }) => {
-  return (
-    <div className="game-footer-menu">
-      <Box spacing="lg">{props.winnerName} wins!</Box>
-    </div>
-  );
+  return <Box spacing="lg">{props.winnerName} wins!</Box>;
+};
+
+/******************************************************************************
+ * ### ExplanationMenu
+ ******************************************************************************/
+const ExplanationMenu = (props: { explanation: string }) => {
+  return <Box spacing="lg">{props.explanation}</Box>;
 };
 
 /******************************************************************************
@@ -540,27 +548,28 @@ export const GameBoard = memo(
             </Fragment>
           );
         })}
-        {observingPlayer === undefined ? (
+        {observingPlayer === undefined && (
           <div className="game-player-abutment-spacer" />
-        ) : (
-          // Always leave room for the footer menu if there is an observing player.
-          <div className="game-footer-spacer" />
         )}
-        {observingPlayerIsChoosing && (
-          <GameBoardChoiceMenu
-            instructions={props.game.activity.choice.instructions}
-            choiceType={props.game.activity.choice.type}
-            values={props.game.activity.choice.values}
-            onSubmitChoice={props.onSubmitChoice}
-            submitDisabled={submitDisabled}
-            toggleValue={props.selectorProps.toggleValue}
-            checkValueSelected={props.selectorProps.checkValueSelected}
-            moreValuesAllowed={props.selectorProps.moreValuesAllowed}
-          />
-        )}
-        {gameOver && (
-          <GameOverMenu winnerName={props.game.winner?.name ?? ""} />
-        )}
+        <div className="game-footer-spacer" />
+        <GameBoardFooterContainer>
+          {gameOver ? (
+            <GameOverMenu winnerName={props.game.winner?.name ?? ""} />
+          ) : observingPlayerIsChoosing ? (
+            <GameBoardChoiceMenu
+              instructions={props.game.activity.choice.instructions}
+              choiceType={props.game.activity.choice.type}
+              values={props.game.activity.choice.values}
+              onSubmitChoice={props.onSubmitChoice}
+              submitDisabled={submitDisabled}
+              toggleValue={props.selectorProps.toggleValue}
+              checkValueSelected={props.selectorProps.checkValueSelected}
+              moreValuesAllowed={props.selectorProps.moreValuesAllowed}
+            />
+          ) : (
+            <ExplanationMenu explanation={props.game.activity.explanation} />
+          )}
+        </GameBoardFooterContainer>
         <Dialog
           title={dialogTitle}
           description=""

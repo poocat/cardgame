@@ -27,6 +27,7 @@ export const choiceValueDigestSchema = z.strictObject({
 
 export const activityDigestSchema = z.strictObject({
   type: z.union(activityTypes.map((t) => z.literal(t))),
+  explanation: z.string(),
   choice: z.strictObject({
     name: z.string(),
     type: z.union(choiceTypes.map((t) => z.literal(t))),
