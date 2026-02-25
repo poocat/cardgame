@@ -126,6 +126,13 @@
   justify-content: space-between;
 }
 
+.game-player-area--side-left .game-player-tablet {
+  box-shadow: var(--color-black) 2px 2px;
+}
+.game-player-area--side-right .game-player-tablet {
+  box-shadow: var(--color-black) -2px 2px;
+}
+
 .game-player-tablet--player-0 {
   background: var(--color-player-red);
 }
