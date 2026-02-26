@@ -60,16 +60,16 @@
   /* Game styling */
   --total-width: 1000px;
 
-  --cutout-width: 350px;
+  --cutout-width: 400px;
   --cutout-hradius: calc(var(--cutout-width) / 2);
   --cutout-vradius: 150px;
   --vertical-padding-top: var(--cutout-vradius);
 
-  --player-area-height: 225px;
+  --player-area-height: 250px;
 
-  --tablet-width: 350px;
+  --tablet-width: 325px;
 
-  --center-area-width: 350px;
+  --center-area-width: 375px;
 
   --hand-area-width: 300px;
   --hand-area-height: 200px;
@@ -78,8 +78,8 @@
 
   --margin-bottom: 25px;
 
-  --card-width-sm: 60px;
-  --card-height-sm: 60px;
+  --card-width-sm: 75px;
+  --card-height-sm: 75px;
   --card-width-lg: 250px;
   --card-height-lg: 350px;
 }

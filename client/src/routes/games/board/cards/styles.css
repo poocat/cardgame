@@ -5,7 +5,7 @@
 .game-card-container {
   /* Padding is necessary to ensure that the highlight is visible. */
   padding: 3px;
-  border-radius: 3px;
+  border-radius: 5px;
   margin: 1px;
   transition: transform 0.5s;
 }
@@ -34,7 +34,7 @@
   width: var(--card-width-sm);
   height: var(--card-width-sm);
   border: 1px solid;
-  border-radius: 2px;
+  border-radius: 4px;
   padding: var(--space-xs);
   display: flex;
   flex-direction: column;
