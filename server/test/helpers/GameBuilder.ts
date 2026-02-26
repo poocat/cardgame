@@ -195,6 +195,7 @@ export class GameBuilder {
         location: spec.location,
         lastMovedOnTick: 0,
         lastMovedOnTurn: 0,
+        triggerInstructions: "",
       };
     });
 

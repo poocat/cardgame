@@ -107,7 +107,21 @@ function assertInvariants(gameData: GameData, label: string) {
     ).toBeLessThanOrEqual(CONSTANTS.maxNumProducersInPlay);
   }
 
-  // 6. Exactly one playerTakingTurnId matches a player
+  // 6. No player has too many consumers in play
+  for (const player of gameData.players) {
+    const consumersInPlay = gameData.cards.filter(
+      (c) =>
+        c.ownerId === player.id &&
+        c.type === "consumer" &&
+        c.location.type === "inPlay",
+    );
+    expect(
+      consumersInPlay.length,
+      `[${label}] player ${player.id} has ${consumersInPlay.length} consumers in play (max ${CONSTANTS.maxNumConsumersInPlay})`,
+    ).toBeLessThanOrEqual(CONSTANTS.maxNumConsumersInPlay);
+  }
+
+  // 7. Exactly one playerTakingTurnId matches a player
   const turnPlayer = gameData.players.filter(
     (p) => p.id === gameData.playerTakingTurnId,
   );
