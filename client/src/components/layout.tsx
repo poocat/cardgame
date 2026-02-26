@@ -32,3 +32,24 @@ export const Box = (props: {
 export const Divider = () => {
   return <div className="divider" />;
 };
+
+/******************************************************************************
+ * ### Abutment
+ ******************************************************************************/
+export const Abutment = (props: { children?: React.ReactNode }) => {
+  return <div className="abutment">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### Edge
+ *
+ * A zero-height, full-width container that can be used to align elements along
+ * the bottom edge of its previous sibling.
+ ******************************************************************************/
+export const Edge = (props: { children?: React.ReactNode }) => {
+  return (
+    <div className="abutment">
+      <div className="edge">{props.children}</div>
+    </div>
+  );
+};

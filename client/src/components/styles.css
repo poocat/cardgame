@@ -338,3 +338,21 @@
 }
 
 /* .dialog-content {} */
+
+/***************************************************************************
+  Abutment/Edge
+***************************************************************************/
+
+.abutment {
+  width: 100%;
+  height: 0;
+  top: 0;
+  position: relative;
+}
+
+.edge {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  transform: translateY(50%);
+}
