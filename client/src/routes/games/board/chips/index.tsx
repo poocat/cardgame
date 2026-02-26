@@ -1,4 +1,5 @@
 import { ButtonBase } from "@client/components";
+import { Edge } from "@client/components/layout";
 import type { Size } from "@client/components/types";
 import { useCallback, useMemo } from "react";
 import type { ChipDigest, PlayerSide, SelectorProps } from "../types";
@@ -145,19 +146,19 @@ export const ChipDisplaySelector = (props: {
 };
 
 /******************************************************************************
- * ### ChipCounterBadge
+ * ### ChipCounterEdge
  *
- * A zero-height container used for positioning chip counters on the edges
- * of other elements.
+ * A zero-height container used for positioning chip counters on the bottom
+ * edges of other elements.
  *
- * Note, if siblings have non-zero margin, the position will be offset from
- * the edge.
+ * Note, if siblings have non-zero bottom margin, the position will be offset
+ * from the edge.
  ******************************************************************************/
-export const ChipCounterBadge = (props: { children: React.ReactNode }) => {
+export const ChipCounterEdge = (props: { children: React.ReactNode }) => {
   return (
-    <div className="game-chip-edge">
-      <div className={`game-chip-edge__container`}>{props.children}</div>
-    </div>
+    <Edge>
+      <div className="game-chip-edge">{props.children}</div>
+    </Edge>
   );
 };
 

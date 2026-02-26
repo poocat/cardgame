@@ -25,18 +25,8 @@
   color: var(--color-white);
 }
 
-/* Used to put chips on the edge of another element */
 .game-chip-edge {
-  width: 100%;
-  height: 0;
-  top: 0;
   position: relative;
-}
-
-.game-chip-edge__container {
-  position: absolute;
-  bottom: 0;
-  transform: translateY(50%);
   left: 5%;
 }
 

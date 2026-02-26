@@ -2,7 +2,7 @@ import { Button, SelectButton } from "@client/components";
 import { Stack } from "@client/components/layout";
 import { memo, useCallback } from "react";
 import {
-  ChipCounterBadge,
+  ChipCounterEdge,
   ChipDisplay,
   ChipDisplayCounter,
   ChipDisplaySelector,
@@ -106,7 +106,7 @@ export const FaceUpThumbnail = memo(
           <CardImage size="thumbnail" name={props.card.name} />
         </Thumbnail>
         {props.card.chips.length > 0 && (
-          <ChipCounterBadge>
+          <ChipCounterEdge>
             <ChipDisplay side="left" inverted={false} fullWidth={true}>
               <ChipDisplayCounter
                 size="sm"
@@ -114,7 +114,7 @@ export const FaceUpThumbnail = memo(
                 selectedCount={selectedChipIds.length}
               />
             </ChipDisplay>
-          </ChipCounterBadge>
+          </ChipCounterEdge>
         )}
       </ThumbnailContainer>
     );
@@ -255,7 +255,7 @@ export const DetailCard = (props: {
         </CardDetailForeground>
       </CardDetailBody>
       {chipIds.length > 0 && (
-        <ChipCounterBadge>
+        <ChipCounterEdge>
           <ChipDisplay side="left" inverted={false} fullWidth={true}>
             <ChipDisplayCounter
               size="lg"
@@ -263,7 +263,7 @@ export const DetailCard = (props: {
               selectedCount={numSelectedChips}
             />
           </ChipDisplay>
-        </ChipCounterBadge>
+        </ChipCounterEdge>
       )}
       {cardHasChoice && (
         <CardDetailMenuContainer>
