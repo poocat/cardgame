@@ -33,7 +33,8 @@
   top: 4px; /* To account for the outline width */
   height: 9999px; /* Should get cropped when used in the game background. */
   background: var(--color-night);
-  outline: 4px double var(--color-black);
+  outline: 3px double var(--color-black);
+  border: 2px solid var(--color-black);
   border-radius:
     var(--cutout-hradius) var(--cutout-hradius) 0 0 / var(--cutout-vradius)
     var(--cutout-vradius) 0 0;
@@ -99,7 +100,7 @@
 .game-player-tablet {
   width: var(--tablet-width);
   height: 100%;
-  border: 4px double var(--color-black);
+  border: 3px double var(--color-black);
   padding: var(--space-md);
   display: flex;
   flex-direction: column;
@@ -137,10 +138,12 @@
 }
 
 .game-player-tablet__indicator {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   background-color: red;
-  outline: 4px double var(--color-black);
+  border: 2px double var(--color-black);
+  outline: 1px solid var(--color-black);
+  border-radius: 50%;
 }
 
 .game-player-tablet__footer {
