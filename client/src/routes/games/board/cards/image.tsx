@@ -15,7 +15,7 @@ export const CardImage = (props: {
   return (
     <img
       className="game-card__image"
-      src={`/api/cards/images/${slugify(props.name)}.${props.size}.svg`}
+      src={`/api/cards/images/${slugify(props.name)}.${props.size}.png`}
       onError={() => setFailed(true)}
       alt={props.name}
     />
