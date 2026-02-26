@@ -238,11 +238,11 @@
 }
 
 .select-btn--color-action {
-  background-color: var(--color-action, #9696c8);
+  background-color: var(--color-action);
 }
 
 .select-btn--color-card {
-  background-color: var(--color-card, #7dc8c8);
+  background-color: var(--color-card);
 }
 
 .select-btn--color-chip {
@@ -262,7 +262,6 @@
   border-color: var(--color-black);
 }
 
-/* Boolean variants. */
 .select-btn--rounded {
   /* Fully rounded corders */
   border-radius: 9999px;

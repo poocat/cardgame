@@ -28,15 +28,19 @@
   --color-highlight: #ffffee88;
   --color-lowlight: #22222288;
 
-  /* Colors: Chips */
+  /* Colors: */
   --color-chip: #ffff00;
-  --color-chip-selected: #ffff0077;
+  --color-chip-transparent: #ffff0077;
 
-  /* Colors: Players */
   --color-player-red: #ff8888;
   --color-player-yellow: #ffff88;
   --color-player-green: #71d989;
   --color-player-blue: #8888ff;
+
+  --color-action: #9696c8;
+
+  --color-card: #7dc8c8;
+  --color-card-transparent: #7dc8c877;
 
   /* Spacing */
   --space-xs: 2px;

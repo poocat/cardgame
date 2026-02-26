@@ -101,7 +101,7 @@
 
 /* Variant of a chip, used to indicate how many chips have been selected from the given pool. */
 .game-chip--selected {
-  background-color: var(--color-chip-selected);
+  background-color: var(--color-chip-transparent);
 }
 
 .game-chip--size-sm {
