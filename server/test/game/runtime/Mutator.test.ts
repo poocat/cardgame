@@ -3,7 +3,7 @@ import {
   resetCardRegistry,
 } from "@server/game/cards/registry";
 import { Mutator } from "@server/game/runtime/Mutator";
-import { ActivityData } from "@server/types";
+import type { ActivityData } from "@server/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testCards } from "../../fixtures/cards";
 import { GameBuilder } from "../../helpers/GameBuilder";

@@ -45,6 +45,7 @@ export function initGameData(
         lastMovedOnTick: 0,
         lastMovedOnTurn: 0,
         ownerId: id,
+        triggerInstructions: c.trigger?.instructions ?? null,
       }));
       shuffle(playerCards);
       cards.push(...playerCards);

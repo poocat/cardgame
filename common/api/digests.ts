@@ -27,6 +27,7 @@ export const choiceValueDigestSchema = z.strictObject({
 
 export const activityDigestSchema = z.strictObject({
   type: z.union(activityTypes.map((t) => z.literal(t))),
+  explanation: z.string(),
   choice: z.strictObject({
     name: z.string(),
     type: z.union(choiceTypes.map((t) => z.literal(t))),
@@ -52,6 +53,7 @@ export const chipDigestSchema = z.strictObject({
 export const visibleCardDigestSchema = z.strictObject({
   id: idSchema,
   name: z.string(),
+  triggerInstructions: z.string().nullable(),
   type: z.union(cardTypes.map((t) => z.literal(t))),
   lastMovedOnTick: z.number().int(),
   lastMovedOnTurn: z.number().int(),

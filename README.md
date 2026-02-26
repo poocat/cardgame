@@ -128,3 +128,7 @@ There are different types of actions available on cards:
     ```
     PRIVATE_CARDS_PATH=./src/game/cards/private
     ```
+  - Pin the submodule to the current submodule commit.
+    ```
+    git add server/src/game/cards/private
+    ```

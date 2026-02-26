@@ -16,13 +16,12 @@ export const cardPlayChecks: CardTypeMap<
    * time.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   producer: ({ cardData, accessor }) => {
-    const producersInPlay = accessor.cards.filter(
-      (c) =>
-        c.location.type === "inPlay" &&
-        c.type === "producer" &&
-        c.ownerId === cardData.ownerId,
-    );
-    if (producersInPlay.length >= CONSTANTS.maxNumProducersInPlay) {
+    const inPlay = accessor.getCards({
+      playerIds: [cardData.ownerId],
+      types: ["producer"],
+      locationTypes: ["inPlay"],
+    });
+    if (inPlay.length >= CONSTANTS.maxNumProducersInPlay) {
       return {
         ok: false,
         reasons: [
@@ -38,7 +37,21 @@ export const cardPlayChecks: CardTypeMap<
    * There are no limits on the number of "consumer" cards that can be brought
    * into play.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  consumer: () => {
-    return { ok: true };
+  consumer: ({ cardData, accessor }) => {
+    const inPlay = accessor.getCards({
+      playerIds: [cardData.ownerId],
+      types: ["consumer"],
+      locationTypes: ["inPlay"],
+    });
+    if (inPlay.length >= CONSTANTS.maxNumConsumersInPlay) {
+      return {
+        ok: false,
+        reasons: [
+          `Already ${CONSTANTS.maxNumConsumersInPlay} consumer in play.`,
+        ],
+      };
+    } else {
+      return { ok: true };
+    }
   },
 };

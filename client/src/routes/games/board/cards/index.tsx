@@ -227,6 +227,9 @@ export const DetailCard = (props: {
         <CardDetailForeground>
           <div>{props.card.name}</div>
           <Stack spacing="sm" orientation="vertical">
+            {props.card.triggerInstructions && (
+              <div>{props.card.triggerInstructions}</div>
+            )}
             {props.card.actions.map((action) => {
               const selected =
                 props.selectorProps?.checkValueSelected(action.id) ?? false;
