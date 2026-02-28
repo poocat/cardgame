@@ -1,4 +1,4 @@
-import type { Border, Color, Size, Spacing } from "./types";
+import type { Border, Color, EdgeVariant, Size, Spacing } from "./types";
 
 type Orientation = "horizontal" | "vertical";
 
@@ -34,22 +34,18 @@ export const Divider = () => {
 };
 
 /******************************************************************************
- * ### Abutment
- ******************************************************************************/
-export const Abutment = (props: { children?: React.ReactNode }) => {
-  return <div className="abutment">{props.children}</div>;
-};
-
-/******************************************************************************
  * ### Edge
  *
  * A zero-height, full-width container that can be used to align elements along
  * the bottom edge of its previous sibling.
  ******************************************************************************/
-export const Edge = (props: { children?: React.ReactNode }) => {
+export const Edge = (props: {
+  variant: EdgeVariant;
+  children?: React.ReactNode;
+}) => {
   return (
     <div className="abutment">
-      <div className="edge">{props.children}</div>
+      <div className={`edge edge--${props.variant}`}>{props.children}</div>
     </div>
   );
 };

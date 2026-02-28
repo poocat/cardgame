@@ -3,10 +3,8 @@
 ***************************************************************************/
 
 .game-card-container {
-  /* Padding is necessary to ensure that the highlight is visible. */
-  padding: 3px;
+  padding: 3px; /* Padding is necessary to ensure that the highlight is visible. */
   border-radius: 5px;
-  margin: 1px;
   transition: transform 0.5s;
 }
 
@@ -58,7 +56,7 @@
 }
 
 .game-card--placeholder {
-  background-color: var(--color-white);
+  background: none;
   border-color: var(--color-black);
   color: var(--color-black);
 }
@@ -67,6 +65,48 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.game-card-edge {
+  display: flex;
+  position: relative;
+  right: var(--space-sm);
+}
+
+.game-card-selector {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-card-selector__button {
+  margin-left: 1px;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-black);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-black);
+  padding-top: 3px; /* Optical alignment for text */
+}
+
+.game-card-selector__button--size-sm {
+  width: var(--control-size-sm);
+  height: var(--control-size-sm);
+  font-size: var(--font-size-sm);
+}
+
+.game-card-selector__button--size-md {
+  width: var(--control-size-md);
+  height: var(--control-size-md);
+  font-size: var(--font-size-md);
+}
+
+.game-card-selector__button--size-lg {
+  width: var(--control-size-lg);
+  height: var(--control-size-lg);
+  font-size: var(--font-size-lg);
 }
 
 /***************************************************************************
@@ -102,7 +142,7 @@
 
 .game-dialog__menu {
   width: 100%;
-  height: 50px;
+  padding: var(--space-sm);
   display: flex;
   justify-content: end;
   justify-items: end;
@@ -128,11 +168,4 @@
 .game-dialog__card--consumer {
   background: var(--color-night);
   color: var(--color-white);
-}
-
-.game-dialog__card__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 9px;
 }

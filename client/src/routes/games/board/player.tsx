@@ -64,7 +64,7 @@ export const PlayerTabletHeader = (props: {
 export const PlayerTabletCardArea = (props: { children: React.ReactNode }) => {
   return (
     <div className="game-player-tablet__body">
-      <div className="game-player-tablet__card-area">{props.children}</div>
+      <div className="game-player-tablet__card-stack">{props.children}</div>
     </div>
   );
 };
@@ -106,7 +106,7 @@ export const PlayerCenterCardArea = (props: {
   side: PlayerSide;
   children?: React.ReactNode;
 }) => {
-  return <div className="game-player-center__card-area">{props.children}</div>;
+  return <div className="game-player-center__card-stack">{props.children}</div>;
 };
 
 /******************************************************************************
@@ -120,12 +120,8 @@ export const ObservingPlayerHand = (props: {
   children?: React.ReactNode;
 }) => {
   return (
-    <div
-      className={`game-player-hand-container game-player-hand-container--side-${props.side}`}
-    >
-      <div className={`game-player-hand game-player-hand--side-${props.side}`}>
-        {props.children}
-      </div>
+    <div className={`game-player-hand game-player-hand--side-${props.side}`}>
+      <div className="game-player-hand__card-stack">{props.children}</div>
     </div>
   );
 };

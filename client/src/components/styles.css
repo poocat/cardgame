@@ -182,7 +182,6 @@
 }
 
 .btn--rounded {
-  /* Fully rounded corders */
   border-radius: 9999px;
 }
 
@@ -263,7 +262,6 @@
 }
 
 .select-btn--rounded {
-  /* Fully rounded corders */
   border-radius: 9999px;
 }
 
@@ -352,7 +350,14 @@
 
 .edge {
   position: absolute;
-  width: 100%;
   bottom: 0;
   transform: translateY(50%);
+}
+
+.edge--horizontal-start {
+  left: 0;
+}
+
+.edge--horizontal-end {
+  right: 0;
 }

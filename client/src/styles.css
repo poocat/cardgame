@@ -30,60 +30,54 @@
 
   /* Colors: */
   --color-chip: #ffff00;
-  --color-chip-transparent: #ffff0077;
+  --color-chip-buffer: #ffffaa;
+  --color-action: #9696c8;
+  --color-card: #7dc8c8;
 
   --color-player-red: #ff8888;
   --color-player-yellow: #ffff88;
   --color-player-green: #71d989;
   --color-player-blue: #8888ff;
 
-  --color-action: #9696c8;
-
-  --color-card: #7dc8c8;
-  --color-card-transparent: #7dc8c877;
-
   /* Spacing */
-  --space-xs: 2px;
+  --space-xs: 1px;
   --space-sm: 5px;
   --space-md: 15px;
   --space-lg: 18px;
 
   /* Sizing */
-  --control-size-xs: 15px;
   --control-size-sm: 20px;
-  --control-size-md: 35px;
-  --control-size-lg: 50px;
+  --control-size-md: 28px;
+  --control-size-lg: 40px;
 
   /* Typography */
   --font-family: "Rockwell", serif;
   --font-size-xs: 8px;
   --font-size-sm: 10px;
-  --font-size-md: 14px;
+  --font-size-md: 12px;
   --font-size-lg: 18px;
 
   /* Game styling */
   --total-width: 1000px;
 
-  --cutout-width: 400px;
+  --cutout-width: 375px;
   --cutout-hradius: calc(var(--cutout-width) / 2);
-  --cutout-vradius: 150px;
+  --cutout-vradius: var(--cutout-hradius);
   --vertical-padding-top: var(--cutout-vradius);
 
   --player-area-height: 250px;
 
   --tablet-width: 325px;
 
-  --center-area-width: 375px;
+  --center-area-width: 350px;
 
   --hand-area-width: 300px;
   --hand-area-height: 200px;
 
   --footer-menu-max-height: 200px;
 
-  --margin-bottom: 25px;
-
-  --card-width-sm: 75px;
-  --card-height-sm: 75px;
+  --card-width-sm: 70px;
+  --card-height-sm: 70px;
   --card-width-lg: 250px;
   --card-height-lg: 350px;
 }

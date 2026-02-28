@@ -38,7 +38,7 @@ const ChoiceSelectButton = (
 
   return (
     <SelectButton
-      size="sm"
+      size="md"
       border="dark"
       color={color}
       label={props.label}
@@ -99,7 +99,7 @@ export const ChoiceMenu = memo(
             <Button
               border="dark"
               color="secondary"
-              size="md"
+              size="lg"
               disabled={props.submitDisabled}
               onClick={props.onSubmitChoice}
             >
