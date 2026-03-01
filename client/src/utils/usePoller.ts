@@ -22,7 +22,7 @@ type UsePollerHook<TData> = {
  * ### usePoller
  *
  * A hook to support a polling procedure on an endpoint that will accept a
- * "If-Modified-Since" header.
+ * "If-None-Match" header.
  *
  * 1. GET fetch resource, store ETag.
  * 2. Check data for whether to keep polling. If not, skip to 5.
@@ -96,18 +96,16 @@ export function usePoller<TData extends object>(args: {
   );
 
   // Manage change in polling state.
-  if (polling) {
-    if (error || !pollingEnabled) {
+  useEffect(() => {
+    if (polling && (error || !pollingEnabled)) {
       setPolling(false);
-    }
-  } else {
-    if (!error && pollingEnabled) {
+    } else if (!polling && !error && pollingEnabled) {
       setPolling(true);
       setPollCount(0);
       setElapsedTimeMs(0);
       fetchResource().then(() => updatePollClock(0));
     }
-  }
+  }, [polling, error, pollingEnabled, fetchResource, updatePollClock]);
 
   // Setup polling loop.
   useEffect(() => {
