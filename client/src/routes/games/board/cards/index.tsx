@@ -324,7 +324,7 @@ export const DetailCard = (props: {
             <DetailCardChipSelect
               chips={props.card.chips}
               onSubmitChoice={props.onSubmitChoice}
-              submitDisabled={props.submitDisabled}
+              submitDisabled={submitDisabled}
               selectorProps={props.selectorProps}
             />
           )}

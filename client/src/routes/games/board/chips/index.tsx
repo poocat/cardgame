@@ -47,9 +47,7 @@ export const ChipCounter = (props: {
    */
   const direction = props.side === "left" ? "forward" : "reverse";
   return (
-    <div
-      className={`game-chip-stack game-chip-stack--${direction} game-chip-stack--size-${props.size}`}
-    >
+    <div className={`game-chip-stack game-chip-stack--${direction}`}>
       <Chip count={props.baseCount} size={props.size} />
       {props.selectedCount > 0 && (
         <>
@@ -129,9 +127,7 @@ export const ChipSelector = (props: {
   disableSubmit?: boolean;
 }) => {
   return (
-    <div
-      className={`game-chip-stack game-chip-stack--size-${props.size} game-chip-stack--forward`}
-    >
+    <div className={`game-chip-stack game-chip-stack--forward`}>
       <ButtonBase disabled={props.numSelected < 1} onClick={props.onDecrement}>
         <div className={`game-chip game-chip--size-${props.size}`}>-</div>
       </ButtonBase>
@@ -202,10 +198,10 @@ export function useChipSelector(args: {
   ]);
 
   const removeChip = useCallback(() => {
-    if (selectedValues.length > 0) {
+    if (selected.length > 0) {
       args.selectorProps?.removeValue(selected[0]);
     }
-  }, [args.selectorProps?.removeValue, selectedValues.length, selected]);
+  }, [args.selectorProps?.removeValue, selected]);
 
   return useMemo(
     () => ({

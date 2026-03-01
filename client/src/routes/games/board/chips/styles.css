@@ -46,15 +46,6 @@
   width: 100%;
 }
 
-.game-chip-pool__display__counter {
-  display: flex;
-  align-items: center;
-}
-
-.game-chip-pool__display--side-right .game-chip-pool__display__counter {
-  flex-direction: row-reverse;
-}
-
 /***************************************************************************
   Chip
 ***************************************************************************/
@@ -121,6 +112,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: var(--space-xs);
 }
 
 .game-chip-stack--forward {
@@ -129,18 +121,6 @@
 
 .game-chip-stack--reverse {
   flex-direction: row-reverse;
-}
-
-.game-chip-stack--size-sm {
-  gap: var(--space-xs);
-}
-
-.game-chip-stack--size-md {
-  gap: var(--space-xs);
-}
-
-.game-chip-stack--size-lg {
-  gap: var(--space-xs);
 }
 
 /***************************************************************************
@@ -159,25 +139,18 @@
 .game-arrow--size-sm {
   border-top: 3px solid transparent;
   border-bottom: 3px solid transparent;
+  border-left: 4px solid var(--color-black);
 }
 
 .game-arrow--size-md {
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent;
+  border-left: 6px solid var(--color-black);
 }
 
 .game-arrow--size-lg {
   border-top: 7px solid transparent;
   border-bottom: 7px solid transparent;
-}
-
-.game-arrow--size-sm {
-  border-left: 4px solid var(--color-black);
-}
-.game-arrow--size-md {
-  border-left: 6px solid var(--color-black);
-}
-.game-arrow--size-lg {
   border-left: 8px solid var(--color-black);
 }
 
