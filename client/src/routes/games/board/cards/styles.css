@@ -115,8 +115,31 @@
 
 .game-dialog__card-container {
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-dialog__card {
+  position: relative;
   width: var(--card-width-lg);
   height: var(--card-height-lg);
+  border-radius: 12px;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  border: 2px solid black;
+}
+
+.game-dialog__card--producer {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.game-dialog__card--consumer {
+  background: var(--color-white);
+  color: var(--color-black);
 }
 
 .game-dialog__card-background {
@@ -134,10 +157,29 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: var(--space-md);
+  padding: var(--card-outer-border-width-lg);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.game-dialog__card-name {
+  padding: var(--space-xs);
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+}
+
+.game-dialog__card-actions {
+  display: flex;
+  flex-direction: column;
+  padding: var(--card-inner-border-width-lg);
+  gap: var(--space-xs);
+}
+
+.game-dialog__card-trigger-instructions {
+  padding: var(--space-sm);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-white-translucent);
 }
 
 .game-dialog__menu {
@@ -145,26 +187,4 @@
   padding: var(--space-sm);
   display: flex;
   justify-content: end;
-}
-
-.game-dialog__card {
-  width: var(--card-width-lg);
-  height: var(--card-height-lg);
-  border-radius: 12px;
-  cursor: default;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
-  border: 2px solid black;
-}
-
-.game-dialog__card--producer {
-  background: var(--color-gray);
-  color: var(--color-white);
-}
-
-.game-dialog__card--consumer {
-  background: var(--color-night);
-  color: var(--color-white);
 }

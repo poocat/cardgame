@@ -18,11 +18,14 @@ import type {
   VisibleCardDigest,
 } from "../types";
 import {
+  CardDetailActions,
   CardDetailBackground,
   CardDetailBody,
   CardDetailContainer,
   CardDetailForeground,
   CardDetailMenuContainer,
+  CardDetailName,
+  CardDetailTriggerInstructions,
 } from "./detail";
 import { CardImage } from "./image";
 import "./styles.css";
@@ -34,8 +37,8 @@ import { Thumbnail, ThumbnailContainer } from "./thumbnail";
  ******************************************************************************/
 export const CardSelector = (props: {
   size: Size;
-  selected: boolean;
   selectDisabled: boolean;
+  selected: boolean;
   onToggle: () => void;
 }) => {
   const symbol = props.selected ? "☑" : "☐";
@@ -197,7 +200,7 @@ const DetailCardAction = (props: {
       border="dark"
       selected={props.selected}
       onClick={props.onChange}
-      size="md"
+      size="sm"
       color="action"
       disabled={props.disabled}
       label={label}
@@ -273,15 +276,18 @@ export const DetailCard = (props: {
 
   return (
     <CardDetailContainer>
+      <CardDetailName>{props.card.name}</CardDetailName>
       <CardDetailBody type={props.card.type}>
         <CardDetailBackground>
           <CardImage size="fullsize" name={props.card.name} />
         </CardDetailBackground>
         <CardDetailForeground>
-          <div>{props.card.name}</div>
-          <Stack spacing="sm" orientation="vertical">
+          <div />
+          <CardDetailActions>
             {props.card.triggerInstructions && (
-              <div>{props.card.triggerInstructions}</div>
+              <CardDetailTriggerInstructions>
+                {props.card.triggerInstructions}
+              </CardDetailTriggerInstructions>
             )}
             {props.card.actions.map((action) => {
               const selected =
@@ -304,7 +310,7 @@ export const DetailCard = (props: {
                 />
               );
             })}
-          </Stack>
+          </CardDetailActions>
         </CardDetailForeground>
       </CardDetailBody>
       {chipIds.length > 0 && (

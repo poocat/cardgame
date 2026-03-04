@@ -80,6 +80,8 @@
   --card-height-sm: 70px;
   --card-width-lg: 250px;
   --card-height-lg: 350px;
+  --card-outer-border-width-lg: 9px;
+  --card-inner-border-width-lg: 20px;
 }
 
 /***************************************************************************
