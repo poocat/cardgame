@@ -122,7 +122,7 @@ export const ChipSelector = (props: {
   numSelected: number;
   onIncrement: () => void;
   onDecrement: () => void;
-  onSubmit: () => void;
+  onSubmit?: () => void;
   disableIncrement?: boolean;
   disableSubmit?: boolean;
 }) => {
@@ -137,10 +137,14 @@ export const ChipSelector = (props: {
       >
         <div className={`game-chip game-chip--size-${props.size}`}>+</div>
       </ButtonBase>
-      <Arrow size={props.size} light={props.light} />
-      <ButtonBase disabled={!!props.disableSubmit} onClick={props.onSubmit}>
-        <div className={`game-chip game-chip--size-${props.size}`}>ok</div>
-      </ButtonBase>
+      {props.onSubmit && (
+        <>
+          <Arrow size={props.size} light={props.light} />
+          <ButtonBase disabled={!!props.disableSubmit} onClick={props.onSubmit}>
+            <div className={`game-chip game-chip--size-${props.size}`}>ok</div>
+          </ButtonBase>
+        </>
+      )}
     </div>
   );
 };
