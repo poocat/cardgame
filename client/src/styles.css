@@ -96,3 +96,26 @@ body {
   color: var(--color-black);
   background: var(--color-white);
 }
+
+/***************************************************************************
+  Basic animations
+***************************************************************************/
+@keyframes pulse-highlight {
+  0%,
+  100% {
+    background-color: var(--color-highlight);
+  }
+  50% {
+    background-color: transparent;
+  }
+}
+
+@keyframes pulse-lowlight {
+  0%,
+  100% {
+    background-color: var(--color-lowlight);
+  }
+  50% {
+    background-color: transparent;
+  }
+}

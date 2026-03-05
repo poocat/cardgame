@@ -37,6 +37,7 @@
 .game-chip-pool__display--light {
   border-color: var(--color-white);
 }
+
 .game-chip-pool__display--side-right {
   flex-direction: row-reverse;
 }
@@ -44,6 +45,11 @@
 /* Expanded width when selector buttons are shown */
 .game-chip-pool__display--fullwidth {
   width: 100%;
+  animation: pulse-lowlight 2000ms ease-in-out infinite;
+}
+
+.game-chip-pool__display--light.game-chip-pool__display--fullwidth {
+  animation: pulse-highlight 2000ms ease-in-out infinite;
 }
 
 /***************************************************************************

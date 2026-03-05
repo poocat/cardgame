@@ -10,6 +10,7 @@
 
 .game-card-container--selectable {
   background-color: var(--color-lowlight);
+  animation: pulse-lowlight 1500ms ease-in-out infinite;
 }
 
 .game-card-container--selected {
@@ -22,6 +23,7 @@
 
 .game-player-center .game-card-container--selectable {
   background-color: var(--color-highlight);
+  animation: pulse-highlight 1500ms ease-in-out infinite;
 }
 
 .game-player-center .game-card-container--selected {
