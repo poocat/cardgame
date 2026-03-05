@@ -72,6 +72,7 @@ export function usePoller<TData extends object>(args: {
         etag.current = response.headers.get("ETag");
         const newData = await args.getData(response);
         setData(newData);
+        setElapsedTimeMs(0);
       } else {
         throw new Error(`Fetch failed: ${response.status}`);
       }
