@@ -221,8 +221,8 @@ export const GameBoard = memo(
 
     return (
       <GameBoardContainer>
-        {playerList.map(({ player, isObserver, index }) => {
-          const side = getPlayerSide(index);
+        {playerList.map(({ player, isObserver, index }, i) => {
+          const side = getPlayerSide(i);
           const onTurn = props.game.playerTakingTurnId === player.id;
           const producersInPlay = player.cardsInPlay.filter(
             (card) => card.type === "producer",
