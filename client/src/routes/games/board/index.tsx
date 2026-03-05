@@ -252,9 +252,6 @@ export const GameBoard = memo(
                     playerOnTurn={onTurn}
                   />
                   <PlayerTabletCardArea>
-                    {range(numProducerPlaceholders).map((i) => (
-                      <ThumbnailPlaceholder key={i} highlight="none" />
-                    ))}
                     {producersInPlay.map((card) => (
                       <FaceUpThumbnail
                         key={card.id}
@@ -268,6 +265,9 @@ export const GameBoard = memo(
                             : null
                         }
                       />
+                    ))}
+                    {range(numProducerPlaceholders).map((i) => (
+                      <ThumbnailPlaceholder key={i} highlight="none" />
                     ))}
                   </PlayerTabletCardArea>
                   <PlayerTabletFooter>
