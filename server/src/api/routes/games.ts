@@ -218,6 +218,7 @@ games.patch(
       const nextGameData = makeDecision({
         gameData: game.data,
         decision,
+        autoDecide: true,
       });
 
       const result = await gameRepo.updateOne({
