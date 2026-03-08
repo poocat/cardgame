@@ -85,17 +85,13 @@ export const activityTypeNextActivity: ActivityTypeMap<
     const actionIds = currentDecisions.decisions[0].values ?? [];
     if (actionIds.length === 0) {
       // If nothing was chosen, then it's time to pass the turn.
-      const playerIndex = accessor.players.findIndex(
-        (p) => p.id === playerData.id,
-      );
-      const nextPlayerIndex = (playerIndex + 1) % accessor.players.length;
-      const nextPlayerData = accessor.players[nextPlayerIndex];
-      mutator.passTurn({ from: playerData.id, to: nextPlayerData.id });
+      const { from, to } = accessor.getTurnTransition({});
+      mutator.passTurn({ from: from.id, to: to.id });
       mutator.setActivity({
         activity: {
           type: "drawingCards",
           currentChoice: createDrawingCardsChoice({
-            playerId: nextPlayerData.id,
+            playerId: to.id,
             accessor,
           }),
           nextChoices: [],
