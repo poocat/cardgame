@@ -182,7 +182,6 @@
 }
 
 .btn--rounded {
-  /* Fully rounded corders */
   border-radius: 9999px;
 }
 
@@ -238,11 +237,11 @@
 }
 
 .select-btn--color-action {
-  background-color: var(--color-action, #9696c8);
+  background-color: var(--color-action);
 }
 
 .select-btn--color-card {
-  background-color: var(--color-card, #7dc8c8);
+  background-color: var(--color-card);
 }
 
 .select-btn--color-chip {
@@ -262,9 +261,7 @@
   border-color: var(--color-black);
 }
 
-/* Boolean variants. */
 .select-btn--rounded {
-  /* Fully rounded corders */
   border-radius: 9999px;
 }
 
@@ -339,3 +336,28 @@
 }
 
 /* .dialog-content {} */
+
+/***************************************************************************
+  Abutment/Edge
+***************************************************************************/
+
+.abutment {
+  width: 100%;
+  height: 0;
+  top: 0;
+  position: relative;
+}
+
+.edge {
+  position: absolute;
+  bottom: 0;
+  transform: translateY(50%);
+}
+
+.edge--horizontal-start {
+  left: 0;
+}
+
+.edge--horizontal-end {
+  right: 0;
+}

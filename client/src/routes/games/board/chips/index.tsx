@@ -1,4 +1,5 @@
 import { ButtonBase } from "@client/components";
+import { Edge } from "@client/components/layout";
 import type { Size } from "@client/components/types";
 import { useCallback, useMemo } from "react";
 import type { ChipDigest, PlayerSide, SelectorProps } from "../types";
@@ -11,9 +12,20 @@ import "./styles.css";
  ******************************************************************************/
 const Chip = (props: { count: number; size: Size; selected?: boolean }) => {
   const classNames = ["game-chip", `game-chip--size-${props.size}`];
-  if (props.selected) classNames.push("game-chip--selected");
+  if (props.selected) classNames.push("game-chip--buffer");
   const className = classNames.join(" ");
   return <div className={className}>{props.count}</div>;
+};
+
+/******************************************************************************
+ * ### Arrow
+ ******************************************************************************/
+const Arrow = (props: { size: Size; reverse?: boolean; light?: boolean }) => {
+  const classNames = ["game-arrow", `game-arrow--size-${props.size}`];
+  if (props.light) classNames.push("game-arrow--light");
+  if (props.reverse) classNames.push("game-arrow--reverse");
+  const className = classNames.join(" ");
+  return <div className={className} />;
 };
 
 /******************************************************************************
@@ -22,112 +34,100 @@ const Chip = (props: { count: number; size: Size; selected?: boolean }) => {
  * A stack of chip icons that indicates how many chips have been selected
  * from a given pool, if any.
  ******************************************************************************/
-const ChipCounter = (props: {
+export const ChipCounter = (props: {
   size: Size;
+  side: PlayerSide;
+  light: boolean;
   baseCount: number;
   selectedCount: number;
 }) => {
   /**
-   * TODO!!! Add a `prevSelectedCount` to account for multi-choice activities
-   * where chips are selected from the same pool.
+   * TODO!!! Add a `prevSelectedCount` prop to account for multi-choice
+   * activities where chips are selected from the same pool.
    */
+  const direction = props.side === "left" ? "forward" : "reverse";
   return (
-    <>
+    <div className={`game-chip-stack game-chip-stack--${direction}`}>
       <Chip count={props.baseCount} size={props.size} />
       {props.selectedCount > 0 && (
         <>
-          <div className={`game-arrow game-arrow--size-${props.size}`}></div>
+          <Arrow
+            size={props.size}
+            light={props.light}
+            reverse={props.side === "right"}
+          />
           <Chip selected count={props.selectedCount} size={props.size} />
         </>
       )}
-    </>
-  );
-};
-
-/******************************************************************************
- * ### ChipArea
- *
- * A container with a border used to display a named chip pool (e.g. "reserve").
- ******************************************************************************/
-export const ChipArea = (props: {
-  inverted: boolean;
-  side: PlayerSide;
-  children?: React.ReactNode;
-}) => {
-  const classNames = ["game-chip-area", `game-chip-area--side-${props.side}`];
-  if (props.inverted) classNames.push("game-chip-area--inverted");
-  const className = classNames.join(" ");
-  return <div className={className}>{props.children}</div>;
-};
-
-/******************************************************************************
- * ### ChipAreaLabel
- *
- * A wrapper around the text used to name the chip pool.
- ******************************************************************************/
-export const ChipAreaLabel = (props: { children?: React.ReactNode }) => {
-  return <div className="game-chip-area__label">{props.children}</div>;
-};
-
-/******************************************************************************
- * ### ChipDisplay
- *
- * A generic container used to display a chip pool, as well as any selected
- * chips, and any menus for selecting chips. Fills the container it is in.
- * Can be used as a child of `<ChipArea/>`, or elsewhere.
- ******************************************************************************/
-export const ChipDisplay = (props: {
-  side: PlayerSide;
-  inverted: boolean;
-  fullWidth?: boolean;
-  children?: React.ReactNode;
-}) => {
-  const classNames = [
-    "game-chip-display",
-    `game-chip-display--side-${props.side}`,
-  ];
-  if (props.inverted) classNames.push(`game-chip-display--inverted`);
-  if (props.fullWidth) classNames.push("game-chip-display--fullwidth");
-  const className = classNames.join(" ");
-  return <div className={className}>{props.children}</div>;
-};
-
-/******************************************************************************
- * ### ChipDisplayCounter
- *
- * Displays a chip pool, as well as any selected chips from the pool. Should
- * be a child of `<ChipDisplay/>`.
- ******************************************************************************/
-export const ChipDisplayCounter = (props: {
-  size: Size;
-  baseCount: number;
-  selectedCount: number;
-}) => {
-  return (
-    <div className="game-chip-display__counter">
-      <ChipCounter {...props} />
     </div>
   );
 };
 
 /******************************************************************************
- * ### ChipDisplaySelector
+ * ### ChipPoolContainer
+ *
+ * A container with a border used to display a named chip pool (e.g. "reserve").
+ ******************************************************************************/
+export const ChipPoolContainer = (props: {
+  light: boolean;
+  side: PlayerSide;
+  children?: React.ReactNode;
+}) => {
+  const classNames = ["game-chip-pool", `game-chip-pool--side-${props.side}`];
+  if (props.light) classNames.push("game-chip-pool--light");
+  const className = classNames.join(" ");
+  return <div className={className}>{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### ChipPoolLabel
+ *
+ * A wrapper around the text used to name the chip pool.
+ ******************************************************************************/
+export const ChipPoolLabel = (props: { children?: React.ReactNode }) => {
+  return <div className="game-chip-pool__label">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### ChipPoolDisplay
+ *
+ * A container used to display a chip pool, as well as any selected chips, and
+ * any menus for selecting chips.
+ ******************************************************************************/
+export const ChipPoolDisplay = (props: {
+  side: PlayerSide;
+  light: boolean;
+  fullWidth?: boolean;
+  children?: React.ReactNode;
+}) => {
+  const classNames = [
+    "game-chip-pool__display",
+    `game-chip-pool__display--side-${props.side}`,
+  ];
+  if (props.light) classNames.push(`game-chip-pool__display--light`);
+  if (props.fullWidth) classNames.push("game-chip-pool__display--fullwidth");
+  const className = classNames.join(" ");
+  return <div className={className}>{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### ChipSelector
  *
  * A stack of buttons to increment, decrement, and confirm the number of chips
- * selected from the corresponding chip pool. Should be a child of
- * `<ChipDisplay/>`.
+ * selected from the corresponding chip pool.
  ******************************************************************************/
-export const ChipDisplaySelector = (props: {
+export const ChipSelector = (props: {
   size: Size;
+  light: boolean;
   numSelected: number;
   onIncrement: () => void;
   onDecrement: () => void;
-  onSubmit: () => void;
+  onSubmit?: () => void;
   disableIncrement?: boolean;
   disableSubmit?: boolean;
 }) => {
   return (
-    <div className="game-chip-display__selector">
+    <div className={`game-chip-stack game-chip-stack--forward`}>
       <ButtonBase disabled={props.numSelected < 1} onClick={props.onDecrement}>
         <div className={`game-chip game-chip--size-${props.size}`}>-</div>
       </ButtonBase>
@@ -137,27 +137,37 @@ export const ChipDisplaySelector = (props: {
       >
         <div className={`game-chip game-chip--size-${props.size}`}>+</div>
       </ButtonBase>
-      <ButtonBase disabled={!!props.disableSubmit} onClick={props.onSubmit}>
-        <div className={`game-chip game-chip--size-${props.size}`}>ok</div>
-      </ButtonBase>
+      {props.onSubmit && (
+        <>
+          <Arrow size={props.size} light={props.light} />
+          <ButtonBase disabled={!!props.disableSubmit} onClick={props.onSubmit}>
+            <div className={`game-chip game-chip--size-${props.size}`}>ok</div>
+          </ButtonBase>
+        </>
+      )}
     </div>
   );
 };
 
 /******************************************************************************
- * ### ChipCounterBadge
+ * ### ChipCounterEdge
  *
- * A zero-height container used for positioning chip counters on the edges
- * of other elements.
+ * A zero-height container used for positioning chip counters on the bottom
+ * edges of other elements.
  *
- * Note, if siblings have non-zero margin, the position will be offset from
- * the edge.
+ * Note, if siblings have non-zero bottom margin, the position will be offset
+ * from the edge.
  ******************************************************************************/
-export const ChipCounterBadge = (props: { children: React.ReactNode }) => {
+export const ChipCounterEdge = (props: {
+  size: Size;
+  children: React.ReactNode;
+}) => {
   return (
-    <div className="game-chip-edge">
-      <div className={`game-chip-edge__container`}>{props.children}</div>
-    </div>
+    <Edge variant="horizontal-start">
+      <div className={`game-chip-edge game-chip-edge--size-${props.size}`}>
+        {props.children}
+      </div>
+    </Edge>
   );
 };
 
@@ -192,10 +202,10 @@ export function useChipSelector(args: {
   ]);
 
   const removeChip = useCallback(() => {
-    if (selectedValues.length > 0) {
+    if (selected.length > 0) {
       args.selectorProps?.removeValue(selected[0]);
     }
-  }, [args.selectorProps?.removeValue, selectedValues.length, selected]);
+  }, [args.selectorProps?.removeValue, selected]);
 
   return useMemo(
     () => ({

@@ -1,13 +1,14 @@
 import { Dialog } from "@client/components";
+import { CONSTANTS } from "@common/game/constants";
 import type React from "react";
 import { Fragment, memo, useCallback, useMemo } from "react";
 import { DetailCard, FaceUpThumbnail, ThumbnailPlaceholder } from "./cards";
 import {
-  ChipArea,
-  ChipAreaLabel,
-  ChipDisplay,
-  ChipDisplayCounter,
-  ChipDisplaySelector,
+  ChipCounter,
+  ChipPoolContainer,
+  ChipPoolDisplay,
+  ChipPoolLabel,
+  ChipSelector,
   useChipSelector,
 } from "./chips";
 import {
@@ -79,17 +80,21 @@ function getPlayerSide(playerIndex: number): PlayerSide {
   return playerIndex % 2 > 0 ? "right" : "left";
 }
 
+function range(n: number): number[] {
+  return [...Array(n).keys()];
+}
+
 /******************************************************************************
  * ### GameBoardContainer
  ******************************************************************************/
 const GameBoardContainer = (props: { children?: React.ReactNode }) => {
   return (
-    <div className={`game game-container`}>
+    <div className="game-container">
       <div className="game-background">
         <div className={`game-background__cutout`}></div>
       </div>
       <div className="game-foreground">
-        <div className="game-header-spacer"></div>
+        <div className="game-foreground__headspace"></div>
         {props.children}
       </div>
     </div>
@@ -102,10 +107,10 @@ const GameBoardContainer = (props: { children?: React.ReactNode }) => {
  * Composition of a chip counter and a menu for selecting chips from the given
  * pool.
  ******************************************************************************/
-const GameBoardChipMenu = memo(
+const ChipPool = memo(
   (props: {
     label: string;
-    inverted: boolean;
+    light: boolean;
     side: PlayerSide;
     chips: ChipDigest[];
     submitDisabled: boolean;
@@ -130,30 +135,33 @@ const GameBoardChipMenu = memo(
       props.selectorProps !== null && selectableChipIds.length > 0;
 
     return (
-      <ChipArea inverted={props.inverted} side={props.side}>
-        <ChipAreaLabel>{props.label}</ChipAreaLabel>
-        <ChipDisplay
-          inverted={props.inverted}
+      <ChipPoolContainer light={props.light} side={props.side}>
+        <ChipPoolLabel>{props.label}</ChipPoolLabel>
+        <ChipPoolDisplay
+          light={props.light}
           side={props.side}
           fullWidth={selecting}
         >
-          <ChipDisplayCounter
+          <ChipCounter
             size="md"
+            light={props.light}
+            side={props.side}
             baseCount={props.chips.length}
             selectedCount={numSelected}
           />
           {selecting && (
-            <ChipDisplaySelector
+            <ChipSelector
               size="md"
+              light={props.light}
               numSelected={numSelected}
               onIncrement={addChip}
               onDecrement={removeChip}
-              onSubmit={props.onSubmitChoice}
               disableSubmit={props.submitDisabled}
+              disableIncrement={!props.selectorProps?.moreValuesAllowed}
             />
           )}
-        </ChipDisplay>
-      </ChipArea>
+        </ChipPoolDisplay>
+      </ChipPoolContainer>
     );
   },
 );
@@ -212,9 +220,17 @@ export const GameBoard = memo(
 
     return (
       <GameBoardContainer>
-        {playerList.map(({ player, isObserver, index }) => {
-          const side = getPlayerSide(index);
+        {playerList.map(({ player, isObserver, index }, i) => {
+          const side = getPlayerSide(i);
           const onTurn = props.game.playerTakingTurnId === player.id;
+          const producersInPlay = player.cardsInPlay.filter(
+            (card) => card.type === "producer",
+          );
+          const consumersInPlay = player.cardsInPlay.filter(
+            (card) => card.type === "consumer",
+          );
+          const numProducerPlaceholders =
+            CONSTANTS.maxNumProducersInPlay - producersInPlay.length;
           return (
             <Fragment key={player.id}>
               <PlayerArea side={side}>
@@ -235,27 +251,28 @@ export const GameBoard = memo(
                     playerOnTurn={onTurn}
                   />
                   <PlayerTabletCardArea>
-                    {player.cardsInPlay
-                      .filter((card) => card.type === "producer")
-                      .map((card) => (
-                        <FaceUpThumbnail
-                          key={card.id}
-                          variant="inPlay"
-                          card={card}
-                          setDialog={props.dialogProps.set}
-                          choiceProps={props.choiceProps}
-                          selectorProps={
-                            cardSelectEnabled(card.id)
-                              ? props.selectorProps
-                              : null
-                          }
-                        />
-                      ))}
+                    {producersInPlay.map((card) => (
+                      <FaceUpThumbnail
+                        key={card.id}
+                        variant="inPlay"
+                        card={card}
+                        setDialog={props.dialogProps.set}
+                        choiceProps={props.choiceProps}
+                        selectorProps={
+                          cardSelectEnabled(card.id)
+                            ? props.selectorProps
+                            : null
+                        }
+                      />
+                    ))}
+                    {range(numProducerPlaceholders).map((i) => (
+                      <ThumbnailPlaceholder key={i} highlight="none" />
+                    ))}
                   </PlayerTabletCardArea>
                   <PlayerTabletFooter>
-                    <GameBoardChipMenu
+                    <ChipPool
                       label="In Reserve"
-                      inverted={false}
+                      light={false}
                       side={side}
                       chips={player.chipsInReserve}
                       choiceProps={props.choiceProps}
@@ -271,26 +288,24 @@ export const GameBoard = memo(
                 </PlayerTablet>
                 <PlayerCenter side={side}>
                   <PlayerCenterCardArea side={side}>
-                    {player.cardsInPlay
-                      .filter((card) => card.type === "consumer")
-                      .map((card) => (
-                        <FaceUpThumbnail
-                          key={card.id}
-                          variant="inPlay"
-                          card={card}
-                          setDialog={props.dialogProps.set}
-                          choiceProps={props.choiceProps}
-                          selectorProps={
-                            cardSelectEnabled(card.id)
-                              ? props.selectorProps
-                              : null
-                          }
-                        />
-                      ))}
+                    {consumersInPlay.map((card) => (
+                      <FaceUpThumbnail
+                        key={card.id}
+                        variant="inPlay"
+                        card={card}
+                        setDialog={props.dialogProps.set}
+                        choiceProps={props.choiceProps}
+                        selectorProps={
+                          cardSelectEnabled(card.id)
+                            ? props.selectorProps
+                            : null
+                        }
+                      />
+                    ))}
                   </PlayerCenterCardArea>
-                  <GameBoardChipMenu
+                  <ChipPool
                     label="In Channel"
-                    inverted={true}
+                    light={true}
                     side={side}
                     chips={player.chipsinChannel}
                     choiceProps={props.choiceProps}
@@ -324,9 +339,7 @@ export const GameBoard = memo(
             </Fragment>
           );
         })}
-        {observingPlayer === undefined && (
-          <div className="game-player-abutment-spacer" />
-        )}
+        {!observingPlayer && <div className="game-player-abutment-spacer" />}
         <MenuContainer>
           {gameOver ? (
             <GameOverMenu winnerName={props.game.winner?.name ?? ""} />

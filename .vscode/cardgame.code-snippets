@@ -68,5 +68,15 @@
             "  },",
             "};",
         ]
-    }
+    },
+    "React Container": {
+        "scope": "javascript,typescript,typescriptreact",
+        "prefix": "cont",
+        "body": [
+            "const ${1:componentName} = (props: { children?: React.ReactNode }) => {",
+            "  return <div className=\"${2:className}\">{props.children}</div>;",
+            "};",
+        ],
+        "description": "Use only from first column in line to form a divider."
+    },
 }

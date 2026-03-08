@@ -50,7 +50,7 @@ export const Game = () => {
       data.digest.winner === null,
   });
 
-  // Memoize the game data, as is only changes with the "last updated" time.
+  // Memoize the game data, as it only changes with the "last updated" time.
   // biome-ignore lint/correctness/useExhaustiveDependencies: the timestamp is good enough
   const game = useMemo(() => {
     return poller?.data?.digest;
@@ -91,12 +91,12 @@ export const Game = () => {
           "Content-Type": "application/json",
         },
       })
-        .catch((reason) => console.error(reason))
         .then(() => {
           poller.fetchOnce();
           selector.clearValues();
           dialog.close();
-        });
+        })
+        .catch((reason) => console.error(reason));
     }
   }, [
     gameId,

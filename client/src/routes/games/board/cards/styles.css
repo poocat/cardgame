@@ -3,19 +3,18 @@
 ***************************************************************************/
 
 .game-card-container {
-  /* Padding is necessary to ensure that the highlight is visible. */
-  padding: 3px;
-  border-radius: 3px;
-  margin: 1px;
+  padding: 3px; /* Padding is necessary to ensure that the highlight is visible. */
+  border-radius: 5px;
   transition: transform 0.5s;
 }
 
 .game-card-container--selectable {
   background-color: var(--color-lowlight);
+  animation: pulse-lowlight 1500ms ease-in-out infinite;
 }
 
 .game-card-container--selected {
-  outline: var(--color-lowlight);
+  outline: 1px solid var(--color-lowlight);
 }
 
 .game-card-container--exhausted {
@@ -24,6 +23,7 @@
 
 .game-player-center .game-card-container--selectable {
   background-color: var(--color-highlight);
+  animation: pulse-highlight 1500ms ease-in-out infinite;
 }
 
 .game-player-center .game-card-container--selected {
@@ -34,7 +34,7 @@
   width: var(--card-width-sm);
   height: var(--card-width-sm);
   border: 1px solid;
-  border-radius: 2px;
+  border-radius: 4px;
   padding: var(--space-xs);
   display: flex;
   flex-direction: column;
@@ -58,7 +58,7 @@
 }
 
 .game-card--placeholder {
-  background-color: var(--color-white);
+  background: none;
   border-color: var(--color-black);
   color: var(--color-black);
 }
@@ -69,14 +69,79 @@
   object-fit: cover;
 }
 
+.game-card-edge {
+  display: flex;
+  position: relative;
+  right: var(--space-sm);
+}
+
+.game-card-selector {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-card-selector__button {
+  margin-left: 1px;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-black);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-black);
+  padding-top: 3px; /* Optical alignment for text */
+}
+
+.game-card-selector__button--size-sm {
+  width: var(--control-size-sm);
+  height: var(--control-size-sm);
+  font-size: var(--font-size-sm);
+}
+
+.game-card-selector__button--size-md {
+  width: var(--control-size-md);
+  height: var(--control-size-md);
+  font-size: var(--font-size-md);
+}
+
+.game-card-selector__button--size-lg {
+  width: var(--control-size-lg);
+  height: var(--control-size-lg);
+  font-size: var(--font-size-lg);
+}
+
 /***************************************************************************
   Card Dialog
 ***************************************************************************/
 
 .game-dialog__card-container {
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-dialog__card {
+  position: relative;
   width: var(--card-width-lg);
   height: var(--card-height-lg);
+  border-radius: 12px;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  border: 2px solid black;
+}
+
+.game-dialog__card--producer {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.game-dialog__card--consumer {
+  background: var(--color-white);
+  color: var(--color-black);
 }
 
 .game-dialog__card-background {
@@ -94,45 +159,34 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: var(--space-md);
+  padding: var(--card-outer-border-width-lg);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.game-dialog__menu {
-  width: 100%;
-  height: 50px;
-  display: flex;
-  justify-content: end;
-  justify-items: end;
+.game-dialog__card-name {
+  padding: var(--space-xs);
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
 }
 
-.game-dialog__card {
-  width: var(--card-width-lg);
-  height: var(--card-height-lg);
-  border-radius: 12px;
-  cursor: default;
+.game-dialog__card-actions {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: start;
-  border: 2px solid black;
+  padding: var(--card-inner-border-width-lg);
+  gap: var(--space-xs);
 }
 
-.game-dialog__card--producer {
-  background: var(--color-gray);
-  color: var(--color-white);
+.game-dialog__card-trigger-instructions {
+  padding: var(--space-sm);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-white-translucent);
 }
 
-.game-dialog__card--consumer {
-  background: var(--color-night);
-  color: var(--color-white);
-}
-
-.game-dialog__card__image {
+.game-dialog__menu {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 9px;
+  padding: var(--space-sm);
+  display: flex;
+  justify-content: end;
 }

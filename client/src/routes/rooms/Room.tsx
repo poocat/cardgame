@@ -112,13 +112,11 @@ export const Room = () => {
         },
       });
       if (response.ok) {
-        const j = await response.json();
-        ROUTES.games.methods.post.schemas.responseBody.parse(j);
+        setGameStarting(true);
       }
     } catch (error) {
       console.error(error);
     }
-    setGameStarting(true);
   }, [startGameDisabled, roomId, playerId]);
 
   return (

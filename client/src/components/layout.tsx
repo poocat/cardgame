@@ -1,4 +1,4 @@
-import type { Border, Color, Size, Spacing } from "./types";
+import type { Border, Color, EdgeVariant, Size, Spacing } from "./types";
 
 type Orientation = "horizontal" | "vertical";
 
@@ -31,4 +31,21 @@ export const Box = (props: {
 
 export const Divider = () => {
   return <div className="divider" />;
+};
+
+/******************************************************************************
+ * ### Edge
+ *
+ * A zero-height, full-width container that can be used to align elements along
+ * the bottom edge of its previous sibling.
+ ******************************************************************************/
+export const Edge = (props: {
+  variant: EdgeVariant;
+  children?: React.ReactNode;
+}) => {
+  return (
+    <div className="abutment">
+      <div className={`edge edge--${props.variant}`}>{props.children}</div>
+    </div>
+  );
 };

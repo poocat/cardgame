@@ -1,83 +1,55 @@
 /***************************************************************************
   Chip Layout
 ***************************************************************************/
-.game-chip-area {
+.game-chip-pool {
   width: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.game-chip-area--inverted {
+.game-chip-pool--light {
   color: var(--color-white);
 }
-.game-chip-area--side-left {
+.game-chip-pool--side-left {
   align-items: flex-start;
 }
-.game-chip-area--side-right {
+.game-chip-pool--side-right {
   align-items: flex-end;
 }
 
-.game-chip-area__label {
+.game-chip-pool__label {
   font-size: var(--font-size-sm);
 }
 
-.game-chip-area--inverted .game-chip-area__label {
+.game-chip-pool--light .game-chip-pool__label {
   color: var(--color-white);
 }
 
-/* Used to put chips on the edge of another element */
-.game-chip-edge {
-  width: 100%;
-  height: 0;
-  top: 0;
-  position: relative;
-}
-
-.game-chip-edge__container {
-  position: absolute;
-  bottom: 0;
-  transform: translateY(50%);
-  left: 5%;
-}
-
-.game-chip-display {
+.game-chip-pool__display {
   width: 70px;
-  height: 28px;
   padding: var(--space-xs);
-  border: 2px double var(--color-black);
+  border: 1px solid var(--color-black);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.game-chip-display--inverted {
+.game-chip-pool__display--light {
   border-color: var(--color-white);
 }
-.game-chip-display--side-right {
-  flex-direction: row-reverse;
-}
 
-.game-chip-edge .game-chip-display {
-  border-style: none;
+.game-chip-pool__display--side-right {
+  flex-direction: row-reverse;
 }
 
 /* Expanded width when selector buttons are shown */
-.game-chip-display--fullwidth {
+.game-chip-pool__display--fullwidth {
   width: 100%;
+  animation: pulse-lowlight 2000ms ease-in-out infinite;
 }
 
-.game-chip-display__counter {
-  display: flex;
-  align-items: center;
-}
-
-.game-chip-display--side-right .game-chip-display__counter {
-  flex-direction: row-reverse;
-}
-
-.game-chip-display__selector {
-  display: flex;
-  flex-direction: row; /* Always left-to-right, regardless of player orientation */
+.game-chip-pool__display--light.game-chip-pool__display--fullwidth {
+  animation: pulse-highlight 2000ms ease-in-out infinite;
 }
 
 /***************************************************************************
@@ -85,9 +57,6 @@
 ***************************************************************************/
 
 .game-chip {
-  /* width: var(--control-size-sm); */
-  /* height: var(--control-size-sm); */
-  margin-left: 1px;
   background-color: var(--color-chip);
   border: 1px solid var(--color-black);
   border-radius: 50%;
@@ -100,26 +69,64 @@
 }
 
 /* Variant of a chip, used to indicate how many chips have been selected from the given pool. */
-.game-chip--selected {
-  background-color: var(--color-chip-selected);
+.game-chip--buffer {
+  background-color: var(--color-chip-buffer);
 }
 
 .game-chip--size-sm {
-  width: var(--control-size-xs);
-  height: var(--control-size-xs);
-  font-size: var(--font-size-xs);
-}
-
-.game-chip--size-md {
   width: var(--control-size-sm);
   height: var(--control-size-sm);
   font-size: var(--font-size-sm);
 }
 
-.game-chip--size-lg {
+.game-chip--size-md {
   width: var(--control-size-md);
   height: var(--control-size-md);
   font-size: var(--font-size-md);
+}
+
+.game-chip--size-lg {
+  width: var(--control-size-lg);
+  height: var(--control-size-lg);
+  font-size: var(--font-size-lg);
+}
+
+/***************************************************************************
+  Chip Edge
+***************************************************************************/
+
+.game-chip-edge {
+  position: relative;
+}
+
+.game-chip-edge--size-sm {
+  left: var(--space-sm);
+}
+
+.game-chip-edge--size-md {
+  left: var(--space-md);
+}
+
+.game-chip-edge--size-lg {
+  left: var(--space-lg);
+}
+
+/***************************************************************************
+  Chip Stack
+***************************************************************************/
+.game-chip-stack {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.game-chip-stack--forward {
+  flex-direction: row;
+}
+
+.game-chip-stack--reverse {
+  flex-direction: row-reverse;
 }
 
 /***************************************************************************
@@ -128,56 +135,45 @@
 
 /*
   A simple CSS arrow used to indicate direction of chip movement.
-  Faces right for left-side players, left for right-side players.
 */
 .game-arrow {
   width: 0;
   height: 0;
-  margin: 0 var(--space-sm);
+  margin-inline: var(--space-xs);
 }
 
-/* Size variants */
 .game-arrow--size-sm {
   border-top: 3px solid transparent;
   border-bottom: 3px solid transparent;
+  border-left: 4px solid var(--color-black);
 }
 
 .game-arrow--size-md {
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent;
+  border-left: 6px solid var(--color-black);
 }
 
 .game-arrow--size-lg {
   border-top: 7px solid transparent;
   border-bottom: 7px solid transparent;
-}
-
-/* Direction based on player orientation */
-.game-arrow--size-sm {
-  border-left: 4px solid var(--color-black);
-}
-.game-arrow--size-md {
-  border-left: 6px solid var(--color-black);
-}
-.game-arrow--size-lg {
   border-left: 8px solid var(--color-black);
 }
 
-.game-chip-display--side-right .game-arrow--size-sm {
+.game-arrow--reverse.game-arrow--size-sm {
   border-right: 4px solid var(--color-black);
   border-left: none;
 }
-.game-chip-display--side-right .game-arrow--size-md {
+.game-arrow--reverse.game-arrow--size-md {
   border-right: 6px solid var(--color-black);
   border-left: none;
 }
-.game-chip-display--side-right .game-arrow--size-lg {
+.game-arrow--reverse.game-arrow--size-lg {
   border-right: 8px solid var(--color-black);
   border-left: none;
 }
 
-/* Light variant for play area */
-.game-chip-display--inverted .game-arrow {
+.game-arrow--light {
   border-left-color: var(--color-white);
   border-right-color: var(--color-white);
 }

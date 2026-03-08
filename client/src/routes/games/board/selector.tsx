@@ -28,7 +28,7 @@ export function useSelector(args: { min: number; max: number }): SelectorProps {
     setSelectedValues((current) => {
       const next = [...current];
       const idx = next.indexOf(value);
-      next.splice(idx, 1);
+      if (idx !== -1) next.splice(idx, 1);
       return next;
     });
   }, []);
