@@ -1,6 +1,6 @@
 import { getActionDefinition } from "@server/game/cards/registry";
 import type { IAccessor, IDecisions } from "@server/game/types";
-import type { ActivityData, ActivityTypeMap, Decision } from "@server/types";
+import type { ActivityData, ActivityTypeMap } from "@server/types";
 import { createActionChoice } from "./choices";
 
 /******************************************************************************
@@ -42,7 +42,7 @@ export const activityTypeContinuedActivity: ActivityTypeMap<
     const next: ActivityData = {
       ...currentActivity,
       nextChoices: currentActivity.nextChoices.slice(1),
-      previousDecisions: currentDecisions.decisions as Decision[], // boo...
+      previousDecisions: currentDecisions.getDecisions(),
     };
     const nextChoice = currentActivity.nextChoices[0];
     const action = accessor.getActionById({

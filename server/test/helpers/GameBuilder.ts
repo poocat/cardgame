@@ -129,6 +129,16 @@ export class GameBuilder {
   }
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Add N chips to the channel for the given player.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  addChipsInChannel(owner: string, count: number): this {
+    for (let i = 0; i < count; i++) {
+      this.chipSpecs.push({ owner, location: { type: "inChannel" } });
+    }
+    return this;
+  }
+
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Use to specify the activity of the game to the given value.
    *
    * If no activity is set, the default will be a "choosingAction" activity for

@@ -3,6 +3,7 @@ import {
   extendCardRegistry,
   resetCardRegistry,
 } from "@server/game/cards/registry";
+import { Accessor } from "@server/game/runtime";
 import { makeDecision } from "@server/game/stateMachine";
 import type { GameData } from "@server/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -560,6 +561,225 @@ describe("makeDecision", () => {
         },
       });
       expect(result.tick).toBe(1);
+    });
+  });
+
+  describe("automatic decision", () => {
+    it("automatically chooses chips from homogeneous pools", () => {
+      const game = new GameBuilder()
+        .addPlayer("alice")
+        .addPlayer("bob")
+        .addCard({
+          id: "recipient-id",
+          name: testCards.producerWithChipChoices.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+          actionIdMap: { ability: "action-id" },
+        })
+        // Only one donor makes the "other cards" pool homogeneous.
+        .addCard({
+          id: "donor-id",
+          name: testCards.dummyProducer.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+        })
+        .addChip({
+          owner: "alice",
+          location: { type: "onCard", cardId: "donor-id" },
+        })
+        // Having no chips in channel makes the "channel or reserve" pool
+        // homogeneous.
+        .addChipsInReserve("alice", 3)
+        .addChipsInReserve("bob", 3)
+        .setPlayerTakingTurn("alice")
+        .setUpActionActivity("action-id")
+        .build();
+
+      const result = makeDecision({
+        gameData: game,
+        decision: {
+          name: "actionToTake",
+          playerId: "alice",
+          values: ["action-id"],
+        },
+        autoDecide: true,
+      });
+
+      // Since the action's choices can be made automatically, the next
+      // activity should be "choosingAction".
+      expect(result.activity.type).toBe("choosingAction");
+
+      const chips = new Accessor(result).getChips({
+        cardIds: ["recipient-id"],
+      });
+      expect(chips.length).toBe(2);
+    });
+
+    it("is not active by default", () => {
+      const game = new GameBuilder()
+        .addPlayer("alice")
+        .addPlayer("bob")
+        .addCard({
+          id: "recipient-id",
+          name: testCards.producerWithChipChoices.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+          actionIdMap: { ability: "action-id" },
+        })
+        .addCard({
+          id: "donor-id",
+          name: testCards.dummyProducer.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+        })
+        .addChip({
+          owner: "alice",
+          location: { type: "onCard", cardId: "donor-id" },
+        })
+        .addChipsInReserve("alice", 3)
+        .addChipsInReserve("bob", 3)
+        .setPlayerTakingTurn("alice")
+        .setUpActionActivity("action-id")
+        .build();
+
+      const result = makeDecision({
+        gameData: game,
+        decision: {
+          name: "actionToTake",
+          playerId: "alice",
+          values: ["action-id"],
+        },
+        autoDecide: false,
+      });
+
+      expect(result.activity.type).toBe("takingAction");
+      expect(result.activity.nextChoices.length).toBe(1);
+    });
+
+    it("cannot choose chips automatically from multiple cards", () => {
+      const game = new GameBuilder()
+        .addPlayer("alice")
+        .addPlayer("bob")
+        .addCard({
+          id: "recipient-id",
+          name: testCards.producerWithChipChoices.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+          actionIdMap: { ability: "action-id" },
+        })
+        // Adding multiple donor cards makes the "other cards" pool heterogeneous.
+        .addCard({
+          id: "donor-1-id",
+          name: testCards.dummyProducer.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+        })
+        .addChip({
+          owner: "alice",
+          location: { type: "onCard", cardId: "donor-1-id" },
+        })
+        .addCard({
+          id: "donor-2-id",
+          name: testCards.dummyProducer.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+        })
+        .addChip({
+          owner: "alice",
+          location: { type: "onCard", cardId: "donor-2-id" },
+        })
+        .addChipsInReserve("alice", 3)
+        .addChipsInReserve("bob", 3)
+        .setPlayerTakingTurn("alice")
+        .setUpActionActivity("action-id")
+        .build();
+
+      const result = makeDecision({
+        gameData: game,
+        decision: {
+          name: "actionToTake",
+          playerId: "alice",
+          values: ["action-id"],
+        },
+        autoDecide: true,
+      });
+
+      // Since the second choice cannot be made automatically, the next
+      // activity should be "takingAction", and there should be one choice
+      // left.
+      expect(result.activity.type).toBe("takingAction");
+      expect(result.activity.nextChoices.length).toBe(0);
+    });
+
+    it("cannot choose chips automatically from heterogeneous pools", () => {
+      const game = new GameBuilder()
+        .addPlayer("alice")
+        .addPlayer("bob")
+        .addCard({
+          id: "recipient-id",
+          name: testCards.producerWithChipChoices.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+          actionIdMap: { ability: "action-id" },
+        })
+        // Adding multiple donor cards makes the "other cards" pool heterogeneous.
+        .addCard({
+          id: "donor-id",
+          name: testCards.dummyProducer.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+        })
+        .addChip({
+          owner: "alice",
+          location: { type: "onCard", cardId: "donor-id" },
+        })
+        // Adding a chip to Alice's channel makes the "channel or reserve" pool
+        // heterogeneous.
+        .addChip({
+          id: "channel-chip-id",
+          owner: "alice",
+          location: { type: "inChannel" },
+        })
+        .addChipsInReserve("alice", 3)
+        .addChipsInReserve("bob", 3)
+        .setPlayerTakingTurn("alice")
+        .setUpActionActivity("action-id")
+        .build();
+
+      let result = makeDecision({
+        gameData: game,
+        decision: {
+          name: "actionToTake",
+          playerId: "alice",
+          values: ["action-id"],
+        },
+        autoDecide: true,
+      });
+
+      // Since the first choice cannot be made automatically, the next
+      // activity should be "takingAction", and there should be two choices
+      // left (current + next).
+      expect(result.activity.type).toBe("takingAction");
+      expect(result.activity.nextChoices.length).toBe(1);
+
+      result = makeDecision({
+        gameData: result,
+        decision: {
+          name: "chips",
+          playerId: "alice",
+          values: ["channel-chip-id"],
+        },
+        autoDecide: true,
+      });
+
+      // Since the second choice can be made automatically, the action should
+      // be concluded, and the next activity should be "choosingAction".
+      expect(result.activity.type).toBe("choosingAction");
+
+      const chips = new Accessor(result).getChips({
+        cardIds: ["recipient-id"],
+      });
+      expect(chips.length).toBe(2);
     });
   });
 });

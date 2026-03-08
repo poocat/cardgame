@@ -410,4 +410,72 @@ export const testCards = {
       },
     },
   },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * A producer with an ability that moves chips onto itself from various
+   * pools.
+   * - 1 from either its owner's reserve or its owner's channel
+   * - 1 from one of its owner's other cards in play
+   *
+   * Can be used to test the auto-decision feature.
+   * - If there are no chips in the owner's channel, then the first choice is
+   *   homogeneous, and can be made automatically.
+   * - If there is only one other card in play, then the second choice is
+   *   homogeneous, and can be made automatically.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  producerWithChipChoices: {
+    name: "Producer with Various Chip Choices",
+    type: "producer",
+    actions: {
+      play: {},
+      ability: {
+        instructions:
+          "Move 1 chip from either your reserve or channel, and 1 chip from one of your other cards in play.",
+        sequence: {
+          choices: [
+            {
+              type: "chipId",
+              name: "chips",
+              instructions: "Choose 1 chip from your reserve or channel.",
+              min: 1,
+              max: 1,
+              getValues: ({ accessor, context }) => {
+                return accessor
+                  .getChips({
+                    playerIds: [context.choosingPlayerId],
+                    locationTypes: ["inReserve", "inChannel"],
+                  })
+                  .map((c) => c.id);
+              },
+            },
+            {
+              type: "chipId",
+              name: "chips",
+              instructions:
+                "Choose 1 chip from another one of your cards in play.",
+              min: 1,
+              max: 1,
+              getValues: ({ accessor, context }) => {
+                const otherCardsInPlay = accessor.getCards({
+                  playerIds: [context.playerTakingActionId],
+                  locationTypes: ["inPlay"],
+                  excludeIds: [context.cardId],
+                });
+                return accessor
+                  .getChips({
+                    cardIds: otherCardsInPlay.map((c) => c.id),
+                  })
+                  .map((c) => c.id);
+              },
+            },
+          ],
+          affect: ({ context, decisions, mutator }) => {
+            mutator.moveChips({
+              ids: decisions.getValues({ name: "chips" }),
+              location: { type: "onCard", cardId: context.cardId },
+            });
+          },
+        },
+      },
+    },
+  },
 } as const satisfies CardMap;

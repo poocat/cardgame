@@ -13,6 +13,10 @@ export class Decisions implements IDecisions {
     this.decisions = decisions;
   }
 
+  getDecisions(): Decision[] {
+    return [...this.decisions] as Decision[];
+  }
+
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Use to get all the values chosen for the given name. If a player ID is
    * given, will only include values chosen by that player.

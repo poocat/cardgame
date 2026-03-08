@@ -139,6 +139,7 @@ export type ActionContext = {
 ////////////////////////////////////////////////////////////////////////////////
 export interface IDecisions {
   decisions: DeepReadonly<Decision[]>;
+  getDecisions(): Decision[];
   getValues(args: { name: string; playerId: Id }): ChoiceValue[];
   getPlayerIds(args: { name: string }): Id[];
 }
