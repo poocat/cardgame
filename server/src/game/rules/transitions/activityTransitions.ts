@@ -122,21 +122,39 @@ export const activityTypeNextActivity: ActivityTypeMap<
     }
   },
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Every "taking action" activity should be followed by a "choosing action"
+   * A "taking action" activity is typically followed by a "choosing action"
    * activity.
+   *
+   * However, if the taken action resulted in a change to the player on turn,
+   * facilitate the beginning of that player's turn.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   takingAction: ({ playerData, accessor, mutator }) => {
-    mutator.setActivity({
-      activity: {
-        type: "choosingAction",
-        playerChoosingActionId: playerData.id,
-        currentChoice: createChoosingActionChoice({
-          playerId: playerData.id,
-          accessor,
-        }),
-        nextChoices: [],
-        previousDecisions: [],
-      },
-    });
+    const playerTakingTurnId = accessor.getPlayerTakingTurn().id;
+    if (playerTakingTurnId !== playerData.id) {
+      mutator.setActivity({
+        activity: {
+          type: "drawingCards",
+          currentChoice: createDrawingCardsChoice({
+            playerId: playerTakingTurnId,
+            accessor,
+          }),
+          nextChoices: [],
+          previousDecisions: [],
+        },
+      });
+    } else {
+      mutator.setActivity({
+        activity: {
+          type: "choosingAction",
+          playerChoosingActionId: playerData.id,
+          currentChoice: createChoosingActionChoice({
+            playerId: playerData.id,
+            accessor,
+          }),
+          nextChoices: [],
+          previousDecisions: [],
+        },
+      });
+    }
   },
 };
