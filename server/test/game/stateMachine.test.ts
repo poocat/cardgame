@@ -388,6 +388,123 @@ describe("makeDecision", () => {
       // Should transition back to choosingAction
       expect(result.activity.type).toBe("choosingAction");
     });
+
+    it("transitions to another player when action passes turn in 2-player game", () => {
+      const game = new GameBuilder()
+        .addPlayer("alice")
+        .addPlayer("bob")
+        .addCard({
+          id: "c1",
+          owner: "alice",
+          name: testCards.producerThatPassesTurn.name,
+          location: { type: "inPlay", exhausted: false },
+          actionIdMap: { ability: "c1-ability" },
+        })
+        .addChipsInReserve("alice", 5)
+        .addChipsInReserve("bob", 5)
+        .setPlayerTakingTurn("alice")
+        .setUpActionActivity("c1-ability")
+        .build();
+
+      // Alice takes the action that passes the turn.
+      let result = makeDecision({
+        gameData: game,
+        decision: {
+          playerId: "alice",
+          name: "actionToTake",
+          values: ["c1-ability"],
+        },
+      });
+
+      // The action should exhaust the card.
+      const card = result.cards.find((c) => c.id === "c1");
+      expect(card?.location.type).toBe("inPlay");
+      if (card?.location.type === "inPlay") {
+        expect(card.location.exhausted).toBe(true);
+      }
+
+      // The action should have passed the turn to Bob.
+      expect(result.playerTakingTurnId).toBe("bob");
+      expect(result.activity.type).toBe("drawingCards");
+
+      // Bob concludes "drawingCards" activity.
+      result = makeDecision({
+        gameData: result,
+        decision: {
+          playerId: "bob",
+          name: result.activity.currentChoice.name,
+          values: [],
+        },
+      });
+
+      // Bob passes his turn (chooses no action).
+      expect(result.activity.type).toBe("choosingAction");
+      result = makeDecision({
+        gameData: result,
+        decision: {
+          playerId: "bob",
+          name: result.activity.currentChoice.name,
+          values: [],
+        },
+      });
+
+      // Should cycle back to alice.
+      expect(result.playerTakingTurnId).toBe("alice");
+      expect(result.activity.type).toBe("drawingCards");
+    });
+
+    it("transitions to another player when action passes turn in 3-player game", () => {
+      const game = new GameBuilder()
+        .addPlayer("alice")
+        .addPlayer("bob")
+        .addPlayer("charlie")
+        .addCard({
+          id: "c1",
+          owner: "alice",
+          name: testCards.producerThatPassesTurn.name,
+          location: { type: "inPlay", exhausted: false },
+          actionIdMap: { ability: "c1-ability" },
+        })
+        .addChipsInReserve("alice", 5)
+        .addChipsInReserve("bob", 5)
+        .addChipsInReserve("charlie", 5)
+        .setPlayerTakingTurn("alice")
+        .setUpActionActivity("c1-ability")
+        .build();
+
+      // Alice's ability passes the turn to Bob.
+      let result = makeDecision({
+        gameData: game,
+        decision: {
+          playerId: "alice",
+          name: game.activity.currentChoice.name,
+          values: ["c1-ability"],
+        },
+      });
+
+      expect(result.playerTakingTurnId).toBe("bob");
+
+      // Bob draws and then passes.
+      result = makeDecision({
+        gameData: result,
+        decision: {
+          playerId: "bob",
+          name: result.activity.currentChoice.name,
+          values: [],
+        },
+      });
+      result = makeDecision({
+        gameData: result,
+        decision: {
+          playerId: "bob",
+          name: result.activity.currentChoice.name,
+          values: [],
+        },
+      });
+
+      // Should go to charlie, not back to alice.
+      expect(result.playerTakingTurnId).toBe("charlie");
+    });
   });
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -564,6 +681,9 @@ describe("makeDecision", () => {
     });
   });
 
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Automatic Decisionmaking
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   describe("automatic decision", () => {
     it("automatically chooses chips from homogeneous pools", () => {
       const game = new GameBuilder()

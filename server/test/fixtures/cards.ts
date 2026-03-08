@@ -478,4 +478,23 @@ export const testCards = {
       },
     },
   },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * A producer with an ability that changes whose turn it is.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  producerThatPassesTurn: {
+    name: "Producer that Passes Turn",
+    type: "producer",
+    actions: {
+      ability: {
+        instructions: "Pass the turn to the next player",
+        sequence: {
+          choices: [],
+          affect: ({ accessor, mutator }) => {
+            const { from, to } = accessor.getTurnTransition({});
+            mutator.passTurn({ from: from.id, to: to.id });
+          },
+        },
+      },
+    },
+  },
 } as const satisfies CardMap;
