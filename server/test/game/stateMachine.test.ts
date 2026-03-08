@@ -565,7 +565,7 @@ describe("makeDecision", () => {
   });
 
   describe("automatic decision", () => {
-    it("automatically chooses chips from homogenous pools", () => {
+    it("automatically chooses chips from homogeneous pools", () => {
       const game = new GameBuilder()
         .addPlayer("alice")
         .addPlayer("bob")
@@ -576,7 +576,7 @@ describe("makeDecision", () => {
           location: { type: "inPlay", exhausted: false },
           actionIdMap: { ability: "action-id" },
         })
-        // Only one donor makes the "other cards" pool homogenous.
+        // Only one donor makes the "other cards" pool homogeneous.
         .addCard({
           id: "donor-id",
           name: testCards.dummyProducer.name,
@@ -588,7 +588,7 @@ describe("makeDecision", () => {
           location: { type: "onCard", cardId: "donor-id" },
         })
         // Having no chips in channel makes the "channel or reserve" pool
-        // homogenous.
+        // homogeneous.
         .addChipsInReserve("alice", 3)
         .addChipsInReserve("bob", 3)
         .setPlayerTakingTurn("alice")
@@ -667,7 +667,7 @@ describe("makeDecision", () => {
           location: { type: "inPlay", exhausted: false },
           actionIdMap: { ability: "action-id" },
         })
-        // Adding multiple donor cards makes the "other cards" pool heterogenous.
+        // Adding multiple donor cards makes the "other cards" pool heterogeneous.
         .addCard({
           id: "donor-1-id",
           name: testCards.dummyProducer.name,
@@ -711,7 +711,7 @@ describe("makeDecision", () => {
       expect(result.activity.nextChoices.length).toBe(0);
     });
 
-    it("cannot choose chips automatically from heterogenous pools", () => {
+    it("cannot choose chips automatically from heterogeneous pools", () => {
       const game = new GameBuilder()
         .addPlayer("alice")
         .addPlayer("bob")
@@ -722,7 +722,7 @@ describe("makeDecision", () => {
           location: { type: "inPlay", exhausted: false },
           actionIdMap: { ability: "action-id" },
         })
-        // Adding multiple donor cards makes the "other cards" pool heterogenous.
+        // Adding multiple donor cards makes the "other cards" pool heterogeneous.
         .addCard({
           id: "donor-id",
           name: testCards.dummyProducer.name,
@@ -734,7 +734,7 @@ describe("makeDecision", () => {
           location: { type: "onCard", cardId: "donor-id" },
         })
         // Adding a chip to Alice's channel makes the "channel or reserve" pool
-        // heterogenous.
+        // heterogeneous.
         .addChip({
           id: "channel-chip-id",
           owner: "alice",

@@ -418,9 +418,9 @@ export const testCards = {
    *
    * Can be used to test the auto-decision feature.
    * - If there are no chips in the owner's channel, then the first choice is
-   *   homogenous, and can be made automatically.
+   *   homogeneous, and can be made automatically.
    * - If there is only one other card in play, then the second choice is
-   *   homogenous, and can be made automatically.
+   *   homogeneous, and can be made automatically.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   producerWithChipChoices: {
     name: "Producer with Various Chip Choices",
