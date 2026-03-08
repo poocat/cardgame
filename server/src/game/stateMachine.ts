@@ -159,8 +159,8 @@ export function makeDecision(args: {
   // to the game data.
   const next = new Next(args.gameData);
 
+  let decisionLoopCount = 0;
   do {
-    let decisionLoopCount = 0;
     if (currentActivity.nextChoices.length > 0) {
       // If the current activity needs more choices to be made, continue the activity.
       next.mutatorQueue.setActivity({
@@ -183,8 +183,8 @@ export function makeDecision(args: {
       ]);
     } else {
       // Otherwise, use the decisions made to affect the game data.
+      let activityLoopCount = 0;
       do {
-        let activityLoopCount = 0;
         // Apply all the effects for the decisions made for this activity.
         activityTypeEffects[currentActivity.type]({
           accessor: currentAccessor,
