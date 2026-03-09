@@ -134,7 +134,7 @@ export function createDrawingCardsChoice(args: {
 export function createChoosingActionChoice(args: {
   playerId: Id;
   accessor: IAccessor;
-  annotator?: IAnnotator;
+  annotator: IAnnotator;
 }): ChoiceData {
   // Filtering through every action seems dumb, but...
   const values = args.accessor.actions

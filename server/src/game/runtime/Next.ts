@@ -1,4 +1,9 @@
-import { Accessor, Mutator, MutatorQueue } from "@server/game/runtime";
+import {
+  Accessor,
+  Annotator,
+  Mutator,
+  MutatorQueue,
+} from "@server/game/runtime";
 import type { ActivityData, GameData } from "@server/types";
 
 /******************************************************************************
@@ -11,10 +16,12 @@ export class Next {
   /** A deep copy of the given game data, to mutate. */
   private gameData: GameData;
   public mutatorQueue: MutatorQueue;
+  public annotator: Annotator;
 
   constructor(gameData: GameData) {
     this.gameData = structuredClone(gameData);
     this.mutatorQueue = new MutatorQueue();
+    this.annotator = new Annotator();
   }
 
   get activity(): ActivityData {
@@ -33,6 +40,7 @@ export class Next {
   finish(): GameData {
     // Increment the game tick.
     this.gameData.tick += 1;
+    // TODO!!! Add annotations to game data!!!
     return this.gameData;
   }
 }

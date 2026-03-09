@@ -1,5 +1,10 @@
 import { CONSTANTS } from "@common/game/constants";
-import type { IAccessor, IDecisions, IMutator } from "@server/game/types";
+import type {
+  IAccessor,
+  IAnnotator,
+  IDecisions,
+  IMutator,
+} from "@server/game/types";
 import type { ActivityTypeMap, PlayerData } from "@server/types";
 import {
   createChoosingActionChoice,
@@ -21,6 +26,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
     accessor: IAccessor;
     currentDecisions: IDecisions;
     mutator: IMutator;
+    annotator: IAnnotator;
   }) => void
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -30,7 +36,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
    * However, at the beginning of the game, repeat the "drawing cards" activity
    * until the entire opening hand is drawn.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  drawingCards: ({ playerData, accessor, mutator }) => {
+  drawingCards: ({ playerData, accessor, annotator, mutator }) => {
     const cardsInHand = accessor.getCards({
       playerIds: [playerData.id],
       locationTypes: ["inHand"],
@@ -65,6 +71,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
           currentChoice: createChoosingActionChoice({
             playerId: playerData.id,
             accessor,
+            annotator,
           }),
           nextChoices: [],
           previousDecisions: [],
@@ -128,7 +135,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
    * However, if the taken action resulted in a change to the player on turn,
    * facilitate the beginning of that player's turn.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  takingAction: ({ playerData, accessor, mutator }) => {
+  takingAction: ({ playerData, accessor, annotator, mutator }) => {
     const playerTakingTurnId = accessor.getPlayerTakingTurn().id;
     if (playerTakingTurnId !== playerData.id) {
       mutator.setActivity({
@@ -150,6 +157,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
           currentChoice: createChoosingActionChoice({
             playerId: playerData.id,
             accessor,
+            annotator,
           }),
           nextChoices: [],
           previousDecisions: [],

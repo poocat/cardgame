@@ -214,6 +214,7 @@ export function makeDecision(args: {
           accessor: nextAccessor,
           currentDecisions,
           mutator: next.mutatorQueue,
+          annotator: next.annotator,
         });
         /**
          * TODO!!!
