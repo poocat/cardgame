@@ -30,37 +30,20 @@ jobs:
         working-directory: server
 
     steps:
-      - name: clone repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          token: ${{ secrets.PRIVATE_SUBMODULE_CI_PAT }}
-          # FIXME!!! Action doesn't support submodule checkout with deploy key.
-          # (See: https://github.com/actions/checkout/issues/287)
-          # ssh-key: ${{ secrets.PRIVATE_SUBMODULE_CI_DEPLOY_KEY }}
+      # Clone repo and checkout submodules
+      - uses: webfactory/ssh-agent@v0.9.1
+        with:                                                                                                                                                                                                           
+          ssh-private-key: ${{ secrets.PRIVATE_SUBMODULE_CI_DEPLOY_KEY }}
 
-      # Hack 1 (from https://github.com/actions/checkout/issues/287#issuecomment-3018957939):
-      # - name: setup SSH for submodules
-      #   run: |
-      #     mkdir -p ~/.ssh
-      #     echo "${{ secrets.PRIVATE_SUBMODULE_CI_DEPLOY_KEY }}" > ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa
-      #     ssh-keyscan github.com >> ~/.ssh/known_hosts
-      # - name: init and update submodules
-      #   run: |
-      #     git submodule sync
-      #     git submodule update --init --recursive
+      - uses: actions/checkout@v4
 
-      # Hack 2:
-      # - uses: webfactory/ssh-agent@v0.9.1                                                                                                                                                                 
-      #   with:                                                                                                                                                                                             
-      #     ssh-private-key: ${{ secrets.PRIVATE_SUBMODULE_CI_DEPLOY_KEY }}   
+      - name: config git to use SSH url
+        run: git config --global url."git@github.com:".insteadOf "https://github.com/"
 
-      # - name: init and update submodules
-      #   run: |
-      #     git submodule sync
-      #     git submodule update --init --recursive
+      - name: checkout submodules
+        run: git submodule update --init --recursive
 
+      # Setup Node
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -69,4 +52,5 @@ jobs:
 
       - run: npm ci
 
+      # Run tests
       - run: npm test
