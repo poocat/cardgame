@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx @biomejs/biome ci common server client
+
+  test:
+    name: Server Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+
+    steps:
+      # Clone repo and checkout submodules
+      - uses: webfactory/ssh-agent@v0.9.1
+        with:                                                                                                                                                                                                           
+          ssh-private-key: ${{ secrets.PRIVATE_SUBMODULE_CI_DEPLOY_KEY }}
+
+      - uses: actions/checkout@v4
+
+      - name: config git to use SSH url
+        run: git config --global url."git@github.com:".insteadOf "https://github.com/"
+
+      - name: checkout submodules
+        run: git submodule update --init --recursive
+
+      # Setup Node
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - run: npm ci
+
+      # Run tests
+      - run: npm test
