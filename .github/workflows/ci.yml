@@ -18,7 +18,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx @biomejs/biome ci .
+      - run: npx @biomejs/biome ci common server client
 
   test:
     name: Server Tests
