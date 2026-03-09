@@ -4,6 +4,7 @@ import type {
   ActionContext,
   ChoiceDef,
   IAccessor,
+  IAnnotator,
   IDecisions,
 } from "@server/game/types";
 import type {
@@ -133,6 +134,7 @@ export function createDrawingCardsChoice(args: {
 export function createChoosingActionChoice(args: {
   playerId: Id;
   accessor: IAccessor;
+  annotator?: IAnnotator;
 }): ChoiceData {
   // Filtering through every action seems dumb, but...
   const values = args.accessor.actions
@@ -146,6 +148,7 @@ export function createChoosingActionChoice(args: {
         accessor: args.accessor,
       });
       if (!typeCheckResult.ok) {
+        args.annotator?.add({ id: a.id, messages: typeCheckResult.reasons });
         return false;
       }
       const actionDef = getActionDefinition({
@@ -159,6 +162,7 @@ export function createChoosingActionChoice(args: {
           context: { cardId: a.card.id, playerTakingActionId: args.playerId },
         });
         if (!result.ok) {
+          args.annotator?.add({ id: a.id, messages: result.reasons });
           return false;
         }
       }
