@@ -46,6 +46,20 @@ export class Accessor implements IAccessor {
     }
   }
 
+  getTurnTransition(args: { from?: Id }) {
+    const firstPlayer = args.from
+      ? this.players.find((p) => p.id === args.from)
+      : this.getPlayerTakingTurn();
+    if (!firstPlayer) {
+      throw new Error(`Player ${args.from} not in game.`);
+    }
+    const firstPlayerIndex = this.players.findIndex(
+      (p) => p.id === firstPlayer?.id,
+    );
+    const secondPlayerIndex = (firstPlayerIndex + 1) % this.players.length;
+    return { from: firstPlayer, to: this.players[secondPlayerIndex] };
+  }
+
   getActionById(args: { actionId: Id }) {
     const match = this.gameData.actions.find((a) => a.id === args.actionId);
     if (!match) {

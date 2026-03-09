@@ -44,6 +44,7 @@ const accessorTypes = [
   "getCards",
   "getChips",
   "getPlayerTakingTurn",
+  "getTurnTransition",
 ] as const;
 type AccessorType = (typeof accessorTypes)[number];
 type _AccessorArgs = {
@@ -65,6 +66,7 @@ type _AccessorArgs = {
     excludeIds?: Id[];
   };
   getPlayerTakingTurn: undefined;
+  getTurnTransition: { from?: Id };
 };
 export type AccessorArgs = {
   [K in AccessorType]: _AccessorArgs[K];
@@ -80,6 +82,7 @@ export interface IAccessor extends AccessorMethods<unknown> {
 
   getActionById(args: { actionId: Id }): DeepReadonly<ActionData>;
   getCardById(args: { cardId: Id }): DeepReadonly<CardData>;
+  /** Parameterized "query" for cards. */
   getCards(args: {
     playerIds?: Id[];
     types?: CardType[];
@@ -89,13 +92,20 @@ export interface IAccessor extends AccessorMethods<unknown> {
     maxChips?: number;
     excludeIds?: Id[];
   }): DeepReadonly<CardData>[];
+  /** Parameterized "query" for chips. */
   getChips(args: {
     playerIds?: Id[];
     locationTypes?: ChipLocationType[];
     cardIds?: Id[];
     excludeIds?: Id[];
   }): DeepReadonly<ChipData>[];
+  /** Returns the player data for the player currently taking their turn. */
   getPlayerTakingTurn(): DeepReadonly<PlayerData>;
+  /** Returns the player data for the given player––or the player currently taking their turn, if omitted––and the player that comes after them. */
+  getTurnTransition(args: { from?: Id }): {
+    from: DeepReadonly<PlayerData>;
+    to: DeepReadonly<PlayerData>;
+  };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,8 +120,6 @@ const mutationTypes = [
   "addWin",
 ] as const;
 type MutatorType = (typeof mutationTypes)[number];
-// TODO!!! No actions should have access to `passTurn` and `setActivity`
-// mutations.
 type _MutatorArgs = {
   moveChips: { ids: Id[]; location: ChipLocationData };
   moveCard: { id: Id; location: CardLocationData };
