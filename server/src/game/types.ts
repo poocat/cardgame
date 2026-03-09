@@ -159,8 +159,6 @@ export type CheckResult =
   | { ok: true; reasons?: never }
   | { ok: false; reasons: string[] };
 
-export type Annotation = { id: Id; message: string };
-
 export interface IAnnotator {
   add(args: { id: Id; messages: string[] }): void;
 }

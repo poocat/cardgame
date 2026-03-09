@@ -162,6 +162,11 @@ export type WinData = {
   onTick: Tick;
 };
 
+export type AnnotationData = {
+  id: Id;
+  message: string;
+};
+
 export type GameData = {
   /** An integer count of how many times the game state has been updated, since the beginning of the game. */
   tick: Tick;
@@ -174,4 +179,5 @@ export type GameData = {
   cards: CardData[];
   chips: ChipData[];
   wins: WinData[];
+  annotations: AnnotationData[];
 };

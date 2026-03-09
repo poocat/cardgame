@@ -1,5 +1,5 @@
-import type { Annotation, IAnnotator } from "@server/game/types";
-import type { Id } from "@server/types";
+import type { IAnnotator } from "@server/game/types";
+import type { AnnotationData, Id } from "@server/types";
 
 /******************************************************************************
  * ### Annotator
@@ -8,7 +8,7 @@ import type { Id } from "@server/types";
  * reasons why the current player cannot take a given action.
  ******************************************************************************/
 export class Annotator implements IAnnotator {
-  public annotations: Annotation[] = [];
+  public annotations: AnnotationData[] = [];
 
   add(args: { id: Id; messages: string[] }) {
     this.annotations.push(
