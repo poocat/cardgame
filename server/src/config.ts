@@ -8,7 +8,7 @@ export const CONFIG = {
   nodeEnv: process.env.NODE_ENV || "development",
   mongoDbName: process.env.MONGODB_NAME || "cardgame",
   mongoDbUri: process.env.MONGODB_URI || `mongodb://localhost:27017`,
-  privateCardsPath: process.env.PRIVATE_CARDS_PATH
-    ? path.resolve(process.env.PRIVATE_CARDS_PATH)
+  privatePath: process.env.PRIVATE_PATH
+    ? path.resolve(process.env.PRIVATE_PATH)
     : null,
 };
