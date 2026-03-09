@@ -1,4 +1,3 @@
-import { CONSTANTS } from "@common/game/constants";
 import { logger } from "@server/logger";
 import type { ErrorRequestHandler } from "express";
 import rateLimit from "express-rate-limit";

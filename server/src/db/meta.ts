@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from "crypto";
+import { createHash, randomUUID } from "node:crypto";
 import z from "zod";
 
 export const documentMetaSchema = z.strictObject({
