@@ -9,11 +9,11 @@
  * definitions and images.
  */
 
+import path from "node:path";
 import { CONFIG } from "@server/config";
 import type { ActionDef, CardDef } from "@server/game/types";
 import { logger } from "@server/logger";
 import type { ActionType } from "@server/types";
-import path from "node:path";
 import { cards as exampleCardMap } from "./examples";
 
 const cardMap = new Map<string, CardDef>();

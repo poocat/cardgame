@@ -15,11 +15,11 @@
  * have a rectangular 5:7 aspect ratio.
  */
 
+import fs from "node:fs";
+import path from "node:path";
 import { CONFIG } from "@server/config";
 import { logger } from "@server/logger";
 import { Router, static as staticFileHandler } from "express";
-import fs from "node:fs";
-import path from "node:path";
 
 export const cards = Router();
 

@@ -1,7 +1,13 @@
-import { DeleteResult, Document, Filter, Sort, UpdateResult } from "mongodb";
-import z from "zod";
-import { documentMetaSchema } from "@server/db/meta";
-import { GameData } from "@server/types";
+import type { documentMetaSchema } from "@server/db/meta";
+import type { GameData } from "@server/types";
+import type {
+  DeleteResult,
+  Document,
+  Filter,
+  Sort,
+  UpdateResult,
+} from "mongodb";
+import type z from "zod";
 
 type RepoDocMeta = z.infer<typeof documentMetaSchema>;
 
