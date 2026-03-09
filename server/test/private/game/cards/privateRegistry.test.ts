@@ -1,4 +1,4 @@
-import { cards } from "@server/game/cards/private";
+import { cards } from "@private/cards";
 import {
   allRegisteredCards,
   extendCardRegistry,

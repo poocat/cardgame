@@ -1,4 +1,3 @@
-[submodule "server/src/game/cards/private"]
-	path = server/src/game/cards/private
-	url = https://github.com/poocat/cardgame-cards.git
-    
+[submodule "private"]
+	path = private
+	url = https://github.com/poocat/cardgame-private.git

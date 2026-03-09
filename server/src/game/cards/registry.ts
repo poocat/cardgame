@@ -5,8 +5,7 @@
  * a custom set.
  *
  * This repository is configured to use a submodule at
- * `server/src/game/cards/private` as the source of all "official" card
- * definitions and images.
+ * `private/` as the source of all "official" card definitions and images.
  */
 
 import path from "node:path";
@@ -85,18 +84,18 @@ export function useExampleCards() {
 /******************************************************************************
  * ### usePrivateCards
  *
- * Resets the card registry and fills it with with cards in a "private"
- * directory located in `server/src/game/cards/private`.
+ * Resets the card registry and fills it with with cards from the private
+ * submodule located at `private/cards`.
  *
- * At a minimun, this directory must have an `index.ts` file, which exports
+ * The `cards` directory must have an `index.ts` file, which exports
  * an `Object` named `cards`, the values of which have the `CardDef` type
  * exported from `@server/game/types`.
  ******************************************************************************/
 export function usePrivateCards() {
-  if (!CONFIG.privateCardsPath) {
-    throw new Error("No private card path configured.");
+  if (!CONFIG.privatePath) {
+    throw new Error("No private path configured.");
   }
-  const { cards } = require(path.join(CONFIG.privateCardsPath, "index"));
+  const { cards } = require(path.join(CONFIG.privatePath, "cards", "index"));
   resetCardRegistry();
   extendCardRegistry({ cards: Object.values(cards) });
   logger.info({ count: cardMap.size }, "loaded private cards");
