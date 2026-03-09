@@ -5,8 +5,8 @@ import {
 import { Mutator } from "@server/game/runtime/Mutator";
 import type { ActivityData } from "@server/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { testCards } from "../../fixtures/cards";
-import { GameBuilder } from "../../helpers/GameBuilder";
+import { testCards } from "../../../fixtures/cards";
+import { GameBuilder } from "../../../helpers/GameBuilder";
 
 beforeAll(() => {
   extendCardRegistry({ cards: Object.values(testCards) });

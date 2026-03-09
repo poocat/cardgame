@@ -4,8 +4,8 @@ import {
 } from "@server/game/cards/registry";
 import { Accessor } from "@server/game/runtime/Accessor";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { testCards } from "../../fixtures/cards";
-import { GameBuilder } from "../../helpers/GameBuilder";
+import { testCards } from "../../../fixtures/cards";
+import { GameBuilder } from "../../../helpers/GameBuilder";
 
 beforeAll(() => {
   extendCardRegistry({ cards: Object.values(testCards) });

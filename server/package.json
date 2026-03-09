@@ -7,6 +7,7 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest run --config vitest.config.ts",
+    "test:public": "vitest run --config vitest.config.ts public",
     "test:watch": "vitest --config vitest.config.ts",
     "build": "tsc --build",
     "start": "ts-node -r tsconfig-paths/register src/index.ts"
