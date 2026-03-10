@@ -30,7 +30,7 @@ import {
 import { CardImage } from "./image";
 import "./styles.css";
 import { Tooltip } from "@client/components/tooltips";
-import type { ThumbnailHighlight } from "./thumbnail";
+import type { ThumbnailEmphasis } from "./thumbnail";
 import { Thumbnail, ThumbnailContainer } from "./thumbnail";
 
 /******************************************************************************
@@ -78,10 +78,10 @@ const CardSelectorEdge = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 export const ThumbnailPlaceholder = (props: {
   children?: React.ReactNode;
-  highlight: ThumbnailHighlight;
+  emphasis?: ThumbnailEmphasis;
 }) => {
   return (
-    <ThumbnailContainer highlight={props.highlight}>
+    <ThumbnailContainer emphasis={props.emphasis}>
       <Thumbnail placeholder>{props.children}</Thumbnail>
     </ThumbnailContainer>
   );
@@ -141,14 +141,17 @@ export const FaceUpThumbnail = memo(
       props.setDialog({ type: "card", card: props.card });
     }, [props.card, props.setDialog]);
 
-    const highlight: ThumbnailHighlight = cardHasChoice
-      ? "selectable"
-      : cardWasChosenPreviously
-        ? "selected"
-        : "none";
+    const emphasis =
+      props.selectorProps && cardHasChoice
+        ? "animated"
+        : cardHasChoice
+          ? "solid"
+          : cardWasChosenPreviously
+            ? "outlined"
+            : undefined;
 
     return (
-      <ThumbnailContainer highlight={highlight} exhausted={cardIsExhausted}>
+      <ThumbnailContainer emphasis={emphasis} exhausted={cardIsExhausted}>
         <Thumbnail onClick={expand}>
           <CardImage size="thumbnail" name={props.card.name} />
         </Thumbnail>

@@ -237,7 +237,7 @@ export const GameBoard = memo(
                 {/* Abutment not displayed for observing player. */}
                 {!isObserver && (
                   <PlayerAbutment>
-                    <ThumbnailPlaceholder highlight="none">
+                    <ThumbnailPlaceholder>
                       <div>
                         <div>Hand</div>
                         <div>{player.cardsInHand.length}</div>
@@ -266,7 +266,7 @@ export const GameBoard = memo(
                       />
                     ))}
                     {range(numProducerPlaceholders).map((i) => (
-                      <ThumbnailPlaceholder key={i} highlight="none" />
+                      <ThumbnailPlaceholder key={i} />
                     ))}
                   </PlayerTabletCardArea>
                   <PlayerTabletFooter>
