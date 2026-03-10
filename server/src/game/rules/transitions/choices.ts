@@ -134,7 +134,7 @@ export function createDrawingCardsChoice(args: {
 export function createChoosingActionChoice(args: {
   playerId: Id;
   accessor: IAccessor;
-  annotator: IAnnotator;
+  annotator?: IAnnotator;
 }): ChoiceData {
   // Filter through actions.
   const values = args.accessor
@@ -142,7 +142,7 @@ export function createChoosingActionChoice(args: {
     .filter((a) => {
       // Cannot take an action from another player's card.
       if (a.card.ownerId !== args.playerId) {
-        args.annotator.add({
+        args.annotator?.add({
           id: a.id,
           messages: ["This action is not on your card."],
         });
@@ -154,7 +154,7 @@ export function createChoosingActionChoice(args: {
         accessor: args.accessor,
       });
       if (!typeCheckResult.ok) {
-        args.annotator.add({ id: a.id, messages: typeCheckResult.reasons });
+        args.annotator?.add({ id: a.id, messages: typeCheckResult.reasons });
         return false;
       }
       const actionDef = getActionDefinition({
@@ -168,7 +168,7 @@ export function createChoosingActionChoice(args: {
           context: { cardId: a.card.id, playerTakingActionId: args.playerId },
         });
         if (!result.ok) {
-          args.annotator.add({ id: a.id, messages: result.reasons });
+          args.annotator?.add({ id: a.id, messages: result.reasons });
           return false;
         }
       }

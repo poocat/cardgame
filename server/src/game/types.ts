@@ -162,6 +162,7 @@ export type CheckResult =
 
 export interface IAnnotator {
   add(args: { id: Id; messages: string[] }): void;
+  clear(): void;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

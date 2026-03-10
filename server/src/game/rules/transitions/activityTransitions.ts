@@ -26,7 +26,7 @@ export const activityTypeNextActivity: ActivityTypeMap<
     accessor: IAccessor;
     currentDecisions: IDecisions;
     mutator: IMutator;
-    annotator: IAnnotator;
+    annotator?: IAnnotator;
   }) => void
 > = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
