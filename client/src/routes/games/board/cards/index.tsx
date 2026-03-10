@@ -29,6 +29,7 @@ import {
 } from "./detail";
 import { CardImage } from "./image";
 import "./styles.css";
+import { Tooltip } from "@client/components/tooltips";
 import type { ThumbnailHighlight } from "./thumbnail";
 import { Thumbnail, ThumbnailContainer } from "./thumbnail";
 
@@ -191,10 +192,11 @@ const DetailCardAction = (props: {
   actionType: string;
   actionId: string;
   instructions: string;
+  annotations: string[];
   onChange: () => void;
 }) => {
   const label = `[${props.actionType}] ${props.instructions}`;
-  return (
+  const button = (
     <SelectButton
       fullWidth
       border="dark"
@@ -206,6 +208,14 @@ const DetailCardAction = (props: {
       label={label}
     />
   );
+  if (props.annotations.length > 0) {
+    return (
+      <Tooltip side="right" content={props.annotations.join(" ")}>
+        {button}
+      </Tooltip>
+    );
+  }
+  return button;
 };
 
 /******************************************************************************
@@ -302,6 +312,7 @@ export const DetailCard = (props: {
                   actionId={action.id}
                   actionType={action.type}
                   instructions={action.instructions}
+                  annotations={action.annotations}
                   disabled={
                     !cardHasSelectableActions || !selectable || !toggleable
                   }
