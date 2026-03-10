@@ -40,7 +40,8 @@ export class Next {
   finish(): GameData {
     // Increment the game tick.
     this.gameData.tick += 1;
-    // TODO!!! Add annotations to game data!!!
+    // Update annotations.
+    this.gameData.annotations = this.annotator.annotations;
     return this.gameData;
   }
 }
