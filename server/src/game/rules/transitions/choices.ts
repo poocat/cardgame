@@ -136,19 +136,25 @@ export function createChoosingActionChoice(args: {
   accessor: IAccessor;
   annotator: IAnnotator;
 }): ChoiceData {
-  // Filtering through every action seems dumb, but...
-  const values = args.accessor.actions
+  // Filter through actions.
+  const values = args.accessor
+    .getVisibleActions({ playerId: args.playerId })
     .filter((a) => {
       // Cannot take an action from another player's card.
       if (a.card.ownerId !== args.playerId) {
+        args.annotator.add({
+          id: a.id,
+          messages: ["This action is not on your card."],
+        });
         return false;
       }
+
       const typeCheckResult = actionTypeChecks[a.type]({
         actionData: a,
         accessor: args.accessor,
       });
       if (!typeCheckResult.ok) {
-        args.annotator?.add({ id: a.id, messages: typeCheckResult.reasons });
+        args.annotator.add({ id: a.id, messages: typeCheckResult.reasons });
         return false;
       }
       const actionDef = getActionDefinition({
@@ -162,7 +168,7 @@ export function createChoosingActionChoice(args: {
           context: { cardId: a.card.id, playerTakingActionId: args.playerId },
         });
         if (!result.ok) {
-          args.annotator?.add({ id: a.id, messages: result.reasons });
+          args.annotator.add({ id: a.id, messages: result.reasons });
           return false;
         }
       }

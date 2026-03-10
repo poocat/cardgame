@@ -68,6 +68,19 @@ export class Accessor implements IAccessor {
     return match;
   }
 
+  getVisibleActions(args: { playerId: Id }) {
+    const allCardsInPlay = this.getCards({
+      locationTypes: ["inPlay"],
+    });
+    const playerCardsInHand = this.getCards({
+      playerIds: [args.playerId],
+      locationTypes: ["inHand"],
+    });
+    const cardIds = [...allCardsInPlay, ...playerCardsInHand].map((c) => c.id);
+    const ids = new Set(cardIds);
+    return this.actions.filter((a) => ids.has(a.card.id));
+  }
+
   getCardById(args: { cardId: Id }) {
     const match = this.gameData.cards.find((card) => card.id === args.cardId);
     if (!match) {

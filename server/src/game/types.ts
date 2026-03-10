@@ -81,6 +81,7 @@ export interface IAccessor extends AccessorMethods<unknown> {
   actions: DeepReadonly<ActionData[]>;
 
   getActionById(args: { actionId: Id }): DeepReadonly<ActionData>;
+  getVisibleActions(args: { playerId: Id }): DeepReadonly<ActionData[]>;
   getCardById(args: { cardId: Id }): DeepReadonly<CardData>;
   /** Parameterized "query" for cards. */
   getCards(args: {
