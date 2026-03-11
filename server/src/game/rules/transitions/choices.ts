@@ -71,19 +71,28 @@ export function createActionChoice(args: {
   currentDecisions: IDecisions;
   actionContext: ActionContext;
 }): ChoiceData {
-  const values = args.choiceDef.getValues({
+  const commonArgs = {
     accessor: args.accessor,
     currentDecisions: args.currentDecisions,
     context: {
       ...args.actionContext,
       choosingPlayerId: args.actionContext.playerTakingActionId,
     },
-  });
+  };
+  const values = args.choiceDef.getValues(commonArgs);
+  const min =
+    args.choiceDef.min ??
+    args.choiceDef.getMin?.({ ...commonArgs, values }) ??
+    0;
+  const max =
+    args.choiceDef.max ??
+    args.choiceDef.getMax?.({ ...commonArgs, values }) ??
+    9999;
   return {
     name: args.choiceDef.name,
     type: args.choiceDef.type,
-    min: args.choiceDef.min,
-    max: args.choiceDef.max,
+    min,
+    max,
     choosingPlayerId: args.actionContext.playerTakingActionId,
     instructions: args.choiceDef.instructions,
     values,
