@@ -1,9 +1,13 @@
+import { Box, Divider, Stack, TooltipProvider } from "@client/components";
 import { Game } from "@client/routes/games/Game";
 import { GameList } from "@client/routes/games/GameList";
 import { NewRoom } from "@client/routes/rooms/NewRoom";
 import { Room } from "@client/routes/rooms/Room";
 import { Link, Outlet, Route, Routes } from "react-router";
-import { Box, Divider, Stack } from "./components/layout";
+
+const Providers = (props: { children: React.ReactNode }) => {
+  return <TooltipProvider>{props.children}</TooltipProvider>;
+};
 
 const Layout = () => {
   return (
@@ -22,18 +26,20 @@ const Layout = () => {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<NewRoom />} />
-        <Route path="/games">
-          <Route index element={<GameList />} />
-          <Route path=":gameId" element={<Game />} />
+    <Providers>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<NewRoom />} />
+          <Route path="/games">
+            <Route index element={<GameList />} />
+            <Route path=":gameId" element={<Game />} />
+          </Route>
+          <Route path="/rooms">
+            <Route path=":roomId" element={<Room />} />
+          </Route>
         </Route>
-        <Route path="/rooms">
-          <Route path=":roomId" element={<Room />} />
-        </Route>
-      </Route>
-    </Routes>
+      </Routes>
+    </Providers>
   );
 }
 

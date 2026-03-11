@@ -29,7 +29,8 @@ import {
 } from "./detail";
 import { CardImage } from "./image";
 import "./styles.css";
-import type { ThumbnailHighlight } from "./thumbnail";
+import { Tooltip } from "@client/components/tooltips";
+import type { ThumbnailEmphasis } from "./thumbnail";
 import { Thumbnail, ThumbnailContainer } from "./thumbnail";
 
 /******************************************************************************
@@ -77,10 +78,10 @@ const CardSelectorEdge = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 export const ThumbnailPlaceholder = (props: {
   children?: React.ReactNode;
-  highlight: ThumbnailHighlight;
+  emphasis?: ThumbnailEmphasis;
 }) => {
   return (
-    <ThumbnailContainer highlight={props.highlight}>
+    <ThumbnailContainer emphasis={props.emphasis}>
       <Thumbnail placeholder>{props.children}</Thumbnail>
     </ThumbnailContainer>
   );
@@ -140,14 +141,17 @@ export const FaceUpThumbnail = memo(
       props.setDialog({ type: "card", card: props.card });
     }, [props.card, props.setDialog]);
 
-    const highlight: ThumbnailHighlight = cardHasChoice
-      ? "selectable"
-      : cardWasChosenPreviously
-        ? "selected"
-        : "none";
+    const emphasis =
+      props.selectorProps && cardHasChoice
+        ? "animated"
+        : cardHasChoice
+          ? "solid"
+          : cardWasChosenPreviously
+            ? "outlined"
+            : undefined;
 
     return (
-      <ThumbnailContainer highlight={highlight} exhausted={cardIsExhausted}>
+      <ThumbnailContainer emphasis={emphasis} exhausted={cardIsExhausted}>
         <Thumbnail onClick={expand}>
           <CardImage size="thumbnail" name={props.card.name} />
         </Thumbnail>
@@ -191,10 +195,11 @@ const DetailCardAction = (props: {
   actionType: string;
   actionId: string;
   instructions: string;
+  annotations: string[];
   onChange: () => void;
 }) => {
   const label = `[${props.actionType}] ${props.instructions}`;
-  return (
+  const button = (
     <SelectButton
       fullWidth
       border="dark"
@@ -206,6 +211,14 @@ const DetailCardAction = (props: {
       label={label}
     />
   );
+  if (props.annotations.length > 0) {
+    return (
+      <Tooltip side="right" content={props.annotations.join(" ")}>
+        {button}
+      </Tooltip>
+    );
+  }
+  return button;
 };
 
 /******************************************************************************
@@ -302,6 +315,7 @@ export const DetailCard = (props: {
                   actionId={action.id}
                   actionType={action.type}
                   instructions={action.instructions}
+                  annotations={action.annotations}
                   disabled={
                     !cardHasSelectableActions || !selectable || !toggleable
                   }

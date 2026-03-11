@@ -208,12 +208,15 @@ export function makeDecision(args: {
           mutator: next.mutatorQueue,
         });
         nextAccessor = next.dequeueMutations();
+        // Clear annotations, as they are only relevant to the next activity.
+        next.annotator.clear();
         // Generate and apply the next activity using the updated game data.
         activityTypeNextActivity[currentActivity.type]({
           playerData: playerTakingTurn,
           accessor: nextAccessor,
           currentDecisions,
           mutator: next.mutatorQueue,
+          annotator: next.annotator,
         });
         /**
          * TODO!!!

@@ -295,6 +295,7 @@ export class GameBuilder {
       cards,
       chips,
       wins: [],
+      annotations: [],
     };
   }
 }

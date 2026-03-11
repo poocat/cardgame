@@ -4,6 +4,7 @@ import type {
   ActionContext,
   ChoiceDef,
   IAccessor,
+  IAnnotator,
   IDecisions,
 } from "@server/game/types";
 import type {
@@ -113,6 +114,7 @@ export function createDrawingCardsChoice(args: {
       types: ["producer"],
       locationTypes: ["inDeck"],
     });
+    // TODO!!! "Producer" and "consumer" are generic terms. Allow themed terminology.
     if (producers.length > 0) values.push("producer");
     if (consumers.length > 0) values.push("consumer");
   }
@@ -133,19 +135,27 @@ export function createDrawingCardsChoice(args: {
 export function createChoosingActionChoice(args: {
   playerId: Id;
   accessor: IAccessor;
+  annotator?: IAnnotator;
 }): ChoiceData {
-  // Filtering through every action seems dumb, but...
-  const values = args.accessor.actions
+  // Filter through actions.
+  const values = args.accessor
+    .getVisibleActions({ playerId: args.playerId })
     .filter((a) => {
       // Cannot take an action from another player's card.
       if (a.card.ownerId !== args.playerId) {
+        args.annotator?.add({
+          id: a.id,
+          messages: ["This is not your card."],
+        });
         return false;
       }
+
       const typeCheckResult = actionTypeChecks[a.type]({
         actionData: a,
         accessor: args.accessor,
       });
       if (!typeCheckResult.ok) {
+        args.annotator?.add({ id: a.id, messages: typeCheckResult.reasons });
         return false;
       }
       const actionDef = getActionDefinition({
@@ -159,6 +169,7 @@ export function createChoosingActionChoice(args: {
           context: { cardId: a.card.id, playerTakingActionId: args.playerId },
         });
         if (!result.ok) {
+          args.annotator?.add({ id: a.id, messages: result.reasons });
           return false;
         }
       }

@@ -1,26 +1,25 @@
 import { ButtonBase } from "@client/components";
 import "./styles.css";
 
-export type ThumbnailHighlight = "selectable" | "selected" | "none";
+export type ThumbnailEmphasis = "solid" | "outlined" | "animated";
 
 /******************************************************************************
  * ### ThumbnailContainer
  *
  * Container for thumbnail card or card placeholder.
  *
- * Can be used to highlight the card as "selectable" (card is selectable, or
- * has a selectable item on it) or "selected" (card or item on card was selected
- * for a previous choice in the current activity).
+ * Can be used to emphasize the card with a "solid" background, an "outlined"
+ * background, or an "animated" background (which is just the "solid"
+ * background that pulses).
  ******************************************************************************/
 export const ThumbnailContainer = (props: {
-  highlight: ThumbnailHighlight;
+  emphasis?: ThumbnailEmphasis;
   exhausted?: boolean;
   children?: React.ReactNode;
 }) => {
-  const classNames = [
-    "game-card-container",
-    `game-card-container--${props.highlight}`,
-  ];
+  const classNames = ["game-card-container"];
+  if (props.emphasis)
+    classNames.push(`game-card-container--emphasis-${props.emphasis}`);
   if (props.exhausted) classNames.push(`game-card-container--exhausted`);
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;

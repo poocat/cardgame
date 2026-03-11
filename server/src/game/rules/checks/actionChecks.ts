@@ -25,7 +25,7 @@ export const actionTypeChecks: ActionTypeMap<
       reasons.push(...result.reasons);
     }
     if (matchingCard.location.type !== "inHand") {
-      reasons.push("Card belonging to action is not in hand.");
+      reasons.push("This card is already in play.");
     }
     if (reasons.length > 0) {
       return { ok: false, reasons };
@@ -42,11 +42,11 @@ export const actionTypeChecks: ActionTypeMap<
     const matchingCard = accessor.getCardById({ cardId: actionData.card.id });
     const reasons: string[] = [];
     if (!matchingCard) {
-      reasons.push("Card belonging to action not in game.");
+      reasons.push("This card is not in the game.");
     } else if (matchingCard.location.type !== "inPlay") {
-      reasons.push("Card is not in play.");
+      reasons.push("This card is not in play.");
     } else if (matchingCard?.location.exhausted) {
-      reasons.push("Card is exhausted.");
+      reasons.push("This card is exhausted.");
     }
     if (reasons.length > 0) {
       return { ok: false, reasons };
@@ -63,11 +63,11 @@ export const actionTypeChecks: ActionTypeMap<
     const matchingCard = accessor.getCardById({ cardId: actionData.card.id });
     const reasons: string[] = [];
     if (!matchingCard) {
-      reasons.push("Card belonging to action not in game.");
+      reasons.push("This card is not in the game.");
     } else if (matchingCard.location.type !== "inPlay") {
-      reasons.push("Card is not in play.");
+      reasons.push("This card is not in play.");
     } else if (matchingCard?.location.exhausted) {
-      reasons.push("Card is exhausted.");
+      reasons.push("This card is exhausted.");
     }
     if (reasons.length > 0) {
       return { ok: false, reasons };

@@ -44,6 +44,7 @@ export const actionDigestSchema = z.strictObject({
   id: idSchema,
   type: z.union(actionTypes.map((t) => z.literal(t))),
   instructions: z.string(),
+  annotations: z.array(z.string()),
 });
 
 export const chipDigestSchema = z.strictObject({

@@ -101,6 +101,18 @@ export function digestGameData({
 
   const otherPlayerData = gameData.players.filter((p) => p.id !== playerId);
   const observingPlayerData = gameData.players.find((p) => p.id === playerId);
+  const observingPlayerIsChoosing =
+    playerId === gameData.activity.currentChoice.choosingPlayerId;
+
+  // If the requesting player is choosing, provide annotations.
+  const annotationMap: Record<Id, string[]> = {};
+  if (observingPlayerIsChoosing) {
+    gameData.annotations.forEach(({ id, message }) => {
+      const match = annotationMap[id];
+      if (match) match.push(message);
+      else annotationMap[id] = [message];
+    });
+  }
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Use to create digests for cards that are visible to the observing player.
@@ -114,8 +126,14 @@ export function digestGameData({
     for (const type of actionTypes) {
       const match = cardActions.find((a) => a.type === type);
       if (match)
-        actions.push({ id: match.id, type, instructions: match.instructions });
+        actions.push({
+          id: match.id,
+          type,
+          instructions: match.instructions,
+          annotations: annotationMap[match.id] ?? [],
+        });
     }
+
     return {
       id: cardData.id,
       name: cardData.name,

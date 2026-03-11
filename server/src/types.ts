@@ -133,7 +133,7 @@ export type ChoiceData = _DiscriminatedUnionFromArray<
     max: number | null;
   }
 >;
-/** When an activity requires multiple choices, all but the first may be "dependent" on previous choices made during the activity. */
+/** Actions can precipitate multiple choices. All but the first are "dependent" on previous choices made during the activity. */
 export type NextChoiceData = { index: number; playerId: Id };
 
 export type Decision = { name: string; playerId: Id; values: ChoiceValue[] };
@@ -162,6 +162,11 @@ export type WinData = {
   onTick: Tick;
 };
 
+export type AnnotationData = {
+  id: Id;
+  message: string;
+};
+
 export type GameData = {
   /** An integer count of how many times the game state has been updated, since the beginning of the game. */
   tick: Tick;
@@ -174,4 +179,5 @@ export type GameData = {
   cards: CardData[];
   chips: ChipData[];
   wins: WinData[];
+  annotations: AnnotationData[];
 };

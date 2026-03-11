@@ -3,30 +3,38 @@
 ***************************************************************************/
 
 .game-card-container {
-  padding: 3px; /* Padding is necessary to ensure that the highlight is visible. */
+  padding: 3px; /* Padding is necessary to ensure that any emphasis is visible. */
   border-radius: 5px;
   transition: transform 0.5s;
-}
-
-.game-card-container--selectable {
-  background-color: var(--color-lowlight);
-  animation: pulse-lowlight 1500ms ease-in-out infinite;
-}
-
-.game-card-container--selected {
-  outline: 1px solid var(--color-lowlight);
 }
 
 .game-card-container--exhausted {
   transform: rotate(5deg);
 }
 
-.game-player-center .game-card-container--selectable {
+.game-card-container--emphasis-animated {
+  background-color: var(--color-lowlight);
+  animation: pulse-lowlight 1500ms ease-in-out infinite;
+}
+
+.game-card-container--emphasis-solid {
+  background-color: var(--color-lowlight);
+}
+
+.game-card-container--emphasis-outlined {
+  outline: 1px solid var(--color-lowlight);
+}
+
+.game-player-center .game-card-container--emphasis-animated {
   background-color: var(--color-highlight);
   animation: pulse-highlight 1500ms ease-in-out infinite;
 }
 
-.game-player-center .game-card-container--selected {
+.game-player-center .game-card-container--emphasis-solid {
+  background-color: var(--color-highlight);
+}
+
+.game-player-center .game-card-container--emphasis-outlined {
   outline: 1px solid var(--color-highlight);
 }
 

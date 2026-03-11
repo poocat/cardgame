@@ -105,6 +105,7 @@ export function initGameData(
       nextChoices: [],
     },
     wins: [],
+    annotations: [],
   };
   return data;
 }
