@@ -21,10 +21,14 @@ export const cardPlayChecks: CardTypeMap<
       types: ["producer"],
       locationTypes: ["inPlay"],
     });
-    if (inPlay.length >= CONSTANTS.maxNumProducersInPlay) {
+    if (
+      cardData.location.type !== "inPlay" &&
+      inPlay.length >= CONSTANTS.maxNumProducersInPlay
+    ) {
       return {
         ok: false,
         reasons: [
+          // TODO!!! "Producers" is the generic term. Allow themed terminology.
           `Already ${CONSTANTS.maxNumProducersInPlay} producers in play.`,
         ],
       };
@@ -43,11 +47,15 @@ export const cardPlayChecks: CardTypeMap<
       types: ["consumer"],
       locationTypes: ["inPlay"],
     });
-    if (inPlay.length >= CONSTANTS.maxNumConsumersInPlay) {
+    if (
+      cardData.location.type !== "inPlay" &&
+      inPlay.length >= CONSTANTS.maxNumConsumersInPlay
+    ) {
       return {
         ok: false,
         reasons: [
-          `Already ${CONSTANTS.maxNumConsumersInPlay} consumer in play.`,
+          // TODO!!! "Consumers" is the generic term. Allow themed terminology.
+          `Already ${CONSTANTS.maxNumConsumersInPlay} consumers in play.`,
         ],
       };
     } else {

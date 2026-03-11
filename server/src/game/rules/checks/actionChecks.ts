@@ -25,7 +25,7 @@ export const actionTypeChecks: ActionTypeMap<
       reasons.push(...result.reasons);
     }
     if (matchingCard.location.type !== "inHand") {
-      reasons.push("This card is not in your hand.");
+      reasons.push("This card is already in play.");
     }
     if (reasons.length > 0) {
       return { ok: false, reasons };

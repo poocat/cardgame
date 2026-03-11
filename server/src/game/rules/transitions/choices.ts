@@ -114,6 +114,7 @@ export function createDrawingCardsChoice(args: {
       types: ["producer"],
       locationTypes: ["inDeck"],
     });
+    // TODO!!! "Producer" and "consumer" are generic terms. Allow themed terminology.
     if (producers.length > 0) values.push("producer");
     if (consumers.length > 0) values.push("consumer");
   }
@@ -144,7 +145,7 @@ export function createChoosingActionChoice(args: {
       if (a.card.ownerId !== args.playerId) {
         args.annotator?.add({
           id: a.id,
-          messages: ["This action is not on your card."],
+          messages: ["This is not your card."],
         });
         return false;
       }
