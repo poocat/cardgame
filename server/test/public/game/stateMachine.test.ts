@@ -902,4 +902,124 @@ describe("makeDecision", () => {
       expect(chips.length).toBe(2);
     });
   });
+
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Annotations
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  describe("annotations", () => {
+    it("annotates actions that cannot be taken when card is in play", () => {
+      const game = new GameBuilder()
+        .addPlayer("alice")
+        .addPlayer("bob")
+        .addCard({
+          id: "c1",
+          name: testCards.basicProducer.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: false },
+          actionIdMap: { play: "c1-play" },
+        })
+        .setActivity({
+          type: "drawingCards",
+          currentChoice: {
+            type: "arbitrary",
+            name: "foobar",
+            values: [],
+            min: 0,
+            max: 1,
+            choosingPlayerId: "alice",
+            instructions: "",
+          },
+          nextChoices: [],
+          previousDecisions: [],
+        })
+        .setPlayerTakingTurn("alice")
+        .build();
+
+      // Draw no cards from empty deck.
+      const result = makeDecision({
+        gameData: game,
+        decision: {
+          playerId: "alice",
+          name: game.activity.currentChoice.name,
+          values: [],
+        },
+      });
+
+      const annotatedIds = result.annotations.map((a) => a.id);
+      expect(annotatedIds).toContain("c1-play");
+    });
+
+    it("annotates actions that cannot be taken from the player's hand", () => {
+      const game = new GameBuilder()
+        .addPlayer("alice")
+        .addPlayer("bob")
+        .addCard({
+          id: "c1",
+          name: testCards.basicProducer.name,
+          owner: "alice",
+          location: { type: "inHand" },
+          actionIdMap: { ability: "c1-ability", discard: "c1-discard" },
+        })
+        .setActivity({
+          type: "drawingCards",
+          currentChoice: {
+            type: "arbitrary",
+            name: "foobar",
+            values: [],
+            min: 0,
+            max: 1,
+            choosingPlayerId: "alice",
+            instructions: "",
+          },
+          nextChoices: [],
+          previousDecisions: [],
+        })
+        .setPlayerTakingTurn("alice")
+        .build();
+
+      // Draw no cards from empty deck.
+      const result = makeDecision({
+        gameData: game,
+        decision: {
+          playerId: "alice",
+          name: game.activity.currentChoice.name,
+          values: [],
+        },
+      });
+
+      const annotatedIds = result.annotations.map((a) => a.id);
+      expect(annotatedIds).toContain("c1-ability");
+      expect(annotatedIds).toContain("c1-discard");
+    });
+
+    it("annotates actions that cannot be taken from exhausted card", () => {
+      const game = new GameBuilder()
+        .addPlayer("alice")
+        .addPlayer("bob")
+        .addCard({
+          id: "c1",
+          name: testCards.producerWithTrivialActions.name,
+          owner: "alice",
+          location: { type: "inPlay", exhausted: true },
+          actionIdMap: { ability: "c1-ability", discard: "c1-discard" },
+        })
+        .setUpActionActivity("c1-ability")
+        .setPlayerTakingTurn("alice")
+        .build();
+
+      // Choose the action. Should resolve immediately, and exhaust the card.
+      const result = makeDecision({
+        gameData: game,
+        decision: {
+          playerId: "alice",
+          name: game.activity.currentChoice.name,
+          values: ["c1-ability"],
+        },
+      });
+
+      const annotatedIds = result.annotations.map((a) => a.id);
+      expect(annotatedIds).toContain("c1-ability");
+      expect(annotatedIds).toContain("c1-discard");
+    });
+  });
 });

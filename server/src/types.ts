@@ -133,7 +133,7 @@ export type ChoiceData = _DiscriminatedUnionFromArray<
     max: number | null;
   }
 >;
-/** When an activity requires multiple choices, all but the first may be "dependent" on previous choices made during the activity. */
+/** Actions can precipitate multiple choices. All but the first are "dependent" on previous choices made during the activity. */
 export type NextChoiceData = { index: number; playerId: Id };
 
 export type Decision = { name: string; playerId: Id; values: ChoiceValue[] };

@@ -11,7 +11,11 @@ export const testCards = {
   dummyProducer: {
     name: "Dummy Producer",
     type: "producer",
-    actions: {},
+    actions: {
+      play: {},
+      ability: {},
+      discard: {},
+    },
   },
   dummyConsumer: {
     name: "Dummy Consumer",
@@ -21,7 +25,8 @@ export const testCards = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * A producer that can be brought into play without any conditions, can be
    * discarded, and has an action that is always available (so long as the card
-   * is in play), and does not affect the game state.
+   * is in play), which requires one choice (which cannot be made
+   * automatically), and does not affect the game state.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   basicProducer: {
     name: "Playable Producer",
@@ -44,6 +49,19 @@ export const testCards = {
           affect: () => {},
         },
       },
+      discard: {},
+    },
+  },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * A producer with all action types, but actions are trivial (do not require
+   * choices, and do not affect game state except for triggered effects).
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  producerWithTrivialActions: {
+    name: "Dummy Producer",
+    type: "producer",
+    actions: {
+      play: {},
+      ability: {},
       discard: {},
     },
   },
