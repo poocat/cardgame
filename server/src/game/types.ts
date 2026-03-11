@@ -174,9 +174,23 @@ export type ChoiceDef = {
   type: ChoiceType;
   instructions: string;
   /** Use to indicate the minimum number of options the player must select from the given options. */
-  min: number;
+  min?: number;
   /** Use to indicate the maximum number of options the player may select from the given options. */
-  max: number;
+  max?: number;
+  /** To to generate a value for `min` if undefined. */
+  getMin?: (args: {
+    accessor: IAccessor;
+    currentDecisions: Decisions;
+    context: ActionContext & { choosingPlayerId: Id };
+    values: ChoiceValue[];
+  }) => number;
+  /** To to generate a value for `max` if undefined. */
+  getMax?: (args: {
+    accessor: IAccessor;
+    currentDecisions: Decisions;
+    context: ActionContext & { choosingPlayerId: Id };
+    values: ChoiceValue[];
+  }) => number;
   /** Use to retrieve the values to choose between from the game data. */
   getValues: (args: {
     accessor: IAccessor;
