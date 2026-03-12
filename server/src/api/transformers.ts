@@ -137,10 +137,13 @@ export function digestGameData({
         });
     }
 
+    const imageSourceLink = cardDef.links?.find((l) => l.type === "imgsrc");
+
     return {
       id: cardData.id,
       name: cardData.name,
       triggerInstructions: cardDef.trigger?.instructions ?? "",
+      imageSourceUrl: imageSourceLink?.url ?? "",
       type: cardData.type,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
       lastMovedOnTick: cardData.lastMovedOnTick,

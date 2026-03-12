@@ -55,6 +55,7 @@ export const visibleCardDigestSchema = z.strictObject({
   id: idSchema,
   name: z.string(),
   triggerInstructions: z.string().nullable(),
+  imageSourceUrl: z.string().optional(),
   type: z.union(cardTypes.map((t) => z.literal(t))),
   lastMovedOnTick: z.number().int(),
   lastMovedOnTurn: z.number().int(),
