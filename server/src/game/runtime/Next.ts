@@ -24,17 +24,23 @@ export class Next {
     this.annotator = new Annotator();
   }
 
-  get activity(): ActivityData {
+  getActivity(): ActivityData {
     return this.gameData.activity;
+  }
+
+  getAccessor(opts?: { clone?: boolean }): Accessor {
+    const gameData = opts?.clone
+      ? structuredClone(this.gameData)
+      : this.gameData;
+    return new Accessor(gameData);
   }
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Use to apply all the currently queued mutations and return the updated
    * game data.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  dequeueMutations(): Accessor {
+  dequeueMutations() {
     this.mutatorQueue.apply(new Mutator(this.gameData));
-    return new Accessor(this.gameData);
   }
 
   finish(): GameData {

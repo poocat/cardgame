@@ -170,8 +170,9 @@ export function makeDecision(args: {
           currentDecisions,
         }),
       });
-      currentAccessor = next.dequeueMutations();
-      currentActivity = next.activity;
+      next.dequeueMutations();
+      currentAccessor = next.getAccessor({ clone: true });
+      currentActivity = next.getActivity();
       if (args.autoDecide)
         currentAutoDecisions = getAutoDecisions({
           currentAccessor,
@@ -193,31 +194,33 @@ export function makeDecision(args: {
           mutator: next.mutatorQueue,
           // logger: logger, // Something to think about...
         });
-        let nextAccessor = next.dequeueMutations();
+        next.dequeueMutations();
         // Fire triggers for this activity, based on changes to the game data.
         activityTypeTriggeredEffects[currentActivity.type]({
           current: currentAccessor,
-          next: nextAccessor,
+          next: next.getAccessor(),
           mutator: next.mutatorQueue,
         });
-        nextAccessor = next.dequeueMutations();
+        next.dequeueMutations();
         // Look for any custom triggers on cards in play and fire.
         triggeredEffects({
           current: currentAccessor,
-          next: nextAccessor,
+          next: next.getAccessor(),
           mutator: next.mutatorQueue,
         });
-        nextAccessor = next.dequeueMutations();
+        next.dequeueMutations();
         // Clear annotations, as they are only relevant to the next activity.
         next.annotator.clear();
         // Generate and apply the next activity using the updated game data.
         activityTypeNextActivity[currentActivity.type]({
           playerData: playerTakingTurn,
-          accessor: nextAccessor,
+          accessor: next.getAccessor(),
           currentDecisions,
           mutator: next.mutatorQueue,
           annotator: next.annotator,
         });
+        next.dequeueMutations();
+
         /**
          * TODO!!!
          * It's possible for the activity to stick a player with an impossible
@@ -225,9 +228,19 @@ export function makeDecision(args: {
          * the number of values available. Need to figure out how to catch this
          * and roll back.
          */
-        const previousActivityType = currentActivity.type;
-        currentAccessor = next.dequeueMutations();
-        currentActivity = next.activity;
+
+        logger.info(
+          {
+            currentActivityType: currentActivity.type,
+            nextActivityType: next.getActivity().type,
+            playerId: args.decision.playerId,
+          },
+          "activity transitioned",
+        );
+
+        // Update references.
+        currentAccessor = next.getAccessor({ clone: true });
+        currentActivity = next.getActivity();
         if (args.autoDecide)
           currentAutoDecisions = getAutoDecisions({
             currentAccessor,
@@ -237,15 +250,6 @@ export function makeDecision(args: {
           ...currentDecisions.getDecisions(),
           ...currentAutoDecisions,
         ]);
-
-        logger.info(
-          {
-            previousActivityType,
-            newActivityType: currentActivity.type,
-            playerId: args.decision.playerId,
-          },
-          "activity transitioned",
-        );
 
         if (activityLoopCount++ >= 10) {
           // Canary in a coal mine...
