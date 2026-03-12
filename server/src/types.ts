@@ -52,9 +52,6 @@ export type ActionData = _DiscriminatedUnionFromArray<
     id: Id;
     // TODO!!! Name and owner are copies of card data. Should normalize.
     card: { id: Id; name: string; ownerId: Id };
-    // TODO!!! The instructions should come directly from the card definition
-    // at "digest" time.
-    instructions: string;
   }
 >;
 
@@ -101,7 +98,6 @@ export type CardData = _DiscriminatedUnionFromArray<
     location: CardLocationData;
     lastMovedOnTick: Tick;
     lastMovedOnTurn: Turn;
-    triggerInstructions: string | null;
   }
 >;
 
