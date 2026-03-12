@@ -45,7 +45,6 @@ export function initGameData(
         lastMovedOnTick: 0,
         lastMovedOnTurn: 0,
         ownerId: id,
-        triggerInstructions: c.trigger?.instructions ?? null,
       }));
       shuffle(playerCards);
       cards.push(...playerCards);
@@ -69,16 +68,13 @@ export function initGameData(
     const actions: GameData["actions"] = [];
     cards.forEach((c) => {
       const cardDef = getCardDefinition(c.name);
-      Object.entries(cardDef?.actions ?? {}).forEach(
-        ([actionType, actionDef]) => {
-          actions.push({
-            id: makeId(),
-            type: actionType as ActionType,
-            card: { name: c.name, id: c.id, ownerId: c.ownerId },
-            instructions: actionDef.instructions ?? "",
-          });
-        },
-      );
+      Object.keys(cardDef?.actions ?? {}).forEach((actionType) => {
+        actions.push({
+          id: makeId(),
+          type: actionType as ActionType,
+          card: { name: c.name, id: c.id, ownerId: c.ownerId },
+        });
+      });
     });
     return actions;
   })(cardData);

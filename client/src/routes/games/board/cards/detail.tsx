@@ -39,10 +39,28 @@ export const CardDetailForeground = (props: { children?: React.ReactNode }) => {
 };
 
 /******************************************************************************
+ * ### CardDetailHeader
+ ******************************************************************************/
+export const CardDetailHeader = (props: { children: React.ReactNode }) => {
+  return <div className="game-dialog__card-header">{props.children}</div>;
+};
+
+/******************************************************************************
  * ### CardDetailName
  ******************************************************************************/
-export const CardDetailName = (props: { children?: React.ReactNode }) => {
+export const CardDetailName = (props: { children: React.ReactNode }) => {
   return <div className="game-dialog__card-name">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### CardDetailLink
+ ******************************************************************************/
+export const CardDetailLink = (props: { url: string }) => {
+  return (
+    <div className="game-dialog__card-link">
+      <a href={props.url}>source</a>
+    </div>
+  );
 };
 
 /******************************************************************************

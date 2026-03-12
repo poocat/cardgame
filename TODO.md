@@ -2,11 +2,11 @@
 
 - [ ] Add unit tests for API.
 - [ ] Write helpers for defining common actions for cards.
-- [ ] Support different language translations of game instructions.
+- [ ] Support different language transformations of game instructions.
 - [ ] Support "development" activity.
-- [ ] Add external links to image source.
 - [ ] Add "recent events" log to UI.
 - [ ] Mutate game state on each step of sequence.
+- [x] Add external links to image source.
 - [x] Add tooltips to actions that you cannot take stating the reasons why.
 - [x] Add "auto decide" scenarios.
 - [x] Display trigger instructions on cards.

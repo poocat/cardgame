@@ -205,7 +205,6 @@ export class GameBuilder {
         location: spec.location,
         lastMovedOnTick: 0,
         lastMovedOnTurn: 0,
-        triggerInstructions: "",
       };
     });
 
@@ -234,7 +233,6 @@ export class GameBuilder {
               id: actionId,
               type: actionType as ActionType,
               card: { id: card.id, name: card.name, ownerId: card.ownerId },
-              instructions: actionDef.instructions ?? "",
             });
           }
         }

@@ -19,6 +19,7 @@ import type {
 } from "@common/api/digests";
 import { actionTypes } from "@common/game/enums";
 import type { RoomDoc } from "@server/db/types";
+import { getCardDefinition } from "@server/game/cards/registry";
 import type { CardData, Decision, GameData, Id } from "@server/types";
 import type z from "zod";
 
@@ -118,26 +119,31 @@ export function digestGameData({
    * Use to create digests for cards that are visible to the observing player.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   function visibleCardDigest(cardData: CardData): VisibleCardDigest {
+    const cardDef = getCardDefinition(cardData.name);
     // Actions should be displayed in order.
     const cardActions = gameData.actions.filter(
       (a) => a.card.id === cardData.id,
     );
     const actions: VisibleCardDigest["actions"] = [];
     for (const type of actionTypes) {
-      const match = cardActions.find((a) => a.type === type);
-      if (match)
+      const matchDef = cardDef.actions[type];
+      const matchData = cardActions.find((a) => a.type === type);
+      if (matchDef && matchData)
         actions.push({
-          id: match.id,
+          id: matchData.id,
           type,
-          instructions: match.instructions,
-          annotations: annotationMap[match.id] ?? [],
+          instructions: matchDef.instructions ?? "",
+          annotations: annotationMap[matchData.id] ?? [],
         });
     }
+
+    const imageSourceLink = cardDef.links?.find((l) => l.type === "imgsrc");
 
     return {
       id: cardData.id,
       name: cardData.name,
-      triggerInstructions: cardData.triggerInstructions,
+      triggerInstructions: cardDef.trigger?.instructions ?? "",
+      imageSourceUrl: imageSourceLink?.url ?? "",
       type: cardData.type,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
       lastMovedOnTick: cardData.lastMovedOnTick,

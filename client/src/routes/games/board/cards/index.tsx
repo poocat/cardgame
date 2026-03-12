@@ -23,6 +23,8 @@ import {
   CardDetailBody,
   CardDetailContainer,
   CardDetailForeground,
+  CardDetailHeader,
+  CardDetailLink,
   CardDetailMenuContainer,
   CardDetailName,
   CardDetailTriggerInstructions,
@@ -289,7 +291,12 @@ export const DetailCard = (props: {
 
   return (
     <CardDetailContainer>
-      <CardDetailName>{props.card.name}</CardDetailName>
+      <CardDetailHeader>
+        <CardDetailName>{props.card.name}</CardDetailName>
+        {props.card.imageSourceUrl && (
+          <CardDetailLink url={props.card.imageSourceUrl} />
+        )}
+      </CardDetailHeader>
       <CardDetailBody type={props.card.type}>
         <CardDetailBackground>
           <CardImage size="fullsize" name={props.card.name} />

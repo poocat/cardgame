@@ -243,6 +243,13 @@ export type TriggerDef = {
   }) => void;
 };
 
+type LinkDef = {
+  type: "imgsrc";
+  label?: string;
+  description?: string;
+  url: string;
+};
+
 export type CardDef = {
   /** The unique name of the card. Will be copied into the game data, and used to correlate cards in the game with their definitions. */
   name: string;
@@ -250,6 +257,8 @@ export type CardDef = {
   actions: Partial<ActionTypeMap<ActionDef>>;
   /** Each card can have a single, custom triggered effect. The trigger is only active while the card is in play. */
   trigger?: TriggerDef;
+  /** Any card */
+  links?: LinkDef[];
 };
 
 export type CardMap = Record<string, CardDef>;
