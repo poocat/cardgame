@@ -340,36 +340,25 @@ describe("makeDecision", () => {
         .addChipsInReserve("alice", 5)
         .addChipsInReserve("bob", 5)
         .setPlayerTakingTurn("alice")
+        .setUpActionActivity("c1-ability")
         .build();
 
-      // Set up takingAction for the ability
-      game.activity = {
-        type: "takingAction",
-        actionId: "c1-ability",
-        playerTakingActionId: "alice",
-        currentChoice: {
-          name: "targetChips",
-          type: "chipId",
-          choosingPlayerId: "alice",
-          instructions: "Move up to one chip from your reserve to this card.",
-          values: game.chips
-            .filter(
-              (c) => c.ownerId === "alice" && c.location.type === "inReserve",
-            )
-            .map((c) => c.id),
-          min: 0,
-          max: 1,
+      // Choose the action.
+      let result = makeDecision({
+        gameData: game,
+        decision: {
+          name: game.activity.currentChoice.name,
+          playerId: "alice",
+          values: ["c1-ability"],
         },
-        nextChoices: [],
-        previousDecisions: [],
-      };
+      });
 
       const chipToMove = game.chips.find(
         (c) => c.ownerId === "alice" && c.location.type === "inReserve",
       );
 
-      const result = makeDecision({
-        gameData: game,
+      result = makeDecision({
+        gameData: result,
         decision: {
           name: "targetChips",
           playerId: "alice",
@@ -536,29 +525,22 @@ describe("makeDecision", () => {
         .addChipsInReserve("alice", 4)
         .addChipsInReserve("bob", 5)
         .setPlayerTakingTurn("alice")
+        .setUpActionActivity("c-cons-ability")
         .build();
 
-      // Consumer ability: move chip from consumer to a producer
-      game.activity = {
-        type: "takingAction",
-        actionId: "c-cons-ability",
-        playerTakingActionId: "alice",
-        currentChoice: {
-          name: "targetCard",
-          type: "cardId",
-          choosingPlayerId: "alice",
-          instructions: "Choose one of your producer cards.",
-          values: ["c-prod"],
-          min: 1,
-          max: 1,
-        },
-        nextChoices: [{ index: 1, playerId: "alice" }],
-        previousDecisions: [],
-      };
-
-      // First decision: choose the producer card
+      // Choose the action.
       let result = makeDecision({
         gameData: game,
+        decision: {
+          name: game.activity.currentChoice.name,
+          playerId: "alice",
+          values: ["c-cons-ability"],
+        },
+      });
+
+      // Choose the producer card.
+      result = makeDecision({
+        gameData: result,
         decision: {
           name: "targetCard",
           playerId: "alice",
@@ -615,40 +597,32 @@ describe("makeDecision", () => {
         })
         .addChipsInReserve("alice", 3)
         .addChipsInReserve("bob", 5)
+        .setUpActionActivity("c-dying-ability")
         .setPlayerTakingTurn("alice")
         .build();
 
-      // Dying producer's ability: move chip from this card to a consumer
-      game.activity = {
-        type: "takingAction",
-        actionId: "c-dying-ability",
-        playerTakingActionId: "alice",
-        currentChoice: {
-          name: "targetCard",
-          type: "cardId",
-          choosingPlayerId: "alice",
-          instructions: "Choose one of your consumer cards.",
-          values: ["c-cons"],
-          min: 1,
-          max: 1,
-        },
-        nextChoices: [{ index: 1, playerId: "alice" }],
-        previousDecisions: [],
-      };
-
-      // First decision: choose target card
-      let result = makeDecision({
+      // Choose the ability.
+      const result = makeDecision({
         gameData: game,
+        decision: {
+          name: game.activity.currentChoice.name,
+          playerId: "alice",
+          values: ["c-dying-ability"],
+        },
+      });
+
+      // Choose target card with auto-decision off.
+      let manualResult = makeDecision({
+        gameData: result,
         decision: {
           name: "targetCard",
           playerId: "alice",
           values: ["c-cons"],
         },
       });
-
-      // Second decision: choose chip
-      result = makeDecision({
-        gameData: result,
+      // Choose chip manually.
+      manualResult = makeDecision({
+        gameData: manualResult,
         decision: {
           name: "targetChips",
           playerId: "alice",
@@ -656,9 +630,25 @@ describe("makeDecision", () => {
         },
       });
 
-      // The dying producer should be discarded
-      const dyingProd = result.cards.find((c) => c.id === "c-dying");
-      expect(dyingProd?.location.type).toBe("inDiscard");
+      // Choose card with auto-decision on. (Should choose chip automatically.)
+      const autoResult = makeDecision({
+        gameData: result,
+        decision: {
+          name: "targetCard",
+          playerId: "alice",
+          values: ["c-cons"],
+        },
+        autoDecide: true,
+      });
+
+      // The dying producer should be discarded in both cases.
+      const dyingProdManual = manualResult.cards.find(
+        (c) => c.id === "c-dying",
+      );
+      expect(dyingProdManual?.location.type).toBe("inDiscard");
+
+      const dyingProdAuto = autoResult.cards.find((c) => c.id === "c-dying");
+      expect(dyingProdAuto?.location.type).toBe("inDiscard");
     });
   });
 

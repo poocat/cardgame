@@ -138,8 +138,13 @@ export const testCards = {
     trigger: {
       instructions:
         "Whenever the last chip is removed from this card, discard it.",
-      affect: ({ next, context, mutator }) => {
-        if (next.getChips({ cardIds: [context.cardId] }).length < 1) {
+      affect: ({ current, next, context, mutator }) => {
+        // The comparison with "current" is unnecessary to the condition of the
+        // trigger, but necessary to ensure that the state machine keeps track
+        // of the current state separately from the next.
+        const currentChips = current.getChips({ cardIds: [context.cardId] });
+        const nextChips = next.getChips({ cardIds: [context.cardId] });
+        if (currentChips.length > 0 && nextChips.length === 0) {
           mutator.moveCard({
             id: context.cardId,
             location: { type: "inDiscard" },
