@@ -54,8 +54,10 @@ export const activityTypeTriggeredEffects: ActivityTypeMap<
    * - chips that were located on cards that left play need to return to the
    * "reserve"
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  takingAction: ({ current, next, mutator }) => {
-    const cardsInPlay = current.getCards({ locationTypes: ["inPlay"] });
+  takingAction: ({ next, mutator }) => {
+    // Gather all cards that are still in play after the decision has affected
+    // the game state.
+    const cardsInPlay = next.getCards({ locationTypes: ["inPlay"] });
     // Trigger effects based on card type.
     cardsInPlay.forEach((cardData) => {
       cardTypeTriggeredEffects[cardData.type]({
@@ -66,7 +68,7 @@ export const activityTypeTriggeredEffects: ActivityTypeMap<
     });
     // Clean up any chips that are located on cards that are no longer in play.
     const cardsInPlayIds = cardsInPlay.map((c) => c.id);
-    const strayChipIds = current.chips
+    const strayChipIds = next.chips
       .filter(
         (c) =>
           c.location.type === "onCard" &&
