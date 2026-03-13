@@ -6,6 +6,9 @@
 - [ ] Support "development" activity.
 - [ ] Add "recent events" log to UI.
 - [ ] Mutate game state on each step of sequence.
+- [ ] Display top card in discard.
+- [ ] Allow activity resets, e.g. "cancel action".
+- [ ] Make it harder to accidentally pass your turn.
 - [x] Add external links to image source.
 - [x] Add tooltips to actions that you cannot take stating the reasons why.
 - [x] Add "auto decide" scenarios.
