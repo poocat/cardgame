@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "baseUrl": ".",
+    "paths": {
+      "@server/*": ["./server/src/*"],
+      "@common/*": ["./common/*"],
+      "@private/*": ["./private/*"]
+    },
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["private"],
+  "exclude": ["node_modules"]
+}

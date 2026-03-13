@@ -1,3 +1,4 @@
+import { CONSTANTS } from "@common/game/constants";
 import { logger } from "@server/logger";
 import type { ErrorRequestHandler } from "express";
 import rateLimit from "express-rate-limit";
@@ -29,7 +30,8 @@ export const burstLimiter = rateLimit({
  ******************************************************************************/
 export const sustainedLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 120,
+  // Roughly two requests per player per second.
+  max: 60 * 2 * CONSTANTS.maxNumPlayers,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {

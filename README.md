@@ -8,15 +8,20 @@ This stems from a personal project, originally made with flashcards, and play-te
 
 ## Principles
 
-- Keep it simple, avoiding unnecessary abstraction and ornamentation.
+- Keep it simple, avoiding unnecessary ornamentations and external dependencies.
 - Keep it isolated, ensuring the game engine, transport layer, and UI are separately testable and extensible.
 - Keep it anonymous, minimizing users' stored personal data.
+
+## Engine
+
+The game is turn-based. The engine is always waiting for exactly one player to choose from a set of values. The state machine takes the player's decision and the game state as a JSON document, and cranks out a new game state with a new choice to be made, and the cycle repeats.
 
 ## Architecture
 
 - Monorepo with separate server and client applications, using React, Vite, TypeScript, ExpressJS, MongoDB.
 - Shared schemas and type definitions between server and client.
 - Purely functional game engine.
+- Production assets (cards, copy) maintained in private repo configured as submodule.
 
 ```
 ├── server/              # game engine and API (ExpressJS, TypeScript)
@@ -36,9 +41,13 @@ This stems from a personal project, originally made with flashcards, and play-te
         └── routes/ 
             ├── rooms/   # room UI for gathering players and starting games
             └── games/   # game UI
+.
+.
+.
+└── private/             # Private submodule
+    ├── cards/           # Production card definitions and images
+    └── copy/            # Themed rulebook, explanations, et cetera
 ```
-
-A game is stored as a JSON object, containing arrays of players, cards, chips, and actions, and data about the current activity. An active game is always waiting for a single player to choose from a set of values. Once the values are received, the state machine cranks out a new choice, with a new set of values, for a new player, and the cycle repeats.
 
 ## Game Rules
 
@@ -89,6 +98,10 @@ There are different types of actions available on cards:
     ```
   - Run tests (`/server`):
     ```
+    npm run test:public
+    ```
+    Or, if using the private submodule:
+    ```
     npm run test
     ```
   - To start server locally (`/server`):
@@ -106,8 +119,8 @@ There are different types of actions available on cards:
     npm run dev
     ```
 
-- Setting up Private Card Submodule (`/`):
-  - Init the submodule:
+- Using the Private Submodule (`/`):
+  - Initialize the submodule:
     ```
     git submodule init
     ```
@@ -117,18 +130,18 @@ There are different types of actions available on cards:
     ```
   - Switch to a different submodule branch:
     ```
-    cd server/src/game/cards/private
+    cd private
     git checkout <branch>
     ```
-  - Add the path to the card registry (relative to the `/server` folder) to the environment:
+  - Add the path to the private directory (relative to the `/server` folder) to the environment:
     ```
-    export PRIVATE_CARDS_PATH=./src/game/cards/private
+    export PRIVATE_PATH=../private
     ```
     Or, add a file, `server/.env` with the contents:
     ```
-    PRIVATE_CARDS_PATH=./src/game/cards/private
+    PRIVATE_PATH=../private
     ```
-  - Pin the submodule to the current submodule commit.
+  - After committing changes in the submodule, pin the submodule to the current commit:
     ```
-    git add server/src/game/cards/private
+    git add private
     ```

@@ -6,5 +6,5 @@ export const CONSTANTS = {
   maxNumCardsInHand: 8,
   minNumPlayers: 2,
   maxNumPlayers: 4,
-  numChipsOnConsumersToWin: 8,
+  numChipsOnConsumersToWin: 10,
 } as const;

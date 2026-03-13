@@ -38,8 +38,12 @@ export class MutatorQueue implements IMutator {
     this.queue.push({ method: "addWin", args });
   }
 
+  pending() {
+    return this.queue.slice(this.index);
+  }
+
   apply(mutator: IMutator) {
-    this.queue.slice(this.index).forEach((item) => {
+    this.pending().forEach((item) => {
       switch (item.method) {
         case "moveCard":
           mutator.moveCard(item.args);
