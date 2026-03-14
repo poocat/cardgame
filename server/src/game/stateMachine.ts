@@ -12,6 +12,7 @@ import { logger } from "@server/logger";
 import type {
   ActivityData,
   ChipLocationType,
+  ChoiceData,
   Decision,
   GameData,
   Id,
@@ -90,6 +91,23 @@ function decisionIssues(args: {
       (v) => !args.gameData.activity.currentChoice.values.includes(v),
     );
     issues.push(`values not part of the choice (${diff})`);
+  }
+  return issues;
+}
+
+/******************************************************************************
+ * ### choiceIssues
+ *
+ * Validation of the activity to be returned by the state machine.
+ * Returns an array of issues. If there aren't any, then the choice is OK.
+ ******************************************************************************/
+function choiceIssues(choice: ChoiceData): string[] {
+  const issues: string[] = [];
+  const choiceMax = choice.max ?? 9999;
+  if (choiceMax > 0 && choice.min > choice.values.length) {
+    issues.push(
+      `Impossible choice: "${choice.name}" requires ${choice.min} values but only ${choice.values.length} available`,
+    );
   }
   return issues;
 }
@@ -221,18 +239,28 @@ export function makeDecision(args: {
         });
         next.dequeueMutations();
 
-        /**
-         * TODO!!!
-         * It's possible for the activity to stick a player with an impossible
-         * choice, e.g. when the minimum required number of values is greater than
-         * the number of values available. Need to figure out how to catch this
-         * and roll back.
-         */
+        // Validate the next activity, short circuiting before setting the game
+        // state with an impossible choice.
+        const nextActivity = next.getActivity();
+        const nextChoiceIssues = choiceIssues(nextActivity.currentChoice);
+        if (nextChoiceIssues.length > 0) {
+          const errorMessage = `invalid choice: ${issues}`;
+          logger.error(
+            {
+              choiceName: nextActivity.currentChoice.name,
+              min: nextActivity.currentChoice.min,
+              available: nextActivity.currentChoice.values.length,
+              activityType: nextActivity.type,
+            },
+            errorMessage,
+          );
+          throw new Error(errorMessage);
+        }
 
         logger.info(
           {
             currentActivityType: currentActivity.type,
-            nextActivityType: next.getActivity().type,
+            nextActivityType: nextActivity.type,
             playerId: args.decision.playerId,
           },
           "activity transitioned",
@@ -240,7 +268,7 @@ export function makeDecision(args: {
 
         // Update references.
         currentAccessor = next.getAccessor({ clone: true });
-        currentActivity = next.getActivity();
+        currentActivity = nextActivity;
         if (args.autoDecide)
           currentAutoDecisions = getAutoDecisions({
             currentAccessor,
