@@ -39,6 +39,10 @@
   background-color: var(--color-brown);
 }
 
+.box--color-error {
+  background-color: var(--color-error);
+}
+
 /* Border variants */
 .box--border-light {
   border-style: solid;

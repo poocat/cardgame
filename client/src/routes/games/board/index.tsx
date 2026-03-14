@@ -1,4 +1,4 @@
-import { Dialog } from "@client/components";
+import { Box, Dialog, Stack } from "@client/components";
 import { CONSTANTS } from "@common/game/constants";
 import type React from "react";
 import { Fragment, memo, useCallback, useMemo } from "react";
@@ -176,6 +176,7 @@ export const GameBoard = memo(
     dialogProps: DialogProps;
     selectorProps: SelectorProps;
     choiceProps: ChoiceProps;
+    errors: string[];
   }) => {
     const gameOver = props.game.winner !== null;
     const observingPlayer = props.game.observingPlayer;
@@ -356,6 +357,15 @@ export const GameBoard = memo(
             />
           ) : (
             <ExplanationMenu explanation={props.game.activity.explanation} />
+          )}
+          {props.errors.length > 0 && (
+            <Stack orientation="vertical" spacing="sm">
+              {props.errors.map((msg) => (
+                <Box key={msg} fullWidth spacing="lg" color="error">
+                  {msg}
+                </Box>
+              ))}
+            </Stack>
           )}
         </MenuContainer>
         <Dialog
