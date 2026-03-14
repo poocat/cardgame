@@ -224,12 +224,16 @@ games.patch(
       const result = await gameRepo.updateOne({
         id: game.meta.id,
         data: nextGameData,
+        version: game.meta.version,
       });
       if (result.matchedCount === 0) {
-        logger.error({ gameId: req.params.id }, "game update failed");
-        return res
-          .status(STATUS.internalServerError)
-          .json({ message: `could not update game` });
+        logger.warn(
+          { gameId: req.params.id, version: game.meta.version },
+          "version conflict",
+        );
+        return res.status(STATUS.conflict).json({
+          message: "version conflict — another decision was applied first",
+        });
       }
 
       logger.info(
