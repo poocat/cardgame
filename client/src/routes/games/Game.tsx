@@ -1,4 +1,5 @@
 import { Box } from "@client/components/layout";
+import { useAttention } from "@client/utils/useAttention";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
 import { useCallback, useMemo, useState } from "react";
@@ -8,7 +9,6 @@ import { GameBoard } from "./board";
 import { useChoice } from "./board/choice";
 import { useDialog } from "./board/dialog";
 import { useSelector } from "./board/selector";
-import { useAttention } from "@client/utils/useAttention";
 
 type GamesGetOneResponseBody = z.infer<
   typeof ROUTES.games.methods.getOne.schemas.responseBody

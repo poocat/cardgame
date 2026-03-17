@@ -8,7 +8,7 @@ import { useEffect, useRef } from "react";
 ////////////////////////////////////////////////////////////////////////////////
 // Utils for reading and updating document state.
 ////////////////////////////////////////////////////////////////////////////////
-const originalTitle = document.title;
+let originalTitle = document.title;
 const setTitle = (title: string) => {
   document.title = title;
 };
@@ -35,6 +35,7 @@ let flashToggle = false;
 
 function startFlashing() {
   if (flashIntervalId !== null) return;
+  originalTitle = document.title;
   flashIntervalId = setInterval(() => {
     const msg = getActiveMessage();
     if (msg === null) {
@@ -107,15 +108,22 @@ function playAudioCue(cue: AudioCue) {
   try {
     const { frequency, duration, gain } = CUES[cue];
     const ctx = getAudioContext();
+    ctx.resume(); // Resume if suspended, no op if active.
     const oscillator = ctx.createOscillator();
     const gainNode = ctx.createGain();
     oscillator.connect(gainNode);
     gainNode.connect(ctx.destination);
     oscillator.frequency.value = frequency;
     gainNode.gain.value = gain;
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gainNode.disconnect();
+    };
     oscillator.start();
     oscillator.stop(ctx.currentTime + duration);
-  } catch {}
+  } catch (e) {
+    console.warn("attention audio cue failed", e);
+  }
 }
 
 /******************************************************************************
@@ -139,15 +147,16 @@ export function useAttention(opts: {
   const wasActive = useRef(false);
 
   useEffect(() => {
-    const active = opts.message !== null;
+    const message = opts.message || null;
+    const active = message !== null;
 
     if (active && !wasActive.current && !pageVisible()) {
-      if (opts.message) addMessage(id.current, opts.message);
+      addMessage(id.current, message);
       if (opts.audio) playAudioCue(opts.audio);
     } else if (active && wasActive.current) {
       // Message changed while still active. Update the message.
-      if (messages.has(id.current) && opts.message) {
-        addMessage(id.current, opts.message);
+      if (messages.has(id.current)) {
+        addMessage(id.current, message);
       }
     } else if (!active) {
       clearMessage(id.current);
