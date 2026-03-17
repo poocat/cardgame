@@ -1,14 +1,14 @@
 import { Box } from "@client/components/layout";
-import { useAlert } from "@client/utils/useAlert";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 import type z from "zod";
 import { GameBoard } from "./board";
 import { useChoice } from "./board/choice";
 import { useDialog } from "./board/dialog";
 import { useSelector } from "./board/selector";
+import { useAttention } from "@client/utils/useAttention";
 
 type GamesGetOneResponseBody = z.infer<
   typeof ROUTES.games.methods.getOne.schemas.responseBody
@@ -63,25 +63,13 @@ export const Game = () => {
 
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (
-      typeof Notification !== "undefined" &&
-      Notification.permission === "default"
-    ) {
-      Notification.requestPermission();
-    }
-  }, []);
-  useAlert({
-    active: observingPlayerIsChoosing,
-    notificationMessage: "Choice required!",
-    titleMessage: "Choice required!",
-    audio: "click",
+  useAttention({
+    message: observingPlayerIsChoosing ? "Choice required!" : null,
+    audio: "short",
   });
-  useAlert({
-    active: Boolean(game?.winner?.name),
-    notificationMessage: `${game?.winner?.name} has won!`,
-    titleMessage: `${game?.winner?.name} has won!`,
-    audio: "tada",
+  useAttention({
+    message: game?.winner ? `${game.winner.name} won!` : null,
+    audio: "long",
   });
 
   const dialog = useDialog();
