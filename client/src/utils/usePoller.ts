@@ -78,7 +78,7 @@ export function usePoller<TData extends object>(args: {
       }
       setError(null);
     } catch (err) {
-      const msg = `Poller Error: ${err}`;
+      const msg = `${err}`;
       console.error("Poller Error:", err);
       setError(msg);
     }

@@ -1,7 +1,7 @@
 import { Box } from "@client/components/layout";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 import type z from "zod";
 import { GameBoard } from "./board";
@@ -60,6 +60,8 @@ export const Game = () => {
   const currentChoiceName = currentChoice?.name;
   const observingPlayerIsChoosing = !poller.polling;
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const dialog = useDialog();
   const selector = useSelector({
     min: currentChoice?.min ?? 0,
@@ -76,6 +78,7 @@ export const Game = () => {
       currentChoiceName &&
       poller.fetchOnce
     ) {
+      setSubmitError(null);
       const payload: GamesPatchRequestBody = {
         decision: {
           playerId: observingPlayerId,
@@ -84,19 +87,28 @@ export const Game = () => {
         },
       };
       const body = JSON.stringify(payload);
-      await fetch(url, {
-        method: "PATCH",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then(() => {
+      try {
+        const response = await fetch(url, {
+          method: "PATCH",
+          body,
+          headers: { "Content-Type": "application/json" },
+        });
+        if (response.ok || response.status === 204) {
           poller.fetchOnce();
           selector.clearValues();
           dialog.close();
-        })
-        .catch((reason) => console.error(reason));
+        } else if (response.status === 409) {
+          await poller.fetchOnce();
+          setSubmitError("Board updated. Please re-submit.");
+        } else {
+          const msg = await response
+            .json()
+            .catch(() => ({ message: "Unknown error" }));
+          setSubmitError(msg.message ?? "Submission failed.");
+        }
+      } catch {
+        setSubmitError("Network error.");
+      }
     }
   }, [
     gameId,
@@ -110,13 +122,17 @@ export const Game = () => {
     url,
   ]);
 
+  const errors: string[] = [];
+  if (poller.error) errors.push(poller.error);
+  if (submitError) errors.push(submitError);
+
   return (
     <div>
       <Box spacing="md">
         {poller.polling ? (
           <span>Polled {poller.pollCount} times..</span>
         ) : (
-          <span>Not polling... {poller.error && `(${poller.error})`}</span>
+          <span>Not polling...</span>
         )}
       </Box>
       {game && (
@@ -126,6 +142,7 @@ export const Game = () => {
           choiceProps={choice}
           selectorProps={selector}
           dialogProps={dialog}
+          errors={errors}
         />
       )}
     </div>
