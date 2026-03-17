@@ -94,10 +94,19 @@ const CUES = {
   long: { frequency: 880, duration: 0.3, gain: 0.3 },
 } as const satisfies Record<AudioCue, AudioCueProps>;
 
+let audioCtx: AudioContext | null = null;
+
+function getAudioContext(): AudioContext {
+  if (!audioCtx || audioCtx.state === "closed") {
+    audioCtx = new AudioContext();
+  }
+  return audioCtx;
+}
+
 function playAudioCue(cue: AudioCue) {
   try {
     const { frequency, duration, gain } = CUES[cue];
-    const ctx = new AudioContext();
+    const ctx = getAudioContext();
     const oscillator = ctx.createOscillator();
     const gainNode = ctx.createGain();
     oscillator.connect(gainNode);
@@ -106,7 +115,6 @@ function playAudioCue(cue: AudioCue) {
     gainNode.gain.value = gain;
     oscillator.start();
     oscillator.stop(ctx.currentTime + duration);
-    oscillator.onended = () => ctx.close();
   } catch {}
 }
 
