@@ -7,11 +7,11 @@ import type { SelectorProps } from "./types";
  * State management for the list of values that are chosen by the current
  * choosing player.
  ******************************************************************************/
-export function useSelector(args: { min: number; max: number }): SelectorProps {
+export function useSelector(opts: { min: number; max: number }): SelectorProps {
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
-  const moreValuesNeeded = selectedValues.length < (args.min ?? 0);
-  const moreValuesAllowed = selectedValues.length < (args.max ?? 9999);
+  const moreValuesNeeded = selectedValues.length < (opts.min ?? 0);
+  const moreValuesAllowed = selectedValues.length < (opts.max ?? 9999);
 
   const checkValueSelected = useCallback(
     (value: string) => {

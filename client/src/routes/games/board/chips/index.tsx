@@ -177,7 +177,7 @@ export const ChipCounterEdge = (props: {
  * State management for components that let the player select chips from a given
  * pool.
  ******************************************************************************/
-export function useChipSelector(args: {
+export function useChipSelector(opts: {
   chips: ChipDigest[];
   selectorProps: SelectorProps | null;
 }): {
@@ -186,26 +186,26 @@ export function useChipSelector(args: {
   addChip: () => void;
   removeChip: () => void;
 } {
-  const chipIds = args.chips.map((c) => c.id);
-  const selectedValues = args.selectorProps?.selectedValues ?? [];
+  const chipIds = opts.chips.map((c) => c.id);
+  const selectedValues = opts.selectorProps?.selectedValues ?? [];
   const selected = selectedValues.filter((v) => chipIds.includes(v));
   const remaining = chipIds.filter((chipId) => !selected.includes(chipId));
 
   const addChip = useCallback(() => {
-    if (args.selectorProps?.moreValuesAllowed && remaining.length > 0) {
-      args.selectorProps?.addValue(remaining[0]);
+    if (opts.selectorProps?.moreValuesAllowed && remaining.length > 0) {
+      opts.selectorProps?.addValue(remaining[0]);
     }
   }, [
-    args.selectorProps?.addValue,
-    args.selectorProps?.moreValuesAllowed,
+    opts.selectorProps?.addValue,
+    opts.selectorProps?.moreValuesAllowed,
     remaining,
   ]);
 
   const removeChip = useCallback(() => {
     if (selected.length > 0) {
-      args.selectorProps?.removeValue(selected[0]);
+      opts.selectorProps?.removeValue(selected[0]);
     }
-  }, [args.selectorProps?.removeValue, selected]);
+  }, [opts.selectorProps?.removeValue, selected]);
 
   return useMemo(
     () => ({

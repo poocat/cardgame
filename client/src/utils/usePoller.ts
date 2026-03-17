@@ -35,7 +35,7 @@ type UsePollerHook<TData> = {
  * error.
  *
  ******************************************************************************/
-export function usePoller<TData extends object>(args: {
+export function usePoller<TData extends object>(opts: {
   /** The endpoint for the resource to poll/fetch. */
   url: string;
   /** Specifies what the polling interval should be, based on how long the poller has been polling. */
@@ -61,7 +61,7 @@ export function usePoller<TData extends object>(args: {
         etag.current && polling
           ? { "If-None-Match": etag.current.toString() }
           : undefined;
-      const response = await fetch(args.url, {
+      const response = await fetch(opts.url, {
         method: "GET",
         cache: "no-store",
         headers,
@@ -70,7 +70,7 @@ export function usePoller<TData extends object>(args: {
         // Not modified.
       } else if (response.ok) {
         etag.current = response.headers.get("ETag");
-        const newData = await args.getData(response);
+        const newData = await opts.getData(response);
         setData(newData);
         setElapsedTimeMs(0);
       } else {
@@ -82,7 +82,7 @@ export function usePoller<TData extends object>(args: {
       console.error("Poller Error:", err);
       setError(msg);
     }
-  }, [polling, args.url, args.getData]);
+  }, [polling, opts.url, opts.getData]);
 
   // Use to update the polling count and elapsed time.
   const updatePollClock = useCallback((intervalMs: number) => {
@@ -92,8 +92,8 @@ export function usePoller<TData extends object>(args: {
 
   // Examine the latest data to find out if polling should continue.
   const pollingEnabled = useMemo(
-    () => !data || args.getPollingEnabled(data),
-    [data, args.getPollingEnabled],
+    () => !data || opts.getPollingEnabled(data),
+    [data, opts.getPollingEnabled],
   );
 
   // Manage change in polling state.
@@ -114,7 +114,7 @@ export function usePoller<TData extends object>(args: {
       if (intervalIdRef.current) clearInterval(intervalIdRef.current);
       return;
     }
-    const nextIntervalMs = args.getIntervalMs(elapsedTimeMs);
+    const nextIntervalMs = opts.getIntervalMs(elapsedTimeMs);
     const poll = async () => {
       fetchResource().then(() => updatePollClock(nextIntervalMs));
     };
@@ -125,7 +125,7 @@ export function usePoller<TData extends object>(args: {
   }, [
     polling,
     fetchResource,
-    args.getIntervalMs,
+    opts.getIntervalMs,
     elapsedTimeMs,
     updatePollClock,
   ]);
