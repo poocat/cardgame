@@ -1,4 +1,5 @@
 import { Box } from "@client/components/layout";
+import { useAttention } from "@client/utils/useAttention";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
 import { useCallback, useMemo, useState } from "react";
@@ -61,6 +62,15 @@ export const Game = () => {
   const observingPlayerIsChoosing = !poller.polling;
 
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useAttention({
+    message: observingPlayerIsChoosing ? "Choice required!" : null,
+    audio: "short",
+  });
+  useAttention({
+    message: game?.winner ? `${game.winner.name} won!` : null,
+    audio: "long",
+  });
 
   const dialog = useDialog();
   const selector = useSelector({
