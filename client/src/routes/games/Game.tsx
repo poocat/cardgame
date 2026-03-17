@@ -1,7 +1,8 @@
 import { Box } from "@client/components/layout";
+import { useAlert } from "@client/utils/useAlert";
 import { usePoller } from "@client/utils/usePoller";
 import { ROUTES } from "@common/api/routes";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 import type z from "zod";
 import { GameBoard } from "./board";
@@ -61,6 +62,27 @@ export const Game = () => {
   const observingPlayerIsChoosing = !poller.polling;
 
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "default"
+    ) {
+      Notification.requestPermission();
+    }
+  }, []);
+  useAlert({
+    active: observingPlayerIsChoosing,
+    notificationMessage: "Choice required!",
+    titleMessage: "Choice required!",
+    audio: "click",
+  });
+  useAlert({
+    active: Boolean(game?.winner?.name),
+    notificationMessage: `${game?.winner?.name} has won!`,
+    titleMessage: `${game?.winner?.name} has won!`,
+    audio: "tada",
+  });
 
   const dialog = useDialog();
   const selector = useSelector({
