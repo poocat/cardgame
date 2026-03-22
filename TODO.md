@@ -1,5 +1,6 @@
 # TODO:
 
+- [ ] Give `common/` its own `package.json`, or adopt npm workspaces to resolve shared dependencies in ci/cd.
 - [ ] Add unit tests for API.
 - [ ] Write helpers for defining common actions for cards.
 - [ ] Support different language transformations of game instructions.

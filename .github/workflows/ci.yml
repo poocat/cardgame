@@ -52,5 +52,12 @@ jobs:
 
       - run: npm ci
 
+      - name: Install root dependencies
+        run: npm ci
+        working-directory: .
+
+      # Typecheck
+      - run: npm run build
+
       # Run tests
       - run: npm test
