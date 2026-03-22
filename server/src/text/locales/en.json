@@ -5,6 +5,8 @@
   "term.producers": "PRODUCERS",
   "term.consumer": "CONSUMER",
   "term.consumers": "CONSUMERS",
+  "term.channel": "CHANNEL",
+  "term.reserve": "RESERVE",
 
   "activity.drawingCards.choice.instructions": "Choose a deck to draw from.",
   "activity.choosingAction.choice.instructions": "Choose an action to take, or pass your turn."
