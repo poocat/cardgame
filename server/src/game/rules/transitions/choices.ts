@@ -48,7 +48,7 @@ export function nullChoice(): ChoiceData {
     name: "",
     type: "arbitrary",
     choosingPlayerId: "",
-    instructions: msg("null"),
+    instructions: msg(""),
     values: [],
     min: 0,
     max: 0,
