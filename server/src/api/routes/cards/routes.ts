@@ -20,8 +20,19 @@ import path from "node:path";
 import { CONFIG } from "@server/config";
 import { logger } from "@server/logger";
 import { Router, static as staticFileHandler } from "express";
+import slowDown from "express-slow-down";
+import { burstLimiter } from "../../middleware";
 
 export const cards = Router();
+cards.use(burstLimiter({ windowMs: 5 * 1000, max: 100 }));
+cards.use(
+  slowDown({
+    windowMs: 30 * 1000,
+    delayAfter: 60,
+    delayMs: (hits) => Math.max(0, hits - 60) * 200,
+    maxDelayMs: 1000,
+  }),
+);
 
 if (CONFIG.privatePath) {
   const dir = path.join(CONFIG.privatePath, "cards", "images");

@@ -1,52 +1,20 @@
-/**
- * Transformers modify data on their way into and out of the API layer.
- *
- * For instance:
- * - Game data, which is relatively "flat", is transformed to a nested object
- *   that more easily corresponds to how the game data is presented.
- * - Private user ids need to be anonymized, to prevent cheating.
- * - Anonymized ids need to be deanonymized before being passed to the state
- *   machine.
- */
-
-import { createHash } from "node:crypto";
 import type {
   choiceValueDigestSchema,
   gameDigestSchema,
   inPlayCardDigestSchema,
-  roomDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
 import { actionTypes } from "@common/game/enums";
-import type { RoomDoc } from "@server/db/types";
+import { anonymizeId } from "@server/api/anonymization";
 import { getCardDefinition } from "@server/game/cards/registry";
-import type { CardData, Decision, GameData, Id } from "@server/types";
+import type { CardData, GameData, Id } from "@server/types";
 import type z from "zod";
 
-type RoomData = RoomDoc["data"];
-
 type GameDigest = z.infer<typeof gameDigestSchema>;
-type RoomDigest = z.infer<typeof roomDigestSchema>;
+
 type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
 type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type ChoiceValuesDigest = z.infer<typeof choiceValueDigestSchema>;
-
-function anonymizeId(id: string, salt: string): string {
-  const base = `${id}:${salt}`;
-  const hash = createHash("sha256").update(base).digest("hex");
-
-  // UUID version 4 consists of 32 hexadecimal digits in the form:
-  // 8-4-4-4-12 (total 36 characters including hyphens)
-  const uuid = [
-    hash.substring(0, 8),
-    hash.substring(8, 12),
-    `4${hash.substring(12, 15)}`, // Set the version to 4
-    `8${hash.substring(15, 18)}`, // Set the variant to 8 (RFC 4122)
-    hash.substring(18, 30),
-  ].join("-");
-
-  return uuid;
-}
 
 function createActivityExplanation(gameData: GameData): string {
   const choosingPlayerId = gameData.activity.currentChoice.choosingPlayerId;
@@ -180,13 +148,11 @@ export function digestGameData({
   switch (gameData.activity.currentChoice.type) {
     case "arbitrary": {
       choiceValuesDigest.push(
-        ...choiceValues.map((v) => ({ value: v, onCardId: null, label: v })),
-      );
-      break;
-    }
-    case "deck": {
-      choiceValuesDigest.push(
-        ...choiceValues.map((v) => ({ value: v, onCardId: null, label: v })),
+        ...choiceValues.map((v) => ({
+          value: v,
+          onCardId: null,
+          label: v,
+        })),
       );
       break;
     }
@@ -250,7 +216,10 @@ export function digestGameData({
       type: gameData.activity.type,
       explanation: createActivityExplanation(gameData),
       choice: {
-        ...gameData.activity.currentChoice,
+        name: gameData.activity.currentChoice.name,
+        type: gameData.activity.currentChoice.type,
+        min: gameData.activity.currentChoice.min,
+        max: gameData.activity.currentChoice.max,
         values: choiceValuesDigest,
         choosingPlayerId:
           anonymizedPlayerIdMap[
@@ -347,61 +316,4 @@ export function digestGameData({
     };
   }
   return digest;
-}
-
-/******************************************************************************
- * ### deanonymizeDecision
- *
- * Transforms a decision that may include anonymized values by replacing
- * anonymized values with the corresponding private data.
- ******************************************************************************/
-export function deanonymizeDecision({
-  decision,
-  anonymizationSalt,
-  playerIds,
-}: {
-  decision: Decision;
-  anonymizationSalt: string;
-  playerIds: Id[];
-}): Decision {
-  const valueMap: Record<Id, Id> = {};
-  playerIds.forEach((id) => {
-    valueMap[anonymizeId(id, anonymizationSalt)] = id;
-  });
-  return {
-    ...decision,
-    values: decision.values.map((v) => valueMap[v] ?? v),
-  };
-}
-
-/******************************************************************************
- * ### digestRoomData
- *
- * Transforms room data by anonymizing private values like other player ids.
- ******************************************************************************/
-export function digestRoomData({
-  roomData,
-  anonymizationSalt,
-  playerId,
-}: {
-  roomData: RoomData;
-  anonymizationSalt: string;
-  playerId?: Id;
-}): RoomDigest {
-  const allPlayers = [roomData.host, ...roomData.guests];
-  const playerIdMap: Record<Id, Id> = {};
-  allPlayers.forEach((p) => {
-    playerIdMap[p.id] =
-      p.id === playerId ? p.id : anonymizeId(p.id, anonymizationSalt);
-  });
-  return {
-    host: {
-      ...roomData.host,
-      id: playerIdMap[roomData.host.id],
-    },
-    guests: roomData.guests.map((p) => ({
-      ...p,
-      id: playerIdMap[p.id],
-    })),
-  };
 }
