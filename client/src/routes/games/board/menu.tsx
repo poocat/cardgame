@@ -81,6 +81,7 @@ export const MenuContainer = (props: { children?: React.ReactNode }) => {
 export const ChoiceMenu = memo(
   (
     props: {
+      submitLabel: string;
       instructions: string;
       choiceType: ChoiceType;
       values: ChoiceValueDigest[];
@@ -103,7 +104,7 @@ export const ChoiceMenu = memo(
               disabled={props.submitDisabled}
               onClick={props.onSubmitChoice}
             >
-              Submit Choices
+              {props.submitLabel}
             </Button>
           </Box>
           <Box spacing="sm">
