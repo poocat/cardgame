@@ -1,8 +1,13 @@
 {
+  "null": "",
+
   "term.chip": "CHIP",
   "term.chips": "CHIPS",
   "term.producer": "PRODUCER",
   "term.producers": "PRODUCERS",
   "term.consumer": "CONSUMER",
-  "term.consumers": "CONSUMERS"
+  "term.consumers": "CONSUMERS",
+
+  "activity.drawingCards.choice.instructions": "Choose a deck to draw from.",
+  "activity.choosingAction.choice.instructions": "Choose an action to take, or pass your turn."
 }

@@ -173,7 +173,7 @@ export type ChoiceDef = {
   /** The "name" of the choice. */
   name: string;
   type: ChoiceType;
-  instructions: string;
+  instructions: Message;
   /** Use to provide labels for any of the values returned by `getValues` */
   labels?: Record<string, Message>;
   /** Use to indicate the minimum number of options the player must select from the given options. */
@@ -226,7 +226,7 @@ export type SequenceDef = {
 
 export type ActionDef = {
   /** Instructions to display on the card. */
-  instructions?: string;
+  instructions?: Message;
   /** The sequence for the action's activity. If undefined, only the default effects (for the given action type) will be used. */
   sequence?: SequenceDef;
   /** Use to skip default effects, since default effects can potentially "overwrite" custom effects. */
@@ -234,7 +234,7 @@ export type ActionDef = {
 };
 
 export type TriggerDef = {
-  instructions: string;
+  instructions: Message;
   affect: (args: {
     current: IAccessor;
     next: IAccessor;

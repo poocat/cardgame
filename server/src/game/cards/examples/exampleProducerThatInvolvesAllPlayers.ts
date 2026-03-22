@@ -6,8 +6,9 @@ export const exampleProducerThatInvolvesAllPlayers: CardDef = {
   actions: {
     play: {},
     ability: {
-      instructions:
-        "Each player may move up to 1 of their chips from their reserve to one of their consumers in play.",
+      instructions: {
+        key: "Each player may move up to 1 of their chips from their reserve to one of their consumers in play.",
+      },
       sequence: {
         getPlayers: ({ accessor }) =>
           accessor.players.filter((p) => {
@@ -25,7 +26,9 @@ export const exampleProducerThatInvolvesAllPlayers: CardDef = {
           {
             name: "targetChip",
             type: "chipId",
-            instructions: "Choose up to 1 of the chips in your reserve.",
+            instructions: {
+              key: "Choose up to 1 of the chips in your reserve.",
+            },
             min: 0,
             max: 1,
             getValues: ({ accessor, context }) => {
@@ -39,7 +42,7 @@ export const exampleProducerThatInvolvesAllPlayers: CardDef = {
           {
             name: "targetConsumer",
             type: "cardId",
-            instructions: "Choose which consumer to move the chip to.",
+            instructions: { key: "Choose which consumer to move the chip to." },
             min: 1,
             max: 1,
             getValues: ({ accessor, context }) =>

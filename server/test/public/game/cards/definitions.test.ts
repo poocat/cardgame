@@ -3,6 +3,7 @@ import {
   resetCardRegistry,
 } from "@server/game/cards/registry";
 import { makeDecision } from "@server/game/stateMachine";
+import { msg } from "@server/text/messages";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testCards } from "../../../fixtures/cards";
 import { GameBuilder } from "../../../helpers/GameBuilder";
@@ -81,7 +82,9 @@ describe("ability with chip transfer", () => {
         name: "targetChips",
         type: "chipId",
         choosingPlayerId: "alice",
-        instructions: "Move up to one chip from your reserve to this card.",
+        instructions: msg(
+          "Move up to one chip from your reserve to this card.",
+        ),
         values: ["ch-a1"],
         min: 0,
         max: 1,
@@ -135,7 +138,9 @@ describe("ability with chip transfer", () => {
         name: "targetChips",
         type: "chipId",
         choosingPlayerId: "alice",
-        instructions: "Move up to one chip from your reserve to this card.",
+        instructions: msg(
+          "Move up to one chip from your reserve to this card.",
+        ),
         values: reserveChips,
         min: 0,
         max: 1,
@@ -198,8 +203,9 @@ describe("play action with check", () => {
         name: "targetChips",
         type: "chipId",
         choosingPlayerId: "alice",
-        instructions:
+        instructions: msg(
           "Move one chip from one of your producers onto this card.",
+        ),
         values: ["ch-on-prod"],
         min: 1,
         max: 1,

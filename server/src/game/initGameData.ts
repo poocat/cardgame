@@ -101,7 +101,7 @@ export function initGameData(
         min: 1,
         max: 1,
         choosingPlayerId: firstPlayer.id,
-        instructions: "Choose the deck to draw your first card from.",
+        instructions: msg("activity.drawingCards.choice.instructions"),
       },
       nextChoices: [],
     },

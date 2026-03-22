@@ -89,8 +89,8 @@ export function digestGameData({
 
   const localeBundle = getLocaleBundle(locale);
 
-  function resolveMessage(msg: Message | undefined, def: string): string {
-    if (msg === undefined) return def;
+  function resolveMessage(msg: Message | undefined, def?: string): string {
+    if (msg === undefined) return def ?? "";
     return resolve(msg, localeBundle);
   }
 
@@ -108,7 +108,7 @@ export function digestGameData({
         actions.push({
           id: matchData.id,
           type,
-          instructions: matchDef.instructions ?? "",
+          instructions: resolveMessage(matchDef.instructions),
           annotations: annotationMap[matchData.id] ?? [],
         });
     }
@@ -118,7 +118,7 @@ export function digestGameData({
     return {
       id: cardData.id,
       name: cardData.name,
-      triggerInstructions: cardDef.trigger?.instructions ?? "",
+      triggerInstructions: resolveMessage(cardDef.trigger?.instructions),
       imageSourceUrl: imageSourceLink?.url ?? "",
       type: cardData.type,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
@@ -234,7 +234,9 @@ export function digestGameData({
           anonymizedPlayerIdMap[
             gameData.activity.currentChoice.choosingPlayerId
           ],
-        instructions: gameData.activity.currentChoice.instructions,
+        instructions: resolveMessage(
+          gameData.activity.currentChoice.instructions,
+        ),
       },
       previouslyChosenValues: gameData.activity.previousDecisions.flatMap(
         (d) => d.values,

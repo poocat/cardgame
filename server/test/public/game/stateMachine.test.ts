@@ -5,6 +5,7 @@ import {
 } from "@server/game/cards/registry";
 import { Accessor } from "@server/game/runtime";
 import { makeDecision } from "@server/game/stateMachine";
+import { msg } from "@server/text/messages";
 import type { GameData } from "@server/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testCards } from "../../fixtures/cards";
@@ -54,7 +55,7 @@ function buildBasicGame(): GameData {
       min: 1,
       max: 1,
       choosingPlayerId: "alice",
-      instructions: "Choose deck.",
+      instructions: msg("Choose deck."),
     },
     nextChoices: [],
     previousDecisions: [],
@@ -209,7 +210,7 @@ describe("makeDecision", () => {
             min: 1,
             max: 1,
             choosingPlayerId: "alice",
-            instructions: "Draw.",
+            instructions: msg("Draw."),
           },
           nextChoices: [],
           previousDecisions: [],
@@ -263,7 +264,7 @@ describe("makeDecision", () => {
             name: "actionToTake",
             type: "actionId",
             choosingPlayerId: "alice",
-            instructions: "Choose an action.",
+            instructions: msg("Choose an action."),
             values: [],
             min: 0,
             max: 1,
@@ -917,7 +918,7 @@ describe("makeDecision", () => {
             min: 0,
             max: 1,
             choosingPlayerId: "alice",
-            instructions: "",
+            instructions: msg(""),
           },
           nextChoices: [],
           previousDecisions: [],
@@ -959,7 +960,7 @@ describe("makeDecision", () => {
             min: 0,
             max: 1,
             choosingPlayerId: "alice",
-            instructions: "",
+            instructions: msg(""),
           },
           nextChoices: [],
           previousDecisions: [],

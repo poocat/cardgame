@@ -127,7 +127,7 @@ export type ChoiceData = _DiscriminatedUnionFromArray<
   {
     name: string;
     choosingPlayerId: Id;
-    instructions: string;
+    instructions: Message;
     values: ChoiceValue[];
     min: number;
     max: number | null;

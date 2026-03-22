@@ -5,13 +5,17 @@ export const exampleProducerThatCanDie: CardDef = {
   type: "producer",
   actions: {
     play: {
-      instructions: "Bring into play with up to 1 chip from your reserve.",
+      instructions: {
+        key: "Bring into play with up to 1 chip from your reserve.",
+      },
       sequence: {
         choices: [
           {
             name: "targetChips",
             type: "chipId",
-            instructions: "Choose up to 1 of the chips in your reserve.",
+            instructions: {
+              key: "Choose up to 1 of the chips in your reserve.",
+            },
             min: 0,
             max: 1,
             getValues: ({ accessor, context }) => {
@@ -32,8 +36,9 @@ export const exampleProducerThatCanDie: CardDef = {
       },
     },
     ability: {
-      instructions:
-        "Move one chip from this card to one of your other consumers in play.",
+      instructions: {
+        key: "Move one chip from this card to one of your other consumers in play.",
+      },
       sequence: {
         check: ({ accessor, context }) => {
           const candidates = accessor.getCards({
@@ -55,7 +60,7 @@ export const exampleProducerThatCanDie: CardDef = {
           {
             type: "cardId",
             name: "targetCard",
-            instructions: "Choose one of your consumer cards.",
+            instructions: { key: "Choose one of your consumer cards." },
             min: 1,
             max: 1,
             getValues: ({ accessor, context }) => {
@@ -72,7 +77,7 @@ export const exampleProducerThatCanDie: CardDef = {
           {
             type: "chipId",
             name: "targetChips",
-            instructions: "Choose a chip from this card.",
+            instructions: { key: "Choose a chip from this card." },
             min: 1,
             max: 1,
             getValues: ({ accessor, context }) => {
@@ -95,8 +100,9 @@ export const exampleProducerThatCanDie: CardDef = {
     },
   },
   trigger: {
-    instructions:
-      "Whenever the last chip is removed from this card, discard it.",
+    instructions: {
+      key: "Whenever the last chip is removed from this card, discard it.",
+    },
     affect: ({ next, context, mutator }) => {
       if (next.getChips({ cardIds: [context.cardId] }).length < 1) {
         mutator.moveCard({

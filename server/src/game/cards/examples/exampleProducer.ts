@@ -6,13 +6,17 @@ export const exampleProducer: CardDef = {
   actions: {
     play: {},
     ability: {
-      instructions: "Move up to one chip from your reserve to this card.",
+      instructions: {
+        key: "Move up to one chip from your reserve to this card.",
+      },
       sequence: {
         choices: [
           {
             type: "chipId",
             name: "targetChips",
-            instructions: "Move up to one chip from your reserve to this card.",
+            instructions: {
+              key: "Move up to one chip from your reserve to this card.",
+            },
             min: 0,
             max: 1,
             getValues: ({ accessor, context }) => {

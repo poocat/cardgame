@@ -13,6 +13,7 @@
 
 import { actionTypes } from "@common/game/enums";
 import { getCardDefinition } from "@server/game/cards/registry";
+import { msg } from "@server/text/messages";
 import type {
   ActionData,
   ActionType,
@@ -254,7 +255,7 @@ export class GameBuilder {
               name: "actionToTake",
               type: "actionId",
               choosingPlayerId: playerTakingTurnId,
-              instructions: "Choose an action.",
+              instructions: msg("Choose an action."),
               values: [this.activitySpec.actionId],
               min: 0,
               max: 1,
@@ -271,7 +272,7 @@ export class GameBuilder {
               name: "actionToTake",
               type: "actionId",
               choosingPlayerId: playerTakingTurnId,
-              instructions: "Choose an action.",
+              instructions: msg("Choose an action."),
               values: [],
               min: 0,
               max: 1,

@@ -5,7 +5,9 @@ export const exampleConsumer: CardDef = {
   type: "consumer",
   actions: {
     play: {
-      instructions: "Bring into play with 1 chip from one of your producers.",
+      instructions: {
+        key: "Bring into play with 1 chip from one of your producers.",
+      },
       sequence: {
         check: ({ accessor, context }) => {
           const candidates = accessor.getCards({
@@ -26,8 +28,9 @@ export const exampleConsumer: CardDef = {
           {
             type: "chipId",
             name: "targetChips",
-            instructions:
-              "Move one chip from one of your producers onto this card.",
+            instructions: {
+              key: "Move one chip from one of your producers onto this card.",
+            },
             min: 1,
             max: 1,
             getValues: ({ accessor, context }) => {
@@ -56,8 +59,9 @@ export const exampleConsumer: CardDef = {
       },
     },
     ability: {
-      instructions:
-        "Move one chip from this card to one of your producers in play.",
+      instructions: {
+        key: "Move one chip from this card to one of your producers in play.",
+      },
       sequence: {
         check: ({ accessor, context }) => {
           const candidates = accessor.getCards({
@@ -78,7 +82,7 @@ export const exampleConsumer: CardDef = {
           {
             type: "cardId",
             name: "targetCard",
-            instructions: "Choose one of your producer cards.",
+            instructions: { key: "Choose one of your producer cards." },
             min: 1,
             max: 1,
             getValues: ({ accessor, context }) => {
@@ -94,7 +98,7 @@ export const exampleConsumer: CardDef = {
           {
             type: "chipId",
             name: "targetChips",
-            instructions: "Choose a chip from this card.",
+            instructions: { key: "Choose a chip from this card." },
             min: 1,
             max: 1,
             getValues: ({ accessor, context }) => {

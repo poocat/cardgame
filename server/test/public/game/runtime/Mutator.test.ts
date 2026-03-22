@@ -3,6 +3,7 @@ import {
   resetCardRegistry,
 } from "@server/game/cards/registry";
 import { Mutator } from "@server/game/runtime/Mutator";
+import { msg } from "@server/text/messages";
 import type { ActivityData } from "@server/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testCards } from "../../../fixtures/cards";
@@ -183,7 +184,7 @@ describe("Mutator", () => {
           min: 1,
           max: 1,
           choosingPlayerId: "alice",
-          instructions: "Draw a card.",
+          instructions: msg("Draw a card."),
         },
         nextChoices: [],
         previousDecisions: [],
