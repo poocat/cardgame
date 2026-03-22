@@ -44,6 +44,17 @@ type PlayerListItem = { index: number } & (
   | { isObserver: true; player: ObserverPlayerDigest }
   | { isObserver: false; player: OtherPlayerDigest }
 );
+
+/******************************************************************************
+ * ### getPlayerList
+ *
+ * Order the player data such that the observing player is always last, the
+ * player after them is always at the top, and the remaining players are
+ * between them in play order.
+ *
+ * This ensures that the player's cards and controls can always be found at
+ * the bottom of the game board.
+ ******************************************************************************/
 function getPlayerList(args: {
   playerOrder: string[];
   otherPlayers: OtherPlayerDigest[];
@@ -213,6 +224,19 @@ export const GameBoard = memo(
       }
     }, [props.dialogProps.value]);
 
+    // Compose the label for the submit button, indicating when doing so wioll
+    // end the player's turn.
+    const submitLabel = useMemo(() => {
+      const numSelectedValues = props.selectorProps.selectedValues.length;
+      if (
+        props.game.activity.type === "choosingAction" &&
+        numSelectedValues === 0
+      ) {
+        return "End Turn";
+      }
+      return `Submit ${numSelectedValues} Choice(s)`;
+    }, [props.game.activity.type, props.selectorProps.selectedValues.length]);
+
     const playerList = getPlayerList({
       playerOrder: props.game.playerOrder,
       observingPlayer: props.game.observingPlayer,
@@ -346,6 +370,7 @@ export const GameBoard = memo(
             <GameOverMenu winnerName={props.game.winner?.name ?? ""} />
           ) : observingPlayerIsChoosing ? (
             <ChoiceMenu
+              submitLabel={submitLabel}
               instructions={props.game.activity.choice.instructions}
               choiceType={props.game.activity.choice.type}
               values={props.game.activity.choice.values}
