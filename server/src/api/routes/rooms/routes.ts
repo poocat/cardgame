@@ -1,15 +1,23 @@
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
 import { STATUS } from "@server/api/status";
-import { digestRoomData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
 import { getRepositories } from "@server/db/database";
 import { makeId, makeMetaHash } from "@server/db/meta";
 import { logger } from "@server/logger";
 import { json as jsonHandler, Router } from "express";
+import { burstLimiter, sustainedLimiter } from "../../middleware";
+import { digestRoomData } from "./digest";
 
 export const rooms = Router();
 rooms.use(jsonHandler());
+rooms.use(burstLimiter({ windowMs: 10 * 1000, max: 30 }));
+rooms.use(
+  sustainedLimiter({
+    windowMs: 60 * 1000,
+    max: 60 * 2 * CONSTANTS.maxNumPlayers,
+  }),
+);
 
 /******************************************************************************
  * ### POST rooms/

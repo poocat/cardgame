@@ -1,7 +1,7 @@
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
+import { deanonymizeDecision } from "@server/api/anonymization";
 import { STATUS } from "@server/api/status";
-import { deanonymizeDecision, digestGameData } from "@server/api/transformers";
 import { validated } from "@server/api/wrappers";
 import { getRepositories } from "@server/db/database";
 import { makeMetaHash } from "@server/db/meta";
@@ -9,9 +9,18 @@ import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
 import { logger } from "@server/logger";
 import { json as jsonHandler, Router } from "express";
+import { burstLimiter, sustainedLimiter } from "../../middleware";
+import { digestGameData } from "./digest";
 
 export const games = Router();
 games.use(jsonHandler());
+games.use(burstLimiter({ windowMs: 10 * 1000, max: 30 }));
+games.use(
+  sustainedLimiter({
+    windowMs: 60 * 1000,
+    max: 60 * 2 * CONSTANTS.maxNumPlayers,
+  }),
+);
 
 /******************************************************************************
  * ### POST games/
