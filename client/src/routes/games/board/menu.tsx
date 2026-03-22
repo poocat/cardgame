@@ -31,7 +31,6 @@ const ChoiceSelectButton = (
       color = "chip";
       break;
     case "cardId":
-    case "deck":
       color = "card";
       break;
   }

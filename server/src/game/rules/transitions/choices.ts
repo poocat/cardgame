@@ -129,7 +129,7 @@ export function createDrawingCardsChoice(args: {
   }
   return {
     name: "deck",
-    type: "deck",
+    type: "arbitrary",
     choosingPlayerId: args.playerId,
     instructions: "Choose a card to draw.",
     values,

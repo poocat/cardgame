@@ -148,11 +148,7 @@ export function digestGameData({
   switch (gameData.activity.currentChoice.type) {
     case "arbitrary": {
       choiceValuesDigest.push(
-        ...choiceValues.map((v) => ({
-          value: v,
-          onCardId: null,
-          label: v,
-        })),
+        ...choiceValues.map((v) => ({ value: v, onCardId: null, label: v })),
       );
       break;
     }
