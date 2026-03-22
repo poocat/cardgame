@@ -1,6 +1,5 @@
 import { CONSTANTS } from "@common/game/constants";
 import { getActionDefinition } from "@server/game/cards/registry";
-import { msg } from "@server/game/text/messages";
 import type {
   ActionContext,
   ChoiceDef,
@@ -8,6 +7,7 @@ import type {
   IAnnotator,
   IDecisions,
 } from "@server/game/types";
+import { msg } from "@server/text/messages";
 import type {
   ActionData,
   ActivityData,
@@ -47,7 +47,6 @@ export function nullChoice(): ChoiceData {
   return {
     name: "",
     type: "arbitrary",
-    labels: {},
     choosingPlayerId: "",
     instructions: "",
     values: [],
@@ -130,7 +129,6 @@ export function createDrawingCardsChoice(args: {
       types: ["producer"],
       locationTypes: ["inDeck"],
     });
-    // TODO!!! "Producer" and "consumer" are generic terms. Allow themed terminology.
     if (producers.length > 0) values.push("producer");
     if (consumers.length > 0) values.push("consumer");
   }

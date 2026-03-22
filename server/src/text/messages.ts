@@ -1,6 +1,10 @@
 import type { Message } from "@server/types";
+import type { messageKeys } from "./keys";
 
-export function msg(key: string, params?: Message["params"]): Message {
+// "Loose autocomplete" pattern
+type Key = (typeof messageKeys)[number] | (string & {});
+
+export function msg(key: Key, params?: Message["params"]): Message {
   return params ? { key, params } : { key };
 }
 

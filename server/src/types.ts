@@ -118,10 +118,7 @@ export type ChoiceValue = string;
 export type ChoiceData = _DiscriminatedUnionFromArray<
   typeof choiceTypes,
   {
-    arbitrary: {
-      /** Use to map messages to the given arbitrary values. */
-      labels?: Record<ChoiceValue, Message>;
-    };
+    arbitrary: { labels?: Record<ChoiceValue, Message> };
     actionId: unknown;
     cardId: unknown;
     chipId: unknown;
@@ -130,7 +127,6 @@ export type ChoiceData = _DiscriminatedUnionFromArray<
   {
     name: string;
     choosingPlayerId: Id;
-    // instructions: Message;
     instructions: string;
     values: ChoiceValue[];
     min: number;
