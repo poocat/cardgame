@@ -49,7 +49,7 @@ function buildBasicGame(): GameData {
     type: "drawingCards",
     currentChoice: {
       name: "deck",
-      type: "deck",
+      type: "arbitrary",
       values: ["producer", "consumer"],
       min: 1,
       max: 1,

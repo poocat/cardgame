@@ -128,7 +128,7 @@ describe("MutatorQueue", () => {
         type: "drawingCards",
         currentChoice: {
           name: "deck",
-          type: "deck",
+          type: "arbitrary",
           values: [""],
           min: 1,
           max: 1,
