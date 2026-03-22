@@ -52,5 +52,8 @@ jobs:
 
       - run: npm ci
 
+      # Typecheck
+      - run: npm run build
+
       # Run tests
       - run: npm test
