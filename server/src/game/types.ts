@@ -256,6 +256,8 @@ type LinkDef = {
 export type CardDef = {
   /** The unique name of the card. Will be copied into the game data, and used to correlate cards in the game with their definitions. */
   name: string;
+  /** The name of the card as it is displayed to the player. Supports localization. Defaults to `name`. */
+  display?: Message;
   type: CardType;
   actions: Partial<ActionTypeMap<ActionDef>>;
   /** Each card can have a single, custom triggered effect. The trigger is only active while the card is in play. */

@@ -292,7 +292,7 @@ export const DetailCard = (props: {
   return (
     <CardDetailContainer>
       <CardDetailHeader>
-        <CardDetailName>{props.card.name}</CardDetailName>
+        <CardDetailName>{props.card.display}</CardDetailName>
         {props.card.imageSourceUrl && (
           <CardDetailLink url={props.card.imageSourceUrl} />
         )}

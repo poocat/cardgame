@@ -118,6 +118,7 @@ export function digestGameData({
     return {
       id: cardData.id,
       name: cardData.name,
+      display: resolveMessage(cardDef.display, cardData.name),
       triggerInstructions: resolveMessage(cardDef.trigger?.instructions),
       imageSourceUrl: imageSourceLink?.url ?? "",
       type: cardData.type,
