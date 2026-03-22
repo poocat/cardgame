@@ -39,6 +39,11 @@ export type Id = string;
 export type Tick = number;
 export type Turn = number;
 
+export type Message = {
+  key: string;
+  params?: Record<string, string | number | Message>;
+};
+
 export type ActionType = _UnionFromArray<typeof actionTypes>;
 export type ActionTypeMap<T> = _MapFromArray<typeof actionTypes, T>;
 export type ActionData = _DiscriminatedUnionFromArray<
@@ -113,16 +118,19 @@ export type ChoiceValue = string;
 export type ChoiceData = _DiscriminatedUnionFromArray<
   typeof choiceTypes,
   {
-    arbitrary: unknown;
+    arbitrary: {
+      /** Use to map messages to the given arbitrary values. */
+      labels?: Record<ChoiceValue, Message>;
+    };
     actionId: unknown;
     cardId: unknown;
     chipId: unknown;
     playerId: unknown;
-    deck: unknown;
   },
   {
     name: string;
     choosingPlayerId: Id;
+    // instructions: Message;
     instructions: string;
     values: ChoiceValue[];
     min: number;

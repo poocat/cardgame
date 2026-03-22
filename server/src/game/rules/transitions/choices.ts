@@ -1,5 +1,6 @@
 import { CONSTANTS } from "@common/game/constants";
 import { getActionDefinition } from "@server/game/cards/registry";
+import { msg } from "@server/game/text/messages";
 import type {
   ActionContext,
   ChoiceDef,
@@ -46,6 +47,7 @@ export function nullChoice(): ChoiceData {
   return {
     name: "",
     type: "arbitrary",
+    labels: {},
     choosingPlayerId: "",
     instructions: "",
     values: [],
@@ -89,6 +91,10 @@ export function createActionChoice(args: {
     args.choiceDef.max ??
     args.choiceDef.getMax?.({ ...commonArgs, values }) ??
     9999;
+  const optionals =
+    args.choiceDef.type === "arbitrary"
+      ? { labelMap: args.choiceDef.labels }
+      : {};
   return {
     name: args.choiceDef.name,
     type: args.choiceDef.type,
@@ -97,6 +103,7 @@ export function createActionChoice(args: {
     choosingPlayerId: args.actionContext.playerTakingActionId,
     instructions: args.choiceDef.instructions,
     values,
+    ...optionals,
   };
 }
 
@@ -133,6 +140,10 @@ export function createDrawingCardsChoice(args: {
     choosingPlayerId: args.playerId,
     instructions: "Choose a card to draw.",
     values,
+    labels: {
+      consumer: msg("term.consumer"),
+      producer: msg("term.producer"),
+    },
     min: values.length > 0 ? 1 : 0,
     max: 1,
   };

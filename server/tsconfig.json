@@ -17,6 +17,7 @@
     ] /* Allow multiple folders to be treated as one when resolving modules. */,
     "outDir": "./dist" /* Specify an output folder for all emitted files. */,
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+    "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
     /* Type Checking */
     "strict": true /* Enable all strict type-checking options. */,

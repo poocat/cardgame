@@ -14,6 +14,7 @@ import type {
   ChoiceValue,
   Decision,
   Id,
+  Message,
   PlayerData,
 } from "@server/types";
 
@@ -173,6 +174,8 @@ export type ChoiceDef = {
   name: string;
   type: ChoiceType;
   instructions: string;
+  /** Use to provide labels for any of the values returned by `getValues` */
+  labels?: Record<string, Message>;
   /** Use to indicate the minimum number of options the player must select from the given options. */
   min?: number;
   /** Use to indicate the maximum number of options the player may select from the given options. */

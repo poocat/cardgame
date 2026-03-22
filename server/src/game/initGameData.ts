@@ -93,6 +93,10 @@ export function initGameData(
         name: "deck",
         type: "arbitrary",
         values: ["producer", "consumer"],
+        labels: {
+          producer: { key: "term.producer" },
+          consumer: { key: "term.consumer" },
+        },
         min: 1,
         max: 1,
         choosingPlayerId: firstPlayer.id,
