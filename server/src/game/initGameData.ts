@@ -5,6 +5,7 @@ import {
   getCardDefinition,
 } from "@server/game/cards/registry";
 import { logger } from "@server/logger";
+import { msg } from "@server/text/messages";
 import type { ActionType, GameData } from "@server/types";
 
 function makeId(): string {
@@ -94,8 +95,8 @@ export function initGameData(
         type: "arbitrary",
         values: ["producer", "consumer"],
         labels: {
-          producer: { key: "term.producer" },
-          consumer: { key: "term.consumer" },
+          producer: msg("term.producer"),
+          consumer: msg("term.consumer"),
         },
         min: 1,
         max: 1,

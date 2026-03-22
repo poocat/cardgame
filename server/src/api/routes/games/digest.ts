@@ -7,7 +7,9 @@ import type {
 import { actionTypes } from "@common/game/enums";
 import { anonymizeId } from "@server/api/anonymization";
 import { getCardDefinition } from "@server/game/cards/registry";
-import type { CardData, GameData, Id } from "@server/types";
+import { resolve } from "@server/text/messages";
+import { getLocaleBundle } from "@server/text/registry";
+import type { CardData, GameData, Id, Message } from "@server/types";
 import type z from "zod";
 
 type GameDigest = z.infer<typeof gameDigestSchema>;
@@ -54,11 +56,13 @@ export function digestGameData({
   gameData,
   anonymizationSalt,
   playerId,
+  locale = "en",
 }: {
   gameData: GameData;
   anonymizationSalt: string;
   /* The id of the player requesting the data. Undefined for a spectator. */
   playerId?: Id;
+  locale?: string;
 }): GameDigest {
   const anonymizedPlayerIdMap: Record<Id, Id> = {};
   const playerNameMap: Record<Id, string> = {};
@@ -83,9 +87,13 @@ export function digestGameData({
     });
   }
 
-  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Use to create digests for cards that are visible to the observing player.
-   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  const localeBundle = getLocaleBundle(locale);
+
+  function resolveMessage(msg: Message | undefined, def: string): string {
+    if (msg === undefined) return def;
+    return resolve(msg, localeBundle);
+  }
+
   function visibleCardDigest(cardData: CardData): VisibleCardDigest {
     const cardDef = getCardDefinition(cardData.name);
     // Actions should be displayed in order.
@@ -147,8 +155,13 @@ export function digestGameData({
   const choiceValuesDigest: ChoiceValuesDigest[] = [];
   switch (gameData.activity.currentChoice.type) {
     case "arbitrary": {
+      const labels = gameData.activity.currentChoice.labels;
       choiceValuesDigest.push(
-        ...choiceValues.map((v) => ({ value: v, onCardId: null, label: v })),
+        ...choiceValues.map((v) => ({
+          value: v,
+          onCardId: null,
+          label: resolveMessage(labels?.[v], v),
+        })),
       );
       break;
     }

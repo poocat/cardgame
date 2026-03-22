@@ -3,9 +3,10 @@ import { errorHandler } from "@server/api/middleware";
 import { cards, games, rooms } from "@server/api/routes";
 import { CONFIG } from "@server/config";
 import { initDb } from "@server/db/database";
+import { useExampleCards, usePrivateCards } from "@server/game/cards/registry";
 import { logger } from "@server/logger";
+import { useDefaultLocales, usePrivateLocales } from "@server/text/registry";
 import express from "express";
-import { useExampleCards, usePrivateCards } from "./game/cards/registry";
 
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
@@ -22,6 +23,13 @@ export async function startServer() {
   } catch (error) {
     logger.warn({ error }, "could not load private card registry");
     useExampleCards();
+  }
+
+  try {
+    usePrivateLocales();
+  } catch (error) {
+    logger.warn({ error }, "could not load private locales");
+    useDefaultLocales();
   }
 
   const app = express();
