@@ -20,7 +20,7 @@ export const exampleConsumer: CardDef = {
           } else {
             return {
               ok: false,
-              reasons: ["No producers in play with chips on them."],
+              reasons: [{ key: "No producers in play with chips on them." }],
             };
           }
         },
@@ -74,7 +74,7 @@ export const exampleConsumer: CardDef = {
           } else {
             return {
               ok: false,
-              reasons: ["No other producers in play."],
+              reasons: [{ key: "No other producers in play." }],
             };
           }
         },

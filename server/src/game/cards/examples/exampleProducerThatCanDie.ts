@@ -52,7 +52,7 @@ export const exampleProducerThatCanDie: CardDef = {
           } else {
             return {
               ok: false,
-              reasons: ["No other consumers in play."],
+              reasons: [{ key: "No other consumers in play." }],
             };
           }
         },

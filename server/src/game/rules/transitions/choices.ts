@@ -163,7 +163,7 @@ export function createChoosingActionChoice(args: {
       if (a.card.ownerId !== args.playerId) {
         args.annotator?.add({
           id: a.id,
-          messages: ["This is not your card."],
+          messages: [msg("reason.notOwner")],
         });
         return false;
       }

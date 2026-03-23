@@ -159,10 +159,10 @@ export interface IDecisions {
 ////////////////////////////////////////////////////////////////////////////////
 export type CheckResult =
   | { ok: true; reasons?: never }
-  | { ok: false; reasons: string[] };
+  | { ok: false; reasons: Message[] };
 
 export interface IAnnotator {
-  add(args: { id: Id; messages: string[] }): void;
+  add(args: { id: Id; messages: Message[] }): void;
   clear(): void;
 }
 

@@ -92,7 +92,7 @@ export const testCards = {
             } else {
               return {
                 ok: false,
-                reasons: ["No consumers in play."],
+                reasons: [{ key: "No consumers in play." }],
               };
             }
           },
@@ -226,7 +226,7 @@ export const testCards = {
             } else {
               return {
                 ok: false,
-                reasons: ["No producers in play with chips on them."],
+                reasons: [{ key: "No producers in play with chips on them." }],
               };
             }
           },
@@ -316,7 +316,7 @@ export const testCards = {
             } else {
               return {
                 ok: false,
-                reasons: ["No producers in play."],
+                reasons: [{ key: "No producers in play." }],
               };
             }
           },

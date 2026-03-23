@@ -164,7 +164,7 @@ export type WinData = {
 
 export type AnnotationData = {
   id: Id;
-  message: string;
+  message: Message;
 };
 
 export type GameData = {

@@ -9,4 +9,11 @@ export const messageKeys = [
   "term.reserve",
   "activity.drawingCards.choice.instructions",
   "activity.choosingAction.choice.instructions",
+  "reason.cardAlreadyInPlay",
+  "reason.cardNotInGame",
+  "reason.cardNotInPlay",
+  "reason.cardExhausted",
+  "reason.notOwner",
+  "reason.maxProducersInPlay",
+  "reason.maxConsumersInPlay",
 ] as const;

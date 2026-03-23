@@ -64,6 +64,13 @@ export function digestGameData({
   playerId?: Id;
   locale?: string;
 }): GameDigest {
+  const localeBundle = getLocaleBundle(locale);
+
+  function resolveMessage(msg: Message | undefined, def?: string): string {
+    if (msg === undefined) return def ?? "";
+    return resolve(msg, localeBundle);
+  }
+
   const anonymizedPlayerIdMap: Record<Id, Id> = {};
   const playerNameMap: Record<Id, string> = {};
   gameData.players.forEach((p) => {
@@ -81,17 +88,11 @@ export function digestGameData({
   const annotationMap: Record<Id, string[]> = {};
   if (observingPlayerIsChoosing) {
     gameData.annotations.forEach(({ id, message }) => {
+      const resolved = resolveMessage(message);
       const match = annotationMap[id];
-      if (match) match.push(message);
-      else annotationMap[id] = [message];
+      if (match) match.push(resolved);
+      else annotationMap[id] = [resolved];
     });
-  }
-
-  const localeBundle = getLocaleBundle(locale);
-
-  function resolveMessage(msg: Message | undefined, def?: string): string {
-    if (msg === undefined) return def ?? "";
-    return resolve(msg, localeBundle);
   }
 
   function visibleCardDigest(cardData: CardData): VisibleCardDigest {
