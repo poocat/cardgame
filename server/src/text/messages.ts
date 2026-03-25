@@ -29,6 +29,9 @@ export function msg(key: Key, params?: Message["params"]): Message {
  * key in the message `params`, then by looking for a matching key in the given
  * `bundle`. If no matches are found, the token is not replaced.
  *
+ * Tokens may also be replaced by messages, each with their own tokens.
+ * So, tokens are replaced recursively.
+ *
  * Example:
  * ```
  * >>> resolve(
@@ -41,14 +44,19 @@ export function msg(key: Key, params?: Message["params"]): Message {
 export function resolve(
   message: Message,
   bundle: Record<string, string>,
+  depth = 0,
 ): string {
   const template = bundle[message.key] ?? message.key;
-  if (!message.params) return template;
-  const params = message.params;
+  if (depth > 5) return template;
+  const params = message.params ?? {};
   return template.replace(/\{([a-zA-Z0-9.]+)\}/g, (_, key) => {
+    // Look for replacement, first in params, then in the bundle itself.
     const val = params[key] ?? bundle[key];
+    // Keep token intact if there's nothing to replace it with.
     if (val === undefined) return `{${key}}`;
-    if (typeof val === "object") return resolve(val, bundle);
-    return String(val);
+    // Params can map to messages.
+    else if (typeof val === "object") return resolve(val, bundle, depth + 1);
+    // Tokens can resolve to a string with more tokens.
+    return resolve({ key: String(val) }, bundle, depth + 1);
   });
 }
