@@ -1,13 +1,15 @@
 import type { Message } from "@server/types";
 import type { messageKeys } from "./keys";
 
-// "Loose autocomplete" pattern
-type Key = (typeof messageKeys)[number] | (string & {});
+type Key = (typeof messageKeys)[number];
 
 /******************************************************************************
  * ### msg
  *
- * Helper for generating message objects.
+ * Helper for generating message objects. Only accepts keys that are used for
+ * messages emitted from the game engine (not cards).
+ *
+ * For cards, use literal objects e.g. `{key: "...", params: {...}}`.
  ******************************************************************************/
 export function msg(key: Key, params?: Message["params"]): Message {
   return params ? { key, params } : { key };

@@ -10,13 +10,11 @@
 
   "activity.drawingCards.choice.instructions": "Choose a deck to draw from.",
   "activity.choosingAction.choice.instructions": "Choose an action to take, or pass your turn.",
-
   "reason.cardAlreadyInPlay": "This card is already in play.",
   "reason.cardExhausted": "This card is exhausted.",
   "reason.cardNotInPlay": "This card is not in play.",
   "reason.cardNotInGame": "This card is not in the game.",
   "reason.maxProducersInPlay": "There are already {n} {term.producers} in play.",
   "reason.maxConsumersInPlay": "There are already {n} {term.consumers} in play.",
-  "reason.notOwner": "This is not your card.",
-  "": ""
+  "reason.notOwner": "This is not your card."
 }

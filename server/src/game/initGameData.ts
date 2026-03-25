@@ -95,8 +95,8 @@ export function initGameData(
         type: "arbitrary",
         values: ["producer", "consumer"],
         labels: {
-          producer: msg("term.producer"),
-          consumer: msg("term.consumer"),
+          producer: msg("deck.producers"),
+          consumer: msg("deck.consumers"),
         },
         min: 1,
         max: 1,

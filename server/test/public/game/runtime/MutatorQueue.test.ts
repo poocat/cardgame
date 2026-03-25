@@ -4,7 +4,6 @@ import {
 } from "@server/game/cards/registry";
 import { Mutator } from "@server/game/runtime/Mutator";
 import { MutatorQueue } from "@server/game/runtime/MutatorQueue";
-import { msg } from "@server/text/messages";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testCards } from "../../../fixtures/cards";
 import { GameBuilder } from "../../../helpers/GameBuilder";
@@ -134,7 +133,7 @@ describe("MutatorQueue", () => {
           min: 1,
           max: 1,
           choosingPlayerId: "alice",
-          instructions: msg("Draw."),
+          instructions: { key: "Draw." },
         },
         nextChoices: [],
         previousDecisions: [],
