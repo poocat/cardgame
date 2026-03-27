@@ -8,8 +8,6 @@ type Key = (typeof messageKeys)[number];
  *
  * Helper for generating message objects. Only accepts keys that are used for
  * messages emitted from the game engine (not cards).
- *
- * For cards, use literal objects e.g. `{key: "...", params: {...}}`.
  ******************************************************************************/
 export function msg(key: Key, params?: Message["params"]): Message {
   return params ? { key, params } : { key };
