@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import { CONFIG } from "@server/config";
 import { logger } from "@server/logger";
@@ -62,13 +63,13 @@ export function usePrivateLocales() {
     throw new Error("No private path configured.");
   }
   const localesDir = path.join(CONFIG.privatePath, "text", "locales");
-  const fs = require("node:fs");
-  const files: string[] = fs.readdirSync(localesDir);
+  const files = fs.readdirSync(localesDir);
   resetLocaleRegistry();
   for (const file of files) {
     if (!file.endsWith(".json")) continue;
     const locale = file.replace(".json", "");
-    const bundle = require(path.join(localesDir, file));
+    const content = fs.readFileSync(path.join(localesDir, file), "utf-8");
+    const bundle = JSON.parse(content);
     registerLocaleBundle(locale, bundle);
   }
   logger.info({ count: localeMap.size }, "loaded private locales");
