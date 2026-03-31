@@ -7,9 +7,15 @@ import type {
 import { actionTypes } from "@common/game/enums";
 import { anonymizeId } from "@server/api/anonymization";
 import { getCardDefinition } from "@server/game/cards/registry";
-import { resolve } from "@server/text/messages";
+import { msg, resolve } from "@server/text/messages";
 import { getLocaleBundle } from "@server/text/registry";
-import type { CardData, GameData, Id, Message } from "@server/types";
+import type {
+  ActionType,
+  CardData,
+  GameData,
+  Id,
+  Message,
+} from "@server/types";
 import type z from "zod";
 
 type GameDigest = z.infer<typeof gameDigestSchema>;
@@ -18,7 +24,20 @@ type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
 type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type ChoiceValuesDigest = z.infer<typeof choiceValueDigestSchema>;
 
-function createActivityExplanation(gameData: GameData): string {
+function actionTypeMessage(actionType?: ActionType): Message {
+  switch (actionType) {
+    case "play":
+      return msg("action.type.play");
+    case "ability":
+      return msg("action.type.ability");
+    case "discard":
+      return msg("action.type.discard");
+    default:
+      throw new Error(`Unexpected action type: ${actionType}`);
+  }
+}
+
+function createActivityExplanation(gameData: GameData): Message {
   const choosingPlayerId = gameData.activity.currentChoice.choosingPlayerId;
   const choosingPlayer = gameData.players.find(
     (p) => p.id === choosingPlayerId,
@@ -26,22 +45,32 @@ function createActivityExplanation(gameData: GameData): string {
   const choosingPlayerName = choosingPlayer?.name;
   switch (gameData.activity.type) {
     case "choosingAction": {
-      return `${choosingPlayerName} is choosing which action to take, or whether or not to pass their turn.`;
+      return msg("activity.choosingAction.explanation", {
+        choosingPlayerName: choosingPlayerName ?? "",
+      });
     }
     case "drawingCards": {
-      return `${choosingPlayerName} is choosing which deck to draw from.`;
+      return msg("activity.drawingCards.explanation", {
+        choosingPlayerName: choosingPlayerName ?? "",
+      });
     }
     case "takingAction": {
       const actionId = gameData.activity.actionId;
+      const action = gameData.actions.find((a) => a.id === actionId);
       const playerTakingActionId = gameData.activity.playerTakingActionId;
       const playerTakingAction = gameData.players.find(
         (p) => p.id === playerTakingActionId,
       );
-      const action = gameData.actions.find((a) => a.id === actionId);
-      return `${playerTakingAction?.name} has chosen the ${action?.type} action from ${action?.card.name}. ${choosingPlayerName} is currently choosing values.`;
+      const cardDef = getCardDefinition(action?.card.name ?? "");
+      return msg("activity.takingAction.explanation", {
+        currentPlayerName: playerTakingAction?.name ?? "",
+        choosingPlayerName: choosingPlayerName ?? "",
+        cardName: cardDef.display ?? { key: action?.card.name ?? "" },
+        actionType: actionTypeMessage(action?.type),
+      });
     }
     default: {
-      return "";
+      return { key: "" };
     }
   }
 }
@@ -225,7 +254,7 @@ export function digestGameData({
     playerTakingTurnId: anonymizedPlayerIdMap[gameData.playerTakingTurnId],
     activity: {
       type: gameData.activity.type,
-      explanation: createActivityExplanation(gameData),
+      explanation: resolveMessage(createActivityExplanation(gameData)),
       choice: {
         name: gameData.activity.currentChoice.name,
         type: gameData.activity.currentChoice.type,
