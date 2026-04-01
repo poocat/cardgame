@@ -37,6 +37,9 @@ export function msg(key: Key, params?: Message["params"]): Message {
  *   { hello: "Hello, {name}{emphasis}", emphasis: "!"},
  * )
  * "Hello, World!"
+ *
+ * Note, there's nothing preventing the message params from using keys that are
+ * in the bundle, in which case the message params take precedence.
  * ```
  ******************************************************************************/
 export function resolve(
