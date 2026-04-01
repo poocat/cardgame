@@ -1,6 +1,6 @@
 {
   "deck.producers": "Producer",
-  "deck.consumer": "Consumer",
+  "deck.consumers": "Consumer",
   "action.type.play": "play",
   "action.type.ability": "ability",
   "action.type.discard": "discard",

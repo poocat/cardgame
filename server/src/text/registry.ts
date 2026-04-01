@@ -74,3 +74,18 @@ export function usePrivateLocales() {
   }
   logger.info({ count: localeMap.size }, "loaded private locales");
 }
+
+/******************************************************************************
+ * ### missingBundleKeys
+ *
+ * Returns any keys from the given `requiredKeys` that are missing from the
+ * given locale `bundle`.
+ *
+ * Used to validate bundles.
+ ******************************************************************************/
+export function missingBundleKeys(
+  bundle: LocaleBundle,
+  requiredKeys: readonly string[],
+): string[] {
+  return requiredKeys.filter((key) => !(key in bundle));
+}
