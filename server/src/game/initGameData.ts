@@ -5,6 +5,7 @@ import {
   getCardDefinition,
 } from "@server/game/cards/registry";
 import { logger } from "@server/logger";
+import { msg } from "@server/text/messages";
 import type { ActionType, GameData } from "@server/types";
 
 function makeId(): string {
@@ -91,12 +92,16 @@ export function initGameData(
       previousDecisions: [],
       currentChoice: {
         name: "deck",
-        type: "deck",
+        type: "arbitrary",
         values: ["producer", "consumer"],
+        labels: {
+          producer: msg("deck.producers"),
+          consumer: msg("deck.consumers"),
+        },
         min: 1,
         max: 1,
         choosingPlayerId: firstPlayer.id,
-        instructions: "Choose the deck to draw your first card from.",
+        instructions: msg("activity.drawingCards.choice.instructions"),
       },
       nextChoices: [],
     },

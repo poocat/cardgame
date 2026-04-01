@@ -14,6 +14,7 @@ import type {
   ChoiceValue,
   Decision,
   Id,
+  Message,
   PlayerData,
 } from "@server/types";
 
@@ -158,10 +159,10 @@ export interface IDecisions {
 ////////////////////////////////////////////////////////////////////////////////
 export type CheckResult =
   | { ok: true; reasons?: never }
-  | { ok: false; reasons: string[] };
+  | { ok: false; reasons: Message[] };
 
 export interface IAnnotator {
-  add(args: { id: Id; messages: string[] }): void;
+  add(args: { id: Id; messages: Message[] }): void;
   clear(): void;
 }
 
@@ -172,7 +173,9 @@ export type ChoiceDef = {
   /** The "name" of the choice. */
   name: string;
   type: ChoiceType;
-  instructions: string;
+  instructions: Message;
+  /** Use to provide labels for any of the values returned by `getValues` */
+  labels?: Record<string, Message>;
   /** Use to indicate the minimum number of options the player must select from the given options. */
   min?: number;
   /** Use to indicate the maximum number of options the player may select from the given options. */
@@ -223,7 +226,7 @@ export type SequenceDef = {
 
 export type ActionDef = {
   /** Instructions to display on the card. */
-  instructions?: string;
+  instructions?: Message;
   /** The sequence for the action's activity. If undefined, only the default effects (for the given action type) will be used. */
   sequence?: SequenceDef;
   /** Use to skip default effects, since default effects can potentially "overwrite" custom effects. */
@@ -231,7 +234,7 @@ export type ActionDef = {
 };
 
 export type TriggerDef = {
-  instructions: string;
+  instructions: Message;
   affect: (args: {
     current: IAccessor;
     next: IAccessor;
@@ -253,6 +256,8 @@ type LinkDef = {
 export type CardDef = {
   /** The unique name of the card. Will be copied into the game data, and used to correlate cards in the game with their definitions. */
   name: string;
+  /** The name of the card as it is displayed to the player. Supports localization. Defaults to `name`. */
+  display?: Message;
   type: CardType;
   actions: Partial<ActionTypeMap<ActionDef>>;
   /** Each card can have a single, custom triggered effect. The trigger is only active while the card is in play. */

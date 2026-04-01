@@ -7,7 +7,15 @@ import type {
 import { actionTypes } from "@common/game/enums";
 import { anonymizeId } from "@server/api/anonymization";
 import { getCardDefinition } from "@server/game/cards/registry";
-import type { CardData, GameData, Id } from "@server/types";
+import { msg, resolve } from "@server/text/messages";
+import { getLocaleBundle } from "@server/text/registry";
+import type {
+  ActionType,
+  CardData,
+  GameData,
+  Id,
+  Message,
+} from "@server/types";
 import type z from "zod";
 
 type GameDigest = z.infer<typeof gameDigestSchema>;
@@ -16,7 +24,20 @@ type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
 type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type ChoiceValuesDigest = z.infer<typeof choiceValueDigestSchema>;
 
-function createActivityExplanation(gameData: GameData): string {
+function actionTypeMessage(actionType?: ActionType): Message {
+  switch (actionType) {
+    case "play":
+      return msg("action.type.play");
+    case "ability":
+      return msg("action.type.ability");
+    case "discard":
+      return msg("action.type.discard");
+    default:
+      throw new Error(`Unexpected action type: ${actionType}`);
+  }
+}
+
+function createActivityExplanation(gameData: GameData): Message {
   const choosingPlayerId = gameData.activity.currentChoice.choosingPlayerId;
   const choosingPlayer = gameData.players.find(
     (p) => p.id === choosingPlayerId,
@@ -24,22 +45,32 @@ function createActivityExplanation(gameData: GameData): string {
   const choosingPlayerName = choosingPlayer?.name;
   switch (gameData.activity.type) {
     case "choosingAction": {
-      return `${choosingPlayerName} is choosing which action to take, or whether or not to pass their turn.`;
+      return msg("activity.choosingAction.explanation", {
+        choosingPlayerName: choosingPlayerName ?? "",
+      });
     }
     case "drawingCards": {
-      return `${choosingPlayerName} is choosing which deck to draw from.`;
+      return msg("activity.drawingCards.explanation", {
+        choosingPlayerName: choosingPlayerName ?? "",
+      });
     }
     case "takingAction": {
       const actionId = gameData.activity.actionId;
+      const action = gameData.actions.find((a) => a.id === actionId);
       const playerTakingActionId = gameData.activity.playerTakingActionId;
       const playerTakingAction = gameData.players.find(
         (p) => p.id === playerTakingActionId,
       );
-      const action = gameData.actions.find((a) => a.id === actionId);
-      return `${playerTakingAction?.name} has chosen the ${action?.type} action from ${action?.card.name}. ${choosingPlayerName} is currently choosing values.`;
+      const cardDef = getCardDefinition(action?.card.name ?? "");
+      return msg("activity.takingAction.explanation", {
+        currentPlayerName: playerTakingAction?.name ?? "",
+        choosingPlayerName: choosingPlayerName ?? "",
+        cardName: cardDef.display ?? { key: action?.card.name ?? "" },
+        actionType: actionTypeMessage(action?.type),
+      });
     }
     default: {
-      return "";
+      return { key: "" };
     }
   }
 }
@@ -54,12 +85,21 @@ export function digestGameData({
   gameData,
   anonymizationSalt,
   playerId,
+  locale = "en",
 }: {
   gameData: GameData;
   anonymizationSalt: string;
   /* The id of the player requesting the data. Undefined for a spectator. */
   playerId?: Id;
+  locale?: string;
 }): GameDigest {
+  const localeBundle = getLocaleBundle(locale);
+
+  function resolveMessage(msg: Message | undefined, def?: string): string {
+    if (msg === undefined) return def ?? "";
+    return resolve(msg, localeBundle);
+  }
+
   const anonymizedPlayerIdMap: Record<Id, Id> = {};
   const playerNameMap: Record<Id, string> = {};
   gameData.players.forEach((p) => {
@@ -77,15 +117,13 @@ export function digestGameData({
   const annotationMap: Record<Id, string[]> = {};
   if (observingPlayerIsChoosing) {
     gameData.annotations.forEach(({ id, message }) => {
+      const resolved = resolveMessage(message);
       const match = annotationMap[id];
-      if (match) match.push(message);
-      else annotationMap[id] = [message];
+      if (match) match.push(resolved);
+      else annotationMap[id] = [resolved];
     });
   }
 
-  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Use to create digests for cards that are visible to the observing player.
-   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   function visibleCardDigest(cardData: CardData): VisibleCardDigest {
     const cardDef = getCardDefinition(cardData.name);
     // Actions should be displayed in order.
@@ -100,7 +138,7 @@ export function digestGameData({
         actions.push({
           id: matchData.id,
           type,
-          instructions: matchDef.instructions ?? "",
+          instructions: resolveMessage(matchDef.instructions),
           annotations: annotationMap[matchData.id] ?? [],
         });
     }
@@ -110,7 +148,8 @@ export function digestGameData({
     return {
       id: cardData.id,
       name: cardData.name,
-      triggerInstructions: cardDef.trigger?.instructions ?? "",
+      display: resolveMessage(cardDef.display, cardData.name),
+      triggerInstructions: resolveMessage(cardDef.trigger?.instructions),
       imageSourceUrl: imageSourceLink?.url ?? "",
       type: cardData.type,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
@@ -147,11 +186,12 @@ export function digestGameData({
   const choiceValuesDigest: ChoiceValuesDigest[] = [];
   switch (gameData.activity.currentChoice.type) {
     case "arbitrary": {
+      const labels = gameData.activity.currentChoice.labels;
       choiceValuesDigest.push(
         ...choiceValues.map((v) => ({
           value: v,
           onCardId: null,
-          label: v,
+          label: resolveMessage(labels?.[v], v),
         })),
       );
       break;
@@ -214,7 +254,7 @@ export function digestGameData({
     playerTakingTurnId: anonymizedPlayerIdMap[gameData.playerTakingTurnId],
     activity: {
       type: gameData.activity.type,
-      explanation: createActivityExplanation(gameData),
+      explanation: resolveMessage(createActivityExplanation(gameData)),
       choice: {
         name: gameData.activity.currentChoice.name,
         type: gameData.activity.currentChoice.type,
@@ -225,7 +265,9 @@ export function digestGameData({
           anonymizedPlayerIdMap[
             gameData.activity.currentChoice.choosingPlayerId
           ],
-        instructions: gameData.activity.currentChoice.instructions,
+        instructions: resolveMessage(
+          gameData.activity.currentChoice.instructions,
+        ),
       },
       previouslyChosenValues: gameData.activity.previousDecisions.flatMap(
         (d) => d.values,

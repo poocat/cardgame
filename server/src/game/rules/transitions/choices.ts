@@ -7,6 +7,7 @@ import type {
   IAnnotator,
   IDecisions,
 } from "@server/game/types";
+import { msg } from "@server/text/messages";
 import type {
   ActionData,
   ActivityData,
@@ -47,7 +48,7 @@ export function nullChoice(): ChoiceData {
     name: "",
     type: "arbitrary",
     choosingPlayerId: "",
-    instructions: "",
+    instructions: { key: "" },
     values: [],
     min: 0,
     max: 0,
@@ -89,6 +90,10 @@ export function createActionChoice(args: {
     args.choiceDef.max ??
     args.choiceDef.getMax?.({ ...commonArgs, values }) ??
     9999;
+  const optionals =
+    args.choiceDef.type === "arbitrary"
+      ? { labelMap: args.choiceDef.labels }
+      : {};
   return {
     name: args.choiceDef.name,
     type: args.choiceDef.type,
@@ -97,6 +102,7 @@ export function createActionChoice(args: {
     choosingPlayerId: args.actionContext.playerTakingActionId,
     instructions: args.choiceDef.instructions,
     values,
+    ...optionals,
   };
 }
 
@@ -123,16 +129,19 @@ export function createDrawingCardsChoice(args: {
       types: ["producer"],
       locationTypes: ["inDeck"],
     });
-    // TODO!!! "Producer" and "consumer" are generic terms. Allow themed terminology.
     if (producers.length > 0) values.push("producer");
     if (consumers.length > 0) values.push("consumer");
   }
   return {
     name: "deck",
-    type: "deck",
+    type: "arbitrary",
     choosingPlayerId: args.playerId,
-    instructions: "Choose a card to draw.",
+    instructions: msg("activity.drawingCards.choice.instructions"),
     values,
+    labels: {
+      consumer: msg("deck.consumers"),
+      producer: msg("deck.producers"),
+    },
     min: values.length > 0 ? 1 : 0,
     max: 1,
   };
@@ -154,7 +163,7 @@ export function createChoosingActionChoice(args: {
       if (a.card.ownerId !== args.playerId) {
         args.annotator?.add({
           id: a.id,
-          messages: ["This is not your card."],
+          messages: [msg("reason.notOwner")],
         });
         return false;
       }
@@ -189,7 +198,7 @@ export function createChoosingActionChoice(args: {
     name: "actionToTake",
     type: "actionId",
     choosingPlayerId: args.playerId,
-    instructions: "Choose an action to take, or pass your turn.",
+    instructions: msg("activity.choosingAction.choice.instructions"),
     values,
     min: 0,
     max: 1,

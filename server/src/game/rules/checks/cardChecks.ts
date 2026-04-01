@@ -1,5 +1,6 @@
 import { CONSTANTS } from "@common/game/constants";
 import type { CheckResult, IAccessor } from "@server/game/types";
+import { msg } from "@server/text/messages";
 import type { CardData, CardTypeMap } from "@server/types";
 
 /******************************************************************************
@@ -28,8 +29,9 @@ export const cardPlayChecks: CardTypeMap<
       return {
         ok: false,
         reasons: [
-          // TODO!!! "Producers" is the generic term. Allow themed terminology.
-          `Already ${CONSTANTS.maxNumProducersInPlay} producers in play.`,
+          msg("reason.maxProducersInPlay", {
+            n: CONSTANTS.maxNumProducersInPlay,
+          }),
         ],
       };
     } else {
@@ -54,8 +56,9 @@ export const cardPlayChecks: CardTypeMap<
       return {
         ok: false,
         reasons: [
-          // TODO!!! "Consumers" is the generic term. Allow themed terminology.
-          `Already ${CONSTANTS.maxNumConsumersInPlay} consumers in play.`,
+          msg("reason.maxConsumersInPlay", {
+            n: CONSTANTS.maxNumConsumersInPlay,
+          }),
         ],
       };
     } else {

@@ -1,5 +1,5 @@
 import type { IAnnotator } from "@server/game/types";
-import type { AnnotationData, Id } from "@server/types";
+import type { AnnotationData, Id, Message } from "@server/types";
 
 /******************************************************************************
  * ### Annotator
@@ -10,7 +10,7 @@ import type { AnnotationData, Id } from "@server/types";
 export class Annotator implements IAnnotator {
   public annotations: AnnotationData[] = [];
 
-  add(args: { id: Id; messages: string[] }) {
+  add(args: { id: Id; messages: Message[] }) {
     this.annotations.push(
       ...args.messages.map((m) => ({ id: args.id, message: m })),
     );

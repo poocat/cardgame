@@ -54,6 +54,7 @@ export const chipDigestSchema = z.strictObject({
 export const visibleCardDigestSchema = z.strictObject({
   id: idSchema,
   name: z.string(),
+  display: z.string(),
   triggerInstructions: z.string().nullable(),
   imageSourceUrl: z.string().optional(),
   type: z.union(cardTypes.map((t) => z.literal(t))),

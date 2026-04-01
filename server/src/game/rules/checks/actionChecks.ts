@@ -1,5 +1,6 @@
 import type { CheckResult, IAccessor } from "@server/game/types";
-import type { ActionData, ActionTypeMap } from "@server/types";
+import { msg } from "@server/text/messages";
+import type { ActionData, ActionTypeMap, Message } from "@server/types";
 import { cardPlayChecks } from "./cardChecks";
 
 /******************************************************************************
@@ -16,7 +17,7 @@ export const actionTypeChecks: ActionTypeMap<
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   play: ({ actionData, accessor }) => {
     const matchingCard = accessor.getCardById({ cardId: actionData.card.id });
-    const reasons: string[] = [];
+    const reasons: Message[] = [];
     const result = cardPlayChecks[matchingCard.type]({
       accessor,
       cardData: matchingCard,
@@ -25,7 +26,7 @@ export const actionTypeChecks: ActionTypeMap<
       reasons.push(...result.reasons);
     }
     if (matchingCard.location.type !== "inHand") {
-      reasons.push("This card is already in play.");
+      reasons.push(msg("reason.cardAlreadyInPlay"));
     }
     if (reasons.length > 0) {
       return { ok: false, reasons };
@@ -40,13 +41,13 @@ export const actionTypeChecks: ActionTypeMap<
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   ability: ({ actionData, accessor }) => {
     const matchingCard = accessor.getCardById({ cardId: actionData.card.id });
-    const reasons: string[] = [];
+    const reasons: Message[] = [];
     if (!matchingCard) {
-      reasons.push("This card is not in the game.");
+      reasons.push(msg("reason.cardNotInGame"));
     } else if (matchingCard.location.type !== "inPlay") {
-      reasons.push("This card is not in play.");
+      reasons.push(msg("reason.cardNotInPlay"));
     } else if (matchingCard?.location.exhausted) {
-      reasons.push("This card is exhausted.");
+      reasons.push(msg("reason.cardExhausted"));
     }
     if (reasons.length > 0) {
       return { ok: false, reasons };
@@ -61,13 +62,13 @@ export const actionTypeChecks: ActionTypeMap<
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   discard: ({ actionData, accessor }) => {
     const matchingCard = accessor.getCardById({ cardId: actionData.card.id });
-    const reasons: string[] = [];
+    const reasons: Message[] = [];
     if (!matchingCard) {
-      reasons.push("This card is not in the game.");
+      reasons.push(msg("reason.cardNotInGame"));
     } else if (matchingCard.location.type !== "inPlay") {
-      reasons.push("This card is not in play.");
+      reasons.push(msg("reason.cardNotInPlay"));
     } else if (matchingCard?.location.exhausted) {
-      reasons.push("This card is exhausted.");
+      reasons.push(msg("reason.cardExhausted"));
     }
     if (reasons.length > 0) {
       return { ok: false, reasons };
