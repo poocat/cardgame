@@ -59,12 +59,18 @@ export const Game = () => {
 
   const currentChoice = game?.activity.choice;
   const currentChoiceName = currentChoice?.name;
-  const observingPlayerIsChoosing = !poller.polling;
+  const observingPlayerIsChoosing =
+    game?.activity.choice.choosingPlayerId === observingPlayerId;
 
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   useAttention({
-    message: observingPlayerIsChoosing ? "Choice required!" : null,
+    message: !poller.polling ? "Polling stopped!" : null,
+    audio: "short",
+  });
+  useAttention({
+    message:
+      !poller.polling && observingPlayerIsChoosing ? "Choice required!" : null,
     audio: "short",
   });
   useAttention({
