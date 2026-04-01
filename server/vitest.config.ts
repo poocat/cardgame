@@ -15,6 +15,7 @@ export default defineConfig({
     env: {
       LOG_LEVEL: "silent",
       DOTENV_CONFIG_QUIET: "true",
+      PRIVATE_PATH: path.resolve(__dirname, "../private"),
     },
   },
 });
