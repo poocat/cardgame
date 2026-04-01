@@ -140,6 +140,9 @@
   background: var(--color-player-green);
 }
 .game-player-tablet--player-3 {
+  background: var(--color-player-orange);
+}
+.game-player-tablet--player-4 {
   background: var(--color-player-blue);
 }
 
