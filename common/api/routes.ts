@@ -115,4 +115,20 @@ export const ROUTES = {
     path: "/api/cards",
     methods: {},
   },
+  rulebook: {
+    path: "/api/rulebook",
+    methods: {
+      get: {
+        path: "/",
+        schemas: {
+          requestQuery: z.object({
+            locale: z
+              .string()
+              .regex(/^[a-z]{2}(-[a-z]{2})?$/)
+              .optional(),
+          }),
+        },
+      },
+    },
+  },
 } as const satisfies Routes;

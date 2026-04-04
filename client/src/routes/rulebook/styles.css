@@ -1,0 +1,25 @@
+.rulebook h1,
+.rulebook h2,
+.rulebook h3,
+.rulebook h4 {
+  margin-top: var(--space-lg);
+}
+
+.rulebook h1 {
+  text-align: center;
+}
+
+.rulebook p,
+.rulebook ul,
+.rulebook ol {
+  margin-top: var(--space-md);
+}
+
+.rulebook li + li {
+  margin-top: var(--space-sm);
+}
+
+.rulebook ul,
+.rulebook ol {
+  padding-left: var(--space-lg);
+}

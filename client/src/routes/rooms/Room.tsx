@@ -28,7 +28,7 @@ export const Room = () => {
   const [gameStarting, setGameStarting] = useState(false);
 
   const url = useMemo(() => {
-    const base = `/api/rooms/${roomId}`;
+    const base = `${ROUTES.rooms.path}/${roomId}`;
     return playerId ? `${base}?playerId=${playerId}` : base;
   }, [roomId, playerId]);
 
@@ -104,7 +104,7 @@ export const Room = () => {
         hostId: playerId,
       });
       const body = JSON.stringify(payload);
-      const response = await fetch(`/api/games`, {
+      const response = await fetch(ROUTES.games.path, {
         method: "POST",
         body,
         headers: {
