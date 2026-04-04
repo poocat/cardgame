@@ -16,7 +16,7 @@ export const NewRoom = () => {
         hostName,
       });
       const body = JSON.stringify(payload);
-      const response = await fetch("/api/rooms", {
+      const response = await fetch(ROUTES.rooms.path, {
         method: "POST",
         body,
         headers: {

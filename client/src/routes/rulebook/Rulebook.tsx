@@ -1,4 +1,5 @@
 import { Box } from "@client/components/layout";
+import { ROUTES } from "@common/api/routes";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import "./styles.css";
@@ -8,7 +9,7 @@ export const Rulebook = () => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch("/api/rulebook")
+    fetch(ROUTES.rulebook.path)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.text();

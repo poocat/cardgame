@@ -14,7 +14,7 @@ export const GameList = () => {
   useEffect(() => {
     const fetchGameList = async () => {
       try {
-        const response = await fetch("/api/games", {
+        const response = await fetch(ROUTES.games.path, {
           method: "GET",
         });
         if (response.ok) {
