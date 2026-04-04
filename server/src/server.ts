@@ -1,6 +1,6 @@
 import { ROUTES } from "@common/api/routes";
 import { errorHandler } from "@server/api/middleware";
-import { cards, games, rooms } from "@server/api/routes";
+import { cards, games, rooms, rulebook } from "@server/api/routes";
 import { CONFIG } from "@server/config";
 import { initDb } from "@server/db/database";
 import { useExampleCards, usePrivateCards } from "@server/game/cards/registry";
@@ -38,6 +38,7 @@ export async function startServer() {
   app.use(ROUTES.cards.path, cards);
   app.use(ROUTES.games.path, games);
   app.use(ROUTES.rooms.path, rooms);
+  app.use(ROUTES.rulebook.path, rulebook);
 
   // Global error handling:
   app.use(errorHandler);
