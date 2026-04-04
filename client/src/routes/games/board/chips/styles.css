@@ -65,7 +65,6 @@
   justify-content: center;
   font-size: var(--font-size-sm);
   color: var(--color-black);
-  padding-top: 3px; /* Optical alignment for text */
 }
 
 /* Variant of a chip, used to indicate how many chips have been selected from the given pool. */

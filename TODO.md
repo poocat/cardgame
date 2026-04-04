@@ -3,13 +3,13 @@
 - [ ] Give `common/` its own `package.json`, or adopt npm workspaces to resolve shared dependencies in ci/cd.
 - [ ] Add unit tests for API.
 - [ ] Write helpers for defining common actions for cards.
-- [ ] Support different language transformations of game instructions.
 - [ ] Support "development" activity.
-- [ ] Add "recent events" log to UI.
+- [ ] Add "recent mutations" log in UI.
 - [ ] Mutate game state on each step of sequence.
 - [ ] Display top card in discard.
 - [ ] Allow activity resets, e.g. "cancel action".
-- [ ] Make it harder to accidentally pass your turn.
+- [x] Support different language transformations of game instructions.
+- [x] Make it harder to accidentally pass your turn.
 - [x] Add external links to image source.
 - [x] Add tooltips to actions that you cannot take stating the reasons why.
 - [x] Add "auto decide" scenarios.

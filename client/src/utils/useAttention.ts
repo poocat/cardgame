@@ -150,8 +150,8 @@ export function useAttention(opts: {
     const message = opts.message || null;
     const active = message !== null;
 
-    if (active && !wasActive.current && !pageVisible()) {
-      addMessage(id.current, message);
+    if (active && !wasActive.current) {
+      if (!pageVisible()) addMessage(id.current, message);
       if (opts.audio) playAudioCue(opts.audio);
     } else if (active && wasActive.current) {
       // Message changed while still active. Update the message.
