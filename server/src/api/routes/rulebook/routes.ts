@@ -1,33 +1,44 @@
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
+import { ROUTES } from "@common/api/routes";
+import { burstLimiter } from "@server/api/middleware";
+import { STATUS } from "@server/api/status";
+import { validated } from "@server/api/wrappers";
 import { CONFIG } from "@server/config";
 import { logger } from "@server/logger";
 import { Router } from "express";
 
 export const rulebook = Router();
+rulebook.use(burstLimiter({ windowMs: 10 * 1000, max: 20 }));
 
 const rulesDir = CONFIG.privatePath
   ? path.join(CONFIG.privatePath, "copy", "rules")
   : null;
 
-if (rulesDir && fs.existsSync(rulesDir)) {
-  logger.info({ dir: rulesDir }, "serving rules");
-}
+rulebook.get(
+  ROUTES.rulebook.methods.get.path,
+  validated({
+    schemas: ROUTES.rulebook.methods.get.schemas,
+    handler: async (req, res) => {
+      if (!rulesDir) {
+        return res
+          .status(STATUS.notFound)
+          .json({ message: "Rules not available" });
+      }
 
-rulebook.get("/", (req, res) => {
-  if (!rulesDir || !fs.existsSync(rulesDir)) {
-    return res.status(404).json({ error: "Rules not available" });
-  }
+      const locale = req.query.locale ?? "en";
+      const filePath = path.join(rulesDir, `${locale}.md`);
+      const fallbackPath = path.join(rulesDir, "en.md");
 
-  const locale = typeof req.query.locale === "string" ? req.query.locale : "en";
-  const filePath = path.join(rulesDir, `${locale}.md`);
-  const fallbackPath = path.join(rulesDir, "en.md");
-  const resolvedPath = fs.existsSync(filePath) ? filePath : fallbackPath;
+      for (const candidate of [filePath, fallbackPath]) {
+        try {
+          const content = await fs.readFile(candidate, "utf-8");
+          logger.debug({ locale, file: candidate }, "serving rulebook");
+          return res.type("text/markdown").send(content);
+        } catch {}
+      }
 
-  if (!fs.existsSync(resolvedPath)) {
-    return res.status(404).json({ error: "Rules not found" });
-  }
-
-  const content = fs.readFileSync(resolvedPath, "utf-8");
-  res.type("text/markdown").send(content);
-});
+      return res.status(STATUS.notFound).json({ message: "Rules not found" });
+    },
+  }),
+);
