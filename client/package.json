@@ -15,6 +15,7 @@
     "@radix-ui/react-visually-hidden": "^1.2.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
     "react-router": "^7.9.4"
   },
   "devDependencies": {

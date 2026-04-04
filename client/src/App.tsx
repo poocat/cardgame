@@ -3,6 +3,7 @@ import { Game } from "@client/routes/games/Game";
 import { GameList } from "@client/routes/games/GameList";
 import { NewRoom } from "@client/routes/rooms/NewRoom";
 import { Room } from "@client/routes/rooms/Room";
+import { Rulebook } from "@client/routes/rulebook/Rulebook";
 import { Link, Outlet, Route, Routes } from "react-router";
 
 const Providers = (props: { children: React.ReactNode }) => {
@@ -14,8 +15,9 @@ const Layout = () => {
     <div>
       <Box spacing="md" color="secondary">
         <Stack spacing="md" orientation="horizontal">
-          <Link to="/">Cardgame</Link>
-          <Link to="/games">Games</Link>
+          <Link to="/">Game</Link>
+          <Link to="/games">List</Link>
+          <Link to="/rulebook">Rulebook</Link>
         </Stack>
       </Box>
       <Divider />
@@ -37,6 +39,7 @@ function App() {
           <Route path="/rooms">
             <Route path=":roomId" element={<Room />} />
           </Route>
+          <Route path="/rulebook" element={<Rulebook />} />
         </Route>
       </Routes>
     </Providers>
