@@ -33,14 +33,14 @@ import { CardImage } from "./image";
 import "./styles.css";
 import { Tooltip } from "@client/components/tooltips";
 import { Mini } from "./mini";
+import {
+  CardPile,
+  CardPileLabel,
+  CardPileStack,
+  CardPileStackItem,
+} from "./pile";
 import type { ThumbnailEmphasis } from "./thumbnail";
 import { Thumbnail, ThumbnailContainer } from "./thumbnail";
-import {
-  MiniCardPile,
-  MiniCardPileLabel,
-  MiniCardPileStack,
-  MiniCardPileStackItem,
-} from "./pile";
 
 /******************************************************************************
  * ### CardSelector
@@ -200,9 +200,6 @@ export const FaceUpThumbnail = memo(
 
 /******************************************************************************
  * ### MiniPlaceholder
- *
- * Mini-sized placeholder used to display a count, e.g. of non-visible cards in
- * a discard pile.
  ******************************************************************************/
 export const MiniPlaceholder = (props: { children?: React.ReactNode }) => {
   return <Mini placeholder>{props.children}</Mini>;
@@ -239,37 +236,37 @@ export const DiscardPile = (props: {
   setDialog: DialogProps["set"];
 }) => {
   return (
-    <MiniCardPile>
-      <MiniCardPileLabel>Discard ({props.totalCount})</MiniCardPileLabel>
-      <MiniCardPileStack>
-        <MiniCardPileStackItem>
+    <CardPile>
+      <CardPileLabel>Discard ({props.totalCount})</CardPileLabel>
+      <CardPileStack>
+        <CardPileStackItem>
           <MiniPlaceholder />
-        </MiniCardPileStackItem>
+        </CardPileStackItem>
         {props.cardsVisible.map((c) => (
-          <MiniCardPileStackItem key={c.id}>
+          <CardPileStackItem key={c.id}>
             <FaceUpMini card={c} setDialog={props.setDialog} />
-          </MiniCardPileStackItem>
+          </CardPileStackItem>
         ))}
-      </MiniCardPileStack>
-    </MiniCardPile>
+      </CardPileStack>
+    </CardPile>
   );
 };
 
 /******************************************************************************
  * ### HandPile
  *
- * Displays the most recently discarded cards at the top of a "pile".
+ * Indicates how many cards are in a non-observing player's hand.
  ******************************************************************************/
 export const HandPile = (props: { count: number }) => {
   return (
-    <MiniCardPile>
-      <MiniCardPileLabel>Hand ({props.count})</MiniCardPileLabel>
-      <MiniCardPileStack>
-        <MiniCardPileStackItem>
+    <CardPile>
+      <CardPileLabel>Hand ({props.count})</CardPileLabel>
+      <CardPileStack>
+        <CardPileStackItem>
           <MiniPlaceholder />
-        </MiniCardPileStackItem>
-      </MiniCardPileStack>
-    </MiniCardPile>
+        </CardPileStackItem>
+      </CardPileStack>
+    </CardPile>
   );
 };
 

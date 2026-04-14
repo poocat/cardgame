@@ -125,7 +125,7 @@ export function digestGameData({
   }
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   *
+   * Use to create digests for any visible card.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   function visibleCardDigest(cardData: CardData): VisibleCardDigest {
     const cardDef = getCardDefinition(cardData.name);
@@ -168,7 +168,7 @@ export function digestGameData({
   }
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Use to create digests for cards in play.
+   * Use to create digests for face-up cards in play.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   function cardInPlayDigest(cardData: CardData): InPlayCardDigest {
     return {
