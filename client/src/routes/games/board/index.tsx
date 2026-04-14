@@ -24,12 +24,12 @@ import {
   MenuContainer,
 } from "./menu";
 import {
-  ObservingPlayerDashboard,
-  ObservingPlayerHand,
   PlayerAbutment,
   PlayerArea,
   PlayerCenter,
   PlayerCenterCardArea,
+  PlayerDashboard,
+  PlayerHand,
   PlayerTablet,
   PlayerTabletCardArea,
   PlayerTabletFooter,
@@ -269,12 +269,12 @@ export const GameBoard = memo(
                 {/* Abutment not displayed for observing player. */}
                 {!isObserver && (
                   <PlayerAbutment>
-                    <HandPile count={player.cardsInHand.length} />
                     <DiscardPile
                       cardsVisible={player.cardsInDiscardVisible}
                       totalCount={player.cardsInDiscard.length}
                       setDialog={props.dialogProps.set}
                     />
+                    <HandPile count={player.cardsInHand.length} />
                   </PlayerAbutment>
                 )}
                 <PlayerTablet index={index}>
@@ -352,8 +352,8 @@ export const GameBoard = memo(
                 </PlayerCenter>
               </PlayerArea>
               {isObserver && (
-                <ObservingPlayerDashboard side={side}>
-                  <ObservingPlayerHand>
+                <PlayerDashboard side={side}>
+                  <PlayerHand>
                     {player.cardsInHand.map((card) => (
                       <FaceUpThumbnail
                         key={card.id}
@@ -368,13 +368,13 @@ export const GameBoard = memo(
                         }
                       />
                     ))}
-                  </ObservingPlayerHand>
+                  </PlayerHand>
                   <DiscardPile
                     cardsVisible={player.cardsInDiscardVisible}
                     totalCount={player.cardsInDiscard.length}
                     setDialog={props.dialogProps.set}
                   />
-                </ObservingPlayerDashboard>
+                </PlayerDashboard>
               )}
             </Fragment>
           );
