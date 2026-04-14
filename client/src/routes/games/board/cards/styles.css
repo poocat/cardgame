@@ -149,11 +149,13 @@
 
 .game-card-pile__item {
   position: relative;
+  transform: translateY(
+    calc(var(--game-card-pile-item-index, 0) * var(--space-sm))
+  );
 }
 
 .game-card-pile__item + .game-card-pile__item {
-  margin-left: calc(var(--card-width-sm) * -0.75);
-  margin-bottom: 4px;
+  margin-left: calc(var(--card-width-sm) * -0.66);
 }
 
 /***************************************************************************

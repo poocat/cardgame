@@ -242,8 +242,8 @@ export const DiscardPile = (props: {
         <CardPileStackItem>
           <MiniPlaceholder />
         </CardPileStackItem>
-        {props.cardsVisible.map((c) => (
-          <CardPileStackItem key={c.id}>
+        {props.cardsVisible.map((c, i) => (
+          <CardPileStackItem key={c.id} index={i + 1}>
             <FaceUpMini card={c} setDialog={props.setDialog} />
           </CardPileStackItem>
         ))}
