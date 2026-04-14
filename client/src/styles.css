@@ -78,8 +78,10 @@
 
   --footer-menu-max-height: 200px;
 
-  --card-width-sm: 70px;
-  --card-height-sm: 70px;
+  --card-width-sm: 44px;
+  --card-height-sm: 44px;
+  --card-width-md: 70px;
+  --card-height-md: 70px;
   --card-width-lg: 250px;
   --card-height-lg: 350px;
   --card-outer-border-width-lg: 9px;
