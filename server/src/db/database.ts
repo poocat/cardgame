@@ -1,10 +1,10 @@
 import { CONFIG } from "@server/config";
 import { collectionNames, migrations } from "@server/db/migrations";
-import { Repository } from "@server/db/repository";
 import type { GameDoc, RoomDoc } from "@server/db/types";
 import { logger } from "@server/logger";
 import type { Db } from "mongodb";
 import { MongoClient } from "mongodb";
+import { GameRepository, RoomRepository } from "./repositories";
 
 let db: Db;
 
@@ -52,7 +52,7 @@ export function getRepositories() {
     throw new Error("Database not initialized.");
   }
   return {
-    games: new Repository(db.collection<GameDoc>(collectionNames.games)),
-    rooms: new Repository(db.collection<RoomDoc>(collectionNames.rooms)),
+    games: new GameRepository(db.collection<GameDoc>(collectionNames.games)),
+    rooms: new RoomRepository(db.collection<RoomDoc>(collectionNames.rooms)),
   };
 }

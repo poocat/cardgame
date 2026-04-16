@@ -85,8 +85,17 @@ export const ROUTES = {
           }),
         },
       },
-      post: {
+      getByGame: {
         path: "/",
+        schemas: {
+          requestQuery: z.strictObject({ gameId: gameIdSchema }),
+          responseBody: z.strictObject({
+            roomId: roomIdSchema,
+          }),
+        },
+      },
+      post: {
+        path: "",
         schemas: {
           requestBody: z.strictObject({
             hostName: playerNameSchema,
@@ -107,6 +116,13 @@ export const ROUTES = {
           responseBody: z.strictObject({
             playerId: playerIdSchema,
           }),
+        },
+      },
+      deleteGame: {
+        path: "/:id/game",
+        schemas: {
+          requestParams: z.strictObject({ id: roomIdSchema }),
+          requestQuery: z.object({ playerId: playerIdSchema.optional() }),
         },
       },
     },

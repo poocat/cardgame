@@ -188,3 +188,74 @@ rooms.post(
     },
   }),
 );
+
+/******************************************************************************
+ * ### GET rooms?gameId={gameId}
+ *
+ * Used to get a room that is assigned the given game id.
+ ******************************************************************************/
+rooms.get(
+  ROUTES.rooms.methods.getByGame.path,
+  validated({
+    schemas: ROUTES.rooms.methods.getByGame.schemas,
+    handler: async (req, res) => {
+      const { rooms: roomRepo } = getRepositories();
+      const room = await roomRepo.findOneByGameId({ gameId: req.query.gameId });
+
+      if (!room) {
+        logger.warn({ gameId: req.query.gameId }, "room not found for game id");
+        return res
+          .status(STATUS.notFound)
+          .json({ message: `room not found for game ${req.query.gameId}` });
+      }
+
+      res.status(STATUS.ok).json({ roomId: room.meta.id });
+    },
+  }),
+);
+
+/******************************************************************************
+ * ### DELETE rooms/{id}/game?playerId={playerId}
+ *
+ * Nulls the game associated with a room, so that players can return to the
+ * room without being redirected to a game, then start a new game.
+ *
+ * Can only be done successfully by the host player.
+ ******************************************************************************/
+rooms.delete(
+  ROUTES.rooms.methods.deleteGame.path,
+  validated({
+    schemas: ROUTES.rooms.methods.deleteGame.schemas,
+    handler: async (req, res) => {
+      const { rooms: roomRepo } = getRepositories();
+
+      roomRepo.findMany({});
+
+      const room = await roomRepo.findOne({ id: req.params.id });
+      if (!room) {
+        logger.warn({ roomId: req.params.id }, "room not found");
+        return res
+          .status(STATUS.notFound)
+          .json({ message: `room ${req.params.id} not found` });
+      }
+      if (req.query.playerId !== room.data.host.id) {
+        logger.warn({ roomId: req.params.id }, "only host can delete game");
+      }
+
+      const result = await roomRepo.updateOne({
+        id: req.params.id,
+        version: room.meta.version,
+        data: { ...room.data, gameId: null },
+      });
+
+      if (result.matchedCount === 0) {
+        return res
+          .status(STATUS.conflict)
+          .json({ message: `room already updated, please retry` });
+      }
+
+      logger.info({ roomId: req.params.id }, "room game reset");
+      return res.status(STATUS.noContent).end();
+    },
+  }),
+);
