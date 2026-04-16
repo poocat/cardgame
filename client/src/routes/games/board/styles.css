@@ -267,21 +267,22 @@
   Note, since it is not a child of a player area, it cannot inherit from
   `game-player-area--side-left` or `game-player-area--side-right`.
 ***************************************************************************/
-.game-player-hand {
+.game-player-dashboard {
   width: 100%;
   display: flex;
+  flex-direction: column;
   padding: var(--space-sm);
 }
 
-.game-player-hand--side-left {
-  justify-content: flex-start;
+.game-player-dashboard--side-left {
+  align-items: flex-start;
 }
 
-.game-player-hand--side-right {
-  justify-content: flex-end;
+.game-player-dashboard--side-right {
+  align-items: flex-end;
 }
 
-.game-player-hand__card-stack {
+.game-player-dashboard__card-stack {
   width: var(--hand-area-width);
   display: flex;
   flex-wrap: wrap;
@@ -291,10 +292,10 @@
   align-items: flex-start;
 }
 
-.game-player-hand--side-left .game-player-hand__card-stack {
+.game-player-dashboard--side-left .game-player-dashboard__card-stack {
   flex-direction: row;
 }
 
-.game-player-hand--side-right .game-player-hand__card-stack {
+.game-player-dashboard--side-right .game-player-dashboard__card-stack {
   flex-direction: row-reverse;
 }

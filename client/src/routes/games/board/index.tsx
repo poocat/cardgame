@@ -2,7 +2,13 @@ import { Box, Dialog, Stack } from "@client/components";
 import { CONSTANTS } from "@common/game/constants";
 import type React from "react";
 import { Fragment, memo, useCallback, useMemo } from "react";
-import { DetailCard, FaceUpThumbnail, ThumbnailPlaceholder } from "./cards";
+import {
+  DetailCard,
+  DiscardPile,
+  FaceUpThumbnail,
+  HandPile,
+  ThumbnailPlaceholder,
+} from "./cards";
 import {
   ChipCounter,
   ChipPoolContainer,
@@ -18,11 +24,12 @@ import {
   MenuContainer,
 } from "./menu";
 import {
-  ObservingPlayerHand,
   PlayerAbutment,
   PlayerArea,
   PlayerCenter,
   PlayerCenterCardArea,
+  PlayerDashboard,
+  PlayerHand,
   PlayerTablet,
   PlayerTabletCardArea,
   PlayerTabletFooter,
@@ -262,12 +269,12 @@ export const GameBoard = memo(
                 {/* Abutment not displayed for observing player. */}
                 {!isObserver && (
                   <PlayerAbutment>
-                    <ThumbnailPlaceholder>
-                      <div>
-                        <div>Hand</div>
-                        <div>{player.cardsInHand.length}</div>
-                      </div>
-                    </ThumbnailPlaceholder>
+                    <DiscardPile
+                      cardsVisible={player.cardsInDiscardVisible}
+                      totalCount={player.cardsInDiscard.length}
+                      setDialog={props.dialogProps.set}
+                    />
+                    <HandPile count={player.cardsInHand.length} />
                   </PlayerAbutment>
                 )}
                 <PlayerTablet index={index}>
@@ -344,22 +351,30 @@ export const GameBoard = memo(
                   />
                 </PlayerCenter>
               </PlayerArea>
-              {/* Face-up hand only displayed for observer player. */}
               {isObserver && (
-                <ObservingPlayerHand side={side}>
-                  {player.cardsInHand.map((card) => (
-                    <FaceUpThumbnail
-                      key={card.id}
-                      variant="inHand"
-                      card={card}
-                      setDialog={props.dialogProps.set}
-                      choiceProps={props.choiceProps}
-                      selectorProps={
-                        cardSelectEnabled(card.id) ? props.selectorProps : null
-                      }
-                    />
-                  ))}
-                </ObservingPlayerHand>
+                <PlayerDashboard side={side}>
+                  <PlayerHand>
+                    {player.cardsInHand.map((card) => (
+                      <FaceUpThumbnail
+                        key={card.id}
+                        variant="inHand"
+                        card={card}
+                        setDialog={props.dialogProps.set}
+                        choiceProps={props.choiceProps}
+                        selectorProps={
+                          cardSelectEnabled(card.id)
+                            ? props.selectorProps
+                            : null
+                        }
+                      />
+                    ))}
+                  </PlayerHand>
+                  <DiscardPile
+                    cardsVisible={player.cardsInDiscardVisible}
+                    totalCount={player.cardsInDiscard.length}
+                    setDialog={props.dialogProps.set}
+                  />
+                </PlayerDashboard>
               )}
             </Fragment>
           );

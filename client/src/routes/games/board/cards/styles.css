@@ -39,8 +39,8 @@
 }
 
 .game-card {
-  width: var(--card-width-sm);
-  height: var(--card-width-sm);
+  width: var(--card-width-md);
+  height: var(--card-width-md);
   border: 1px solid;
   border-radius: 4px;
   padding: var(--space-xs);
@@ -54,6 +54,14 @@
   background-color: var(--color-white);
   border-color: var(--color-black);
   color: var(--color-black);
+}
+
+.game-card--mini {
+  width: var(--card-width-sm);
+  height: var(--card-height-sm);
+  padding: 1px;
+  font-size: var(--font-size-xs);
+  border-radius: 3px;
 }
 
 .game-card--clickable {
@@ -117,6 +125,37 @@
   width: var(--control-size-lg);
   height: var(--control-size-lg);
   font-size: var(--font-size-lg);
+}
+
+/***************************************************************************
+  Card Piles
+***************************************************************************/
+
+.game-card-pile {
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.game-card-pile__label {
+  font-size: var(--font-size-sm);
+}
+
+.game-card-pile__stack {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.game-card-pile__item {
+  position: relative;
+  transform: translateY(
+    calc(var(--game-card-pile-item-index, 0) * var(--space-sm))
+  );
+}
+
+.game-card-pile__item + .game-card-pile__item {
+  margin-left: calc(var(--card-width-sm) * -0.66);
 }
 
 /***************************************************************************

@@ -124,6 +124,9 @@ export function digestGameData({
     });
   }
 
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Use to create digests for any visible card.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   function visibleCardDigest(cardData: CardData): VisibleCardDigest {
     const cardDef = getCardDefinition(cardData.name);
     // Actions should be displayed in order.
@@ -165,7 +168,7 @@ export function digestGameData({
   }
 
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Use to create digests for cards in play.
+   * Use to create digests for face-up cards in play.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   function cardInPlayDigest(cardData: CardData): InPlayCardDigest {
     return {
@@ -175,8 +178,34 @@ export function digestGameData({
     };
   }
 
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Use to find the last card(s) discarded by the given player, as these cards
+   * should be shown face-up.
+   *
+   * Since multiple cards can be discarded simultaneously, all cards that
+   * arrived in the discard location on the same tick will be face-up.
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  function getLatestDiscards(
+    cards: CardData[],
+    playerId: Id,
+  ): VisibleCardDigest[] {
+    // Filter and order such cards that have been in their location longer
+    // appear later.
+    const ordered = cards
+      .filter((c) => c.ownerId === playerId && c.location.type === "inDiscard")
+      .sort((a, b) => b.lastMovedOnTick - a.lastMovedOnTick);
+    let latestDiscardTick = null;
+    const out: VisibleCardDigest[] = [];
+    for (const card of ordered) {
+      if (latestDiscardTick === null) latestDiscardTick = card.lastMovedOnTick;
+      else if (card.lastMovedOnTick < latestDiscardTick) break;
+      out.push(visibleCardDigest(card));
+    }
+    return out;
+  }
+
   // Cards should be ordered based on how long they have been at their current
-  // location.
+  // location, with cards that have been in their location the longest first.
   const allCards = [...gameData.cards];
   allCards.sort((a, b) => a.lastMovedOnTick - b.lastMovedOnTick);
 
@@ -296,6 +325,15 @@ export function digestGameData({
             (c) => c.ownerId === playerData.id && c.location.type === "inPlay",
           )
           .map((c) => cardInPlayDigest(c)),
+        cardsInDiscard: allCards
+          .filter(
+            (c) =>
+              c.ownerId === playerData.id && c.location.type === "inDiscard",
+          )
+          .map((c) => ({
+            id: c.id,
+          })),
+        cardsInDiscardVisible: getLatestDiscards(allCards, playerData.id),
         chipsInReserve: gameData.chips
           .filter(
             (c) =>
@@ -341,6 +379,17 @@ export function digestGameData({
             c.location.type === "inPlay",
         )
         .map((c) => cardInPlayDigest(c)),
+      cardsInDiscard: allCards
+        .filter(
+          (c) =>
+            c.ownerId === observingPlayerData.id &&
+            c.location.type === "inDiscard",
+        )
+        .map((c) => ({ id: c.id })),
+      cardsInDiscardVisible: getLatestDiscards(
+        allCards,
+        observingPlayerData.id,
+      ),
       chipsInReserve: gameData.chips
         .filter(
           (c) =>

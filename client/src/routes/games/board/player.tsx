@@ -110,18 +110,32 @@ export const PlayerCenterCardArea = (props: {
 };
 
 /******************************************************************************
- * ### ObservingPlayerHand
+ * ### PlayerDashboard
  *
- * Used at the bottom of the UI to display the cards in the observing player's
- * hand.
+ * The area underneath the observing player's "tablet", used to display the
+ * player's discard pile, and all the cards in the observing player's hand,
+ * face up.
  ******************************************************************************/
-export const ObservingPlayerHand = (props: {
+export const PlayerDashboard = (props: {
   side: PlayerSide;
   children?: React.ReactNode;
 }) => {
   return (
-    <div className={`game-player-hand game-player-hand--side-${props.side}`}>
-      <div className="game-player-hand__card-stack">{props.children}</div>
+    <div
+      className={`game-player-dashboard game-player-dashboard--side-${props.side}`}
+    >
+      {props.children}
     </div>
+  );
+};
+
+/******************************************************************************
+ * ### PlayerHand
+ *
+ * A container for the face-up cards in the observing player's hand.
+ ******************************************************************************/
+export const PlayerHand = (props: { children?: React.ReactNode }) => {
+  return (
+    <div className="game-player-dashboard__card-stack">{props.children}</div>
   );
 };

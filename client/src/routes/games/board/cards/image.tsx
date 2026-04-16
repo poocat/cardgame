@@ -6,7 +6,7 @@ function slugify(name: string): string {
 
 export const CardImage = (props: {
   name: string;
-  size: "thumbnail" | "fullsize";
+  variant: "thumbnail" | "fullsize";
 }) => {
   const [failed, setFailed] = useState(false);
 
@@ -15,7 +15,7 @@ export const CardImage = (props: {
   return (
     <img
       className="game-card__image"
-      src={`/api/cards/images/${slugify(props.name)}.${props.size}.png`}
+      src={`/api/cards/images/${slugify(props.name)}.${props.variant}.png`}
       onError={() => setFailed(true)}
       alt={props.name}
     />

@@ -77,6 +77,8 @@ const playerDigestCommonSchema = z.strictObject({
   name: z.string(),
   cardsInDeck: z.array(hiddenCardDigestSchema),
   cardsInPlay: z.array(inPlayCardDigestSchema),
+  cardsInDiscard: z.array(hiddenCardDigestSchema),
+  cardsInDiscardVisible: z.array(visibleCardDigestSchema),
   chipsInReserve: z.array(chipDigestSchema),
   chipsinChannel: z.array(chipDigestSchema),
 });

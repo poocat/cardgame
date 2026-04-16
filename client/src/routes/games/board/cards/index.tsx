@@ -32,6 +32,13 @@ import {
 import { CardImage } from "./image";
 import "./styles.css";
 import { Tooltip } from "@client/components/tooltips";
+import { Mini } from "./mini";
+import {
+  CardPile,
+  CardPileLabel,
+  CardPileStack,
+  CardPileStackItem,
+} from "./pile";
 import type { ThumbnailEmphasis } from "./thumbnail";
 import { Thumbnail, ThumbnailContainer } from "./thumbnail";
 
@@ -155,7 +162,7 @@ export const FaceUpThumbnail = memo(
     return (
       <ThumbnailContainer emphasis={emphasis} exhausted={cardIsExhausted}>
         <Thumbnail onClick={expand}>
-          <CardImage size="thumbnail" name={props.card.name} />
+          <CardImage variant="thumbnail" name={props.card.name} />
         </Thumbnail>
         {props.card.chips.length > 0 && (
           <ChipCounterEdge size="sm">
@@ -186,6 +193,82 @@ export const FaceUpThumbnail = memo(
     );
   },
 );
+
+////////////////////////////////////////////////////////////////////////////////
+// Mini Form Factor
+////////////////////////////////////////////////////////////////////////////////
+
+/******************************************************************************
+ * ### MiniPlaceholder
+ ******************************************************************************/
+export const MiniPlaceholder = (props: { children?: React.ReactNode }) => {
+  return <Mini placeholder>{props.children}</Mini>;
+};
+
+/******************************************************************************
+ * ### FaceUpMini
+ *
+ * A face-up card rendered in the "mini" form factor. Clicking opens the card
+ * detail dialog.
+ ******************************************************************************/
+export const FaceUpMini = memo(
+  (props: { card: VisibleCardDigest; setDialog: DialogProps["set"] }) => {
+    const expand = useCallback(() => {
+      props.setDialog({ type: "card", card: props.card });
+    }, [props.card, props.setDialog]);
+
+    return (
+      <Mini onClick={expand}>
+        <CardImage variant="thumbnail" name={props.card.name} />
+      </Mini>
+    );
+  },
+);
+
+/******************************************************************************
+ * ### DiscardPile
+ *
+ * Displays the most recently discarded cards at the top of a "pile".
+ ******************************************************************************/
+export const DiscardPile = (props: {
+  cardsVisible: VisibleCardDigest[];
+  totalCount: number;
+  setDialog: DialogProps["set"];
+}) => {
+  return (
+    <CardPile>
+      <CardPileLabel>Discard ({props.totalCount})</CardPileLabel>
+      <CardPileStack>
+        <CardPileStackItem>
+          <MiniPlaceholder />
+        </CardPileStackItem>
+        {props.cardsVisible.map((c, i) => (
+          <CardPileStackItem key={c.id} index={i + 1}>
+            <FaceUpMini card={c} setDialog={props.setDialog} />
+          </CardPileStackItem>
+        ))}
+      </CardPileStack>
+    </CardPile>
+  );
+};
+
+/******************************************************************************
+ * ### HandPile
+ *
+ * Indicates how many cards are in a non-observing player's hand.
+ ******************************************************************************/
+export const HandPile = (props: { count: number }) => {
+  return (
+    <CardPile>
+      <CardPileLabel>Hand ({props.count})</CardPileLabel>
+      <CardPileStack>
+        <CardPileStackItem>
+          <MiniPlaceholder />
+        </CardPileStackItem>
+      </CardPileStack>
+    </CardPile>
+  );
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Details Form Factor
@@ -299,7 +382,7 @@ export const DetailCard = (props: {
       </CardDetailHeader>
       <CardDetailBody type={props.card.type}>
         <CardDetailBackground>
-          <CardImage size="fullsize" name={props.card.name} />
+          <CardImage variant="fullsize" name={props.card.name} />
         </CardDetailBackground>
         <CardDetailForeground>
           <div />
