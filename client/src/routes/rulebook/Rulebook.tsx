@@ -1,8 +1,7 @@
+import { Copy } from "@client/components";
 import { Box } from "@client/components/layout";
 import { ROUTES } from "@common/api/routes";
 import { useEffect, useState } from "react";
-import Markdown from "react-markdown";
-import "./styles.css";
 
 export const Rulebook = () => {
   const [content, setContent] = useState<string | null>(null);
@@ -23,9 +22,7 @@ export const Rulebook = () => {
 
   return (
     <Box spacing="lg">
-      <div className="rulebook">
-        <Markdown>{content}</Markdown>
-      </div>
+      <Copy>{content}</Copy>
     </Box>
   );
 };

@@ -382,3 +382,32 @@
 .tooltip-arrow {
   fill: var(--color-white);
 }
+
+/***************************************************************************
+  Copy
+***************************************************************************/
+.copy h1,
+.copy h2,
+.copy h3,
+.copy h4 {
+  margin-top: var(--space-lg);
+}
+
+.copy h1 {
+  text-align: center;
+}
+
+.copy p,
+.copy ul,
+.copy ol {
+  margin-top: var(--space-md);
+}
+
+.copy li + li {
+  margin-top: var(--space-sm);
+}
+
+.copy ul,
+.copy ol {
+  padding-left: var(--space-lg);
+}
