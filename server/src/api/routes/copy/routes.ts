@@ -8,37 +8,39 @@ import { CONFIG } from "@server/config";
 import { logger } from "@server/logger";
 import { Router } from "express";
 
-export const rulebook = Router();
-rulebook.use(burstLimiter({ windowMs: 10 * 1000, max: 20 }));
+export const copy = Router();
+copy.use(burstLimiter({ windowMs: 10 * 1000, max: 20 }));
 
-const rulesDir = CONFIG.privatePath
-  ? path.join(CONFIG.privatePath, "copy", "rules")
+const copyDir = CONFIG.privatePath
+  ? path.join(CONFIG.privatePath, "copy")
   : null;
 
-rulebook.get(
-  ROUTES.rulebook.methods.get.path,
+copy.get(
+  ROUTES.copy.methods.get.path,
   validated({
-    schemas: ROUTES.rulebook.methods.get.schemas,
+    schemas: ROUTES.copy.methods.get.schemas,
     handler: async (req, res) => {
-      if (!rulesDir) {
+      if (!copyDir) {
         return res
           .status(STATUS.notFound)
-          .json({ message: "Rules not available" });
+          .json({ message: "Copy not available" });
       }
 
+      const { name } = req.params;
       const locale = req.query.locale ?? "en";
-      const filePath = path.join(rulesDir, `${locale}.md`);
-      const fallbackPath = path.join(rulesDir, "en.md");
+      const dir = path.join(copyDir, name);
+      const filePath = path.join(dir, `${locale}.md`);
+      const fallbackPath = path.join(dir, "en.md");
 
       for (const candidate of [filePath, fallbackPath]) {
         try {
           const content = await fs.readFile(candidate, "utf-8");
-          logger.debug({ locale, file: candidate }, "serving rulebook");
+          logger.debug({ name, locale, file: candidate }, "serving copy");
           return res.type("text/markdown").send(content);
         } catch {}
       }
 
-      return res.status(STATUS.notFound).json({ message: "Rules not found" });
+      return res.status(STATUS.notFound).json({ message: "Copy not found" });
     },
   }),
 );

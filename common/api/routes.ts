@@ -115,12 +115,15 @@ export const ROUTES = {
     path: "/api/cards",
     methods: {},
   },
-  rulebook: {
-    path: "/api/rulebook",
+  copy: {
+    path: "/api/copy",
     methods: {
       get: {
-        path: "/",
+        path: "/:name",
         schemas: {
+          requestParams: z.strictObject({
+            name: z.string().regex(/^[a-z][a-z0-9-]*$/),
+          }),
           requestQuery: z.object({
             locale: z
               .string()

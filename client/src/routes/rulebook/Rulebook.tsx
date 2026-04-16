@@ -9,7 +9,7 @@ export const Rulebook = () => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch(ROUTES.rulebook.path)
+    fetch(`${ROUTES.copy.path}/rules`)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.text();
