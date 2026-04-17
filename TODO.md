@@ -1,13 +1,15 @@
 # TODO:
 
+- [ ] Allow room to be "reset", to make it easier to play consecutive games.
 - [ ] Give `common/` its own `package.json`, or adopt npm workspaces to resolve shared dependencies in ci/cd.
 - [ ] Add unit tests for API.
 - [ ] Write helpers for defining common actions for cards.
 - [ ] Support "development" activity.
 - [ ] Add "recent mutations" log in UI.
 - [ ] Mutate game state on each step of sequence.
-- [ ] Display top card in discard.
 - [ ] Allow activity resets, e.g. "cancel action".
+- [x] Display top card in discard.
+- [x] Add "about" page.
 - [x] Support different language transformations of game instructions.
 - [x] Make it harder to accidentally pass your turn.
 - [x] Add external links to image source.

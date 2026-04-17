@@ -5,6 +5,7 @@ import { NewRoom } from "@client/routes/rooms/NewRoom";
 import { Room } from "@client/routes/rooms/Room";
 import { Rulebook } from "@client/routes/rulebook/Rulebook";
 import { Link, Outlet, Route, Routes } from "react-router";
+import { About } from "./routes/about/About";
 
 const Providers = (props: { children: React.ReactNode }) => {
   return <TooltipProvider>{props.children}</TooltipProvider>;
@@ -18,6 +19,7 @@ const Layout = () => {
           <Link to="/">Game</Link>
           <Link to="/games">List</Link>
           <Link to="/rulebook">Rulebook</Link>
+          <Link to="/about">About</Link>
         </Stack>
       </Box>
       <Divider />
@@ -40,6 +42,7 @@ function App() {
             <Route path=":roomId" element={<Room />} />
           </Route>
           <Route path="/rulebook" element={<Rulebook />} />
+          <Route path="/about" element={<About />} />
         </Route>
       </Routes>
     </Providers>
