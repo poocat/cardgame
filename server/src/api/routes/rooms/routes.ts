@@ -217,6 +217,8 @@ rooms.get(
 /******************************************************************************
  * ### DELETE rooms/{id}/game?playerId={playerId}
  *
+ * Use to implement a "rematch" feature.
+ *
  * Nulls the game associated with a room, so that players can return to the
  * room without being redirected to a game, then start a new game.
  *
@@ -240,6 +242,9 @@ rooms.delete(
       }
       if (req.query.playerId !== room.data.host.id) {
         logger.warn({ roomId: req.params.id }, "only host can delete game");
+        return res
+          .status(STATUS.forbidden)
+          .json({ message: `room can only be reset by host` });
       }
 
       const result = await roomRepo.updateOne({
