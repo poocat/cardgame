@@ -36,8 +36,8 @@ type UsePollerHook<TData> = {
  *
  ******************************************************************************/
 export function usePoller<TData extends object>(opts: {
-  /** The endpoint for the resource to poll/fetch. */
-  url: string;
+  /** The endpoint for the resource to poll/fetch. `null` keeps the poller idle (no fetch, no interval). */
+  url: string | null;
   /** Specifies what the polling interval should be, based on how long the poller has been polling. */
   getIntervalMs: (elapsedTimeMs: number) => number;
   /** Specifies how data is extracted from the GET response body. */
@@ -56,6 +56,10 @@ export function usePoller<TData extends object>(opts: {
   // Use to fetch the data, using the last updated timestamp to check if any
   // changes have been made to the resource.
   const fetchResource = useCallback(async () => {
+    if (opts.url === null) {
+      setError(null);
+      return;
+    }
     try {
       const headers =
         etag.current && polling
@@ -92,8 +96,8 @@ export function usePoller<TData extends object>(opts: {
 
   // Examine the latest data to find out if polling should continue.
   const pollingEnabled = useMemo(
-    () => !data || opts.getPollingEnabled(data),
-    [data, opts.getPollingEnabled],
+    () => opts.url !== null && (!data || opts.getPollingEnabled(data)),
+    [opts.url, data, opts.getPollingEnabled],
   );
 
   // Manage change in polling state.
