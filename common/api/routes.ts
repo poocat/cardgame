@@ -118,11 +118,12 @@ export const ROUTES = {
           }),
         },
       },
-      deleteGame: {
-        path: "/:id/game",
+      patch: {
+        path: "/:id",
         schemas: {
           requestParams: z.strictObject({ id: roomIdSchema }),
           requestQuery: z.object({ playerId: playerIdSchema.optional() }),
+          requestBody: z.strictObject({ gameId: z.null() }),
         },
       },
     },

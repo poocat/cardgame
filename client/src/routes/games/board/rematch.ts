@@ -104,8 +104,12 @@ export const useRematch = (opts: {
     setStartingRematch(true);
     try {
       const response = await fetch(
-        `${ROUTES.rooms.path}/${roomId}/game?playerId=${playerId}`,
-        { method: "DELETE" },
+        `${ROUTES.rooms.path}/${roomId}?playerId=${playerId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ gameId: null }),
+        },
       );
       if (!response.ok) {
         throw new Error(`Rematch request failed: ${response.status}`);
