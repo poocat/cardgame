@@ -95,7 +95,7 @@ export const ROUTES = {
         },
       },
       post: {
-        path: "",
+        path: "/",
         schemas: {
           requestBody: z.strictObject({
             hostName: playerNameSchema,

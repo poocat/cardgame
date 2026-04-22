@@ -231,8 +231,6 @@ rooms.delete(
     handler: async (req, res) => {
       const { rooms: roomRepo } = getRepositories();
 
-      roomRepo.findMany({});
-
       const room = await roomRepo.findOne({ id: req.params.id });
       if (!room) {
         logger.warn({ roomId: req.params.id }, "room not found");

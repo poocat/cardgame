@@ -107,7 +107,7 @@ export const useRematch = (opts: {
         `${ROUTES.rooms.path}/${roomId}/game?playerId=${playerId}`,
         { method: "DELETE" },
       );
-      if (!response.ok && response.status !== 204) {
+      if (!response.ok) {
         throw new Error(`Rematch request failed: ${response.status}`);
       }
       navigate(`/rooms/${roomId}?playerId=${playerId}`);
