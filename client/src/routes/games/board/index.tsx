@@ -35,6 +35,7 @@ import {
   PlayerTabletFooter,
   PlayerTabletHeader,
 } from "./player";
+import type { RematchProps } from "./rematch";
 import "./styles.css";
 import type {
   ChipDigest,
@@ -194,6 +195,7 @@ export const GameBoard = memo(
     dialogProps: DialogProps;
     selectorProps: SelectorProps;
     choiceProps: ChoiceProps;
+    rematchProps: RematchProps;
     errors: string[];
   }) => {
     const gameOver = props.game.winner !== null;
@@ -382,7 +384,10 @@ export const GameBoard = memo(
         {!observingPlayer && <div className="game-player-abutment-spacer" />}
         <MenuContainer>
           {gameOver ? (
-            <GameOverMenu winnerName={props.game.winner?.name ?? ""} />
+            <GameOverMenu
+              winnerName={props.game.winner?.name ?? ""}
+              rematchProps={props.rematchProps}
+            />
           ) : observingPlayerIsChoosing ? (
             <ChoiceMenu
               submitLabel={submitLabel}

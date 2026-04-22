@@ -8,6 +8,7 @@ import type z from "zod";
 import { GameBoard } from "./board";
 import { useChoice } from "./board/choice";
 import { useDialog } from "./board/dialog";
+import { useRematch } from "./board/rematch";
 import { useSelector } from "./board/selector";
 
 type GamesGetOneResponseBody = z.infer<
@@ -84,6 +85,11 @@ export const Game = () => {
     max: currentChoice?.max ?? 9999,
   });
   const choice = useChoice(game?.activity);
+  const rematch = useRematch({
+    gameId,
+    playerId: observingPlayerId,
+    gameOver: game?.winner != null,
+  });
 
   // Submission:
   const submitChoice = useCallback(async () => {
@@ -158,6 +164,7 @@ export const Game = () => {
           choiceProps={choice}
           selectorProps={selector}
           dialogProps={dialog}
+          rematchProps={rematch}
           errors={errors}
         />
       )}

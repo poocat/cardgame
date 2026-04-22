@@ -188,3 +188,76 @@ rooms.post(
     },
   }),
 );
+
+/******************************************************************************
+ * ### GET rooms?gameId={gameId}
+ *
+ * Used to get a room that is assigned the given game id.
+ ******************************************************************************/
+rooms.get(
+  ROUTES.rooms.methods.getByGame.path,
+  validated({
+    schemas: ROUTES.rooms.methods.getByGame.schemas,
+    handler: async (req, res) => {
+      const { rooms: roomRepo } = getRepositories();
+      const room = await roomRepo.findOneByGameId({ gameId: req.query.gameId });
+
+      if (!room) {
+        logger.warn({ gameId: req.query.gameId }, "room not found for game id");
+        return res
+          .status(STATUS.notFound)
+          .json({ message: `room not found for game ${req.query.gameId}` });
+      }
+
+      res.status(STATUS.ok).json({ roomId: room.meta.id });
+    },
+  }),
+);
+
+/******************************************************************************
+ * ### PATCH rooms/{id}?playerId={playerId}
+ *
+ * Applies a partial update to a room. Currently the only supported patch is
+ * clearing the room's `gameId`, which is how the "rematch" feature returns
+ * players to the room so a new game can be started.
+ *
+ * Can only be done successfully by the host player.
+ ******************************************************************************/
+rooms.patch(
+  ROUTES.rooms.methods.patch.path,
+  validated({
+    schemas: ROUTES.rooms.methods.patch.schemas,
+    handler: async (req, res) => {
+      const { rooms: roomRepo } = getRepositories();
+
+      const room = await roomRepo.findOne({ id: req.params.id });
+      if (!room) {
+        logger.warn({ roomId: req.params.id }, "room not found");
+        return res
+          .status(STATUS.notFound)
+          .json({ message: `room ${req.params.id} not found` });
+      }
+      if (req.query.playerId !== room.data.host.id) {
+        logger.warn({ roomId: req.params.id }, "only host can patch room");
+        return res
+          .status(STATUS.forbidden)
+          .json({ message: `room can only be patched by host` });
+      }
+
+      const result = await roomRepo.updateOne({
+        id: req.params.id,
+        version: room.meta.version,
+        data: { ...room.data, gameId: req.body.gameId },
+      });
+
+      if (result.matchedCount === 0) {
+        return res
+          .status(STATUS.conflict)
+          .json({ message: `room already updated, please retry` });
+      }
+
+      logger.info({ roomId: req.params.id }, "room patched");
+      return res.status(STATUS.noContent).end();
+    },
+  }),
+);

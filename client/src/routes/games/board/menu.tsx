@@ -2,6 +2,7 @@ import { Button, SelectButton } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
 import type { Color } from "@client/components/types";
 import { memo, useCallback } from "react";
+import type { RematchProps } from "./rematch";
 import type { ChoiceType, ChoiceValueDigest, SelectorProps } from "./types";
 
 /******************************************************************************
@@ -134,8 +135,56 @@ export const ChoiceMenu = memo(
 /******************************************************************************
  * ### GameOverMenu
  ******************************************************************************/
-export const GameOverMenu = (props: { winnerName: string }) => {
-  return <Box spacing="lg">{props.winnerName} wins!</Box>;
+export const GameOverMenu = (props: {
+  winnerName: string;
+  rematchProps: RematchProps;
+}) => {
+  const { rematchProps } = props;
+  return (
+    <Box spacing="lg">
+      <Stack orientation="vertical" spacing="md">
+        <Box>{props.winnerName} wins!</Box>
+        {rematchProps.role === "host" && (
+          <Box>
+            <Button
+              border="dark"
+              color="chip"
+              size="lg"
+              onClick={rematchProps.startRematch}
+              disabled={rematchProps.startingRematch}
+            >
+              {rematchProps.startingRematch
+                ? "Starting rematch..."
+                : "Initiate Rematch"}
+            </Button>
+          </Box>
+        )}
+        {rematchProps.role === "guest" && (
+          <Box>
+            {rematchProps.rematchReady ? (
+              <Button
+                border="dark"
+                color="chip"
+                size="lg"
+                onClick={rematchProps.goToRematch}
+                disabled={!rematchProps.rematchReady}
+              >
+                Join Rematch
+              </Button>
+            ) : (
+              <Box>Waiting for host to initiate rematch...</Box>
+            )}
+          </Box>
+        )}
+        {rematchProps.role === "unknown room" && (
+          <Box>
+            A rematch has been initiated. Navigate back to the room, or ask the
+            host for a link.
+          </Box>
+        )}
+      </Stack>
+    </Box>
+  );
 };
 
 /******************************************************************************
