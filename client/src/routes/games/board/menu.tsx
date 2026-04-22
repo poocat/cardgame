@@ -145,30 +145,36 @@ export const GameOverMenu = (props: {
       <Stack orientation="vertical" spacing="md">
         <Box>{props.winnerName} wins!</Box>
         {rematchProps.role === "host" && (
-          <Button
-            border="dark"
-            color="chip"
-            size="lg"
-            onClick={rematchProps.startRematch}
-            disabled={rematchProps.startingRematch}
-          >
-            {rematchProps.startingRematch
-              ? "Starting rematch..."
-              : "Initiate Rematch"}
-          </Button>
+          <Box>
+            <Button
+              border="dark"
+              color="chip"
+              size="lg"
+              onClick={rematchProps.startRematch}
+              disabled={rematchProps.startingRematch}
+            >
+              {rematchProps.startingRematch
+                ? "Starting rematch..."
+                : "Initiate Rematch"}
+            </Button>
+          </Box>
         )}
         {rematchProps.role === "guest" && (
-          <Button
-            border="dark"
-            color="chip"
-            size="lg"
-            onClick={rematchProps.goToRematch}
-            disabled={!rematchProps.rematchReady}
-          >
-            {rematchProps.rematchReady
-              ? "Go to Rematch"
-              : "Waiting for Host to Initiate Rematch..."}
-          </Button>
+          <Box>
+            {rematchProps.rematchReady ? (
+              <Button
+                border="dark"
+                color="chip"
+                size="lg"
+                onClick={rematchProps.goToRematch}
+                disabled={!rematchProps.rematchReady}
+              >
+                Join Rematch
+              </Button>
+            ) : (
+              <Box>Waiting for host to initiate rematch...</Box>
+            )}
+          </Box>
         )}
         {rematchProps.role === "unknown room" && (
           <Box>
