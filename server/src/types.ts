@@ -181,3 +181,11 @@ export type GameData = {
   wins: WinData[];
   annotations: AnnotationData[];
 };
+
+type RoomPlayer = { id: string; name: string };
+
+export type RoomData = {
+  gameId: string | null;
+  host: RoomPlayer;
+  guests: RoomPlayer[];
+};
