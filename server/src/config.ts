@@ -11,4 +11,5 @@ export const CONFIG = {
   privatePath: process.env.PRIVATE_PATH
     ? path.resolve(process.env.PRIVATE_PATH)
     : null,
+  logLevel: process.env.LOG_LEVEL || "info",
 };

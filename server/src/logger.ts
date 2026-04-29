@@ -3,7 +3,7 @@ import type { Logger } from "pino";
 import { pino } from "pino";
 
 export const logger: Logger = pino({
-  level: process.env.LOG_LEVEL || "info",
+  level: CONFIG.logLevel,
   formatters: {
     level: (label) => ({ level: label.toUpperCase() }),
   },
