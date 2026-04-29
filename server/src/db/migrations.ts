@@ -1,3 +1,8 @@
+/**
+ * Establishes:
+ * - the names of the MongoDB collections
+ * - the indexes necessary to use the "repository" pattern
+ */
 import type { Db } from "mongodb";
 
 export const collectionNames = {

@@ -1,3 +1,9 @@
+/**
+ * A transformation layer between the storage and transport layers
+ *
+ * Anonymizes private values (e.g. other players' ids), and resolves template
+ * messages
+ */
 import type {
   choiceValueDigestSchema,
   gameDigestSchema,
