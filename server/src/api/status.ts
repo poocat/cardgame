@@ -1,6 +1,8 @@
 export const STATUS = {
   /** 200-OK */
   ok: 200,
+  /** 201-Created */
+  created: 201,
   /** 204-No Content; indicates success, should trigger client to make another request */
   noContent: 204,
   /** 304-Not Modified; indicates requested content is not modified, for conditional GET requests */

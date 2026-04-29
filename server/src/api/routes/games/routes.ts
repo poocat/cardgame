@@ -110,8 +110,7 @@ export const gamesRouter = {
             },
             "game created",
           );
-          // TODO!! Use 201-Created
-          return res.status(STATUS.ok).json({ gameId: game.meta.id });
+          return res.status(STATUS.created).json({ gameId: game.meta.id });
         },
       }),
     );

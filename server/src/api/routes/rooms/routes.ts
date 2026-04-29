@@ -70,7 +70,7 @@ export const roomsRouter = {
           }
 
           logger.info({ roomId: room.meta.id, hostId }, "room created");
-          res.status(STATUS.ok).json({ roomId: room.meta.id, hostId });
+          res.status(STATUS.created).json({ roomId: room.meta.id, hostId });
         },
       }),
     );
@@ -209,7 +209,7 @@ export const roomsRouter = {
             { roomId: req.params.id, guestId, guestName },
             "guest added",
           );
-          return res.status(STATUS.ok).json({ playerId: guestId });
+          return res.status(STATUS.created).json({ playerId: guestId });
         },
       }),
     );
