@@ -1,6 +1,10 @@
-import { ROUTES } from "@common/api/routes";
 import { errorHandler } from "@server/api/middleware";
-import { cards, copy, games, rooms } from "@server/api/routes";
+import {
+  cardsRouter,
+  copyRouter,
+  gamesRouter,
+  roomsRouter,
+} from "@server/api/routes";
 import { CONFIG } from "@server/config";
 import { initDb } from "@server/db/database";
 import { useExampleCards, usePrivateCards } from "@server/game/cards/registry";
@@ -11,8 +15,9 @@ import express from "express";
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
 
+  let data = null;
   try {
-    await initDb();
+    data = await initDb({ uri: CONFIG.mongoDbUri, dbName: CONFIG.mongoDbName });
   } catch (error) {
     logger.error({ error }, "failed to initialize server");
     process.exit(1);
@@ -35,10 +40,22 @@ export async function startServer() {
   const app = express();
   app.use(express.json());
 
-  app.use(ROUTES.cards.path, cards);
-  app.use(ROUTES.copy.path, copy);
-  app.use(ROUTES.games.path, games);
-  app.use(ROUTES.rooms.path, rooms);
+  app.use(
+    cardsRouter.path,
+    cardsRouter.create({ privatePath: CONFIG.privatePath }),
+  );
+  app.use(
+    copyRouter.path,
+    copyRouter.create({ privatePath: CONFIG.privatePath }),
+  );
+  app.use(
+    gamesRouter.path,
+    gamesRouter.create({ repositories: data.repositories }),
+  );
+  app.use(
+    roomsRouter.path,
+    roomsRouter.create({ repositories: data.repositories }),
+  );
 
   // Global error handling:
   app.use(errorHandler);
