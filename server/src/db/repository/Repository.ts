@@ -1,3 +1,30 @@
+/**
+ * Implementation of a "repository" pattern for MongoDB collections that use a
+ * particular "metadata schema":
+ *
+ * ```
+ * {
+ *   metadata {
+ *     id // the unique id for the document
+ *     version // a number that is incremented each time the document is updated
+ *     updatedAt // the time at which the document was last updated
+ *     createdAt // the time at which the document was first created
+ *     salt // a value used to anonymize/deanonymize values in the document
+ *   }
+ *   data {
+ *     ... // collection specific payload
+ *   }
+ * }
+ * ```
+ *
+ * Provides type-safe CRUD operations (e.g. findOne, findMany, insertOne,
+ * updateOne, deleteOne)
+ *
+ * Manages document metadata like unique IDs, version numbers, and timestamps
+ *
+ * Supports optimistic concurrency via version checking on updates, and offers
+ * "meta only" projections for lightweight queries that omit the data payload
+ */
 import { makeDocumentMeta } from "@server/db/meta";
 import { Queries } from "@server/db/repository/Queries";
 import type {
@@ -12,8 +39,8 @@ import type { Collection, DeleteResult, UpdateResult } from "mongodb";
 /******************************************************************************
  * ### Repository
  *
- * Provides CRUD operations on a MongoDB collection based on a particular
- * schema for document metadata.
+ * Provides CRUD operations on a MongoDB collection based on a common "metadata
+ * schema."
  ******************************************************************************/
 export class Repository<TData> implements IRepository<TData> {
   queries: Queries<TData>;
@@ -30,13 +57,11 @@ export class Repository<TData> implements IRepository<TData> {
     id: string;
     metaOnly: true;
   }): Promise<Pick<RepositoryDoc<TData>, "meta"> | null>;
-
   // Overload for when metaOnly is false or undefined (the default case)
   async findOne(args: {
     id: string;
     metaOnly?: false;
   }): Promise<RepositoryDoc<TData> | null>;
-
   async findOne<TMetaOnly extends boolean>(args: {
     id: string;
     metaOnly?: TMetaOnly;
@@ -60,13 +85,11 @@ export class Repository<TData> implements IRepository<TData> {
     metaOnly: true;
     orderBy?: OrderByMeta;
   }): Promise<Pick<RepositoryDoc<TData>, "meta">[]>;
-
   // Overload for when metaOnly is false or undefined (the default case)
   async findMany(args: {
     metaOnly?: false;
     orderBy?: OrderByMeta;
   }): Promise<RepositoryDoc<TData>[]>;
-
   async findMany<TMetaOnly extends boolean>(args: {
     metaOnly?: TMetaOnly;
     orderBy?: OrderByMeta;

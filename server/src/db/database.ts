@@ -1,14 +1,12 @@
-import { CONFIG } from "@server/config";
 import { collectionNames, migrations } from "@server/db/migrations";
 import type { GameDoc, RoomDoc } from "@server/db/types";
 import { logger } from "@server/logger";
+import type { GameData, RoomData } from "@server/types";
 import type { Db } from "mongodb";
 import { MongoClient } from "mongodb";
 import { GameRepository, RoomRepository } from "./repositories";
 
-let db: Db;
-
-export async function runMigrations(db: Db): Promise<void> {
+async function runMigrations(db: Db): Promise<void> {
   const migrationsCollection = db.collection("_migrations");
   await migrationsCollection.createIndex({ version: 1 }, { unique: true });
 
@@ -34,25 +32,26 @@ export async function runMigrations(db: Db): Promise<void> {
   logger.info({ count: appliedCount }, "all migrations applied");
 }
 
-export async function initDb() {
-  const mongoConnectionString = `${CONFIG.mongoDbUri}/${CONFIG.mongoDbName}`;
-  try {
-    const mongoClient = await MongoClient.connect(mongoConnectionString);
-    db = mongoClient.db(CONFIG.mongoDbName);
-    logger.info({ dbName: db.databaseName }, "database connected");
-    await runMigrations(db);
-  } catch (error) {
-    logger.error({ error }, "database connection failed");
-    throw error;
-  }
-}
-
-export function getRepositories() {
-  if (!db) {
-    throw new Error("Database not initialized.");
-  }
+/******************************************************************************
+ * ### initDb
+ *
+ * Connect to the indicated MongoDB instance, attempt migrations, and return
+ * various handles to data access layer.
+ ******************************************************************************/
+export async function initDb(args: { uri: string; dbName: string }): Promise<{
+  repositories: {
+    games: GameRepository<GameData>;
+    rooms: RoomRepository<RoomData>;
+  };
+}> {
+  const client = await MongoClient.connect(`${args.uri}/${args.dbName}`);
+  const db = client.db(args.dbName);
+  logger.info({ dbName: db.databaseName }, "database connected");
+  await runMigrations(db);
   return {
-    games: new GameRepository(db.collection<GameDoc>(collectionNames.games)),
-    rooms: new RoomRepository(db.collection<RoomDoc>(collectionNames.rooms)),
+    repositories: {
+      games: new GameRepository(db.collection<GameDoc>(collectionNames.games)),
+      rooms: new RoomRepository(db.collection<RoomDoc>(collectionNames.rooms)),
+    },
   };
 }

@@ -1,3 +1,7 @@
+/**
+ * Utilities for validating and generating metadata used to support common
+ * CRUD operations
+ */
 import { createHash, randomUUID } from "node:crypto";
 import z from "zod";
 

@@ -1,3 +1,8 @@
+/**
+ * Utility for configuring MongoDB CRUD operations that assume a "metadata
+ * schema" that includes the unique id, create/update timestamps, and a version
+ * number
+ */
 import type { IQueries, OrderByMeta } from "@server/db/types";
 import type { Document, Sort } from "mongodb";
 

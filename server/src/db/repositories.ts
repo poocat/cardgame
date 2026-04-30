@@ -1,3 +1,6 @@
+/**
+ * Collection-specific implementations of the "repository" pattern
+ */
 import { Repository } from "./repository";
 
 export class GameRepository<TData> extends Repository<TData> {}

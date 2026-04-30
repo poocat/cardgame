@@ -1,3 +1,8 @@
+/**
+ * A transformation layer between the storage and transport layers
+ *
+ * Anonymizes private values (e.g. other players' ids)
+ */
 import type { roomDigestSchema } from "@common/api/digests";
 import { anonymizeId } from "@server/api/anonymization";
 import type { RoomDoc } from "@server/db/types";

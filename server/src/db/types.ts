@@ -1,5 +1,5 @@
 import type { documentMetaSchema } from "@server/db/meta";
-import type { GameData } from "@server/types";
+import type { GameData, RoomData } from "@server/types";
 import type {
   DeleteResult,
   Document,
@@ -75,10 +75,4 @@ export type GameDoc = RepositoryDoc<GameData>;
 ////////////////////////////////////////////////////////////////////////////////
 // Room Document
 ////////////////////////////////////////////////////////////////////////////////
-type RoomPlayer = { id: string; name: string };
-type RoomData = {
-  gameId: string | null;
-  host: RoomPlayer;
-  guests: RoomPlayer[];
-};
 export type RoomDoc = RepositoryDoc<RoomData>;
