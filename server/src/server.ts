@@ -3,6 +3,7 @@ import {
   cardsRouter,
   copyRouter,
   gamesRouter,
+  healthRouter,
   roomsRouter,
 } from "@server/api/routes";
 import { CONFIG } from "@server/config";
@@ -39,6 +40,8 @@ export async function startServer() {
 
   const app = express();
   app.use(express.json());
+
+  app.use(healthRouter.path, healthRouter.create());
 
   app.use(
     cardsRouter.path,
