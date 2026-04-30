@@ -11,8 +11,8 @@ import { initDb } from "@server/db/database";
 import { useExampleCards, usePrivateCards } from "@server/game/cards/registry";
 import { logger } from "@server/logger";
 import { useDefaultLocales, usePrivateLocales } from "@server/text/registry";
-import express from "express";
 import cors from "cors";
+import express from "express";
 
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
