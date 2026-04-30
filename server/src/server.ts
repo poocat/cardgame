@@ -39,7 +39,6 @@ export async function startServer() {
   }
 
   const app = express();
-  app.use(express.json());
 
   app.use(healthRouter.path, healthRouter.create());
 
