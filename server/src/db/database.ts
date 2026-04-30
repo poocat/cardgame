@@ -44,7 +44,7 @@ export async function initDb(args: { uri: string; dbName: string }): Promise<{
     rooms: RoomRepository<RoomData>;
   };
 }> {
-  const client = await MongoClient.connect(`${args.uri}/${args.dbName}`);
+  const client = await MongoClient.connect(args.uri);
   const db = client.db(args.dbName);
   logger.info({ dbName: db.databaseName }, "database connected");
   await runMigrations(db);
