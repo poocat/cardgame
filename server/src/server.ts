@@ -15,13 +15,13 @@ import express from "express";
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
 
-  let data = null;
-  try {
-    data = await initDb({ uri: CONFIG.mongoDbUri, dbName: CONFIG.mongoDbName });
-  } catch (error) {
+  const data = await initDb({
+    uri: CONFIG.mongoDbUri,
+    dbName: CONFIG.mongoDbName,
+  }).catch((error) => {
     logger.error({ error }, "failed to initialize server");
     process.exit(1);
-  }
+  });
 
   try {
     usePrivateCards();

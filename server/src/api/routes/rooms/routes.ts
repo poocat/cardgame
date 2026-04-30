@@ -1,5 +1,6 @@
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
+import { burstLimiter, sustainedLimiter } from "@server/api/middleware";
 import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
 import { makeId, makeMetaHash } from "@server/db/meta";
@@ -7,7 +8,6 @@ import type { RoomRepository } from "@server/db/repositories";
 import { logger } from "@server/logger";
 import type { RoomData } from "@server/types";
 import { json as jsonHandler, Router } from "express";
-import { burstLimiter, sustainedLimiter } from "../../middleware";
 import { digestRoomData } from "./digest";
 
 type Dependencies = {

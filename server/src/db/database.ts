@@ -39,25 +39,19 @@ async function runMigrations(db: Db): Promise<void> {
  * various handles to data access layer.
  ******************************************************************************/
 export async function initDb(args: { uri: string; dbName: string }): Promise<{
-  db: Db;
-  client: MongoClient;
   repositories: {
     games: GameRepository<GameData>;
     rooms: RoomRepository<RoomData>;
   };
-  close: () => Promise<void>;
 }> {
   const client = await MongoClient.connect(`${args.uri}/${args.dbName}`);
   const db = client.db(args.dbName);
   logger.info({ dbName: db.databaseName }, "database connected");
   await runMigrations(db);
   return {
-    client,
-    db,
     repositories: {
       games: new GameRepository(db.collection<GameDoc>(collectionNames.games)),
       rooms: new RoomRepository(db.collection<RoomDoc>(collectionNames.rooms)),
     },
-    close: () => client.close(),
   };
 }

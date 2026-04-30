@@ -4,7 +4,7 @@
  * Images are kept in the private submodule at `/cards/images`.
  *
  * The `/images` folder must contain `.svg` files, with names based on the name
- * of the corresponging card, transformed to "kebab-case" e.g. `"My Card"` to
+ * of the corresponding card, transformed to "kebab-case" e.g. `"My Card"` to
  * `"my-card"`.
  *
  * The file names must also be infixed with `.thumbnail` or `.fullsize` e.g.
