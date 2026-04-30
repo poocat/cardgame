@@ -12,6 +12,7 @@ import { useExampleCards, usePrivateCards } from "@server/game/cards/registry";
 import { logger } from "@server/logger";
 import { useDefaultLocales, usePrivateLocales } from "@server/text/registry";
 import express from "express";
+import cors from "cors";
 
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
@@ -43,9 +44,8 @@ export async function startServer() {
 
   // Build the server app:
   const app = express();
-
+  app.use(cors({ origin: CONFIG.allowedOrigins }));
   app.use(healthRouter.path, healthRouter.create());
-
   app.use(
     cardsRouter.path,
     cardsRouter.create({ privatePath: CONFIG.privatePath }),
