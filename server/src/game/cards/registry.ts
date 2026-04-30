@@ -8,7 +8,6 @@
  * `private/` as the source of all "official" card definitions and images.
  */
 
-import path from "node:path";
 import { CONFIG } from "@server/config";
 import type { ActionDef, CardDef } from "@server/game/types";
 import { logger } from "@server/logger";
@@ -95,7 +94,7 @@ export function usePrivateCards() {
   if (!CONFIG.privatePath) {
     throw new Error("No private path configured.");
   }
-  const { cards } = require(path.join(CONFIG.privatePath, "cards", "index"));
+  const { cards } = require("@private/cards");
   resetCardRegistry();
   extendCardRegistry({ cards: Object.values(cards) });
   logger.info({ count: cardMap.size }, "loaded private cards");
