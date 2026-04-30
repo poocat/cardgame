@@ -43,6 +43,7 @@ export async function initDb(args: { uri: string; dbName: string }): Promise<{
     games: GameRepository<GameData>;
     rooms: RoomRepository<RoomData>;
   };
+  close: () => Promise<void>;
 }> {
   const client = await MongoClient.connect(args.uri);
   const db = client.db(args.dbName);
@@ -53,5 +54,6 @@ export async function initDb(args: { uri: string; dbName: string }): Promise<{
       games: new GameRepository(db.collection<GameDoc>(collectionNames.games)),
       rooms: new RoomRepository(db.collection<RoomDoc>(collectionNames.rooms)),
     },
+    close: () => client.close(),
   };
 }

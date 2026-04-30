@@ -16,6 +16,7 @@ import express from "express";
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
 
+  // Initialize db:
   const data = await initDb({
     uri: CONFIG.mongoDbUri,
     dbName: CONFIG.mongoDbName,
@@ -24,6 +25,7 @@ export async function startServer() {
     process.exit(1);
   });
 
+  // Load cards, attempting to import from private submodule:
   try {
     usePrivateCards();
   } catch (error) {
@@ -31,6 +33,7 @@ export async function startServer() {
     useExampleCards();
   }
 
+  // Load locales, attempting to import from private submodule:
   try {
     usePrivateLocales();
   } catch (error) {
@@ -38,6 +41,7 @@ export async function startServer() {
     useDefaultLocales();
   }
 
+  // Build the server app:
   const app = express();
 
   app.use(healthRouter.path, healthRouter.create());
@@ -58,11 +62,37 @@ export async function startServer() {
     roomsRouter.path,
     roomsRouter.create({ repositories: data.repositories }),
   );
-
-  // Global error handling:
   app.use(errorHandler);
 
-  app.listen(CONFIG.port, () => {
+  // Start the server:
+  const server = app.listen(CONFIG.port, () => {
     logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server listening");
   });
+
+  // Configure gracegful shutdown:
+  let shuttingDown = false;
+  const shutdown = async (signal: string) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    logger.info({ signal }, "shutting down gracefully");
+
+    // Force exit with nonzero status if shutdown takes too long.
+    const forceExit = setTimeout(() => {
+      logger.error("shutdown took too long, forcing exit");
+      process.exit(1);
+    }, 10000);
+    forceExit.unref();
+
+    // Close the server, waiting for any existing connections to end.
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    // Close the database connection.
+    await data.close();
+
+    logger.info("shutdown complete");
+    process.exit(0);
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
 }
