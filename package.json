@@ -1,7 +1,13 @@
 {
+  "name": "cardgame",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client",
+    "common"
+  ],
   "devDependencies": {
-    "@biomejs/biome": "2.2.0",
-    "zod": "^4.1.12"
+    "@biomejs/biome": "2.2.0"
   },
   "scripts": {
     "format": "biome check --write common server client"
