@@ -15,6 +15,7 @@
       "./test",
       "../common"
     ] /* Allow multiple folders to be treated as one when resolving modules. */,
+    "rootDir": ".." /* Pin the root so output layout is stable across TS versions. */,
     "outDir": "./dist" /* Specify an output folder for all emitted files. */,
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
     "resolveJsonModule": true,
