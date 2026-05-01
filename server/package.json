@@ -4,7 +4,6 @@
   "version": "0.0.1",
   "description": "Server-side logic for strategy based card game.",
   "author": "Steven Lewis",
-  "main": "index.js",
   "scripts": {
     "test": "vitest run --config vitest.config.ts",
     "test:public": "vitest run --config vitest.config.ts public",
@@ -31,7 +30,6 @@
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
-    "types": "^0.1.1",
     "typescript": "^5.5.3",
     "vitest": "^4.0.18"
   }
