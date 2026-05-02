@@ -19,7 +19,7 @@ export const logger: Logger = pino({
         }
       : undefined,
   base: {
-    env: CONFIG.nodeEnv || "development",
+    env: CONFIG.nodeEnv,
   },
 });
 

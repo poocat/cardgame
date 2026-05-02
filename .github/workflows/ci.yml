@@ -15,7 +15,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
@@ -25,14 +25,11 @@ jobs:
   test:
     name: Server Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
 
     steps:
       # Clone repo and checkout submodules
       - uses: webfactory/ssh-agent@v0.9.1
-        with:                                                                                                                                                                                                           
+        with:
           ssh-private-key: ${{ secrets.PRIVATE_SUBMODULE_CI_DEPLOY_KEY }}
 
       - uses: actions/checkout@v4
@@ -46,18 +43,13 @@ jobs:
       # Setup Node
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
-          cache-dependency-path: server/package-lock.json
 
       - run: npm ci
 
-      - name: Install root dependencies
-        run: npm ci
-        working-directory: .
-
       # Typecheck
-      - run: npm run build
+      - run: npm run build --workspace=server
 
       # Run tests
-      - run: npm test
+      - run: npm test --workspace=server

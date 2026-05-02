@@ -82,66 +82,111 @@ There are different types of actions available on cards:
 
 ## Development
 
-- Prerequisites:
-  - Install Node (e.g. [download](https://nodejs.org/en/download/) an installer...)
-    - At the time of this writing, Node was on version 22.
-  - Install Docker
-    
-- Server:
-  - Bring up database (`/`):
+### Prerequisites:
+- **Node.js** ([download](https://nodejs.org/en/download/)) for runtime and dependency management
+  - To verify the installation, open a terminal and run:
     ```
-    docker compose up
+    node --version
     ```
-  - Install dependencies (`/server`):
+    (This should print the version number for the installed version of Node. The earliest version this project has been tested with is `v22.18.0`.)
+  - It is unlikely that Node would be installed without the included package manager, but you can also verify that the package manager is installed by running:
     ```
-    npm install
+    npm --version
     ```
-  - Run tests (`/server`):
+    (The earliest version this project has been tested with is `10.9.3`.)
+- **Docker** (e.g. [Docker Desktop](https://www.docker.com/products/docker-desktop/)) to bring up a local development database
+  - To verify the installation, open a terminal and run:
     ```
-    npm run test:public
+    docker --version
     ```
-    Or, if using the private submodule:
+    (The earliest version this project has been tested with is `Docker version 28.5.1, build e180ab8`.)
+
+### Server
+The server application represents the implementation of the game "engine", and the interface through which web applications can host games.
+
+#### Set up Database:
+The server requires a connection to a database. By default, the application will look for a database running on locally from the address `mongodb://localhost:27017`.
+- To bring up the local database in a docker container, open a new terminal and navigate to the top folder in this repository, then run:
+  ```
+  docker compose -f docker/compose-local-db.yml up
+  ```
+  This command is free-running, and the terminal running it should be left open in order to run the server application.
+- To connect to a different database, you will need a connection string to a different MongoDB instance:
+  - Copy and rename the environment file `/server/.env.example` to `/server/.env`. You can do this manually if you are using a file explorer that displays hidden files, or you may open a terminal and navigate to the top folder in this repository and run:
     ```
-    npm run test
+    cp server/.env.example server/.env
     ```
-  - To start server locally (`/server`):
-    ```
-    npm run start
+  - Open this file and add the connection string:
+    ```diff
+    +MONGODB_URI="mongodb+srv://username:password@example.mongodb.net"
     ```
 
-- Client:
-  - To install dependencies (`/client`):
-    ```
-    npm install
-    ```
-  - To run the site locally (`/client`):
-    ```
-    npm run dev
-    ```
+#### Install Server Dependencies and Run:
+- Open a terminal and navigate to the top folder in this repository.
+- Install dependencies by running:
+  ```
+  npm install
+  ```
+  (Note, this will also install the client's dependencies, allowing you to skip the install step for running the client, as described below.)
+- Run the development server:
+  ```
+  npm run dev --workspace=server
+  ```
+  This command is free-running, but will not watch for changes made to the server code in `/server`. The command will need to be stopped (CTRL+C) and started again to incorporate changes.
 
-- Using the Private Submodule (`/`):
-  - Initialize the submodule:
-    ```
-    git submodule init
-    ```
-  - Update the submodule, to get latest changes:
-    ```
-    git submodule update
-    ```
-  - Switch to a different submodule branch:
-    ```
-    cd private
-    git checkout <branch>
-    ```
-  - Add the path to the private directory (relative to the `/server` folder) to the environment:
-    ```
-    export PRIVATE_PATH=../private
-    ```
-    Or, add a file, `server/.env` with the contents:
-    ```
-    PRIVATE_PATH=../private
-    ```
-  - After committing changes in the submodule, pin the submodule to the current commit:
-    ```
-    git add private
-    ```
+#### Use Private Submodule Repository:
+If you have access to the private repository that defines the game cards used in production, you can run the server with those resources.
+- Initialize the submodule:
+  ```
+  git submodule init
+  ```
+  This should populate a folder in the top folder of this repository, `/private`.
+- If you haven't already, copy and rename the environment file `/server/.env.example`:
+  ```
+  cp server/.env.example server/.env
+  ```
+- Open this file and confirm that the `/private` folder is one level up from the `/server` folder:
+  ```bash
+  PRIVATE_PATH=../private
+  ```
+- Follow the instructions above to start the server. You should see a number of logs indicating that the private resources were successfully loaded, e.g. `loaded private cards`, `loaded private locales`.
+
+#### Run server tests:
+- Open a new terminal and navigate to the top folder of this repository, and run:
+  ```
+  npm run test:public --workspace=server
+  ```
+- If using the private submodule repository, you can remove the `:public` suffix and run:
+  ```
+  npm run test --workspace=server
+  ```
+
+### Client
+The client application is the implementation of the user interface. It requires an instance of the client running continuously to read and write game data.
+
+#### Install client dependencies and run:
+- Open a terminal and navigate to the top folder in this repository.
+- If you have not already, install dependencies by running:
+  ```
+  npm install
+  ```
+- Start the development server by running:
+  ```
+  npm run dev --workspace=client
+  ```
+  This command is free-running, and will watch for changes made to the code in `/client`.
+
+### Working with the Private Submodule:
+- Update the submodule, to get latest changes:
+  ```
+  git submodule update
+  ```
+- Switch to a different submodule branch:
+  ```
+  cd private
+  git checkout <branch>
+  ```
+- After committing changes in the submodule, pin the submodule to the current commit:
+  ```
+  git add private
+  ```

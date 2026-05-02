@@ -10,6 +10,20 @@ export const timestampSchema = z.iso.datetime();
 
 export const ROUTES = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Health
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  health: {
+    path: "/health",
+    methods: {
+      get: {
+        path: "/",
+        schemas: {
+          responseBody: z.strictObject({}),
+        },
+      },
+    },
+  },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Games
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   games: {
@@ -128,10 +142,16 @@ export const ROUTES = {
       },
     },
   },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Cards (images)
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   cards: {
     path: "/api/cards",
     methods: {},
   },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Copy (rules, about)
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   copy: {
     path: "/api/copy",
     methods: {
