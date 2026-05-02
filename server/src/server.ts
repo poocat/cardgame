@@ -44,6 +44,9 @@ export async function startServer() {
 
   // Build the server app:
   const app = express();
+  if (CONFIG.trustProxyHops !== null) {
+    app.set("trust proxy", CONFIG.trustProxyHops);
+  }
   app.use(cors({ origin: CONFIG.allowedOrigins }));
   app.use(healthRouter.path, healthRouter.create());
   app.use(
@@ -69,7 +72,7 @@ export async function startServer() {
     logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server listening");
   });
 
-  // Configure gracegful shutdown:
+  // Configure graceful shutdown:
   let shuttingDown = false;
   const shutdown = async (signal: string) => {
     if (shuttingDown) return;

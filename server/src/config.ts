@@ -28,6 +28,8 @@ const envSchema = z
           .filter(Boolean),
       )
       .optional(),
+    /** The number of trusted proxy hops */
+    TRUST_PROXY_HOPS: z.coerce.number().int().nonnegative().optional(),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== "production") return;
@@ -36,6 +38,13 @@ const envSchema = z
         code: "custom",
         message: "CORS_ORIGINS must be set in production",
         path: ["CORS_ORIGINS"],
+      });
+    }
+    if (env.TRUST_PROXY_HOPS === undefined) {
+      ctx.addIssue({
+        code: "custom",
+        message: "TRUST_PROXY_HOPS must be set in production",
+        path: ["TRUST_PROXY_HOPS"],
       });
     }
   });
@@ -50,4 +59,5 @@ export const CONFIG = {
   privatePath: env.PRIVATE_PATH ? path.resolve(env.PRIVATE_PATH) : null,
   logLevel: env.LOG_LEVEL,
   allowedOrigins: env.CORS_ORIGINS,
+  trustProxyHops: env.TRUST_PROXY_HOPS ?? null,
 };
