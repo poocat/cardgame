@@ -28,7 +28,7 @@ type UseSubmissionHook = {
 export function useSubmission(opts?: {
   /** If defined, a true `submitting` state will be locked until a different value is passed. Use with an etag or update timestamp when polling. */
   pendingSnapshot?: string | null;
-  /** If `pendingSnaphot` defined, a true `submitting` state will be released upon a change in the value passed. */
+  /** If `pendingSnapshot` is defined, a true `submitting` state will be released upon a change in the value passed. */
   pollError?: string | null;
 }): UseSubmissionHook {
   const [submitting, setSubmitting] = useState(false);
