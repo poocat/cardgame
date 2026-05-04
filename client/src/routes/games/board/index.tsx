@@ -133,6 +133,7 @@ const ChipPool = memo(
     side: PlayerSide;
     chips: ChipDigest[];
     submitDisabled: boolean;
+    submitting: boolean;
     onSubmitChoice: () => void;
     choiceProps: ChoiceProps;
     selectorProps: SelectorProps | null;
@@ -175,6 +176,7 @@ const ChipPool = memo(
               numSelected={numSelected}
               onIncrement={addChip}
               onDecrement={removeChip}
+              disabled={props.submitting}
               disableSubmit={props.submitDisabled}
               disableIncrement={!props.selectorProps?.moreValuesAllowed}
             />
@@ -192,6 +194,7 @@ export const GameBoard = memo(
   (props: {
     game: GameDigest;
     onSubmitChoice: () => void;
+    submitting: boolean;
     dialogProps: DialogProps;
     selectorProps: SelectorProps;
     choiceProps: ChoiceProps;
@@ -292,6 +295,7 @@ export const GameBoard = memo(
                         card={card}
                         setDialog={props.dialogProps.set}
                         choiceProps={props.choiceProps}
+                        submitting={props.submitting}
                         selectorProps={
                           cardSelectEnabled(card.id)
                             ? props.selectorProps
@@ -312,6 +316,7 @@ export const GameBoard = memo(
                       choiceProps={props.choiceProps}
                       onSubmitChoice={props.onSubmitChoice}
                       submitDisabled={submitDisabled}
+                      submitting={props.submitting}
                       selectorProps={
                         someChipsSelectable(player.chipsInReserve)
                           ? props.selectorProps
@@ -329,6 +334,7 @@ export const GameBoard = memo(
                         card={card}
                         setDialog={props.dialogProps.set}
                         choiceProps={props.choiceProps}
+                        submitting={props.submitting}
                         selectorProps={
                           cardSelectEnabled(card.id)
                             ? props.selectorProps
@@ -345,6 +351,7 @@ export const GameBoard = memo(
                     choiceProps={props.choiceProps}
                     onSubmitChoice={props.onSubmitChoice}
                     submitDisabled={submitDisabled}
+                    submitting={props.submitting}
                     selectorProps={
                       someChipsSelectable(player.chipsinChannel)
                         ? props.selectorProps
@@ -363,6 +370,7 @@ export const GameBoard = memo(
                         card={card}
                         setDialog={props.dialogProps.set}
                         choiceProps={props.choiceProps}
+                        submitting={props.submitting}
                         selectorProps={
                           cardSelectEnabled(card.id)
                             ? props.selectorProps
@@ -396,6 +404,7 @@ export const GameBoard = memo(
               values={props.game.activity.choice.values}
               onSubmitChoice={props.onSubmitChoice}
               submitDisabled={submitDisabled}
+              submitting={props.submitting}
               toggleValue={props.selectorProps.toggleValue}
               checkValueSelected={props.selectorProps.checkValueSelected}
               moreValuesAllowed={props.selectorProps.moreValuesAllowed}
@@ -424,6 +433,7 @@ export const GameBoard = memo(
               card={props.dialogProps.value.card}
               onSubmitChoice={props.onSubmitChoice}
               submitDisabled={submitDisabled}
+              submitting={props.submitting}
               choiceProps={props.choiceProps}
               selectorProps={
                 cardSelectEnabled(props.dialogProps.value.card.id)

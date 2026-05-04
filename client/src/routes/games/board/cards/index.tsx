@@ -112,6 +112,7 @@ export const FaceUpThumbnail = memo(
     props: {
       setDialog: DialogProps["set"];
       choiceProps: ChoiceProps;
+      submitting: boolean;
       /** Set to null when the observing player isn't choosing, or the card has no selectable values on it. */
       selectorProps: SelectorProps | null;
     } & (
@@ -181,7 +182,8 @@ export const FaceUpThumbnail = memo(
               size="md"
               selected={cardIsSelected}
               selectDisabled={
-                !cardIsSelected && !props.selectorProps.moreValuesAllowed
+                props.submitting ||
+                (!cardIsSelected && !props.selectorProps.moreValuesAllowed)
               }
               onToggle={() => {
                 props.selectorProps?.toggleValue(props.card.id);
@@ -277,6 +279,7 @@ export const HandPile = (props: { count: number }) => {
 const DetailCardAction = (props: {
   selected: boolean;
   disabled: boolean;
+  submitting: boolean;
   actionType: string;
   actionId: string;
   instructions: string;
@@ -292,7 +295,7 @@ const DetailCardAction = (props: {
       onClick={props.onChange}
       size="sm"
       color="action"
-      disabled={props.disabled}
+      disabled={props.disabled || props.submitting}
       label={label}
     />
   );
@@ -313,6 +316,7 @@ const DetailCardChipSelect = (props: {
   chips: ChipDigest[];
   onSubmitChoice: () => void;
   submitDisabled: boolean;
+  submitting: boolean;
   selectorProps: SelectorProps | null;
 }) => {
   const { numSelected, addChip, removeChip } = useChipSelector({
@@ -325,6 +329,7 @@ const DetailCardChipSelect = (props: {
       size="lg"
       light={true}
       numSelected={numSelected}
+      disabled={props.submitting}
       disableIncrement={!props.selectorProps?.moreValuesAllowed}
       onIncrement={addChip}
       onDecrement={removeChip}
@@ -343,6 +348,7 @@ export const DetailCard = (props: {
   card: FaceUpCardDigest;
   onSubmitChoice: () => void;
   submitDisabled: boolean;
+  submitting: boolean;
   choiceProps: ChoiceProps;
   selectorProps: SelectorProps | null;
 }) => {
@@ -409,6 +415,7 @@ export const DetailCard = (props: {
                   disabled={
                     !cardHasSelectableActions || !selectable || !toggleable
                   }
+                  submitting={props.submitting}
                   selected={selected}
                   onChange={toggle}
                 />
@@ -435,6 +442,7 @@ export const DetailCard = (props: {
               chips={props.card.chips}
               onSubmitChoice={props.onSubmitChoice}
               submitDisabled={submitDisabled}
+              submitting={props.submitting}
               selectorProps={props.selectorProps}
             />
           )}
@@ -445,7 +453,7 @@ export const DetailCard = (props: {
               size="lg"
               onClick={props.onSubmitChoice}
               color="action"
-              disabled={submitDisabled}
+              disabled={submitDisabled || props.submitting}
             >
               ok
             </Button>
@@ -459,7 +467,8 @@ export const DetailCard = (props: {
                 color="card"
                 label="select"
                 disabled={
-                  !cardIsSelected && !props.selectorProps.moreValuesAllowed
+                  props.submitting ||
+                  (!cardIsSelected && !props.selectorProps.moreValuesAllowed)
                 }
                 selected={cardIsSelected}
                 onClick={() => props.selectorProps?.toggleValue(props.card.id)}
@@ -469,7 +478,9 @@ export const DetailCard = (props: {
                 border="dark"
                 size="lg"
                 disabled={
-                  !cardIsSelected || props.selectorProps?.moreValuesNeeded
+                  props.submitting ||
+                  !cardIsSelected ||
+                  props.selectorProps?.moreValuesNeeded
                 }
                 onClick={props.onSubmitChoice}
                 color="card"

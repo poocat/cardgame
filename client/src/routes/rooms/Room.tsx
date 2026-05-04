@@ -1,6 +1,7 @@
 import { Button, Input } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
 import { usePoller } from "@client/utils/usePoller";
+import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -25,7 +26,7 @@ export const Room = () => {
   const [query, setQuery] = useSearchParams();
   const playerId = query.get("playerId");
 
-  const [gameStarting, setGameStarting] = useState(false);
+  const joinSubmission = useSubmission();
 
   const url = useMemo(() => {
     const base = `${ROUTES.rooms.path}/${roomId}`;
@@ -53,6 +54,15 @@ export const Room = () => {
 
   const playerIsHost = poller.data?.digest.host.id === playerId;
 
+  // Hold the start-game lock until the room poll reflects the new gameId
+  // (the navigation effect below then redirects). Without this, the button
+  // briefly re-enables between POST success and the next poll, allowing a
+  // duplicate game to be created.
+  const startSubmission = useSubmission({
+    pendingSnapshot: poller.data?.gameId ?? null,
+    pollError: poller.error,
+  });
+
   const [guestName, setGuestName] = useState("");
 
   // Once the game has started, redirect.
@@ -66,58 +76,59 @@ export const Room = () => {
   }, [gameId, navigate, playerId]);
 
   const submitGuestDisabled = playerIsHost || !guestName;
-  const handleSubmitGuest = useCallback(async () => {
-    if (submitGuestDisabled) return;
-    try {
-      const payload = ROUTES.rooms.methods.postGuest.schemas.requestBody.parse({
-        guestName,
-      });
-      const body = JSON.stringify(payload);
-      const response = await fetch(`${url}/guests`, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
+  const handleSubmitGuest = useCallback(
+    () =>
+      joinSubmission.handle(async () => {
+        if (submitGuestDisabled) return { ok: true };
+        const payload =
+          ROUTES.rooms.methods.postGuest.schemas.requestBody.parse({
+            guestName,
+          });
+        const response = await fetch(`${url}/guests`, {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok) {
+          return { ok: false, error: `Couldn't join (${response.status}).` };
+        }
         const j = await response.json();
         const d = ROUTES.rooms.methods.postGuest.schemas.responseBody.parse(j);
         setQuery({ playerId: d.playerId });
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }, [url, guestName, setQuery, submitGuestDisabled]);
+        return { ok: true };
+      }),
+    [url, guestName, setQuery, submitGuestDisabled, joinSubmission.handle],
+  );
 
   const startGameDisabled = !playerIsHost || !roomId;
-  const handleStartGame = useCallback(async () => {
-    /**
-     * Does not immediately start a game. Instead makes request to start the
-     * game. When the game is ready, it will be reflected in the room data,
-     * which won't arrive until the next poll.
-     */
-    if (startGameDisabled) return;
-    try {
-      const payload = ROUTES.games.methods.post.schemas.requestBody.parse({
-        roomId: roomId,
-        hostId: playerId,
-      });
-      const body = JSON.stringify(payload);
-      const response = await fetch(ROUTES.games.path, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
-        setGameStarting(true);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }, [startGameDisabled, roomId, playerId]);
+  const handleStartGame = useCallback(
+    () =>
+      /**
+       * Does not immediately start a game. Instead makes request to start the
+       * game. When the game is ready, it will be reflected in the room data,
+       * which won't arrive until the next poll.
+       */
+      startSubmission.handle(async () => {
+        if (startGameDisabled) return { ok: true };
+        const payload = ROUTES.games.methods.post.schemas.requestBody.parse({
+          roomId: roomId,
+          hostId: playerId,
+        });
+        const response = await fetch(ROUTES.games.path, {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok) {
+          return {
+            ok: false,
+            error: `Couldn't start game (${response.status}).`,
+          };
+        }
+        return { ok: true };
+      }),
+    [startGameDisabled, roomId, playerId, startSubmission.handle],
+  );
 
   return (
     <Box spacing="lg">
@@ -156,9 +167,9 @@ export const Room = () => {
             color="chip"
             size="lg"
             onClick={handleStartGame}
-            disabled={gameStarting}
+            disabled={startSubmission.submitting}
           >
-            {gameStarting ? "Starting..." : "Start Game"}
+            {startSubmission.submitting ? "Starting..." : "Start Game"}
           </Button>
         ) : playerId ? (
           <Box>Waiting for host to start...</Box>
@@ -175,12 +186,19 @@ export const Room = () => {
                 border="dark"
                 color="primary"
                 size="md"
-                disabled={playerIsHost || !guestName}
+                disabled={
+                  playerIsHost || !guestName || joinSubmission.submitting
+                }
                 onClick={handleSubmitGuest}
               >
-                Join Game
+                {joinSubmission.submitting ? "Joining..." : "Join Game"}
               </Button>
             </Stack>
+          </Box>
+        )}
+        {(joinSubmission.error || startSubmission.error) && (
+          <Box fullWidth spacing="md" color="error">
+            {joinSubmission.error ?? startSubmission.error}
           </Box>
         )}
       </Stack>
