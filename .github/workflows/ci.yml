@@ -6,6 +6,9 @@ on:
       - dev
       - main
 
+env:
+  NODE_VERSION: 22
+
 jobs:
   lint:
     name: Lint & Format
@@ -15,41 +18,55 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
       - run: npm ci
 
       - run: npx @biomejs/biome ci common server client
 
-  test:
-    name: Server Tests
+  test-client:
+    name: Test Client App
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build --workspace=client
+
+  test-server:
+    name: Test Server App
     runs-on: ubuntu-latest
 
     steps:
-      # Clone repo and checkout submodules
       - uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.PRIVATE_SUBMODULE_CI_DEPLOY_KEY }}
 
       - uses: actions/checkout@v4
 
-      - name: config git to use SSH url
+      - name: Config git for SSH
         run: git config --global url."git@github.com:".insteadOf "https://github.com/"
 
-      - name: checkout submodules
+      - name: Checkout Submodules
         run: git submodule update --init --recursive
 
-      # Setup Node
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - run: npm ci
+      - name: Install Project
+        run: npm ci
 
-      # Typecheck
-      - run: npm run build --workspace=server
+      - name: Build App
+        run: npm run build --workspace=server
 
-      # Run tests
-      - run: npm test --workspace=server
+      - name: Run Tests
+        run: npm test --workspace=server
