@@ -65,6 +65,7 @@ export const Game = () => {
     game?.activity.choice.choosingPlayerId === observingPlayerId;
 
   const submission = useSubmission({
+    pollingAware: true,
     pendingSnapshot: poller.data?.updatedAt ?? null,
     pollError: poller.error,
   });

@@ -59,6 +59,7 @@ export const Room = () => {
   // briefly re-enables between POST success and the next poll, allowing a
   // duplicate game to be created.
   const startSubmission = useSubmission({
+    pollingAware: true,
     pendingSnapshot: poller.data?.gameId ?? null,
     pollError: poller.error,
   });

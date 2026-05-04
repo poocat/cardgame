@@ -9,6 +9,16 @@ type UseSubmissionHook = {
   handle: (handler: () => Promise<SubmissionResult>) => Promise<void>;
 };
 
+type UseSubmissionOpts =
+  | { pollingAware?: false }
+  | {
+      pollingAware: true;
+      /** Lock is held until this value changes. Use an etag or update timestamp from the bound poll. */
+      pendingSnapshot: string | null;
+      /** If this changes after submit, the lock is released as a failsafe against a deadlocked UI when the poll itself errors. */
+      pollError?: string | null;
+    };
+
 /******************************************************************************
  * ### useSubmission
  *
@@ -16,28 +26,23 @@ type UseSubmissionHook = {
  * `submitting` flag that can be used for debouncing and providing feedback.
  *
  * Two modes:
- * - One-shot: if `pendingSnapshot` is not defined, `submitting` will only be
- *   held true while the handler is running.
+ * - if `pollingAware` is false or undefined `submitting` will only be held
+ *   true while the handler is running.
  *
- * - Polling-aware: if `pendingSnapshot` is defined, `submitting` is held true
- *   even after the handler resolves, until the snapshot changes. Use to keep
- *   the UI locked until a follow-up poll confirms that the remote state has
- *   advanced. Combine with `pollError` to ensure that a failed post-submit
- *   poll request does not keep the UI locked indefinitely.
+ * - if `pollingAware` is true, `submitting` is held true even after the handler
+ *   resolves, until the snapshot changes. Use to keep the UI locked until a
+ *   follow-up poll confirms that the remote state has advanced. Combine with
+ *   `pollError` to ensure that a failed post-submit poll request does not keep
+ *   the UI locked indefinitely.
  ******************************************************************************/
-export function useSubmission(opts?: {
-  /** If defined, a true `submitting` state will be locked until a different value is passed. Use with an etag or update timestamp when polling. */
-  pendingSnapshot?: string | null;
-  /** If `pendingSnapshot` is defined, a true `submitting` state will be released upon a change in the value passed. */
-  pollError?: string | null;
-}): UseSubmissionHook {
+export function useSubmission(opts?: UseSubmissionOpts): UseSubmissionHook {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const prevSnapshotRef = useRef<string | null>(null);
   const prevPollErrorRef = useRef<string | null>(null);
-  const pollingAware = opts?.pendingSnapshot !== undefined;
-  const pendingSnapshot = opts?.pendingSnapshot ?? null;
-  const pollError = opts?.pollError ?? null;
+  const pollingAware = opts?.pollingAware === true;
+  const pendingSnapshot = opts?.pollingAware ? opts.pendingSnapshot : null;
+  const pollError = (opts?.pollingAware ? opts.pollError : null) ?? null;
 
   const handle = useCallback(
     async (handler: () => Promise<SubmissionResult>) => {
