@@ -11,9 +11,9 @@ export const NewRoom = () => {
   const [hostName, setHostName] = useState("");
   const submission = useSubmission();
 
-  const handleSubmit = () =>
+  const handleSubmit = () => {
+    if (!hostName) return;
     submission.handle(async () => {
-      if (!hostName) return { ok: true };
       const payload = ROUTES.rooms.methods.post.schemas.requestBody.parse({
         hostName,
       });
@@ -33,6 +33,7 @@ export const NewRoom = () => {
       navigate(`/rooms/${d.roomId}?playerId=${d.hostId}`);
       return { ok: true };
     });
+  };
 
   return (
     <Box spacing="lg">

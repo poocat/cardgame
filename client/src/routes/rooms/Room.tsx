@@ -76,59 +76,54 @@ export const Room = () => {
   }, [gameId, navigate, playerId]);
 
   const submitGuestDisabled = playerIsHost || !guestName;
-  const handleSubmitGuest = useCallback(
-    () =>
-      joinSubmission.handle(async () => {
-        if (submitGuestDisabled) return { ok: true };
-        const payload =
-          ROUTES.rooms.methods.postGuest.schemas.requestBody.parse({
-            guestName,
-          });
-        const response = await fetch(`${url}/guests`, {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!response.ok) {
-          return { ok: false, error: `Couldn't join (${response.status}).` };
-        }
-        const j = await response.json();
-        const d = ROUTES.rooms.methods.postGuest.schemas.responseBody.parse(j);
-        setQuery({ playerId: d.playerId });
-        return { ok: true };
-      }),
-    [url, guestName, setQuery, submitGuestDisabled, joinSubmission.handle],
-  );
+  const handleSubmitGuest = useCallback(() => {
+    if (submitGuestDisabled) return;
+    return joinSubmission.handle(async () => {
+      const payload = ROUTES.rooms.methods.postGuest.schemas.requestBody.parse({
+        guestName,
+      });
+      const response = await fetch(`${url}/guests`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        return { ok: false, error: `Couldn't join (${response.status}).` };
+      }
+      const j = await response.json();
+      const d = ROUTES.rooms.methods.postGuest.schemas.responseBody.parse(j);
+      setQuery({ playerId: d.playerId });
+      return { ok: true };
+    });
+  }, [url, guestName, setQuery, submitGuestDisabled, joinSubmission.handle]);
 
   const startGameDisabled = !playerIsHost || !roomId;
-  const handleStartGame = useCallback(
-    () =>
-      /**
-       * Does not immediately start a game. Instead makes request to start the
-       * game. When the game is ready, it will be reflected in the room data,
-       * which won't arrive until the next poll.
-       */
-      startSubmission.handle(async () => {
-        if (startGameDisabled) return { ok: true };
-        const payload = ROUTES.games.methods.post.schemas.requestBody.parse({
-          roomId: roomId,
-          hostId: playerId,
-        });
-        const response = await fetch(ROUTES.games.path, {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!response.ok) {
-          return {
-            ok: false,
-            error: `Couldn't start game (${response.status}).`,
-          };
-        }
-        return { ok: true };
-      }),
-    [startGameDisabled, roomId, playerId, startSubmission.handle],
-  );
+  /**
+   * Does not immediately start a game. Instead makes request to start the
+   * game. When the game is ready, it will be reflected in the room data,
+   * which won't arrive until the next poll.
+   */
+  const handleStartGame = useCallback(() => {
+    if (startGameDisabled) return;
+    return startSubmission.handle(async () => {
+      const payload = ROUTES.games.methods.post.schemas.requestBody.parse({
+        roomId: roomId,
+        hostId: playerId,
+      });
+      const response = await fetch(ROUTES.games.path, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        return {
+          ok: false,
+          error: `Couldn't start game (${response.status}).`,
+        };
+      }
+      return { ok: true };
+    });
+  }, [startGameDisabled, roomId, playerId, startSubmission.handle]);
 
   return (
     <Box spacing="lg">

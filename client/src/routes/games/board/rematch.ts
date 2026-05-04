@@ -100,29 +100,27 @@ export const useRematch = (opts: {
   const hostId = poller.data?.digest.host.id;
   const rematchReady = poller.data !== null && poller.data.gameId !== gameId;
 
-  const startRematch = useCallback(
-    () =>
-      submission.handle(async () => {
-        if (!roomId || !playerId) return { ok: true };
-        const response = await fetch(
-          `${ROUTES.rooms.path}/${roomId}?playerId=${playerId}`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ gameId: null }),
-          },
-        );
-        if (!response.ok) {
-          return {
-            ok: false,
-            error: `Rematch request failed: ${response.status}`,
-          };
-        }
-        navigate(`/rooms/${roomId}?playerId=${playerId}`);
-        return { ok: true };
-      }),
-    [roomId, playerId, navigate, submission.handle],
-  );
+  const startRematch = useCallback(() => {
+    if (!roomId || !playerId) return;
+    return submission.handle(async () => {
+      const response = await fetch(
+        `${ROUTES.rooms.path}/${roomId}?playerId=${playerId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ gameId: null }),
+        },
+      );
+      if (!response.ok) {
+        return {
+          ok: false,
+          error: `Rematch request failed: ${response.status}`,
+        };
+      }
+      navigate(`/rooms/${roomId}?playerId=${playerId}`);
+      return { ok: true };
+    });
+  }, [roomId, playerId, navigate, submission.handle]);
 
   // Navigates back to the room.
   const goToRematch = useCallback(() => {
