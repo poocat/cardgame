@@ -13,7 +13,7 @@ export const NewRoom = () => {
 
   const handleSubmit = () => {
     if (!hostName) return;
-    submission.handle(async () => {
+    return submission.handle(async () => {
       const payload = ROUTES.rooms.methods.post.schemas.requestBody.parse({
         hostName,
       });
