@@ -1,5 +1,6 @@
 import { Button, Input } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
+import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
 import { useNavigate } from "react-router";
@@ -8,29 +9,30 @@ export const NewRoom = () => {
   const navigate = useNavigate();
 
   const [hostName, setHostName] = useState("");
+  const submission = useSubmission();
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!hostName) return;
-    try {
+    return submission.handle(async () => {
       const payload = ROUTES.rooms.methods.post.schemas.requestBody.parse({
         hostName,
       });
-      const body = JSON.stringify(payload);
       const response = await fetch(ROUTES.rooms.path, {
         method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" },
       });
-      if (response.ok) {
-        const j = await response.json();
-        const d = ROUTES.rooms.methods.post.schemas.responseBody.parse(j);
-        navigate(`/rooms/${d.roomId}?playerId=${d.hostId}`);
+      if (!response.ok) {
+        return {
+          ok: false,
+          error: `Couldn't create room (${response.status}).`,
+        };
       }
-    } catch (error) {
-      console.error(error);
-    }
+      const j = await response.json();
+      const d = ROUTES.rooms.methods.post.schemas.responseBody.parse(j);
+      navigate(`/rooms/${d.roomId}?playerId=${d.hostId}`);
+      return { ok: true };
+    });
   };
 
   return (
@@ -48,13 +50,18 @@ export const NewRoom = () => {
               color="primary"
               border="dark"
               size="lg"
-              disabled={!hostName}
+              disabled={!hostName || submission.submitting}
               onClick={handleSubmit}
             >
-              Create Room
+              {submission.submitting ? "Creating..." : "Create Room"}
             </Button>
           </Stack>
         </Box>
+        {submission.error && (
+          <Box fullWidth spacing="md" color="error">
+            {submission.error}
+          </Box>
+        )}
       </Stack>
     </Box>
   );

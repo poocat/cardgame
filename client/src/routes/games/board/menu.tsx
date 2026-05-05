@@ -87,6 +87,7 @@ export const ChoiceMenu = memo(
       values: ChoiceValueDigest[];
       onSubmitChoice: () => void;
       submitDisabled: boolean;
+      submitting: boolean;
     } & Pick<
       SelectorProps,
       "checkValueSelected" | "toggleValue" | "moreValuesAllowed"
@@ -101,17 +102,18 @@ export const ChoiceMenu = memo(
               border="dark"
               color="secondary"
               size="lg"
-              disabled={props.submitDisabled}
+              disabled={props.submitDisabled || props.submitting}
               onClick={props.onSubmitChoice}
             >
-              {props.submitLabel}
+              {props.submitting ? "Submitting..." : props.submitLabel}
             </Button>
           </Box>
           <Box spacing="sm">
             <Stack spacing="sm" orientation="horizontal">
               {props.values.map(({ value, label }) => {
                 const selected = props.checkValueSelected(value);
-                const disabled = !selected && !props.moreValuesAllowed;
+                const disabled =
+                  props.submitting || (!selected && !props.moreValuesAllowed);
                 return (
                   <ChoiceSelectButton
                     key={value}

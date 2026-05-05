@@ -1,8 +1,9 @@
 import { Box } from "@client/components/layout";
 import { useAttention } from "@client/utils/useAttention";
 import { usePoller } from "@client/utils/usePoller";
+import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router";
 import type z from "zod";
 import { GameBoard } from "./board";
@@ -63,7 +64,11 @@ export const Game = () => {
   const observingPlayerIsChoosing =
     game?.activity.choice.choosingPlayerId === observingPlayerId;
 
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const submission = useSubmission({
+    pollingAware: true,
+    pendingSnapshot: poller.data?.updatedAt ?? null,
+    pollError: poller.error,
+  });
 
   useAttention({
     message: !poller.polling ? "Polling stopped!" : null,
@@ -94,13 +99,16 @@ export const Game = () => {
   // Submission:
   const submitChoice = useCallback(async () => {
     if (
-      gameId &&
-      observingPlayerId &&
-      observingPlayerIsChoosing &&
-      currentChoiceName &&
-      poller.fetchOnce
+      !gameId ||
+      !observingPlayerId ||
+      !observingPlayerIsChoosing ||
+      !currentChoiceName ||
+      !poller.fetchOnce
     ) {
-      setSubmitError(null);
+      return;
+    }
+    const fetchOnce = poller.fetchOnce;
+    await submission.handle(async () => {
       const payload: GamesPatchRequestBody = {
         decision: {
           playerId: observingPlayerId,
@@ -108,30 +116,26 @@ export const Game = () => {
           values: selector.selectedValues,
         },
       };
-      const body = JSON.stringify(payload);
-      try {
-        const response = await fetch(url, {
-          method: "PATCH",
-          body,
-          headers: { "Content-Type": "application/json" },
-        });
-        if (response.ok || response.status === 204) {
-          poller.fetchOnce();
-          selector.clearValues();
-          dialog.close();
-        } else if (response.status === 409) {
-          await poller.fetchOnce();
-          setSubmitError("Board updated. Please re-submit.");
-        } else {
-          const msg = await response
-            .json()
-            .catch(() => ({ message: "Unknown error" }));
-          setSubmitError(msg.message ?? "Submission failed.");
-        }
-      } catch {
-        setSubmitError("Network error.");
+      const response = await fetch(url, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.ok || response.status === 204) {
+        fetchOnce();
+        selector.clearValues();
+        dialog.close();
+        return { ok: true };
       }
-    }
+      if (response.status === 409) {
+        await fetchOnce();
+        return { ok: false, error: "Board updated. Please re-submit." };
+      }
+      const msg = await response
+        .json()
+        .catch(() => ({ message: "Unknown error" }));
+      return { ok: false, error: msg.message ?? "Submission failed." };
+    });
   }, [
     gameId,
     observingPlayerId,
@@ -141,12 +145,13 @@ export const Game = () => {
     dialog.close,
     observingPlayerIsChoosing,
     poller.fetchOnce,
+    submission.handle,
     url,
   ]);
 
   const errors: string[] = [];
   if (poller.error) errors.push(poller.error);
-  if (submitError) errors.push(submitError);
+  if (submission.error) errors.push(submission.error);
 
   return (
     <div>
@@ -161,6 +166,7 @@ export const Game = () => {
         <GameBoard
           game={game}
           onSubmitChoice={submitChoice}
+          submitting={submission.submitting}
           choiceProps={choice}
           selectorProps={selector}
           dialogProps={dialog}

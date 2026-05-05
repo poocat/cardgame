@@ -1,4 +1,5 @@
 import { usePoller } from "@client/utils/usePoller";
+import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
@@ -43,7 +44,7 @@ export const useRematch = (opts: {
   const [roomLookupStatus, setRoomLookupStatus] = useState<
     "pending" | "done" | "failed"
   >("pending");
-  const [startingRematch, setStartingRematch] = useState(false);
+  const submission = useSubmission();
 
   // Once the game ends, look up the room that spawned it.
   // Note, if a "guest" reloads the page after the "host" has already initiated
@@ -99,10 +100,9 @@ export const useRematch = (opts: {
   const hostId = poller.data?.digest.host.id;
   const rematchReady = poller.data !== null && poller.data.gameId !== gameId;
 
-  const startRematch = useCallback(async () => {
-    if (!roomId || !playerId || startingRematch) return;
-    setStartingRematch(true);
-    try {
+  const startRematch = useCallback(() => {
+    if (!roomId || !playerId) return;
+    return submission.handle(async () => {
       const response = await fetch(
         `${ROUTES.rooms.path}/${roomId}?playerId=${playerId}`,
         {
@@ -112,14 +112,15 @@ export const useRematch = (opts: {
         },
       );
       if (!response.ok) {
-        throw new Error(`Rematch request failed: ${response.status}`);
+        return {
+          ok: false,
+          error: `Rematch request failed: ${response.status}`,
+        };
       }
       navigate(`/rooms/${roomId}?playerId=${playerId}`);
-    } catch (err) {
-      console.error(err);
-      setStartingRematch(false);
-    }
-  }, [roomId, playerId, startingRematch, navigate]);
+      return { ok: true };
+    });
+  }, [roomId, playerId, navigate, submission.handle]);
 
   // Navigates back to the room.
   const goToRematch = useCallback(() => {
@@ -150,7 +151,11 @@ export const useRematch = (opts: {
   }
   if (hostId === playerId) {
     // Host info known. Observer is host.
-    return { role: "host", startingRematch, startRematch };
+    return {
+      role: "host",
+      startingRematch: submission.submitting,
+      startRematch,
+    };
   }
   return { role: "guest", rematchReady, goToRematch };
 };
