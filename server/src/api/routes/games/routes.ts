@@ -10,6 +10,7 @@ import { initGameData } from "@server/game/initGameData";
 import { makeDecision } from "@server/game/stateMachine";
 import { logger } from "@server/logger";
 import type { GameData, RoomData } from "@server/types";
+import type { RequestHandler } from "express";
 import { json as jsonHandler, Router } from "express";
 import { digestGameData } from "./digest";
 
@@ -18,6 +19,8 @@ type Dependencies = {
     rooms: RoomRepository<RoomData>;
     games: GameRepository<GameData>;
   };
+  /** Override the default rate-limit middleware. */
+  rateLimiters?: RequestHandler[];
 };
 
 /******************************************************************************
@@ -31,13 +34,14 @@ export const gamesRouter = {
     const router = Router();
 
     router.use(jsonHandler());
-    router.use(burstLimiter({ windowMs: 10 * 1000, max: 30 }));
-    router.use(
+    const limiters = deps.rateLimiters ?? [
+      burstLimiter({ windowMs: 10 * 1000, max: 30 }),
       sustainedLimiter({
         windowMs: 60 * 1000,
         max: 60 * 2 * CONSTANTS.maxNumPlayers,
       }),
-    );
+    ];
+    for (const m of limiters) router.use(m);
 
     /**
      * POST games/

@@ -7,6 +7,7 @@ import { makeId, makeMetaHash } from "@server/db/meta";
 import type { RoomRepository } from "@server/db/repositories";
 import { logger } from "@server/logger";
 import type { RoomData } from "@server/types";
+import type { RequestHandler } from "express";
 import { json as jsonHandler, Router } from "express";
 import { digestRoomData } from "./digest";
 
@@ -14,6 +15,8 @@ type Dependencies = {
   repositories: {
     rooms: RoomRepository<RoomData>;
   };
+  /** Override the default rate-limit middleware. */
+  rateLimiters?: RequestHandler[];
 };
 
 /******************************************************************************
@@ -27,13 +30,14 @@ export const roomsRouter = {
     const router = Router();
 
     router.use(jsonHandler());
-    router.use(burstLimiter({ windowMs: 10 * 1000, max: 30 }));
-    router.use(
+    const limiters = deps.rateLimiters ?? [
+      burstLimiter({ windowMs: 10 * 1000, max: 30 }),
       sustainedLimiter({
         windowMs: 60 * 1000,
         max: 60 * 2 * CONSTANTS.maxNumPlayers,
       }),
-    );
+    ];
+    for (const m of limiters) router.use(m);
 
     /**
      * ### POST rooms/
