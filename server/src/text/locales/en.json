@@ -1,4 +1,5 @@
 {
+  "title": "Cardgame",
   "deck.producers": "Producer",
   "deck.consumers": "Consumer",
   "action.type.play": "play",

@@ -12,10 +12,9 @@ const localeMap = new Map<string, LocaleBundle>();
  * ### getLocaleBundle
  *
  * Reads from the locale registry to get the bundle for the given locale key.
- * Falls back to the default English bundle if the key is not found.
  ******************************************************************************/
 export function getLocaleBundle(locale: string): LocaleBundle {
-  return localeMap.get(locale) ?? localeMap.get("en") ?? {};
+  return localeMap.get(locale) ?? {};
 }
 
 /******************************************************************************
