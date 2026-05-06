@@ -75,13 +75,18 @@ export function useSubmission(opts?: UseSubmissionOpts): UseSubmissionHook {
           // Capture error and release lock.
           setError(result.error);
           setSubmitting(false);
-        } else if (pollingAware) {
-          // Wait for next poll or error.
-          handlerSucceededRef.current = true;
-        } else {
+        } else if (!pollingAware) {
           // Release lock, fire success handler immediately.
           setSubmitting(false);
           onSuccessRef.current?.();
+        } else if (prevSnapshotRef.current !== pendingSnapshot) {
+          // If a poll advanced the snapshot during the handler, the
+          // snapshot-advance effect already released the lock — fire onSuccess
+          // inline.
+          onSuccessRef.current?.();
+        } else {
+          // Wait for next poll or error.
+          handlerSucceededRef.current = true;
         }
       } catch {
         setError("Network error.");
@@ -93,12 +98,14 @@ export function useSubmission(opts?: UseSubmissionOpts): UseSubmissionHook {
 
   // Polling-aware unlock: release once the snapshot advances past what was
   // current at submit time. Fires onSuccess only if the handler actually
-  // succeeded (not when the failsafe path zeroed the ref).
+  // succeeded (not when the failsafe path zeroed the ref). Advances the ref
+  // to the new snapshot so a still-in-flight handler can detect that the
+  // snapshot moved out from under it.
   useEffect(() => {
     if (!submitting || !pollingAware) return;
     if (pendingSnapshot && pendingSnapshot !== prevSnapshotRef.current) {
       setSubmitting(false);
-      prevSnapshotRef.current = null;
+      prevSnapshotRef.current = pendingSnapshot;
       if (handlerSucceededRef.current) {
         handlerSucceededRef.current = false;
         onSuccessRef.current?.();
@@ -115,7 +122,9 @@ export function useSubmission(opts?: UseSubmissionOpts): UseSubmissionHook {
     if (pollError === prevPollErrorRef.current) return;
     setSubmitting(false);
     setError("Couldn't confirm submission. Please refresh.");
-    prevSnapshotRef.current = null;
+    // Leave prevSnapshotRef at its submit-time value so an in-flight handler
+    // can tell its lock was released by the failsafe (ref unchanged) rather
+    // than by a snapshot advance (ref moved), and skip onSuccess accordingly.
     handlerSucceededRef.current = false;
   }, [submitting, pollingAware, pollError]);
 
