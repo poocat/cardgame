@@ -18,8 +18,15 @@ import path from "node:path";
 import { ROUTES } from "@common/api/routes";
 import { burstLimiter } from "@server/api/middleware";
 import { logger } from "@server/logger";
+import type { RequestHandler } from "express";
 import { Router, static as staticFileHandler } from "express";
 import slowDown from "express-slow-down";
+
+type Dependencies = {
+  privatePath: string | null;
+  /** Override the default rate-limit middleware. */
+  rateLimiters?: RequestHandler[];
+};
 
 /******************************************************************************
  * ### cardsRouter
@@ -28,18 +35,19 @@ import slowDown from "express-slow-down";
  ******************************************************************************/
 export const cardsRouter = {
   path: ROUTES.cards.path,
-  create: (deps: { privatePath: string | null }) => {
+  create: (deps: Dependencies) => {
     const router = Router();
 
-    router.use(burstLimiter({ windowMs: 5 * 1000, max: 100 }));
-    router.use(
+    const limiters = deps.rateLimiters ?? [
+      burstLimiter({ windowMs: 5 * 1000, max: 100 }),
       slowDown({
         windowMs: 30 * 1000,
         delayAfter: 60,
         delayMs: (hits) => Math.max(0, hits - 60) * 200,
         maxDelayMs: 1000,
       }),
-    );
+    ];
+    for (const m of limiters) router.use(m);
 
     if (deps.privatePath) {
       const dir = path.join(deps.privatePath, "cards", "images");

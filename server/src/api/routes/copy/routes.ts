@@ -13,7 +13,14 @@ import { burstLimiter } from "@server/api/middleware";
 import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
 import { logger } from "@server/logger";
+import type { RequestHandler } from "express";
 import { Router } from "express";
+
+type Dependencies = {
+  privatePath: string | null;
+  /** Override the default rate-limit middleware. */
+  rateLimiters?: RequestHandler[];
+};
 
 /******************************************************************************
  * ### copyRouter
@@ -22,10 +29,13 @@ import { Router } from "express";
  ******************************************************************************/
 export const copyRouter = {
   path: ROUTES.copy.path,
-  create: (deps: { privatePath: string | null }) => {
+  create: (deps: Dependencies) => {
     const router = Router();
 
-    router.use(burstLimiter({ windowMs: 10 * 1000, max: 20 }));
+    const limiters = deps.rateLimiters ?? [
+      burstLimiter({ windowMs: 10 * 1000, max: 20 }),
+    ];
+    for (const m of limiters) router.use(m);
 
     const copyDir = deps.privatePath
       ? path.join(deps.privatePath, "copy")
