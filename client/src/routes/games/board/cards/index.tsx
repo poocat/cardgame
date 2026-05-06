@@ -329,7 +329,7 @@ const DetailCardChipSelect = (props: {
       size="lg"
       light={true}
       numSelected={numSelected}
-      disabled={props.submitting}
+      submitting={props.submitting}
       disableIncrement={!props.selectorProps?.moreValuesAllowed}
       onIncrement={addChip}
       onDecrement={removeChip}
@@ -455,7 +455,7 @@ export const DetailCard = (props: {
               color="action"
               disabled={submitDisabled || props.submitting}
             >
-              ok
+              {props.submitting ? "Submitting..." : "ok"}
             </Button>
           )}
           {cardIsSelectable && props.selectorProps && (
@@ -485,7 +485,7 @@ export const DetailCard = (props: {
                 onClick={props.onSubmitChoice}
                 color="card"
               >
-                ok
+                {props.submitting ? "Submitting..." : "ok"}
               </Button>
             </Stack>
           )}
