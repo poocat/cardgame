@@ -455,7 +455,7 @@ export const DetailCard = (props: {
               color="action"
               disabled={submitDisabled || props.submitting}
             >
-              {props.submitting ? "Submitting..." : "ok"}
+              {props.submitting ? "..." : "ok"}
             </Button>
           )}
           {cardIsSelectable && props.selectorProps && (
@@ -485,7 +485,7 @@ export const DetailCard = (props: {
                 onClick={props.onSubmitChoice}
                 color="card"
               >
-                {props.submitting ? "Submitting..." : "ok"}
+                {props.submitting ? "..." : "ok"}
               </Button>
             </Stack>
           )}
