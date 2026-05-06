@@ -64,12 +64,6 @@ export const Game = () => {
   const observingPlayerIsChoosing =
     game?.activity.choice.choosingPlayerId === observingPlayerId;
 
-  const submission = useSubmission({
-    pollingAware: true,
-    pendingSnapshot: poller.data?.updatedAt ?? null,
-    pollError: poller.error,
-  });
-
   useAttention({
     message: !poller.polling ? "Polling stopped!" : null,
     audio: "short",
@@ -88,6 +82,20 @@ export const Game = () => {
   const selector = useSelector({
     min: currentChoice?.min ?? 0,
     max: currentChoice?.max ?? 9999,
+  });
+
+  // Defer local cleanup until the next poll confirms the submission so the
+  // dialog and selection stay visible while the lock is held.
+  const onSubmissionConfirmed = useCallback(() => {
+    selector.clearValues();
+    dialog.close();
+  }, [selector.clearValues, dialog.close]);
+
+  const submission = useSubmission({
+    pollingAware: true,
+    pendingSnapshot: poller.data?.updatedAt ?? null,
+    pollError: poller.error,
+    onSuccess: onSubmissionConfirmed,
   });
   const choice = useChoice(game?.activity);
   const rematch = useRematch({
@@ -123,8 +131,6 @@ export const Game = () => {
       });
       if (response.ok || response.status === 204) {
         fetchOnce();
-        selector.clearValues();
-        dialog.close();
         return { ok: true };
       }
       if (response.status === 409) {
@@ -141,8 +147,6 @@ export const Game = () => {
     observingPlayerId,
     currentChoiceName,
     selector.selectedValues,
-    selector.clearValues,
-    dialog.close,
     observingPlayerIsChoosing,
     poller.fetchOnce,
     submission.handle,

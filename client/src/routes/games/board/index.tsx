@@ -176,7 +176,7 @@ const ChipPool = memo(
               numSelected={numSelected}
               onIncrement={addChip}
               onDecrement={removeChip}
-              disabled={props.submitting}
+              submitting={props.submitting}
               disableSubmit={props.submitDisabled}
               disableIncrement={!props.selectorProps?.moreValuesAllowed}
             />

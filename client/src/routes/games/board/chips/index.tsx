@@ -126,17 +126,19 @@ export const ChipSelector = (props: {
   disabled?: boolean;
   disableIncrement?: boolean;
   disableSubmit?: boolean;
+  submitting?: boolean;
 }) => {
+  const allDisabled = props.disabled || props.submitting;
   return (
     <div className={`game-chip-stack game-chip-stack--forward`}>
       <ButtonBase
-        disabled={props.disabled || props.numSelected < 1}
+        disabled={allDisabled || props.numSelected < 1}
         onClick={props.onDecrement}
       >
         <div className={`game-chip game-chip--size-${props.size}`}>-</div>
       </ButtonBase>
       <ButtonBase
-        disabled={props.disabled || !!props.disableIncrement}
+        disabled={allDisabled || !!props.disableIncrement}
         onClick={props.onIncrement}
       >
         <div className={`game-chip game-chip--size-${props.size}`}>+</div>
@@ -145,10 +147,12 @@ export const ChipSelector = (props: {
         <>
           <Arrow size={props.size} light={props.light} />
           <ButtonBase
-            disabled={props.disabled || !!props.disableSubmit}
+            disabled={allDisabled || !!props.disableSubmit}
             onClick={props.onSubmit}
           >
-            <div className={`game-chip game-chip--size-${props.size}`}>ok</div>
+            <div className={`game-chip game-chip--size-${props.size}`}>
+              {props.submitting ? "..." : "ok"}
+            </div>
           </ButtonBase>
         </>
       )}
