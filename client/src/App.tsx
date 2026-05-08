@@ -6,17 +6,24 @@ import { Room } from "@client/routes/rooms/Room";
 import { Rulebook } from "@client/routes/rulebook/Rulebook";
 import { Link, Outlet, Route, Routes } from "react-router";
 import { About } from "./routes/about/About";
+import { MessageProvider, useMessages } from "./utils/messages";
 
 const Providers = (props: { children: React.ReactNode }) => {
-  return <TooltipProvider>{props.children}</TooltipProvider>;
+  return (
+    <TooltipProvider>
+      <MessageProvider defaultLocale="en">{props.children}</MessageProvider>
+    </TooltipProvider>
+  );
 };
 
 const Layout = () => {
+  const { resolve } = useMessages();
+  const title = resolve("title", "Game");
   return (
     <div>
       <Box spacing="md" color="secondary">
         <Stack spacing="md" orientation="horizontal">
-          <Link to="/">Game</Link>
+          <Link to="/">{title}</Link>
           <Link to="/games">List</Link>
           <Link to="/rulebook">Rulebook</Link>
           <Link to="/about">About</Link>

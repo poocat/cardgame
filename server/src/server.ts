@@ -6,6 +6,7 @@ import {
   healthRouter,
   roomsRouter,
 } from "@server/api/routes";
+import { localesRouter } from "@server/api/routes/locales/routes";
 import { CONFIG } from "@server/config";
 import { initDb } from "@server/db/database";
 import { useExampleCards, usePrivateCards } from "@server/game/cards/registry";
@@ -49,6 +50,7 @@ export async function startServer() {
   }
   app.use(cors({ origin: CONFIG.allowedOrigins }));
   app.use(healthRouter.path, healthRouter.create());
+  app.use(localesRouter.path, localesRouter.create());
   app.use(
     cardsRouter.path,
     cardsRouter.create({ privatePath: CONFIG.privatePath }),

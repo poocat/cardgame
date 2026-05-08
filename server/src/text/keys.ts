@@ -3,6 +3,7 @@
  * engine regardless of which set of cards is used.
  */
 export const messageKeys = [
+  "title",
   "deck.producers",
   "deck.consumers",
   "action.type.play",

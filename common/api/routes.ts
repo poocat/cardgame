@@ -7,6 +7,7 @@ export const playerIdSchema = z.uuid();
 export const playerNameSchema = z.string().min(1).max(20);
 export const roomIdSchema = z.uuid();
 export const timestampSchema = z.iso.datetime();
+export const localeSchema = z.string().regex(/^[a-z]{2}(-[a-z]{2})?$/);
 
 export const ROUTES = {
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -162,10 +163,23 @@ export const ROUTES = {
             name: z.string().regex(/^[a-z][a-z0-9-]*$/),
           }),
           requestQuery: z.object({
-            locale: z
-              .string()
-              .regex(/^[a-z]{2}(-[a-z]{2})?$/)
-              .optional(),
+            locale: localeSchema.optional(),
+          }),
+        },
+      },
+    },
+  },
+  locales: {
+    path: "/api/locales",
+    methods: {
+      get: {
+        path: "/:locale",
+        schemas: {
+          requestParams: z.strictObject({
+            locale: localeSchema,
+          }),
+          responseBody: z.strictObject({
+            bundle: z.record(z.string(), z.string()),
           }),
         },
       },
