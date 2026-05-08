@@ -120,6 +120,7 @@ The server requires a connection to a database. By default, the application will
     ```diff
     +MONGODB_URI="mongodb+srv://username:password@example.mongodb.net"
     ```
+  - Restart the server app.
 
 #### Install Server Dependencies and Run:
 - Open a terminal and navigate to the top folder in this repository.
@@ -133,6 +134,17 @@ The server requires a connection to a database. By default, the application will
   npm run dev --workspace=server
   ```
   This command is free-running, but will not watch for changes made to the server code in `/server`. The command will need to be stopped (CTRL+C) and started again to incorporate changes.
+
+If the server does not start due to another server using the default port `7070`, you may choose a new port.
+- If you haven't already, copy and rename the environment file `/server/.env.example`. Run:
+  ```
+  cp server/.env.example server/.env
+  ```
+- Open this file and specify the new port:
+  ```diff
+  +PORT=7071
+  ```
+- Restart the server app.
 
 #### Use Private Submodule Repository:
 If you have access to the private repository that defines the game cards used in production, you can run the server with those resources.
@@ -175,6 +187,31 @@ The client application is the implementation of the user interface. It requires 
   npm run dev --workspace=client
   ```
   This command is free-running, and will watch for changes made to the code in `/client`.
+
+If you had changed the port when configuring the server from the default `7070`, you will need to configure the development server to make API at the new address.
+- Open `client/vite.config.ts`, and change the following line:
+  ```diff
+  proxy: {
+    "/api": {
+  -   target: "http://localhost:7070",
+  +   target: "http://localhost:7071",
+      changeOrigin: true,
+    },
+  },
+  ```
+
+#### Use Remote API
+By default, the client app development server routes API requests through the server running locally. If you want to use an instance of the API that is already deployed, you will need to reconfigure the environment.
+
+- Copy and rename the environment file `/client/.env.example`. Open a new terminal and navigate to the top folder of this repository. Then, run:
+  ```
+  cp client/.env.example client/.env
+  ```
+- Open this file and set the `VITE_API_BASE_URL` environment variable:
+  ```diff
+  -VITE_API_BASE_URL=
+  +VITE_API_BASE_URL="https://api.example.com"
+  ```
 
 ### Working with the Private Submodule:
 - Update the submodule, to get latest changes:
