@@ -16,6 +16,8 @@ type ApiQueryError = { type: ApiQueryErrorType; message: string };
 export function useApiQuery<TResponse, TData>(opts: {
   /** Use to invalidate the current data. Changing the key will trigger a refetch. */
   key: string;
+  /** When true, the query is disabled: no fetch runs, and `refetch()` is a no-op. Toggle to `false` to (re)enable. Existing `data` is retained across toggles; `loading` and `error` are reset. */
+  skip?: boolean;
   /** Use to implement the "fetch" portion of the query. If any errors are caught in-flight, will be surfaced with "fetch" error type. */
   fetch: (signal: AbortSignal) => Promise<TResponse>;
   /** Use to implement the "parsing" portion of the query. If any errors are caught in-flight, will be indicated with "parse" error type.  */
@@ -60,6 +62,15 @@ export function useApiQuery<TResponse, TData>(opts: {
     // Linter wants us to use all the deps.
     void opts.key;
     void refetchCount;
+    /**
+     * If skipping, reset "loading" flag and null the error, then return.
+     * Preserve data, so toggling "skip" doesn't invalidate previous queries.
+     */
+    if (opts.skip) {
+      setLoading(false);
+      setError(null);
+      return;
+    }
     // Create an abort controller for this query.
     const abortController = new AbortController();
     setLoading(true);
@@ -104,7 +115,7 @@ export function useApiQuery<TResponse, TData>(opts: {
      * send an "abort" signal.
      */
     return () => abortController.abort();
-  }, [refetchCount, opts.key]);
+  }, [refetchCount, opts.key, opts.skip]);
 
   return {
     data,
