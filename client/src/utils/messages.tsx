@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { apiUrl, useApiQuery } from "./api";
+import { apiUrl, assertHttpSuccess, useApiQuery } from "./api";
 
 type MessageContextValue = {
   /** Replace with text matching the given key. */
@@ -55,8 +55,7 @@ export const MessageProvider = (props: {
           signal,
         },
       );
-      if (!response.ok)
-        throw new Error(`HTTP ${response.status} (${response.statusText})`);
+      assertHttpSuccess(response);
       return response;
     },
     parse: async (response) => {

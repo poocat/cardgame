@@ -10,6 +10,17 @@ export function apiUrl(path: string): string {
   return `${CONFIG.apiBaseUrl}${path}`;
 }
 
+/******************************************************************************
+ * ### assertHttpSuccess
+ *
+ * A lightweight helper for asserting that an HTTP fetch response was
+ * successful.
+ ******************************************************************************/
+export function assertHttpSuccess(response: Response) {
+  if (!response.ok)
+    throw new Error(`HTTP ${response.status} (${response.statusText})`);
+}
+
 type ApiQueryErrorType = "fetch" | "parse";
 type ApiQueryError = { type: ApiQueryErrorType; message: string };
 

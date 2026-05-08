@@ -1,6 +1,6 @@
 import { Copy } from "@client/components";
 import { Box } from "@client/components/layout";
-import { apiUrl, useApiQuery } from "@client/utils/api";
+import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import { ROUTES } from "@common/api/routes";
 
 export const About = () => {
@@ -10,8 +10,7 @@ export const About = () => {
     key: url,
     fetch: async (signal) => {
       const response = await fetch(url, { method: "GET", signal });
-      if (!response.ok)
-        throw new Error(`HTTP ${response.status} (${response.statusText})`);
+      assertHttpSuccess(response);
       return response;
     },
     parse: async (response) => {

@@ -1,5 +1,5 @@
 import { Box, Stack } from "@client/components";
-import { apiUrl, useApiQuery } from "@client/utils/api";
+import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import { ROUTES } from "@common/api/routes";
 import { Link } from "react-router";
 
@@ -10,8 +10,7 @@ export const GameList = () => {
     key: url,
     fetch: async (signal) => {
       const response = await fetch(url, { method: "GET", signal });
-      if (!response.ok)
-        throw new Error(`HTTP ${response.status} (${response.statusText})`);
+      assertHttpSuccess(response);
       return response;
     },
     parse: async (response) => {

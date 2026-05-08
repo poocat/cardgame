@@ -1,4 +1,4 @@
-import { apiUrl, useApiQuery } from "@client/utils/api";
+import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import { usePoller } from "@client/utils/usePoller";
 import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
@@ -53,8 +53,7 @@ export const useRematch = (opts: {
           signal,
         },
       );
-      if (!response.ok)
-        throw new Error(`HTTP ${response.status} (${response.statusText})`);
+      assertHttpSuccess(response);
       return response;
     },
     parse: async (response) => {
