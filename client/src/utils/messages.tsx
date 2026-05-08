@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useApiQuery } from "./api";
+import { apiUrl, useApiQuery } from "./api";
 
 type MessageContextValue = {
   /** Replace with text matching the given key. */
@@ -49,7 +49,7 @@ export const MessageProvider = (props: {
     key: locale,
     fetch: async (signal) => {
       const response = await fetch(
-        `${ROUTES.locales.path}/${encodeURIComponent(locale)}`,
+        apiUrl(`${ROUTES.locales.path}/${encodeURIComponent(locale)}`),
         {
           method: "GET",
           signal,

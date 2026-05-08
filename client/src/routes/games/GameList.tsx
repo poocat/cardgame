@@ -1,10 +1,10 @@
 import { Box, Stack } from "@client/components";
-import { useApiQuery } from "@client/utils/api";
+import { apiUrl, useApiQuery } from "@client/utils/api";
 import { ROUTES } from "@common/api/routes";
 import { Link } from "react-router";
 
 export const GameList = () => {
-  const url = `${ROUTES.games.path}`;
+  const url = apiUrl(ROUTES.games.path);
 
   const { data, error } = useApiQuery({
     key: url,

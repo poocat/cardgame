@@ -1,5 +1,6 @@
 import { Button, Input } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
+import { apiUrl } from "@client/utils/api";
 import { usePoller } from "@client/utils/usePoller";
 import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
@@ -29,7 +30,7 @@ export const Room = () => {
   const joinSubmission = useSubmission();
 
   const url = useMemo(() => {
-    const base = `${ROUTES.rooms.path}/${roomId}`;
+    const base = apiUrl(`${ROUTES.rooms.path}/${roomId}`);
     return playerId ? `${base}?playerId=${playerId}` : base;
   }, [roomId, playerId]);
 
@@ -111,7 +112,7 @@ export const Room = () => {
         roomId: roomId,
         hostId: playerId,
       });
-      const response = await fetch(ROUTES.games.path, {
+      const response = await fetch(apiUrl(ROUTES.games.path), {
         method: "POST",
         body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" },

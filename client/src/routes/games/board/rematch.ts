@@ -1,4 +1,4 @@
-import { useApiQuery } from "@client/utils/api";
+import { apiUrl, useApiQuery } from "@client/utils/api";
 import { usePoller } from "@client/utils/usePoller";
 import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
@@ -46,10 +46,13 @@ export const useRematch = (opts: {
     key: gameId ?? "",
     skip: !gameOver || !gameId,
     fetch: async (signal) => {
-      const response = await fetch(`${ROUTES.rooms.path}?gameId=${gameId}`, {
-        method: "GET",
-        signal,
-      });
+      const response = await fetch(
+        apiUrl(`${ROUTES.rooms.path}?gameId=${gameId}`),
+        {
+          method: "GET",
+          signal,
+        },
+      );
       if (!response.ok)
         throw new Error(`HTTP ${response.status} (${response.statusText})`);
       return response;
@@ -63,7 +66,7 @@ export const useRematch = (opts: {
 
   const roomUrl = useMemo(() => {
     if (!roomId || !playerId) return null;
-    return `${ROUTES.rooms.path}/${roomId}?playerId=${playerId}`;
+    return apiUrl(`${ROUTES.rooms.path}/${roomId}?playerId=${playerId}`);
   }, [roomId, playerId]);
 
   const getPollingEnabled = useCallback(
@@ -89,7 +92,7 @@ export const useRematch = (opts: {
     if (!roomId || !playerId) return;
     return submission.handle(async () => {
       const response = await fetch(
-        `${ROUTES.rooms.path}/${roomId}?playerId=${playerId}`,
+        apiUrl(`${ROUTES.rooms.path}/${roomId}?playerId=${playerId}`),
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

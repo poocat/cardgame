@@ -1,10 +1,10 @@
 import { Copy } from "@client/components";
 import { Box } from "@client/components/layout";
-import { useApiQuery } from "@client/utils/api";
+import { apiUrl, useApiQuery } from "@client/utils/api";
 import { ROUTES } from "@common/api/routes";
 
 export const Rulebook = () => {
-  const url = `${ROUTES.copy.path}/rules`;
+  const url = apiUrl(`${ROUTES.copy.path}/rules`);
 
   const { data, error } = useApiQuery({
     key: url,
