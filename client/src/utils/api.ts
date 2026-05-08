@@ -1,4 +1,14 @@
+import { CONFIG } from "@client/config";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+
+/******************************************************************************
+ * ### apiUrl
+ *
+ * Prepends the configured API base URL to the given route path.
+ ******************************************************************************/
+export function apiUrl(path: string): string {
+  return `${CONFIG.apiBaseUrl}${path}`;
+}
 
 type ApiQueryErrorType = "fetch" | "parse";
 type ApiQueryError = { type: ApiQueryErrorType; message: string };
