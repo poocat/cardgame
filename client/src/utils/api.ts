@@ -4,10 +4,12 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 /******************************************************************************
  * ### apiUrl
  *
- * Prepends the configured API base URL to the given route path.
+ * Convert the given relative path to an absolute path when a "base" url is
+ * defined.
  ******************************************************************************/
 export function apiUrl(path: string): string {
-  return `${CONFIG.apiBaseUrl}${path}`;
+  if (!CONFIG.apiBaseUrl) return path;
+  return new URL(path, CONFIG.apiBaseUrl).toString();
 }
 
 /******************************************************************************
