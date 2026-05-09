@@ -1,5 +1,6 @@
 import { Button, Input } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
+import { apiUrl } from "@client/utils/api";
 import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
@@ -17,7 +18,7 @@ export const NewRoom = () => {
       const payload = ROUTES.rooms.methods.post.schemas.requestBody.parse({
         hostName,
       });
-      const response = await fetch(ROUTES.rooms.path, {
+      const response = await fetch(apiUrl(ROUTES.rooms.path), {
         method: "POST",
         body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" },

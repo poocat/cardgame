@@ -1,28 +1,29 @@
 import { Copy } from "@client/components";
 import { Box } from "@client/components/layout";
+import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import { ROUTES } from "@common/api/routes";
-import { useEffect, useState } from "react";
 
 export const About = () => {
-  const [content, setContent] = useState<string | null>(null);
-  const [error, setError] = useState(false);
+  const url = apiUrl(`${ROUTES.copy.path}/about`);
 
-  useEffect(() => {
-    fetch(`${ROUTES.copy.path}/about`)
-      .then((res) => {
-        if (!res.ok) throw new Error(res.statusText);
-        return res.text();
-      })
-      .then(setContent)
-      .catch(() => setError(true));
-  }, []);
+  const { data, error } = useApiQuery({
+    key: url,
+    fetch: async (signal) => {
+      const response = await fetch(url, { method: "GET", signal });
+      assertHttpSuccess(response);
+      return response;
+    },
+    parse: async (response) => {
+      return response.text();
+    },
+  });
 
   if (error) return <Box spacing="lg">"About" not available.</Box>;
-  if (content === null) return null;
+  if (!data) return null;
 
   return (
     <Box spacing="lg">
-      <Copy>{content}</Copy>
+      <Copy>{data}</Copy>
     </Box>
   );
 };

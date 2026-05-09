@@ -3,14 +3,10 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
-import type { z } from "zod";
-
-const bundleSchema = ROUTES.locales.methods.get.schemas.responseBody;
-type LocaleBundle = z.infer<typeof bundleSchema>;
+import { apiUrl, assertHttpSuccess, useApiQuery } from "./api";
 
 type MessageContextValue = {
   /** Replace with text matching the given key. */
@@ -48,35 +44,25 @@ export const MessageProvider = (props: {
   children?: React.ReactNode;
 }) => {
   const [locale, setLocale] = useState(props.defaultLocale);
-  const [data, setData] = useState<LocaleBundle | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    setError(null);
-    (async () => {
-      try {
-        const response = await fetch(`${ROUTES.locales.path}/${locale}`, {
+  const { data, error } = useApiQuery({
+    key: locale,
+    fetch: async (signal) => {
+      const response = await fetch(
+        apiUrl(`${ROUTES.locales.path}/${encodeURIComponent(locale)}`),
+        {
           method: "GET",
-        });
-        if (cancelled) return;
-        if (response.ok) {
-          const j = await response.json();
-          if (cancelled) return;
-          const d = ROUTES.locales.methods.get.schemas.responseBody.parse(j);
-          setData(d);
-        } else {
-          setError(`Could not fetch locale: ${response.statusText}`);
-        }
-      } catch (error) {
-        setError(`Error: ${error}`);
-        console.error(error);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [locale]);
+          signal,
+        },
+      );
+      assertHttpSuccess(response);
+      return response;
+    },
+    parse: async (response) => {
+      const json = await response.json();
+      return ROUTES.locales.methods.get.schemas.responseBody.parse(json);
+    },
+  });
 
   const resolve = useCallback(
     (key: string, def?: string) => {
@@ -89,7 +75,7 @@ export const MessageProvider = (props: {
     () => ({
       resolve,
       setLocale,
-      error,
+      error: error?.message ?? null,
     }),
     [resolve, error],
   );

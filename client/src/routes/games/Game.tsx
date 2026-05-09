@@ -1,4 +1,5 @@
 import { Box } from "@client/components/layout";
+import { apiUrl } from "@client/utils/api";
 import { useAttention } from "@client/utils/useAttention";
 import { usePoller } from "@client/utils/usePoller";
 import { useSubmission } from "@client/utils/useSubmission";
@@ -25,7 +26,7 @@ export const Game = () => {
   const [query] = useSearchParams();
   const observingPlayerId = query.get("playerId");
 
-  const baseUrl = `/api/games/${gameId}`;
+  const baseUrl = apiUrl(`${ROUTES.games.path}/${gameId}`);
   const url = observingPlayerId
     ? `${baseUrl}?playerId=${observingPlayerId}`
     : baseUrl;

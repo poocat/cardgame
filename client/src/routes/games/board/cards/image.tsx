@@ -1,3 +1,5 @@
+import { apiUrl } from "@client/utils/api";
+import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
 
 function slugify(name: string): string {
@@ -15,7 +17,9 @@ export const CardImage = (props: {
   return (
     <img
       className="game-card__image"
-      src={`/api/cards/images/${slugify(props.name)}.${props.variant}.png`}
+      src={apiUrl(
+        `${ROUTES.cards.path}/images/${slugify(props.name)}.${props.variant}.png`,
+      )}
       onError={() => setFailed(true)}
       alt={props.name}
     />
