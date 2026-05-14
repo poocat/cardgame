@@ -14,16 +14,14 @@
  * have a rectangular 5:7 aspect ratio.
  */
 import fs from "node:fs";
-import path from "node:path";
 import { ROUTES } from "@common/api/routes";
 import { burstLimiter } from "@server/api/middleware";
-import { logger } from "@server/logger";
 import type { RequestHandler } from "express";
 import { Router, static as staticFileHandler } from "express";
 import slowDown from "express-slow-down";
 
 type Dependencies = {
-  privatePath: string | null;
+  cardImagesPath: string | null;
   /** Override the default rate-limit middleware. */
   rateLimiters?: RequestHandler[];
 };
@@ -49,17 +47,15 @@ export const cardsRouter = {
     ];
     for (const m of limiters) router.use(m);
 
-    if (deps.privatePath) {
-      const dir = path.join(deps.privatePath, "cards", "images");
-      if (fs.existsSync(dir)) {
+    if (deps.cardImagesPath) {
+      if (fs.existsSync(deps.cardImagesPath)) {
         router.use(
           `/images`,
-          staticFileHandler(dir, {
+          staticFileHandler(deps.cardImagesPath, {
             maxAge: "7d",
             immutable: true,
           }),
         );
-        logger.info({ dir }, "serving card images");
       }
     }
 

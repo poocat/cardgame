@@ -7,8 +7,6 @@
  * This repository is configured to use a submodule at
  * `private/` as the source of all "official" card definitions and images.
  */
-
-import { CONFIG } from "@server/config";
 import type { ActionDef, CardDef } from "@server/game/types";
 import { logger } from "@server/logger";
 import type { ActionType } from "@server/types";
@@ -90,10 +88,12 @@ export function useExampleCards() {
  * an `Object` named `cards`, the values of which have the `CardDef` type
  * exported from `@server/game/types`.
  ******************************************************************************/
-export function usePrivateCards() {
-  if (!CONFIG.privatePath) {
+export function usePrivateCards(cardsPath: string | null) {
+  if (!cardsPath) {
     throw new Error("No private path configured.");
   }
+  // The require uses a static path so the cards compile with the server.
+  // `cardsPath` is a presence check, not a load target.
   const { cards } = require("@private/cards");
   resetCardRegistry();
   extendCardRegistry({ cards: Object.values(cards) });
