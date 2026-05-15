@@ -7,6 +7,8 @@
 - [ ] Add "recent mutations" log in UI.
 - [ ] Mutate game state on each step of sequence.
 - [ ] Allow activity resets, e.g. "cancel action".
+- [ ] Resolve "messages" in the front end instead of the digest.
+- [ ] Cache game hashes to avoid hitting database on every poll.
 - [x] Allow room to be "reset", to make it easier to play consecutive games.
 - [x] Display top card in discard.
 - [x] Add "about" page.
