@@ -3,17 +3,25 @@
  * engine regardless of which set of cards is used.
  */
 export const messageKeys = [
+  // The title of the game.
   "title",
+  // Themable terms:
   "deck.producers",
   "deck.consumers",
   "action.type.play",
   "action.type.ability",
   "action.type.discard",
+  // Use to generate instructions for non-action activities:
   "activity.drawingCards.choice.instructions",
   "activity.drawingCards.explanation",
   "activity.choosingAction.choice.instructions",
   "activity.choosingAction.explanation",
   "activity.takingAction.explanation",
+  // Use to generate a label for a choice of a given action type for a given card:
+  "label.action.choice",
+  // Use to generate a label the given instructions with the given action type:
+  "label.action.instructions",
+  // Annotations:
   "reason.cardAlreadyInPlay",
   "reason.cardNotInGame",
   "reason.cardNotInPlay",

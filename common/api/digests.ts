@@ -1,6 +1,11 @@
 /**
  * The "digest" is a view of a game's data which reflects how the visual and
  * interactive elements might be arranged.
+ *
+ * A type that is defined for the storage layer (e.g. the `Message` type) may be
+ * redefined here as a schema. Even if the shapes are identical, the definitions
+ * are separate so that the transport layer is allowed to drift from the storage
+ * layer.
  */
 
 import {
@@ -16,18 +21,26 @@ const idSchema = z.uuid();
 /******************************************************************************
  * ### Game Digest
  ******************************************************************************/
+export const messageSchema = z.strictObject({
+  key: z.string(),
+  get params() {
+    return z
+      .record(z.string(), z.union([z.string(), z.number(), messageSchema]))
+      .optional();
+  },
+});
 
 /** */
 export const choiceValueDigestSchema = z.strictObject({
   value: z.string(),
   // All actions and some chips can be associated with a card.
   onCardId: z.string().nullable(),
-  label: z.string(),
+  label: messageSchema.nullable(),
 });
 
 export const activityDigestSchema = z.strictObject({
   type: z.union(activityTypes.map((t) => z.literal(t))),
-  explanation: z.string(),
+  explanation: messageSchema,
   choice: z.strictObject({
     name: z.string(),
     type: z.union(choiceTypes.map((t) => z.literal(t))),
@@ -35,7 +48,7 @@ export const activityDigestSchema = z.strictObject({
     max: z.number().int().min(0).nullable(),
     values: z.array(choiceValueDigestSchema),
     choosingPlayerId: idSchema,
-    instructions: z.string(),
+    instructions: messageSchema,
   }),
   previouslyChosenValues: z.array(z.string()),
 });
@@ -43,8 +56,8 @@ export const activityDigestSchema = z.strictObject({
 export const actionDigestSchema = z.strictObject({
   id: idSchema,
   type: z.union(actionTypes.map((t) => z.literal(t))),
-  instructions: z.string(),
-  annotations: z.array(z.string()),
+  instructions: messageSchema.optional(),
+  annotations: z.array(messageSchema),
 });
 
 export const chipDigestSchema = z.strictObject({
@@ -54,8 +67,8 @@ export const chipDigestSchema = z.strictObject({
 export const visibleCardDigestSchema = z.strictObject({
   id: idSchema,
   name: z.string(),
-  display: z.string(),
-  triggerInstructions: z.string().nullable(),
+  display: messageSchema,
+  triggerInstructions: messageSchema.nullable(),
   imageSourceUrl: z.string().optional(),
   type: z.union(cardTypes.map((t) => z.literal(t))),
   lastMovedOnTick: z.number().int(),

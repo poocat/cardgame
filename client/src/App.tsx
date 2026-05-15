@@ -6,7 +6,8 @@ import { Room } from "@client/routes/rooms/Room";
 import { Rulebook } from "@client/routes/rulebook/Rulebook";
 import { Link, Outlet, Route, Routes } from "react-router";
 import { About } from "./routes/about/About";
-import { MessageProvider, useMessages } from "./utils/messages";
+import { Msg } from "./routes/games/board/msg";
+import { MessageProvider } from "./utils/messages";
 
 const Providers = (props: { children: React.ReactNode }) => {
   return (
@@ -17,13 +18,13 @@ const Providers = (props: { children: React.ReactNode }) => {
 };
 
 const Layout = () => {
-  const { resolve } = useMessages();
-  const title = resolve("title", "Game");
   return (
     <div>
       <Box spacing="md" color="secondary">
         <Stack spacing="md" orientation="horizontal">
-          <Link to="/">{title}</Link>
+          <Link to="/">
+            <Msg value={{ key: "title" }} />
+          </Link>
           <Link to="/games">List</Link>
           <Link to="/rulebook">Rulebook</Link>
           <Link to="/about">About</Link>

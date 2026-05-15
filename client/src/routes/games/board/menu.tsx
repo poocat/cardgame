@@ -2,8 +2,14 @@ import { Button, SelectButton } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
 import type { Color } from "@client/components/types";
 import { memo, useCallback } from "react";
+import { Msg } from "./msg";
 import type { RematchProps } from "./rematch";
-import type { ChoiceType, ChoiceValueDigest, SelectorProps } from "./types";
+import type {
+  ChoiceType,
+  ChoiceValueDigest,
+  Message,
+  SelectorProps,
+} from "./types";
 
 /******************************************************************************
  * ### ChoiceSelectButton
@@ -14,7 +20,7 @@ const ChoiceSelectButton = (
   props: {
     choiceType: ChoiceType;
     value: string;
-    label: string;
+    label: React.ReactNode;
     disabled: boolean;
     selected: boolean;
   } & Pick<SelectorProps, "toggleValue">,
@@ -82,7 +88,7 @@ export const ChoiceMenu = memo(
   (
     props: {
       submitLabel: string;
-      instructions: string;
+      instructions: Message | null;
       choiceType: ChoiceType;
       values: ChoiceValueDigest[];
       onSubmitChoice: () => void;
@@ -96,7 +102,9 @@ export const ChoiceMenu = memo(
     return (
       <Box spacing="sm">
         <Stack spacing="sm" orientation="vertical">
-          <Box spacing="sm">{props.instructions}</Box>
+          <Box spacing="sm">
+            <Msg value={props.instructions} />
+          </Box>
           <Box spacing="sm">
             <Button
               border="dark"
@@ -118,7 +126,7 @@ export const ChoiceMenu = memo(
                   <ChoiceSelectButton
                     key={value}
                     value={value}
-                    label={label}
+                    label={<Msg value={label} />}
                     selected={selected}
                     disabled={disabled}
                     choiceType={props.choiceType}
@@ -192,6 +200,10 @@ export const GameOverMenu = (props: {
 /******************************************************************************
  * ### ExplanationMenu
  ******************************************************************************/
-export const ExplanationMenu = (props: { explanation: string }) => {
-  return <Box spacing="lg">{props.explanation}</Box>;
+export const ExplanationMenu = (props: { explanation: Message }) => {
+  return (
+    <Box spacing="lg">
+      <Msg value={props.explanation} />
+    </Box>
+  );
 };

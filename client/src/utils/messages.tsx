@@ -8,27 +8,33 @@ import {
 } from "react";
 import { apiUrl, assertHttpSuccess, useApiQuery } from "./api";
 
+export type Match =
+  | { type: "icon"; value: string; alt: string }
+  | { type: "text"; value: string };
+
 type MessageContextValue = {
-  /** Replace with text matching the given key. */
-  resolve: (key: string, def?: string) => string;
+  /** Look up the text or icon associated with the given key. Stable. */
+  lookup: (key: string, opts?: { def?: string; textOnly?: boolean }) => Match;
   /** Update the "message" context with a different locale. */
   setLocale: (locale: string) => void;
-  /** Indicates if something went wrong when fetching the locale bundle. */
-  error: string | null;
+  /** Indicate if something went wrong when fetching the locale or icon bundles. */
+  errors: string[];
 };
 
 const MessageContext = createContext<MessageContextValue>({
-  // Default resolver returns the fallback if it exists, else the key itself.
-  resolve: (k, d) => d ?? k,
+  // Default resolver returns the fallback if it exists, else the key itself, as
+  // text.
+  lookup: (k, opts) => ({ type: "text", value: opts?.def ?? k }),
   setLocale: () => {},
-  error: null,
+  errors: [],
 });
 
 /******************************************************************************
  * ### useMessages
  *
  * A hook returning the closest provided "message" context, with handles for
- * setting the current locale and resolving messages.
+ * setting the current locale and looking up keys used in the locale and/or
+ * icon bundles.
  ******************************************************************************/
 export function useMessages() {
   return useContext(MessageContext);
@@ -45,7 +51,8 @@ export const MessageProvider = (props: {
 }) => {
   const [locale, setLocale] = useState(props.defaultLocale);
 
-  const { data, error } = useApiQuery({
+  // Query for locale:
+  const localeBundle = useApiQuery({
     key: locale,
     fetch: async (signal) => {
       const response = await fetch(
@@ -64,20 +71,55 @@ export const MessageProvider = (props: {
     },
   });
 
-  const resolve = useCallback(
-    (key: string, def?: string) => {
-      return data?.bundle[key] ?? def ?? key;
+  // Query for icons:
+  const iconBundle = useApiQuery({
+    key: "icons",
+    fetch: async (signal) => {
+      const response = await fetch(apiUrl(ROUTES.icons.path), {
+        method: "GET",
+        signal,
+      });
+      assertHttpSuccess(response);
+      return response;
     },
-    [data],
+    parse: async (response) => {
+      const json = await response.json();
+      return ROUTES.icons.methods.get.schemas.responseBody.parse(json);
+    },
+  });
+
+  const lookup = useCallback(
+    (key: string, opts?: { def?: string; textOnly?: boolean }) => {
+      const match: Match = (() => {
+        if (!opts?.textOnly) {
+          const matchingIcon = iconBundle.data?.icons[key];
+          if (matchingIcon)
+            return { type: "icon", value: matchingIcon, alt: key };
+        }
+        const matchingText = localeBundle.data?.bundle[key];
+        if (matchingText) return { type: "text", value: matchingText };
+        if (opts?.def) return { type: "text", value: opts.def };
+        return { type: "text", value: key };
+      })();
+      return match;
+    },
+    [localeBundle.data, iconBundle.data],
   );
+
+  const errors = useMemo(() => {
+    const out: string[] = [];
+    if (localeBundle.error) out.push(localeBundle.error.message);
+    if (iconBundle.error) out.push(iconBundle.error.message);
+    return out;
+  }, [localeBundle.error, iconBundle.error]);
 
   const ctx = useMemo(
     () => ({
-      resolve,
+      lookup,
       setLocale,
-      error: error?.message ?? null,
+      errors,
     }),
-    [resolve, error],
+    [lookup, errors],
   );
 
   return (

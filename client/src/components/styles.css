@@ -205,6 +205,7 @@
   justify-content: start;
   text-align: left;
   padding: var(--space-sm);
+  gap: var(--space-sm);
 }
 
 /* Size variants */

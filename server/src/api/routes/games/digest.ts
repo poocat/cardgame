@@ -13,8 +13,7 @@ import type {
 import { actionTypes } from "@common/game/enums";
 import { anonymizeId } from "@server/api/anonymization";
 import { getCardDefinition } from "@server/game/cards/registry";
-import { msg, resolve } from "@server/text/messages";
-import { getLocaleBundle } from "@server/text/registry";
+import { msg } from "@server/text/messages";
 import type {
   ActionType,
   CardData,
@@ -30,6 +29,9 @@ type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
 type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type ChoiceValuesDigest = z.infer<typeof choiceValueDigestSchema>;
 
+/**
+ * Simple switch to get the message corresponding to the given action type.
+ */
 function actionTypeMessage(actionType?: ActionType): Message {
   switch (actionType) {
     case "play":
@@ -43,6 +45,9 @@ function actionTypeMessage(actionType?: ActionType): Message {
   }
 }
 
+/**
+ * Generate a message that explains the current activity.
+ */
 function createActivityExplanation(gameData: GameData): Message {
   const choosingPlayerId = gameData.activity.currentChoice.choosingPlayerId;
   const choosingPlayer = gameData.players.find(
@@ -63,22 +68,41 @@ function createActivityExplanation(gameData: GameData): Message {
     case "takingAction": {
       const actionId = gameData.activity.actionId;
       const action = gameData.actions.find((a) => a.id === actionId);
+      if (!action) {
+        throw new Error(`No action in game data with id ${actionId}`);
+      }
       const playerTakingActionId = gameData.activity.playerTakingActionId;
       const playerTakingAction = gameData.players.find(
         (p) => p.id === playerTakingActionId,
       );
-      const cardDef = getCardDefinition(action?.card.name ?? "");
+      const cardDef = getCardDefinition(action.card.name);
       return msg("activity.takingAction.explanation", {
         currentPlayerName: playerTakingAction?.name ?? "",
         choosingPlayerName: choosingPlayerName ?? "",
-        cardName: cardDef.display ?? { key: action?.card.name ?? "" },
-        actionType: actionTypeMessage(action?.type),
+        cardName: cardDef.display ?? { key: action.card.name },
+        actionType: actionTypeMessage(action.type),
       });
     }
     default: {
       return { key: "" };
     }
   }
+}
+
+/**
+ * Use to create a message for a literal value.
+ *
+ * This only works if:
+ * - no locale or icon bundle uses a key containing `{}` characters
+ * - the consumer prioritizes
+ *
+ * Assumes that the message `params` take precedence over locale or icon bundle.
+ */
+function messageLiteral(value: string): Message {
+  return {
+    key: "{value}",
+    params: { value },
+  };
 }
 
 /******************************************************************************
@@ -91,21 +115,12 @@ export function digestGameData({
   gameData,
   anonymizationSalt,
   playerId,
-  locale = "en",
 }: {
   gameData: GameData;
   anonymizationSalt: string;
   /* The id of the player requesting the data. Undefined for a spectator. */
   playerId?: Id;
-  locale?: string;
 }): GameDigest {
-  const localeBundle = getLocaleBundle(locale);
-
-  function resolveMessage(msg: Message | undefined, def?: string): string {
-    if (msg === undefined) return def ?? "";
-    return resolve(msg, localeBundle);
-  }
-
   const anonymizedPlayerIdMap: Record<Id, Id> = {};
   const playerNameMap: Record<Id, string> = {};
   gameData.players.forEach((p) => {
@@ -120,13 +135,12 @@ export function digestGameData({
     playerId === gameData.activity.currentChoice.choosingPlayerId;
 
   // If the requesting player is choosing, provide annotations.
-  const annotationMap: Record<Id, string[]> = {};
+  const annotationMap: Record<Id, Message[]> = {};
   if (observingPlayerIsChoosing) {
     gameData.annotations.forEach(({ id, message }) => {
-      const resolved = resolveMessage(message);
       const match = annotationMap[id];
-      if (match) match.push(resolved);
-      else annotationMap[id] = [resolved];
+      if (match) match.push(message);
+      else annotationMap[id] = [message];
     });
   }
 
@@ -143,13 +157,21 @@ export function digestGameData({
     for (const type of actionTypes) {
       const matchDef = cardDef.actions[type];
       const matchData = cardActions.find((a) => a.type === type);
-      if (matchDef && matchData)
+      if (matchDef && matchData) {
+        const actionMessage = actionTypeMessage(matchData.type);
         actions.push({
           id: matchData.id,
           type,
-          instructions: resolveMessage(matchDef.instructions),
+          // If no instructions, just serve the action type.
+          instructions: matchDef.instructions
+            ? msg("label.action.instructions", {
+                actionType: actionMessage,
+                instructions: matchDef.instructions ?? "",
+              })
+            : actionMessage,
           annotations: annotationMap[matchData.id] ?? [],
         });
+      }
     }
 
     const imageSourceLink = cardDef.links?.find((l) => l.type === "imgsrc");
@@ -157,8 +179,8 @@ export function digestGameData({
     return {
       id: cardData.id,
       name: cardData.name,
-      display: resolveMessage(cardDef.display, cardData.name),
-      triggerInstructions: resolveMessage(cardDef.trigger?.instructions),
+      display: cardDef.display ?? { key: cardData.name },
+      triggerInstructions: cardDef.trigger?.instructions ?? null,
       imageSourceUrl: imageSourceLink?.url ?? "",
       type: cardData.type,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
@@ -226,7 +248,7 @@ export function digestGameData({
         ...choiceValues.map((v) => ({
           value: v,
           onCardId: null,
-          label: resolveMessage(labels?.[v], v),
+          label: labels?.[v] ?? null,
         })),
       );
       break;
@@ -235,7 +257,11 @@ export function digestGameData({
       choiceValuesDigest.push(
         ...choiceValues.map((v) => {
           const card = allCards.find((c) => c.id === v);
-          const label = card?.name ?? "Card";
+          if (!card) {
+            throw new Error(`No card in game data with id ${v}`);
+          }
+          const cardDef = getCardDefinition(card.name);
+          const label = cardDef.display ?? messageLiteral(card.name);
           return { value: v, onCardId: null, label };
         }),
       );
@@ -245,7 +271,7 @@ export function digestGameData({
       choiceValuesDigest.push(
         ...choiceValues.map((playerId) => {
           const player = gameData.players.find((p) => p.id === playerId);
-          const label = player?.name ?? playerId;
+          const label = messageLiteral(player?.name ?? playerId);
           return {
             value: anonymizedPlayerIdMap[playerId],
             onCardId: null,
@@ -259,7 +285,11 @@ export function digestGameData({
       gameData.actions
         .filter((a) => choiceValues.includes(a.id))
         .forEach((a) => {
-          const label = `[${a.type}] ${a.card.name}`;
+          const cardDef = getCardDefinition(a.card.name);
+          const label = msg("label.action.choice", {
+            actionType: actionTypeMessage(a.type),
+            cardName: cardDef.display ?? a.card.name,
+          });
           choiceValuesDigest.push({ value: a.id, onCardId: a.card.id, label });
         });
       break;
@@ -270,7 +300,11 @@ export function digestGameData({
         .forEach((c) => {
           const onCardId =
             c.location.type === "onCard" ? c.location.cardId : null;
-          choiceValuesDigest.push({ value: c.id, onCardId, label: "Chip" });
+          choiceValuesDigest.push({
+            value: c.id,
+            onCardId,
+            label: messageLiteral("Chip"),
+          });
         });
       break;
     }
@@ -289,7 +323,7 @@ export function digestGameData({
     playerTakingTurnId: anonymizedPlayerIdMap[gameData.playerTakingTurnId],
     activity: {
       type: gameData.activity.type,
-      explanation: resolveMessage(createActivityExplanation(gameData)),
+      explanation: createActivityExplanation(gameData),
       choice: {
         name: gameData.activity.currentChoice.name,
         type: gameData.activity.currentChoice.type,
@@ -300,9 +334,7 @@ export function digestGameData({
           anonymizedPlayerIdMap[
             gameData.activity.currentChoice.choosingPlayerId
           ],
-        instructions: resolveMessage(
-          gameData.activity.currentChoice.instructions,
-        ),
+        instructions: gameData.activity.currentChoice.instructions,
       },
       previouslyChosenValues: gameData.activity.previousDecisions.flatMap(
         (d) => d.values,

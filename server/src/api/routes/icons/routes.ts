@@ -24,8 +24,8 @@ type Dependencies = {
   rateLimiters?: RequestHandler[];
 };
 
-const iconBundleSchema = z.record(z.string(), z.string());
-type IconBundle = z.infer<typeof iconBundleSchema>;
+const iconMapSchema = z.record(z.string(), z.string());
+type IconBundle = Record<string, string>;
 
 function loadBundle(
   mapPath: string | null,
@@ -39,7 +39,7 @@ function loadBundle(
   const content = fs.readFileSync(mapPath, "utf-8");
   let mapping: Record<string, string> = {};
   try {
-    mapping = iconBundleSchema.parse(JSON.parse(content));
+    mapping = iconMapSchema.parse(JSON.parse(content));
   } catch (error) {
     logger.warn({ from: mapPath, error }, "could not parse map");
   }
