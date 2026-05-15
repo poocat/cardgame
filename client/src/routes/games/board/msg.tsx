@@ -3,7 +3,8 @@ import { useMessages } from "@client/utils/messages";
 import { useCallback, useMemo } from "react";
 import type { Message } from "./types";
 
-const PATTERN = /\{([a-zA-Z0-9.]+)\}/g;
+const SPLIT_PATTERN = /\{([a-zA-Z0-9.]+)\}/g;
+const TEST_PATTERN = /\{([a-zA-Z0-9.]+)\}/;
 const MAX_RECURSION_DEPTH = 5;
 
 export const Msg = (props: { value: Message | null; textOnly?: boolean }) => {
@@ -16,16 +17,16 @@ export const Msg = (props: { value: Message | null; textOnly?: boolean }) => {
       const top = lookup(message.key, { textOnly: props.textOnly });
       if (depth > MAX_RECURSION_DEPTH) return [top];
       if (top.type === "icon") return [top];
-      if (!PATTERN.test(top.value)) return [top];
+      if (!TEST_PATTERN.test(top.value)) return [top];
       // Parse the text recursively for any other replacements.
       const segs: Match[] = [];
       const params = message.params ?? {};
-      top.value.split(PATTERN).forEach((sub, i) => {
+      top.value.split(SPLIT_PATTERN).forEach((sub, i) => {
         const token = i % 2 === 0 ? null : sub;
         if (!token) {
           // Doesn't match the token syntax. Preserve text as-is.
           segs.push({ type: "text", value: sub });
-        } else if (params[token]) {
+        } else if (token in params) {
           // Token matches something in params. Pass the match deeper in case
           // of nested messages/tokens.
           const val = params[token];
