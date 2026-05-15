@@ -14,6 +14,7 @@ export const messageKeys = [
   "activity.choosingAction.choice.instructions",
   "activity.choosingAction.explanation",
   "activity.takingAction.explanation",
+  "choice.action",
   "reason.cardAlreadyInPlay",
   "reason.cardNotInGame",
   "reason.cardNotInPlay",

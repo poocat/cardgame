@@ -65,7 +65,7 @@ export const Button = (props: {
 export const SelectButton = (props: {
   selected: boolean;
   onClick: () => void;
-  label: string;
+  label: React.ReactNode;
   size?: Size;
   color?: Color;
   border?: Border;

@@ -13,8 +13,7 @@ import type {
 import { actionTypes } from "@common/game/enums";
 import { anonymizeId } from "@server/api/anonymization";
 import { getCardDefinition } from "@server/game/cards/registry";
-import { msg, resolve } from "@server/text/messages";
-import { getLocaleBundle } from "@server/text/registry";
+import { msg } from "@server/text/messages";
 import type {
   ActionType,
   CardData,
@@ -81,6 +80,12 @@ function createActivityExplanation(gameData: GameData): Message {
   }
 }
 
+// Ad-hoc message generator.
+const messageLiteral = (value: string) => ({
+  key: "{value}",
+  params: { value },
+});
+
 /******************************************************************************
  * ### digestGameData
  *
@@ -91,7 +96,6 @@ export function digestGameData({
   gameData,
   anonymizationSalt,
   playerId,
-  locale = "en",
 }: {
   gameData: GameData;
   anonymizationSalt: string;
@@ -99,13 +103,6 @@ export function digestGameData({
   playerId?: Id;
   locale?: string;
 }): GameDigest {
-  const localeBundle = getLocaleBundle(locale);
-
-  function resolveMessage(msg: Message | undefined, def?: string): string {
-    if (msg === undefined) return def ?? "";
-    return resolve(msg, localeBundle);
-  }
-
   const anonymizedPlayerIdMap: Record<Id, Id> = {};
   const playerNameMap: Record<Id, string> = {};
   gameData.players.forEach((p) => {
@@ -120,13 +117,12 @@ export function digestGameData({
     playerId === gameData.activity.currentChoice.choosingPlayerId;
 
   // If the requesting player is choosing, provide annotations.
-  const annotationMap: Record<Id, string[]> = {};
+  const annotationMap: Record<Id, Message[]> = {};
   if (observingPlayerIsChoosing) {
     gameData.annotations.forEach(({ id, message }) => {
-      const resolved = resolveMessage(message);
       const match = annotationMap[id];
-      if (match) match.push(resolved);
-      else annotationMap[id] = [resolved];
+      if (match) match.push(message);
+      else annotationMap[id] = [message];
     });
   }
 
@@ -147,7 +143,7 @@ export function digestGameData({
         actions.push({
           id: matchData.id,
           type,
-          instructions: resolveMessage(matchDef.instructions),
+          instructions: matchDef.instructions,
           annotations: annotationMap[matchData.id] ?? [],
         });
     }
@@ -157,8 +153,8 @@ export function digestGameData({
     return {
       id: cardData.id,
       name: cardData.name,
-      display: resolveMessage(cardDef.display, cardData.name),
-      triggerInstructions: resolveMessage(cardDef.trigger?.instructions),
+      display: cardDef.display ?? { key: cardData.name },
+      triggerInstructions: cardDef.trigger?.instructions ?? null,
       imageSourceUrl: imageSourceLink?.url ?? "",
       type: cardData.type,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
@@ -226,7 +222,7 @@ export function digestGameData({
         ...choiceValues.map((v) => ({
           value: v,
           onCardId: null,
-          label: resolveMessage(labels?.[v], v),
+          label: labels?.[v] ?? null,
         })),
       );
       break;
@@ -235,7 +231,8 @@ export function digestGameData({
       choiceValuesDigest.push(
         ...choiceValues.map((v) => {
           const card = allCards.find((c) => c.id === v);
-          const label = card?.name ?? "Card";
+          const cardDef = getCardDefinition(card?.name ?? "");
+          const label = cardDef.display ?? messageLiteral(card?.name ?? "Card");
           return { value: v, onCardId: null, label };
         }),
       );
@@ -245,7 +242,7 @@ export function digestGameData({
       choiceValuesDigest.push(
         ...choiceValues.map((playerId) => {
           const player = gameData.players.find((p) => p.id === playerId);
-          const label = player?.name ?? playerId;
+          const label = messageLiteral(player?.name ?? playerId);
           return {
             value: anonymizedPlayerIdMap[playerId],
             onCardId: null,
@@ -259,7 +256,11 @@ export function digestGameData({
       gameData.actions
         .filter((a) => choiceValues.includes(a.id))
         .forEach((a) => {
-          const label = `[${a.type}] ${a.card.name}`;
+          const cardDef = getCardDefinition(a.card.name);
+          const label = msg("choice.action", {
+            actionType: actionTypeMessage(a.type),
+            cardName: cardDef.display ?? a.card.name,
+          });
           choiceValuesDigest.push({ value: a.id, onCardId: a.card.id, label });
         });
       break;
@@ -270,7 +271,11 @@ export function digestGameData({
         .forEach((c) => {
           const onCardId =
             c.location.type === "onCard" ? c.location.cardId : null;
-          choiceValuesDigest.push({ value: c.id, onCardId, label: "Chip" });
+          choiceValuesDigest.push({
+            value: c.id,
+            onCardId,
+            label: messageLiteral("Chip"),
+          });
         });
       break;
     }
@@ -289,7 +294,7 @@ export function digestGameData({
     playerTakingTurnId: anonymizedPlayerIdMap[gameData.playerTakingTurnId],
     activity: {
       type: gameData.activity.type,
-      explanation: resolveMessage(createActivityExplanation(gameData)),
+      explanation: createActivityExplanation(gameData),
       choice: {
         name: gameData.activity.currentChoice.name,
         type: gameData.activity.currentChoice.type,
@@ -300,9 +305,7 @@ export function digestGameData({
           anonymizedPlayerIdMap[
             gameData.activity.currentChoice.choosingPlayerId
           ],
-        instructions: resolveMessage(
-          gameData.activity.currentChoice.instructions,
-        ),
+        instructions: gameData.activity.currentChoice.instructions,
       },
       previouslyChosenValues: gameData.activity.previousDecisions.flatMap(
         (d) => d.values,

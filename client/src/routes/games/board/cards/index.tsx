@@ -32,6 +32,8 @@ import {
 import { CardImage } from "./image";
 import "./styles.css";
 import { Tooltip } from "@client/components/tooltips";
+import { Msg } from "../msg";
+import type { Message } from "../types";
 import { Mini } from "./mini";
 import {
   CardPile,
@@ -282,11 +284,10 @@ const DetailCardAction = (props: {
   submitting: boolean;
   actionType: string;
   actionId: string;
-  instructions: string;
-  annotations: string[];
+  instructions: Message | null;
+  annotations: Message[];
   onChange: () => void;
 }) => {
-  const label = `[${props.actionType}] ${props.instructions}`;
   const button = (
     <SelectButton
       fullWidth
@@ -296,12 +297,15 @@ const DetailCardAction = (props: {
       size="sm"
       color="action"
       disabled={props.disabled || props.submitting}
-      label={label}
+      label={<Msg value={props.instructions} />}
     />
   );
   if (props.annotations.length > 0) {
+    const content = props.annotations.map((anno, i) => (
+      <Msg key={`${i}-${anno}`} value={anno} />
+    ));
     return (
-      <Tooltip side="right" content={props.annotations.join(" ")}>
+      <Tooltip side="right" content={content}>
         {button}
       </Tooltip>
     );
@@ -381,7 +385,9 @@ export const DetailCard = (props: {
   return (
     <CardDetailContainer>
       <CardDetailHeader>
-        <CardDetailName>{props.card.display}</CardDetailName>
+        <CardDetailName>
+          <Msg value={props.card.display} />
+        </CardDetailName>
         {props.card.imageSourceUrl && (
           <CardDetailLink url={props.card.imageSourceUrl} />
         )}
@@ -395,7 +401,7 @@ export const DetailCard = (props: {
           <CardDetailActions>
             {props.card.triggerInstructions && (
               <CardDetailTriggerInstructions>
-                {props.card.triggerInstructions}
+                <Msg value={props.card.triggerInstructions} />
               </CardDetailTriggerInstructions>
             )}
             {props.card.actions.map((action) => {
@@ -410,7 +416,7 @@ export const DetailCard = (props: {
                   key={action.id}
                   actionId={action.id}
                   actionType={action.type}
-                  instructions={action.instructions}
+                  instructions={action.instructions ?? null}
                   annotations={action.annotations}
                   disabled={
                     !cardHasSelectableActions || !selectable || !toggleable

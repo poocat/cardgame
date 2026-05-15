@@ -3,6 +3,7 @@ import type {
   choiceValueDigestSchema,
   gameDigestSchema,
   inPlayCardDigestSchema,
+  messageSchema,
   observingPlayerDigestSchema,
   otherPlayerDigestSchema,
   visibleCardDigestSchema,
@@ -21,6 +22,7 @@ export type ChoiceValueDigest = z.infer<typeof choiceValueDigestSchema>;
 export type ChipDigest = z.infer<typeof chipDigestSchema>;
 export type ObserverPlayerDigest = z.infer<typeof observingPlayerDigestSchema>;
 export type OtherPlayerDigest = z.infer<typeof otherPlayerDigestSchema>;
+export type Message = z.infer<typeof messageSchema>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Choice
