@@ -68,16 +68,19 @@ function createActivityExplanation(gameData: GameData): Message {
     case "takingAction": {
       const actionId = gameData.activity.actionId;
       const action = gameData.actions.find((a) => a.id === actionId);
+      if (!action) {
+        throw new Error(`No action in game data with id ${actionId}`);
+      }
       const playerTakingActionId = gameData.activity.playerTakingActionId;
       const playerTakingAction = gameData.players.find(
         (p) => p.id === playerTakingActionId,
       );
-      const cardDef = getCardDefinition(action?.card.name ?? "");
+      const cardDef = getCardDefinition(action.card.name);
       return msg("activity.takingAction.explanation", {
         currentPlayerName: playerTakingAction?.name ?? "",
         choosingPlayerName: choosingPlayerName ?? "",
-        cardName: cardDef.display ?? { key: action?.card.name ?? "" },
-        actionType: actionTypeMessage(action?.type),
+        cardName: cardDef.display ?? { key: action.card.name },
+        actionType: actionTypeMessage(action.type),
       });
     }
     default: {
@@ -255,8 +258,11 @@ export function digestGameData({
       choiceValuesDigest.push(
         ...choiceValues.map((v) => {
           const card = allCards.find((c) => c.id === v);
-          const cardDef = getCardDefinition(card?.name ?? "");
-          const label = cardDef.display ?? messageLiteral(card?.name ?? "Card");
+          if (!card) {
+            throw new Error(`No card in game data with id ${v}`);
+          }
+          const cardDef = getCardDefinition(card.name);
+          const label = cardDef.display ?? messageLiteral(card.name);
           return { value: v, onCardId: null, label };
         }),
       );
