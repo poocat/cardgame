@@ -120,7 +120,6 @@ export function digestGameData({
   anonymizationSalt: string;
   /* The id of the player requesting the data. Undefined for a spectator. */
   playerId?: Id;
-  locale?: string;
 }): GameDigest {
   const anonymizedPlayerIdMap: Record<Id, Id> = {};
   const playerNameMap: Record<Id, string> = {};
