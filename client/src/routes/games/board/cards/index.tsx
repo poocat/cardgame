@@ -302,7 +302,7 @@ const DetailCardAction = (props: {
   );
   if (props.annotations.length > 0) {
     const content = props.annotations.map((anno, i) => (
-      <Msg key={`${i}-${anno}`} value={anno} />
+      <Msg key={`${i}-${anno.key}`} value={anno} />
     ));
     return (
       <Tooltip side="right" content={content}>

@@ -24,7 +24,7 @@ type MessageContextValue = {
 const MessageContext = createContext<MessageContextValue>({
   // Default resolver returns the fallback if it exists, else the key itself, as
   // text.
-  lookup: (k, opts) => ({ type: "text", value: opts?.def ?? k, match: false }),
+  lookup: (k, opts) => ({ type: "text", value: opts?.def ?? k }),
   setLocale: () => {},
   errors: [],
 });
@@ -97,10 +97,9 @@ export const MessageProvider = (props: {
             return { type: "icon", value: matchingIcon, alt: key };
         }
         const matchingText = localeBundle.data?.bundle[key];
-        if (matchingText)
-          return { type: "text", value: matchingText, match: true };
-        if (opts?.def) return { type: "text", value: opts.def, match: false };
-        return { type: "text", value: key, match: false };
+        if (matchingText) return { type: "text", value: matchingText };
+        if (opts?.def) return { type: "text", value: opts.def };
+        return { type: "text", value: key };
       })();
       return match;
     },

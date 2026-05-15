@@ -29,6 +29,9 @@ type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
 type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type ChoiceValuesDigest = z.infer<typeof choiceValueDigestSchema>;
 
+/**
+ * Simple switch to get the message corresponding to the given action type.
+ */
 function actionTypeMessage(actionType?: ActionType): Message {
   switch (actionType) {
     case "play":
@@ -42,6 +45,9 @@ function actionTypeMessage(actionType?: ActionType): Message {
   }
 }
 
+/**
+ * Generate a message that explains the current activity.
+ */
 function createActivityExplanation(gameData: GameData): Message {
   const choosingPlayerId = gameData.activity.currentChoice.choosingPlayerId;
   const choosingPlayer = gameData.players.find(
@@ -80,11 +86,21 @@ function createActivityExplanation(gameData: GameData): Message {
   }
 }
 
-// Ad-hoc message generator.
-const messageLiteral = (value: string) => ({
-  key: "{value}",
-  params: { value },
-});
+/**
+ * Use to create a message for a literal value.
+ *
+ * This only works if:
+ * - no locale or icon bundle uses a key containing `{}` characters
+ * - the consumer prioritizes
+ *
+ * Assumes that the message `params` take precedence over locale or icon bundle.
+ */
+function messageLiteral(value: string): Message {
+  return {
+    key: "{value}",
+    params: { value },
+  };
+}
 
 /******************************************************************************
  * ### digestGameData

@@ -21,7 +21,7 @@ const idSchema = z.uuid();
 /******************************************************************************
  * ### Game Digest
  ******************************************************************************/
-export const messageSchema = z.object({
+export const messageSchema = z.strictObject({
   key: z.string(),
   get params() {
     return z
