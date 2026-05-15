@@ -1,4 +1,6 @@
 import { messageKeys as privateKeys } from "@private/text/keys";
+import { CONFIG } from "@server/config";
+import { createPrivatePaths } from "@server/paths";
 import { messageKeys as publicKeys } from "@server/text/keys";
 import {
   getLocaleBundle,
@@ -9,9 +11,11 @@ import {
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const allKeys = [...publicKeys, ...privateKeys];
+const { locales: localesPath } = createPrivatePaths(CONFIG.privatePath);
 
 beforeAll(() => {
-  usePrivateLocales();
+  if (!localesPath) throw new Error("test requires private submodule");
+  usePrivateLocales(localesPath);
 });
 
 afterAll(() => {
