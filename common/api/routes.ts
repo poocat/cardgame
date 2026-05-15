@@ -169,6 +169,9 @@ export const ROUTES = {
       },
     },
   },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Locales (for themed/localized messages)
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   locales: {
     path: "/api/locales",
     methods: {
@@ -180,6 +183,22 @@ export const ROUTES = {
           }),
           responseBody: z.strictObject({
             bundle: z.record(z.string(), z.string()),
+          }),
+        },
+      },
+    },
+  },
+  /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * Icons (bundle of SVGs indexed by key)
+   ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  icons: {
+    path: "/api/icons",
+    methods: {
+      get: {
+        path: "/",
+        schemas: {
+          responseBody: z.strictObject({
+            icons: z.record(z.string(), z.string()),
           }),
         },
       },

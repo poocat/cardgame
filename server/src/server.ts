@@ -1,10 +1,10 @@
-import path from "node:path";
 import { errorHandler } from "@server/api/middleware";
 import {
   cardsRouter,
   copyRouter,
   gamesRouter,
   healthRouter,
+  iconsRouter,
   roomsRouter,
 } from "@server/api/routes";
 import { localesRouter } from "@server/api/routes/locales/routes";
@@ -70,6 +70,13 @@ export async function startServer() {
     cardsRouter.create({ cardImagesPath: paths.cardImages }),
   );
   app.use(copyRouter.path, copyRouter.create({ copyPath: paths.copy }));
+  app.use(
+    iconsRouter.path,
+    iconsRouter.create({
+      iconMapPath: paths.iconMap,
+      iconFolderPath: paths.icons,
+    }),
+  );
 
   // Game data endpoints:
   app.use(

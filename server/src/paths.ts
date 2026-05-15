@@ -1,7 +1,7 @@
 import path from "node:path";
 
 type PrivatePaths = Record<
-  "cardImages" | "cards" | "copy" | "locales",
+  "cardImages" | "cards" | "copy" | "iconMap" | "icons" | "locales",
   string | null
 >;
 
@@ -11,6 +11,8 @@ export function createPrivatePaths(root: string | null): PrivatePaths {
       cards: null,
       cardImages: null,
       copy: null,
+      iconMap: null,
+      icons: null,
       locales: null,
     };
   }
@@ -18,6 +20,8 @@ export function createPrivatePaths(root: string | null): PrivatePaths {
     cardImages: path.join(root, "cards", "images"),
     cards: path.join(root, "cards"),
     copy: path.join(root, "copy"),
+    iconMap: path.join(root, "icons", "map.json"),
+    icons: path.join(root, "icons"),
     locales: path.join(root, "text", "locales"),
   };
 }
