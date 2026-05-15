@@ -46,7 +46,9 @@ The game is turn-based. The engine is always waiting for exactly one player to c
 .
 └── private/             # Private submodule
     ├── cards/           # Production card definitions and images
-    └── copy/            # Themed rulebook, explanations, et cetera
+    ├── copy/            # Markdown to render in the client app e.g. the "rulebook" or "about" page
+    ├── text/            # Themed terminology and messages, explanations, et cetera
+    ├── icons/           # Themed icons that can be substituted for various terminology
 ```
 
 ## Game Rules

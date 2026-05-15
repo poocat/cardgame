@@ -17,7 +17,7 @@ import type { RequestHandler } from "express";
 import { Router } from "express";
 
 type Dependencies = {
-  privatePath: string | null;
+  copyPath: string | null;
   /** Override the default rate-limit middleware. */
   rateLimiters?: RequestHandler[];
 };
@@ -37,16 +37,12 @@ export const copyRouter = {
     ];
     for (const m of limiters) router.use(m);
 
-    const copyDir = deps.privatePath
-      ? path.join(deps.privatePath, "copy")
-      : null;
-
     router.get(
       ROUTES.copy.methods.get.path,
       validated({
         schemas: ROUTES.copy.methods.get.schemas,
         handler: async (req, res) => {
-          if (!copyDir) {
+          if (!deps.copyPath) {
             return res
               .status(STATUS.notFound)
               .json({ message: "Copy not available" });
@@ -54,7 +50,7 @@ export const copyRouter = {
 
           const { name } = req.params;
           const locale = req.query.locale ?? "en";
-          const dir = path.join(copyDir, name);
+          const dir = path.join(deps.copyPath, name);
           const filePath = path.join(dir, `${locale}.md`);
           const fallbackPath = path.join(dir, "en.md");
 

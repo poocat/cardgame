@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import { CONFIG } from "@server/config";
 import { logger } from "@server/logger";
 import defaultEn from "./locales/en.json";
 
@@ -57,17 +56,16 @@ export function useDefaultLocales() {
  * The default English bundle is used as the base for every loaded locale,
  * so missing keys fall back to defaults.
  ******************************************************************************/
-export function usePrivateLocales() {
-  if (!CONFIG.privatePath) {
-    throw new Error("No private path configured.");
+export function usePrivateLocales(localeFolderPath: string) {
+  if (!fs.existsSync(localeFolderPath)) {
+    throw new Error(`Locale folder not found: ${localeFolderPath}`);
   }
-  const localesDir = path.join(CONFIG.privatePath, "text", "locales");
-  const files = fs.readdirSync(localesDir);
+  const files = fs.readdirSync(localeFolderPath);
   resetLocaleRegistry();
   for (const file of files) {
     if (!file.endsWith(".json")) continue;
     const locale = file.replace(".json", "");
-    const content = fs.readFileSync(path.join(localesDir, file), "utf-8");
+    const content = fs.readFileSync(path.join(localeFolderPath, file), "utf-8");
     const bundle = JSON.parse(content);
     registerLocaleBundle(locale, bundle);
   }

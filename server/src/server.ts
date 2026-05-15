@@ -4,6 +4,7 @@ import {
   copyRouter,
   gamesRouter,
   healthRouter,
+  iconsRouter,
   roomsRouter,
 } from "@server/api/routes";
 import { localesRouter } from "@server/api/routes/locales/routes";
@@ -14,9 +15,17 @@ import { logger } from "@server/logger";
 import { useDefaultLocales, usePrivateLocales } from "@server/text/registry";
 import cors from "cors";
 import express from "express";
+import { createPrivatePaths } from "./paths";
 
+/******************************************************************************
+ * ### startServer
+ *
+ * Reads configuration to start server and listen.
+ ******************************************************************************/
 export async function startServer() {
   logger.info({ port: CONFIG.port, env: CONFIG.nodeEnv }, "server starting");
+
+  const paths = createPrivatePaths(CONFIG.privatePath);
 
   // Initialize db:
   const data = await initDb({
@@ -29,7 +38,7 @@ export async function startServer() {
 
   // Load cards, attempting to import from private submodule:
   try {
-    usePrivateCards();
+    usePrivateCards(paths.cards);
   } catch (error) {
     logger.warn({ error }, "could not load private card registry");
     useExampleCards();
@@ -37,7 +46,8 @@ export async function startServer() {
 
   // Load locales, attempting to import from private submodule:
   try {
-    usePrivateLocales();
+    if (!paths.locales) throw new Error("No path to locales");
+    usePrivateLocales(paths.locales);
   } catch (error) {
     logger.warn({ error }, "could not load private locales");
     useDefaultLocales();
@@ -48,17 +58,27 @@ export async function startServer() {
   if (CONFIG.trustProxyHops !== null) {
     app.set("trust proxy", CONFIG.trustProxyHops);
   }
+
   app.use(cors({ origin: CONFIG.allowedOrigins }));
+
   app.use(healthRouter.path, healthRouter.create());
+
+  // Content endpoints:
   app.use(localesRouter.path, localesRouter.create());
   app.use(
     cardsRouter.path,
-    cardsRouter.create({ privatePath: CONFIG.privatePath }),
+    cardsRouter.create({ cardImagesPath: paths.cardImages }),
   );
+  app.use(copyRouter.path, copyRouter.create({ copyPath: paths.copy }));
   app.use(
-    copyRouter.path,
-    copyRouter.create({ privatePath: CONFIG.privatePath }),
+    iconsRouter.path,
+    iconsRouter.create({
+      iconMapPath: paths.iconMap,
+      iconFolderPath: paths.icons,
+    }),
   );
+
+  // Game data endpoints:
   app.use(
     gamesRouter.path,
     gamesRouter.create({ repositories: data.repositories }),
@@ -67,6 +87,7 @@ export async function startServer() {
     roomsRouter.path,
     roomsRouter.create({ repositories: data.repositories }),
   );
+
   app.use(errorHandler);
 
   // Start the server:
