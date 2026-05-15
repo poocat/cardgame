@@ -139,13 +139,21 @@ export function digestGameData({
     for (const type of actionTypes) {
       const matchDef = cardDef.actions[type];
       const matchData = cardActions.find((a) => a.type === type);
-      if (matchDef && matchData)
+      if (matchDef && matchData) {
+        const actionMessage = actionTypeMessage(matchData.type);
         actions.push({
           id: matchData.id,
           type,
-          instructions: matchDef.instructions,
+          // If no instructions, just serve the action type.
+          instructions: matchDef.instructions
+            ? msg("label.action.instructions", {
+                actionType: actionMessage,
+                instructions: matchDef.instructions ?? "",
+              })
+            : actionMessage,
           annotations: annotationMap[matchData.id] ?? [],
         });
+      }
     }
 
     const imageSourceLink = cardDef.links?.find((l) => l.type === "imgsrc");
@@ -257,7 +265,7 @@ export function digestGameData({
         .filter((a) => choiceValues.includes(a.id))
         .forEach((a) => {
           const cardDef = getCardDefinition(a.card.name);
-          const label = msg("choice.action", {
+          const label = msg("label.action.choice", {
             actionType: actionTypeMessage(a.type),
             cardName: cardDef.display ?? a.card.name,
           });
