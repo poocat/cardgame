@@ -7,7 +7,7 @@ import { testDb } from "../../helpers/testDb";
 const data = { stub: true } as unknown as GameData;
 
 async function setup() {
-  const db = await testDb();
+  const db = await testDb({ enableMetaCache: true });
   const repo = db.repositories.games;
   // TypeScript magic to spy on a `protected` attribute.
   const collection = (repo as unknown as { collection: Collection }).collection;

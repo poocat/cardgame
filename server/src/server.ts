@@ -31,6 +31,7 @@ export async function startServer() {
   const data = await initDb({
     uri: CONFIG.mongoDbUri,
     dbName: CONFIG.mongoDbName,
+    enableMetaCache: CONFIG.enableMetaCache,
   }).catch((error) => {
     logger.error({ error }, "failed to initialize server");
     process.exit(1);

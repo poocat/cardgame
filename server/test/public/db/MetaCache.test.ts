@@ -25,15 +25,6 @@ describe("MetaCache", () => {
     expect(cache.get("a")).toBeUndefined();
   });
 
-  it("evictAll clears every entry", () => {
-    const cache = new MetaCache();
-    cache.set("a", snapshot("a"));
-    cache.set("b", snapshot("b"));
-    cache.evictAll();
-    expect(cache.get("a")).toBeUndefined();
-    expect(cache.get("b")).toBeUndefined();
-  });
-
   it("drops the least-recently used entry past the bound", () => {
     const cache = new MetaCache(2);
     cache.set("a", snapshot("a"));

@@ -43,18 +43,28 @@ import type { Collection, DeleteResult, UpdateResult } from "mongodb";
  * Provides CRUD operations on a MongoDB collection based on a common "metadata
  * schema."
  *
- * Caches the document meta so that "meta only" reads can avoid a query. Affect
- * is more efficient polling with conditional GET for recently-active games.
+ * Optionally caches the document meta so that "meta only" reads can avoid a
+ * query. The result is faster polling with conditional GET for recently-active
+ * games.
+ *
+ * Caching is opt-in, and off by default, as it does not scale horizontally.
+ * If multiple instances are run behind a load balancer, omit the
+ * `enableMetaCache` option, or set it to `false`.
  ******************************************************************************/
 export class Repository<TData> implements IRepository<TData> {
   queries: Queries<TData>;
   private logger;
-  private metaCache = new MetaCache();
+  private metaCache: MetaCache | null;
+  protected readonly collection: Collection<RepositoryDoc<TData>>;
 
-  constructor(protected readonly collection: Collection<RepositoryDoc<TData>>) {
+  constructor(
+    collection: Collection<RepositoryDoc<TData>>,
+    opts?: { enableMetaCache?: boolean },
+  ) {
     this.collection = collection;
     this.queries = new Queries();
     this.logger = makeChildLogger({ collection: collection.collectionName });
+    this.metaCache = opts?.enableMetaCache ? new MetaCache() : null;
   }
 
   // Overload for when metaOnly is explicitly true
@@ -76,9 +86,10 @@ export class Repository<TData> implements IRepository<TData> {
       "finding document",
     );
 
-    // Serve cached meta if still available.
+    // Serve from cache only for meta-only reads. A full read needs `data`,
+    // which the cache does not hold.
     if (args.metaOnly) {
-      const cached = this.metaCache.get(args.id);
+      const cached = this.metaCache?.get(args.id);
       if (cached) {
         return { meta: cached } as ProjectedRepositoryDoc<TData, TMetaOnly>;
       }
@@ -93,7 +104,7 @@ export class Repository<TData> implements IRepository<TData> {
     }
 
     // Warm the cache from any read, meta-only or full document.
-    this.metaCache.set(args.id, result.meta);
+    this.metaCache?.set(args.id, result.meta);
 
     return result;
   }
@@ -126,7 +137,7 @@ export class Repository<TData> implements IRepository<TData> {
     const result = await this.collection.insertOne(doc);
 
     if (result.insertedId) {
-      this.metaCache.set(doc.meta.id, doc.meta);
+      this.metaCache?.set(doc.meta.id, doc.meta);
       this.logger.info({ id: doc.meta.id }, "document inserted");
       return doc;
     } else {
@@ -159,7 +170,7 @@ export class Repository<TData> implements IRepository<TData> {
     } else {
       // Invalidate cache, don't update. A new meta should prompt a full query
       // any way.
-      this.metaCache.evict(args.id);
+      this.metaCache?.evict(args.id);
       this.logger.debug(
         { id: args.id, matched: result.matchedCount },
         "document updated",
@@ -173,7 +184,7 @@ export class Repository<TData> implements IRepository<TData> {
     const query = this.queries.deleteOne(args);
     const result = await this.collection.deleteOne(query.filter);
 
-    if (result.deletedCount > 0) this.metaCache.evict(args.id);
+    if (result.deletedCount > 0) this.metaCache?.evict(args.id);
 
     this.logger.info(
       { id: args.id, deleted: result.deletedCount },

@@ -2,14 +2,15 @@
  * Implementation of a simple cache tailored to MongoDB documents that use a
  * common "metadata schema".
  *
- * Bounded LRU of document metadata, keyed by document id. Lets Repository
- * answer `findOne({ metaOnly: true })` (the ETag fast path for conditional
- * GETs) without a Mongo round trip.
+ * Warning: the cache is per-process and has no TTL, and therefore is unsafe
+ * if the application is scaled to multiple instances!
  *
- * Invariant: only ever holds values that were observed through its owning
- * Repository instance. Writes through that Repository invalidate the entry;
- * anything that bypasses the Repository (migrations, manual `mongosh`) must
- * call `evictAll()` or accept a stale window.
+ * To illustrate:
+ * Say there are two instances running, A and B, and by some luck, they both
+ * have the same document metadata cached for a given game. If the load balancer
+ * chooses A for the next update (evicting the cache entry on A), then B for the
+ * next read, the request processed by B will continue serving the stale meta
+ * from before the update.
  */
 import type { RepositoryDoc } from "@server/db/types";
 
@@ -53,10 +54,5 @@ export class MetaCache {
 
   evict(id: string): void {
     this.store.delete(id);
-  }
-
-  /** For out-of-band write paths (migrations, manual `mongosh`). */
-  evictAll(): void {
-    this.store.clear();
   }
 }
