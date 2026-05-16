@@ -31,7 +31,7 @@ const envSchema = z
     /** The number of trusted proxy hops */
     TRUST_PROXY_HOPS: z.coerce.number().int().nonnegative().optional(),
     /** Opt in for meta caching */
-    ENABLE_META_CACHE: z.coerce.boolean().optional(),
+    ENABLE_META_CACHE: z.stringbool().optional(),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== "production") return;
