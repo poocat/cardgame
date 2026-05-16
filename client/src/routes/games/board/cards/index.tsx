@@ -165,7 +165,11 @@ export const FaceUpThumbnail = memo(
     return (
       <ThumbnailContainer emphasis={emphasis} exhausted={cardIsExhausted}>
         <Thumbnail onClick={expand}>
-          <CardImage variant="thumbnail" name={props.card.name} />
+          <CardImage
+            variant="thumbnail"
+            name={props.card.name}
+            type={props.card.type}
+          />
         </Thumbnail>
         {props.card.chips.length > 0 && (
           <ChipCounterEdge size="sm">
@@ -223,7 +227,11 @@ export const FaceUpMini = memo(
 
     return (
       <Mini onClick={expand}>
-        <CardImage variant="thumbnail" name={props.card.name} />
+        <CardImage
+          variant="thumbnail"
+          name={props.card.name}
+          type={props.card.type}
+        />
       </Mini>
     );
   },
@@ -394,7 +402,11 @@ export const DetailCard = (props: {
       </CardDetailHeader>
       <CardDetailBody type={props.card.type}>
         <CardDetailBackground>
-          <CardImage variant="fullsize" name={props.card.name} />
+          <CardImage
+            variant="fullsize"
+            name={props.card.name}
+            type={props.card.type}
+          />
         </CardDetailBackground>
         <CardDetailForeground>
           <div />
