@@ -17,7 +17,7 @@ export const Box = (props: {
   size?: Size;
   border?: Border;
   fullWidth?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) => {
   const classNames = ["box"];
   if (props.spacing) classNames.push(`box--spacing-${props.spacing}`);

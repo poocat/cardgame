@@ -158,22 +158,38 @@ export const Game = () => {
   if (poller.error) errors.push(poller.error);
   if (submission.error) errors.push(submission.error);
 
-  return (
+  return game ? (
+    // If there is a game to render, let it render errors.
     <div>
-      <Box fullWidth spacing="md" color={poller.error ? "error" : undefined}>
-        {poller.error}
-      </Box>
-      {game && (
-        <GameBoard
-          game={game}
-          onSubmitChoice={submitChoice}
-          submitting={submission.submitting}
-          choiceProps={choice}
-          selectorProps={selector}
-          dialogProps={dialog}
-          rematchProps={rematch}
-          errors={errors}
-        />
+      <Box spacing="md" />
+      <GameBoard
+        game={game}
+        onSubmitChoice={submitChoice}
+        submitting={submission.submitting}
+        choiceProps={choice}
+        selectorProps={selector}
+        dialogProps={dialog}
+        rematchProps={rematch}
+        errors={errors}
+      />
+    </div>
+  ) : (
+    // Otherwise render errors here, if there are any.
+    <div>
+      {errors.map((e, i) => (
+        <Box
+          key={`${i}-${e}`}
+          fullWidth
+          spacing="md"
+          color={poller.error ? "error" : undefined}
+        >
+          {poller.error}
+        </Box>
+      ))}
+      {poller.pollCount < 1 ? (
+        <Box spacing="md">Loading...</Box>
+      ) : (
+        <Box spacing="md">Game not found...</Box>
       )}
     </div>
   );
