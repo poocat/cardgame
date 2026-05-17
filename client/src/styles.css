@@ -102,6 +102,19 @@ body {
 }
 
 /***************************************************************************
+  Layout
+
+  Shrink-wraps to the widest child (e.g. the fixed-width game board) so the
+  toolbar's auto width spans the full scrollable document on mobile, while
+  never going narrower than the viewport on board-less pages.
+***************************************************************************/
+
+.layout {
+  width: max-content;
+  min-width: 100%;
+}
+
+/***************************************************************************
   Inline icons
 
   Sized to inherited `font-size` so icons rendered inside text scale with

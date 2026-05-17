@@ -19,7 +19,7 @@ const Providers = (props: { children: React.ReactNode }) => {
 
 const Layout = () => {
   return (
-    <div>
+    <div className="layout">
       <Box spacing="md" color="secondary">
         <Stack spacing="md" orientation="horizontal">
           <Msg value={{ key: "logo" }} />
