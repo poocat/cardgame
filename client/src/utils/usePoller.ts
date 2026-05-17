@@ -67,7 +67,7 @@ export function usePoller<TData extends object>(opts: {
           : undefined;
       const response = await fetch(opts.url, {
         method: "GET",
-        cache: "no-store",
+        cache: "no-cache",
         headers,
       });
       if (response.status === 304) {
