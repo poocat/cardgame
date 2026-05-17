@@ -160,11 +160,9 @@ export const Game = () => {
 
   return (
     <div>
-      {poller.error && (
-        <Box fullWidth spacing="md" color="error">
-          {poller.error}
-        </Box>
-      )}
+      <Box fullWidth spacing="md" color={poller.error ? "error" : undefined}>
+        {poller.error}
+      </Box>
       {game && (
         <GameBoard
           game={game}
