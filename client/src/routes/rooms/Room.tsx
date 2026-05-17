@@ -127,78 +127,80 @@ export const Room = () => {
     });
   }, [startGameDisabled, roomId, playerId, startSubmission.handle]);
 
+  const guests = poller.data?.digest.guests ?? [];
+  const submitDisabled = guests.length < 1 || startSubmission.submitting;
+
   return (
-    <Box spacing="lg">
-      <Stack orientation="vertical" spacing="lg">
-        {poller.polling ? (
-          <div>Polled {poller.pollCount} times..</div>
-        ) : (
-          <div>Not polling... {poller.error && `(${poller.error})`}</div>
-        )}
-        <Box border="dark" color="secondary" spacing="md">
-          <Stack orientation="vertical" spacing="sm">
+    <div>
+      {poller.error && (
+        <Box fullWidth spacing="md" color="error">
+          {poller.error}
+        </Box>
+      )}
+      {(joinSubmission.error || startSubmission.error) && (
+        <Box fullWidth spacing="md" color="error">
+          {joinSubmission.error ?? startSubmission.error}
+        </Box>
+      )}
+      <Box spacing="lg">
+        <Stack orientation="vertical" spacing="lg">
+          <Box border="dark" color="secondary" spacing="md">
             <Box>
               Share: <Link to={location.pathname}>{location.pathname}</Link>
             </Box>
-            {playerIsHost && (
-              <Box>
-                (If playing against yourself, open the link in a new window, add
-                a player to the room, then return here to start the game.)
-              </Box>
-            )}
-          </Stack>
-        </Box>
-        Host:
-        <Box size="md" border="dark" spacing="md">
-          {poller.data?.digest.host.name ?? "..."}
-        </Box>
-        Guests:
-        {poller.data?.digest.guests.map((guest) => (
-          <Box size="md" border="dark" key={guest.id} spacing="lg">
-            {guest.name}
           </Box>
-        ))}
-        {playerIsHost ? (
-          <Button
-            border="dark"
-            color="chip"
-            size="lg"
-            onClick={handleStartGame}
-            disabled={startSubmission.submitting}
-          >
-            {startSubmission.submitting ? "Starting..." : "Start Game"}
-          </Button>
-        ) : playerId ? (
-          <Box>Waiting for host to start...</Box>
-        ) : (
-          <Box border="dark" spacing="md" color="secondary">
-            <Stack spacing="lg" orientation="horizontal">
-              <Input
-                size="md"
-                placeholder="your name"
-                value={guestName}
-                onChange={(value) => setGuestName(value)}
-              />
-              <Button
-                border="dark"
-                color="primary"
-                size="md"
-                disabled={
-                  playerIsHost || !guestName || joinSubmission.submitting
-                }
-                onClick={handleSubmitGuest}
-              >
-                {joinSubmission.submitting ? "Joining..." : "Join Game"}
-              </Button>
-            </Stack>
+          Host:
+          <Box size="md" border="dark" spacing="md">
+            {poller.data?.digest.host.name ?? "..."}
           </Box>
-        )}
-        {(joinSubmission.error || startSubmission.error) && (
-          <Box fullWidth spacing="md" color="error">
-            {joinSubmission.error ?? startSubmission.error}
-          </Box>
-        )}
-      </Stack>
-    </Box>
+          Guests:
+          {playerIsHost && guests.length < 1 && (
+            <Box size="md" spacing="lg">
+              ...
+            </Box>
+          )}
+          {poller.data?.digest.guests.map((guest) => (
+            <Box size="md" border="dark" key={guest.id} spacing="lg">
+              {guest.name}
+            </Box>
+          ))}
+          {playerIsHost ? (
+            <Button
+              border="dark"
+              color="chip"
+              size="lg"
+              onClick={handleStartGame}
+              disabled={submitDisabled}
+            >
+              {startSubmission.submitting ? "Starting..." : "Start Game"}
+            </Button>
+          ) : playerId ? (
+            <Box>Waiting for host to start...</Box>
+          ) : (
+            <Box border="dark" spacing="md" color="secondary">
+              <Stack spacing="lg" orientation="horizontal">
+                <Input
+                  size="md"
+                  placeholder="your name"
+                  value={guestName}
+                  onChange={(value) => setGuestName(value)}
+                />
+                <Button
+                  border="dark"
+                  color="primary"
+                  size="md"
+                  disabled={
+                    playerIsHost || !guestName || joinSubmission.submitting
+                  }
+                  onClick={handleSubmitGuest}
+                >
+                  {joinSubmission.submitting ? "Joining..." : "Join Game"}
+                </Button>
+              </Stack>
+            </Box>
+          )}
+        </Stack>
+      </Box>
+    </div>
   );
 };

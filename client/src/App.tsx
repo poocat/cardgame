@@ -22,10 +22,11 @@ const Layout = () => {
     <div>
       <Box spacing="md" color="secondary">
         <Stack spacing="md" orientation="horizontal">
-          <Link to="/">
+          <Msg value={{ key: "logo" }} />
+          <strong>
             <Msg value={{ key: "title" }} />
-          </Link>
-          <Link to="/games">List</Link>
+          </strong>
+          <Link to="/">Play</Link>
           <Link to="/rulebook">Rulebook</Link>
           <Link to="/about">About</Link>
         </Stack>
