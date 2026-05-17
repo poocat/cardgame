@@ -30,6 +30,8 @@ const envSchema = z
       .optional(),
     /** The number of trusted proxy hops */
     TRUST_PROXY_HOPS: z.coerce.number().int().nonnegative().optional(),
+    /** Opt in for meta caching */
+    ENABLE_META_CACHE: z.stringbool().optional(),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== "production") return;
@@ -60,4 +62,5 @@ export const CONFIG = {
   logLevel: env.LOG_LEVEL,
   allowedOrigins: env.CORS_ORIGINS,
   trustProxyHops: env.TRUST_PROXY_HOPS ?? null,
+  enableMetaCache: env.ENABLE_META_CACHE ?? false,
 };
