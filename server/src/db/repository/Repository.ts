@@ -86,14 +86,18 @@ export class Repository<TData> implements IRepository<TData> {
       "finding document",
     );
 
-    // Serve from cache only for meta-only reads. A full read needs `data`,
-    // which the cache does not hold.
+    // Check cache for snapshot of document meta.
     if (args.metaOnly) {
       const cached = this.metaCache?.get(args.id);
       if (cached) {
         return { meta: cached } as ProjectedRepositoryDoc<TData, TMetaOnly>;
       }
     }
+    // Before querying for the entire document, capture the current cache
+    // generation, to hand to the `set` call later. In case a concurrent
+    // update evicts the entry, this version will be used to check for changes
+    // before updating the cache to a stale value.
+    const current = this.metaCache?.generation(args.id);
 
     const query = this.queries.findOne(args);
     const result = await this.collection.findOne(query.filter, query.options);
@@ -103,8 +107,8 @@ export class Repository<TData> implements IRepository<TData> {
       return null;
     }
 
-    // Warm the cache from any read, meta-only or full document.
-    this.metaCache?.set(args.id, result.meta);
+    // Warm the cache.
+    this.metaCache?.set(args.id, result.meta, current);
 
     return result;
   }

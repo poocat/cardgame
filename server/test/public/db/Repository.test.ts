@@ -77,4 +77,42 @@ describe("Repository meta cache", () => {
     expect(projected).toBeNull();
     expect(findSpy).toHaveBeenCalledTimes(1); // went to Mongo, found nothing
   });
+
+  it("does not cache a meta from a read that raced an update", async () => {
+    const { db, repo, findSpy } = await setup();
+    dbs.push(db);
+
+    const inserted = await repo.insertOne({ data });
+    const id = inserted?.meta.id ?? "";
+
+    // A pre-update snapshot, as an in-flight read would have observed it.
+    const stale = await repo.findOne({ id });
+    expect(stale?.meta.version).toBe(0);
+
+    await repo.updateOne({ id, data }); // version -> 1, evicts (tombstone)
+
+    // The next metaOnly read misses (tombstone) and hangs mid-flight while a
+    // concurrent update lands, exactly the race the generation guard targets.
+    let release!: () => void;
+    const gate = new Promise<void>((r) => {
+      release = r;
+    });
+    findSpy.mockImplementationOnce(async () => {
+      await gate;
+      return stale; // resolves with the pre-update document
+    });
+
+    const racing = repo.findOne({ id, metaOnly: true });
+    await repo.updateOne({ id, data }); // version -> 2, evicts again
+    release();
+    const raced = await racing;
+
+    // The in-flight request itself still sees its own stale result...
+    expect(raced?.meta.version).toBe(0);
+
+    // ...but the cache must not be poisoned: a subsequent read goes to Mongo
+    // (call-through, mockImplementationOnce is spent) and sees version 2.
+    const after = await repo.findOne({ id, metaOnly: true });
+    expect(after?.meta.version).toBe(2);
+  });
 });
