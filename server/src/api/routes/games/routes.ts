@@ -1,6 +1,7 @@
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
 import { deanonymizeDecision } from "@server/api/anonymization";
+import { ifNoneMatchSatisfied } from "@server/api/conditionalGet";
 import { burstLimiter, sustainedLimiter } from "@server/api/middleware";
 import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
@@ -174,7 +175,7 @@ export const gamesRouter = {
           }
 
           const etag = makeMetaHash(projected.meta, req.query.playerId);
-          if (req.get("If-None-Match") === etag) {
+          if (ifNoneMatchSatisfied(req.get("If-None-Match"), etag)) {
             logger.debug(
               { gameId: req.params.id, playerId: req.query.playerId },
               "game not modified",
