@@ -100,6 +100,39 @@ describe("GET /api/games/:id", async () => {
     const res = await request(app).get(`/api/games/${randomUUID()}`);
     expect(res.status).toBe(404);
   });
+
+  it("returns 304 when the client echoes back the exact ETag", async () => {
+    const { roomId, hostId } = await seedRoomWithMinPlayers(app);
+    const { body } = await request(app)
+      .post("/api/games/")
+      .send({ roomId, hostId });
+
+    const first = await request(app).get(`/api/games/${body.gameId}`);
+    expect(first.status).toBe(200);
+    const etag = first.headers.etag;
+    expect(etag).toBeTruthy();
+
+    const second = await request(app)
+      .get(`/api/games/${body.gameId}`)
+      .set("If-None-Match", etag);
+    expect(second.status).toBe(304);
+  });
+
+  it("returns 304 when a proxy has weakened the ETag (W/ prefix)", async () => {
+    const { roomId, hostId } = await seedRoomWithMinPlayers(app);
+    const { body } = await request(app)
+      .post("/api/games/")
+      .send({ roomId, hostId });
+
+    const first = await request(app).get(`/api/games/${body.gameId}`);
+    expect(first.status).toBe(200);
+
+    // Emulates a compressing proxy/CDN downgrading the strong validator.
+    const second = await request(app)
+      .get(`/api/games/${body.gameId}`)
+      .set("If-None-Match", `W/${first.headers.etag}`);
+    expect(second.status).toBe(304);
+  });
 });
 
 describe("PATCH /api/games/:id", async () => {
