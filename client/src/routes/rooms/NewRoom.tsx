@@ -1,6 +1,6 @@
-import { Button, Input } from "@client/components";
+import { Button, Copy, Input } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
-import { apiUrl } from "@client/utils/api";
+import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
@@ -36,34 +36,55 @@ export const NewRoom = () => {
     });
   };
 
+  // Fetch welcome note.
+  const welcomeCopyUrl = apiUrl(`${ROUTES.copy.path}/welcome`);
+  const { data: welcomeNote } = useApiQuery({
+    key: welcomeCopyUrl,
+    fetch: async (signal) => {
+      const response = await fetch(welcomeCopyUrl, { method: "GET", signal });
+      assertHttpSuccess(response);
+      return response;
+    },
+    parse: async (response) => {
+      return response.text();
+    },
+  });
+
   return (
-    <Box spacing="lg">
-      <Stack spacing="lg" orientation="vertical">
-        <Box border="dark" spacing="md" color="secondary">
-          <Stack spacing="lg" orientation="horizontal">
-            <Input
-              size="lg"
-              value={hostName}
-              placeholder="your name"
-              onChange={(value) => setHostName(value)}
-            />
-            <Button
-              color="primary"
-              border="dark"
-              size="lg"
-              disabled={!hostName || submission.submitting}
-              onClick={handleSubmit}
-            >
-              {submission.submitting ? "Creating..." : "Create Room"}
-            </Button>
-          </Stack>
-        </Box>
-        {submission.error && (
-          <Box fullWidth spacing="md" color="error">
-            {submission.error}
+    <div style={{ minHeight: "100vh" }}>
+      <Box spacing="lg">
+        <Stack spacing="lg" orientation="vertical">
+          {welcomeNote && (
+            <Box spacing="lg" border="dark">
+              <Copy>{welcomeNote}</Copy>
+            </Box>
+          )}
+          <Box border="dark" spacing="md" color="secondary">
+            <Stack spacing="lg" orientation="horizontal">
+              <Input
+                size="md"
+                value={hostName}
+                placeholder="your name"
+                onChange={(value) => setHostName(value)}
+              />
+              <Button
+                color="primary"
+                border="dark"
+                size="md"
+                disabled={!hostName || submission.submitting}
+                onClick={handleSubmit}
+              >
+                {submission.submitting ? "Creating..." : "Create Room"}
+              </Button>
+            </Stack>
           </Box>
-        )}
-      </Stack>
-    </Box>
+          {submission.error && (
+            <Box fullWidth spacing="md" color="error">
+              {submission.error}
+            </Box>
+          )}
+        </Stack>
+      </Box>
+    </div>
   );
 };
