@@ -60,7 +60,10 @@ export async function startServer() {
     app.set("trust proxy", CONFIG.trustProxyHops);
   }
 
-  app.use(cors({ origin: CONFIG.allowedOrigins }));
+  // `ETag` is not a CORS-safelisted response header, so browsers hide it from
+  // cross-origin JS unless it is explicitly exposed. Without this the poller
+  // never sees the ETag and conditional GET silently degrades to always-200.
+  app.use(cors({ origin: CONFIG.allowedOrigins, exposedHeaders: ["ETag"] }));
 
   app.use(healthRouter.path, healthRouter.create());
 
