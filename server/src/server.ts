@@ -1,4 +1,4 @@
-import { errorHandler } from "@server/api/middleware";
+import { corsPolicy, errorHandler } from "@server/api/middleware";
 import {
   cardsRouter,
   copyRouter,
@@ -13,7 +13,6 @@ import { initDb } from "@server/db/database";
 import { useExampleCards, usePrivateCards } from "@server/game/cards/registry";
 import { logger } from "@server/logger";
 import { useDefaultLocales, usePrivateLocales } from "@server/text/registry";
-import cors from "cors";
 import express from "express";
 import { createPrivatePaths } from "./paths";
 
@@ -60,25 +59,9 @@ export async function startServer() {
     app.set("trust proxy", CONFIG.trustProxyHops);
   }
 
-  /**
-   * CORS Policy:
-   *
-   * `ETag` is not a CORS-safelisted response header, so browsers hide it from
-   * cross-origin JS unless it is explicitly exposed. Without this the poller
-   * never sees the ETag and conditional GET silently degrades to always-200.
-   *
-   * `If-None-Match` is not a CORS-safelisted request header, so the conditional
-   * GET poll triggers a preflight on every request. `maxAge` lets the browser
-   * cache the preflight result and skip the OPTIONS round-trip while polling.
-   * (Chrome caps this at 7200s, Firefox at 86400s; lower values are ignored
-   * only if larger than the cap.)
-   */
+  // Set up CORS policy:
   app.use(
-    cors({
-      origin: CONFIG.allowedOrigins,
-      exposedHeaders: ["ETag"],
-      maxAge: 3600,
-    }),
+    corsPolicy({ origins: CONFIG.allowedOrigins, preflightMaxAge: 3600 }),
   );
 
   app.use(healthRouter.path, healthRouter.create());

@@ -1,6 +1,6 @@
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
-import { ifNoneMatchSatisfied } from "@server/api/conditionalGet";
+import { matchesHeader } from "@server/api/etags";
 import { burstLimiter, sustainedLimiter } from "@server/api/middleware";
 import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
@@ -107,7 +107,7 @@ export const roomsRouter = {
           }
 
           const etag = makeMetaHash(projected.meta, req.query.playerId);
-          if (ifNoneMatchSatisfied(req.get("If-None-Match"), etag)) {
+          if (matchesHeader(req.get("If-None-Match"), etag)) {
             logger.debug(
               { roomId: req.params.id, playerId: req.query.playerId },
               "room not modified",
