@@ -1,4 +1,4 @@
-import { errorHandler } from "@server/api/middleware";
+import { corsPolicy, errorHandler } from "@server/api/middleware";
 import {
   cardsRouter,
   copyRouter,
@@ -13,7 +13,6 @@ import { initDb } from "@server/db/database";
 import { useExampleCards, usePrivateCards } from "@server/game/cards/registry";
 import { logger } from "@server/logger";
 import { useDefaultLocales, usePrivateLocales } from "@server/text/registry";
-import cors from "cors";
 import express from "express";
 import { createPrivatePaths } from "./paths";
 
@@ -31,6 +30,7 @@ export async function startServer() {
   const data = await initDb({
     uri: CONFIG.mongoDbUri,
     dbName: CONFIG.mongoDbName,
+    enableMetaCache: CONFIG.enableMetaCache,
   }).catch((error) => {
     logger.error({ error }, "failed to initialize server");
     process.exit(1);
@@ -59,7 +59,10 @@ export async function startServer() {
     app.set("trust proxy", CONFIG.trustProxyHops);
   }
 
-  app.use(cors({ origin: CONFIG.allowedOrigins }));
+  // Set up CORS policy:
+  app.use(
+    corsPolicy({ origins: CONFIG.allowedOrigins, preflightMaxAge: 3600 }),
+  );
 
   app.use(healthRouter.path, healthRouter.create());
 

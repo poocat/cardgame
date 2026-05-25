@@ -38,21 +38,33 @@ async function runMigrations(db: Db): Promise<void> {
  * Connect to the indicated MongoDB instance, attempt migrations, and return
  * various handles to data access layer.
  ******************************************************************************/
-export async function initDb(args: { uri: string; dbName: string }): Promise<{
+export async function initDb(args: {
+  uri: string;
+  dbName: string;
+  enableMetaCache?: boolean;
+}): Promise<{
   repositories: {
     games: GameRepository<GameData>;
     rooms: RoomRepository<RoomData>;
   };
   close: () => Promise<void>;
 }> {
+  const enableMetaCache = args?.enableMetaCache ?? false;
   const client = await MongoClient.connect(args.uri);
   const db = client.db(args.dbName);
-  logger.info({ dbName: db.databaseName }, "database connected");
+  logger.info(
+    { dbName: db.databaseName, enableMetaCache },
+    "database connected",
+  );
   await runMigrations(db);
   return {
     repositories: {
-      games: new GameRepository(db.collection<GameDoc>(collectionNames.games)),
-      rooms: new RoomRepository(db.collection<RoomDoc>(collectionNames.rooms)),
+      games: new GameRepository(db.collection<GameDoc>(collectionNames.games), {
+        enableMetaCache,
+      }),
+      rooms: new RoomRepository(db.collection<RoomDoc>(collectionNames.rooms), {
+        enableMetaCache,
+      }),
     },
     close: () => client.close(),
   };

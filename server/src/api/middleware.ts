@@ -3,6 +3,7 @@
  */
 import { CONSTANTS } from "@common/game/constants";
 import { logger } from "@server/logger";
+import cors from "cors";
 import type { ErrorRequestHandler } from "express";
 import rateLimit from "express-rate-limit";
 import { STATUS } from "./status";
@@ -82,3 +83,29 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     .status(STATUS.internalServerError)
     .json({ message: "Internal server error" });
 };
+
+/******************************************************************************
+ * ### corsPolicy
+ *
+ * Generates CORS middleware to support the "conditional get" pattern used for
+ * polling, primarily by exposing the `ETag` header.
+ *
+ * `If-None-Match` is not a CORS safelisted request header, so a conditional
+ * GET will trigger a preflight on every request. Setting a maximum age for the
+ * preflight signals the browser to cache the result of the preflight OPTIONS
+ * request.
+ *
+ * (Note, these values are capped to different calues by different browsers.)
+ ******************************************************************************/
+export const corsPolicy = ({
+  origins,
+  preflightMaxAge,
+}: {
+  origins: string[] | undefined;
+  preflightMaxAge: number;
+}) =>
+  cors({
+    origin: origins,
+    exposedHeaders: ["ETag"],
+    maxAge: preflightMaxAge,
+  });

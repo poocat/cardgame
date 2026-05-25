@@ -6,7 +6,7 @@ import { ROUTES } from "@common/api/routes";
 export const About = () => {
   const url = apiUrl(`${ROUTES.copy.path}/about`);
 
-  const { data, error } = useApiQuery({
+  const { data, loading, error } = useApiQuery({
     key: url,
     fetch: async (signal) => {
       const response = await fetch(url, { method: "GET", signal });
@@ -18,6 +18,7 @@ export const About = () => {
     },
   });
 
+  if (loading) return <Box spacing="lg">Loading...</Box>;
   if (error) return <Box spacing="lg">"About" not available.</Box>;
   if (!data) return null;
 

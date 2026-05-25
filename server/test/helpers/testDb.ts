@@ -20,6 +20,10 @@ async function ensureServer() {
   return server;
 }
 
+type TestDbOptions = {
+  enableMetaCache?: boolean;
+};
+
 /******************************************************************************
  * ### testDb
  *
@@ -28,11 +32,12 @@ async function ensureServer() {
  * Creates a fresh database and initializes it (with migrations, et cetera),
  * returning the same handle returned by `initDb`.
  ******************************************************************************/
-export async function testDb() {
+export async function testDb(opts?: TestDbOptions) {
   const s = await ensureServer();
   dbCounter++;
   return initDb({
     uri: s.getUri(),
     dbName: `test_${process.pid}_${dbCounter}`,
+    ...opts,
   });
 }
