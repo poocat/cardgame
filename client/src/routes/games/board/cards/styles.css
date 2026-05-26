@@ -112,17 +112,17 @@
 }
 
 .game-card__type-icon--thumbnail {
-  top: 4.6%;
-  left: 4.6%;
+  top: 4.2%;
+  left: 4.8%;
   width: 17%;
   height: 17%;
 }
 
 .game-card__type-icon--fullsize {
-  top: 7.5%;
-  left: 14%;
-  width: 13%;
-  height: 13%;
+  top: 7.1%;
+  left: 13.8%;
+  width: 13.2%;
+  height: 13.2%;
 }
 
 /* When no image available, center the icon. */
