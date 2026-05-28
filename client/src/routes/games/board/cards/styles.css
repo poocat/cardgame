@@ -79,10 +79,57 @@
   color: var(--color-black);
 }
 
+.game-card__image-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .game-card__image {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* 
+  The placement of the card-type icon is dialed-in to the card art.
+
+  If the card art changes, or if different cards use a different layout,
+  the icons will not line up!
+ */
+.game-card__type-icon {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.game-card__type-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.game-card__type-icon--thumbnail {
+  top: 4.2%;
+  left: 4.8%;
+  width: 17%;
+  height: 17%;
+}
+
+.game-card__type-icon--fullsize {
+  top: 7.1%;
+  left: 13.8%;
+  width: 13.2%;
+  height: 13.2%;
+}
+
+/* When no image available, center the icon. */
+.game-card__type-icon--fallback {
+  position: static;
+  width: 60%;
+  height: 60%;
 }
 
 .game-card-edge {
