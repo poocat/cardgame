@@ -169,6 +169,7 @@ export const FaceUpThumbnail = memo(
             variant="thumbnail"
             name={props.card.name}
             type={props.card.type}
+            subtype={props.card.subtype?.key}
           />
         </Thumbnail>
         {props.card.chips.length > 0 && (
@@ -231,6 +232,7 @@ export const FaceUpMini = memo(
           variant="thumbnail"
           name={props.card.name}
           type={props.card.type}
+          subtype={props.card.subtype?.key}
         />
       </Mini>
     );
@@ -406,6 +408,7 @@ export const DetailCard = (props: {
             variant="fullsize"
             name={props.card.name}
             type={props.card.type}
+            subtype={props.card.subtype?.key}
           />
         </CardDetailBackground>
         <CardDetailForeground>

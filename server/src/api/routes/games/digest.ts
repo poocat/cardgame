@@ -183,6 +183,7 @@ export function digestGameData({
       triggerInstructions: cardDef.trigger?.instructions ?? null,
       imageSourceUrl: imageSourceLink?.url ?? "",
       type: cardData.type,
+      subtype: cardDef.subtype ?? null,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
       lastMovedOnTick: cardData.lastMovedOnTick,
       actions,

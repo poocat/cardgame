@@ -259,6 +259,8 @@ export type CardDef = {
   /** The name of the card as it is displayed to the player. Supports localization. Defaults to `name`. */
   display?: Message;
   type: CardType;
+  /** The flavor subtype for the card. Supports localization and icon lookup. */
+  subtype?: Message;
   actions: Partial<ActionTypeMap<ActionDef>>;
   /** Each card can have a single, custom triggered effect. The trigger is only active while the card is in play. */
   trigger?: TriggerDef;
