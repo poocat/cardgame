@@ -23,7 +23,7 @@ export type CardTypeIconPlacement = "thumbnail" | "fullsize" | "fallback";
  * The themed icon indicating whether a card is a producer or a consumer.
  *
  * The position of the icon in the frame is dialed-in to fit in a specific
- * part of the card image. (The upper left hand corner.)
+ * part of the card image.
  ******************************************************************************/
 const CardTypeIcon = (props: {
   type: CardType;
