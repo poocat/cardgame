@@ -45,6 +45,34 @@ const CardTypeIcon = (props: {
 };
 
 /******************************************************************************
+ * ### CardSubtypeIcon
+ *
+ * The themed icon indicating the card's subtype.
+ *
+ * The position of the icon in the frame is dialed-in to fit in a specific
+ * part of the card image. (The upper right hand corner.)
+ ******************************************************************************/
+const CardSubtypeIcon = (props: {
+  subtype: string;
+  placement: CardTypeIconPlacement;
+}) => {
+  const { lookup } = useMessages();
+  console.log(props.subtype);
+  const match = lookup(props.subtype);
+  if (match.type !== "icon") return null;
+
+  return (
+    <span
+      className={`game-card__subtype-icon game-card__subtype-icon--${props.placement}`}
+      role="img"
+      aria-label={props.subtype}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: content is server-sanitized at bundle load via DOMPurify (svg profile).
+      dangerouslySetInnerHTML={{ __html: match.value }}
+    />
+  );
+};
+
+/******************************************************************************
  * ### CardImage
  *
  * The card's art with its producer/consumer type icon showing through the
@@ -59,8 +87,10 @@ const CardTypeIcon = (props: {
 export const CardImage = (props: {
   name: string;
   type: CardType;
+  subtype: string | null | undefined;
   variant: "thumbnail" | "fullsize";
 }) => {
+  console.log(props);
   const [failed, setFailed] = useState(false);
 
   if (failed) return <CardTypeIcon type={props.type} placement="fallback" />;
@@ -68,6 +98,9 @@ export const CardImage = (props: {
   return (
     <div className="game-card__image-frame">
       <CardTypeIcon type={props.type} placement={props.variant} />
+      {props.subtype && (
+        <CardSubtypeIcon subtype={props.subtype} placement={props.variant} />
+      )}
       <img
         className="game-card__image"
         src={apiUrl(
