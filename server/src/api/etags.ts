@@ -7,12 +7,24 @@
  * algorithm", to establish that the content is equivalent, even if the data
  * is not a byte-by-byte match.
  */
+import { createHash } from "node:crypto";
 
 /**
  * Strip an optional weak-validator prefix so weak comparison can be used.
  */
 function normalizeEtag(tag: string): string {
   return tag.trim().replace(/^W\//, "");
+}
+
+/******************************************************************************
+ * ### makeContentHash
+ *
+ * Returns an ETag derived from the content itself, for resources that have no
+ * document metadata to hash (`makeMetaHash`) because they are not stored in
+ * the database.
+ ******************************************************************************/
+export function makeContentHash(content: string): string {
+  return `"${createHash("sha1").update(content).digest("base64")}"`;
 }
 
 /******************************************************************************
