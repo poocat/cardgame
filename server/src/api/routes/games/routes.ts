@@ -1,6 +1,7 @@
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
 import { deanonymizeDecision } from "@server/api/anonymization";
+import { digestGameData } from "@server/api/digests/games";
 import { matchesHeader } from "@server/api/etags";
 import { burstLimiter, sustainedLimiter } from "@server/api/middleware";
 import { STATUS } from "@server/api/status";
@@ -13,7 +14,6 @@ import { logger } from "@server/logger";
 import type { GameData, RoomData } from "@server/types";
 import type { RequestHandler } from "express";
 import { json as jsonHandler, Router } from "express";
-import { digestGameData } from "./digest";
 
 type Dependencies = {
   repositories: {

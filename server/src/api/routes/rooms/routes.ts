@@ -1,5 +1,6 @@
 import { ROUTES } from "@common/api/routes";
 import { CONSTANTS } from "@common/game/constants";
+import { digestRoomData } from "@server/api/digests/rooms";
 import { matchesHeader } from "@server/api/etags";
 import { burstLimiter, sustainedLimiter } from "@server/api/middleware";
 import { STATUS } from "@server/api/status";
@@ -10,7 +11,6 @@ import { logger } from "@server/logger";
 import type { RoomData } from "@server/types";
 import type { RequestHandler } from "express";
 import { json as jsonHandler, Router } from "express";
-import { digestRoomData } from "./digest";
 
 type Dependencies = {
   repositories: {
