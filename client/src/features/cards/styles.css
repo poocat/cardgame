@@ -1,5 +1,93 @@
 /***************************************************************************
-  Card
+  Card Styles (agnostic of whether they are in the game or catalog context)
+***************************************************************************/
+
+/***************************************************************************
+  Images and Icons
+
+  These are the only classes that are actually shared by all card
+  presentations.
+***************************************************************************/
+
+.card-image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.card-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 
+  The placement of the card type and subtype icons are dialed-in to the card
+  art. If the card art changes, the icons will not line up!
+ */
+
+.card-type-icon {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.card-type-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.card-type-icon--fallback {
+  position: static;
+  width: 60%;
+  height: 60%;
+}
+
+.card-type-icon--thumbnail {
+  top: 4.2%;
+  left: 4.8%;
+  width: 17%;
+  height: 17%;
+}
+
+.card-type-icon--fullsize {
+  top: 7.1%;
+  left: 13.8%;
+  width: 13.2%;
+  height: 13.2%;
+}
+
+.card-subtype-icon {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.card-subtype-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.card-subtype-icon--thumbnail {
+  top: 4.2%;
+  right: 4.8%;
+  width: 17%;
+  height: 17%;
+}
+
+.card-subtype-icon--fullsize {
+  top: 7.1%;
+  right: 13.8%;
+  width: 13.2%;
+  height: 13.2%;
+}
+
+/***************************************************************************
+  Form-factor Specific Styles
 ***************************************************************************/
 
 .game-card-container {
@@ -64,87 +152,6 @@
   background: none;
   border-color: var(--color-black);
   color: var(--color-black);
-}
-
-.game-card__image-frame {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.game-card__image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* 
-  The placement of the card type and subtype icons are dialed-in to the card
-  art.
-
-  If the card art changes, or if different cards use a different layout,
-  the icons will not line up!
- */
-.game-card__type-icon {
-  position: absolute;
-  display: block;
-  pointer-events: none;
-}
-
-.game-card__type-icon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.game-card__type-icon--thumbnail {
-  top: 4.2%;
-  left: 4.8%;
-  width: 17%;
-  height: 17%;
-}
-
-.game-card__type-icon--fullsize {
-  top: 7.1%;
-  left: 13.8%;
-  width: 13.2%;
-  height: 13.2%;
-}
-
-/* Subtype */
-.game-card__subtype-icon {
-  position: absolute;
-  display: block;
-  pointer-events: none;
-}
-
-.game-card__subtype-icon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.game-card__subtype-icon--thumbnail {
-  top: 4.2%;
-  right: 4.8%;
-  width: 17%;
-  height: 17%;
-}
-
-.game-card__subtype-icon--fullsize {
-  top: 7.1%;
-  right: 13.8%;
-  width: 13.2%;
-  height: 13.2%;
-}
-
-/* When no image available, center the icon. */
-.game-card__type-icon--fallback {
-  position: static;
-  width: 60%;
-  height: 60%;
 }
 
 /***************************************************************************

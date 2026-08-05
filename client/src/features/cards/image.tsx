@@ -35,7 +35,7 @@ const CardTypeIcon = (props: {
 
   return (
     <span
-      className={`game-card__type-icon game-card__type-icon--${props.placement}`}
+      className={`card-type-icon card-type-icon--${props.placement}`}
       role="img"
       aria-label={props.type}
       // biome-ignore lint/security/noDangerouslySetInnerHtml: content is server-sanitized at bundle load via DOMPurify (svg profile).
@@ -62,7 +62,7 @@ const CardSubtypeIcon = (props: {
 
   return (
     <span
-      className={`game-card__subtype-icon game-card__subtype-icon--${props.placement}`}
+      className={`card-subtype-icon card-subtype-icon--${props.placement}`}
       role="img"
       aria-label={props.subtype}
       // biome-ignore lint/security/noDangerouslySetInnerHtml: content is server-sanitized at bundle load via DOMPurify (svg profile).
@@ -94,13 +94,13 @@ export const CardImage = (props: {
   if (failed) return <CardTypeIcon type={props.type} placement="fallback" />;
 
   return (
-    <div className="game-card__image-frame">
+    <div className="card-image-container">
       <CardTypeIcon type={props.type} placement={props.variant} />
       {props.subtype && (
         <CardSubtypeIcon subtype={props.subtype} placement={props.variant} />
       )}
       <img
-        className="game-card__image"
+        className="card-image"
         src={apiUrl(
           `${ROUTES.cards.path}${ROUTES.cards.methods.images.path}/${slugify(props.name)}.${props.variant}.png`,
         )}
