@@ -1,0 +1,242 @@
+/***************************************************************************
+  Card
+***************************************************************************/
+
+.game-card-container {
+  padding: 3px; /* Padding is necessary to ensure that any emphasis is visible. */
+  border-radius: 5px;
+  transition: transform 0.5s;
+}
+
+.game-card-container--exhausted {
+  transform: rotate(5deg);
+}
+
+.game-card-container--emphasis-animated {
+  background-color: var(--color-lowlight);
+  animation: pulse-lowlight 1500ms ease-in-out infinite;
+}
+
+.game-card-container--emphasis-solid {
+  background-color: var(--color-lowlight);
+}
+
+.game-card-container--emphasis-outlined {
+  outline: 1px solid var(--color-lowlight);
+}
+
+.game-card {
+  width: var(--card-width-md);
+  height: var(--card-width-md);
+  border: 1px solid;
+  border-radius: 4px;
+  padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: var(--font-size-xs);
+  /* Default */
+  background-color: var(--color-white);
+  border-color: var(--color-black);
+  color: var(--color-black);
+}
+
+.game-card--mini {
+  width: var(--card-width-sm);
+  height: var(--card-height-sm);
+  padding: 1px;
+  font-size: var(--font-size-xs);
+  border-radius: 3px;
+}
+
+.game-card--clickable {
+  cursor: pointer;
+}
+
+.game-card-container--exhausted .game-card {
+  background-color: var(--color-white-translucent);
+  color: var(--color-black-translucent);
+}
+
+.game-card--placeholder {
+  background: none;
+  border-color: var(--color-black);
+  color: var(--color-black);
+}
+
+.game-card__image-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.game-card__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 
+  The placement of the card type and subtype icons are dialed-in to the card
+  art.
+
+  If the card art changes, or if different cards use a different layout,
+  the icons will not line up!
+ */
+.game-card__type-icon {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.game-card__type-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.game-card__type-icon--thumbnail {
+  top: 4.2%;
+  left: 4.8%;
+  width: 17%;
+  height: 17%;
+}
+
+.game-card__type-icon--fullsize {
+  top: 7.1%;
+  left: 13.8%;
+  width: 13.2%;
+  height: 13.2%;
+}
+
+/* Subtype */
+.game-card__subtype-icon {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.game-card__subtype-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.game-card__subtype-icon--thumbnail {
+  top: 4.2%;
+  right: 4.8%;
+  width: 17%;
+  height: 17%;
+}
+
+.game-card__subtype-icon--fullsize {
+  top: 7.1%;
+  right: 13.8%;
+  width: 13.2%;
+  height: 13.2%;
+}
+
+/* When no image available, center the icon. */
+.game-card__type-icon--fallback {
+  position: static;
+  width: 60%;
+  height: 60%;
+}
+
+/***************************************************************************
+  Card Detail Form Factor
+***************************************************************************/
+
+.card-detail-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-detail {
+  position: relative;
+  width: var(--card-width-lg);
+  height: var(--card-height-lg);
+  border-radius: 12px;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  border: 2px solid black;
+}
+
+.card-detail--producer {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.card-detail--consumer {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.card-detail__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.card-detail__foreground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--card-outer-border-width-lg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-detail__header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-xs);
+}
+
+.card-detail__name {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+}
+
+.card-detail__link {
+  font-size: var(--font-size-xs);
+  padding: var(--space-sm);
+  background-color: var(--color-white-translucent);
+  border-radius: 9999px;
+}
+
+.card-detail__actions {
+  display: flex;
+  flex-direction: column;
+  padding: var(--card-inner-border-width-lg);
+  gap: var(--space-xs);
+}
+
+.card-detail__trigger-instructions {
+  padding: var(--space-sm);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-white-translucent);
+}
+
+/* A printed action, shown as text because there is no game to take it in. */
+.card-detail__textbox {
+  padding: var(--space-sm);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-white-translucent);
+}

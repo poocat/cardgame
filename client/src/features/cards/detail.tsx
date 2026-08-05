@@ -1,4 +1,4 @@
-import type { CardType } from "../types";
+import type { CardType } from "./types";
 
 /******************************************************************************
  * ### CardDetailContainer
@@ -7,7 +7,7 @@ import type { CardType } from "../types";
  * dialog.
  ******************************************************************************/
 export const CardDetailContainer = (props: { children?: React.ReactNode }) => {
-  return <div className="game-dialog__card-container">{props.children}</div>;
+  return <div className="card-detail-container">{props.children}</div>;
 };
 
 /******************************************************************************
@@ -18,7 +18,7 @@ export const CardDetailBody = (props: {
   children?: React.ReactNode;
 }) => {
   return (
-    <div className={`game-dialog__card game-dialog__card--${props.type}`}>
+    <div className={`card-detail card-detail--${props.type}`}>
       {props.children}
     </div>
   );
@@ -28,28 +28,28 @@ export const CardDetailBody = (props: {
  * ### CardDetailBackground
  ******************************************************************************/
 export const CardDetailBackground = (props: { children?: React.ReactNode }) => {
-  return <div className="game-dialog__card-background">{props.children}</div>;
+  return <div className="card-detail__background">{props.children}</div>;
 };
 
 /******************************************************************************
  * ### CardDetailForeground
  ******************************************************************************/
 export const CardDetailForeground = (props: { children?: React.ReactNode }) => {
-  return <div className="game-dialog__card-foreground">{props.children}</div>;
+  return <div className="card-detail__foreground">{props.children}</div>;
 };
 
 /******************************************************************************
  * ### CardDetailHeader
  ******************************************************************************/
 export const CardDetailHeader = (props: { children: React.ReactNode }) => {
-  return <div className="game-dialog__card-header">{props.children}</div>;
+  return <div className="card-detail__header">{props.children}</div>;
 };
 
 /******************************************************************************
  * ### CardDetailName
  ******************************************************************************/
 export const CardDetailName = (props: { children: React.ReactNode }) => {
-  return <div className="game-dialog__card-name">{props.children}</div>;
+  return <div className="card-detail__name">{props.children}</div>;
 };
 
 /******************************************************************************
@@ -57,7 +57,7 @@ export const CardDetailName = (props: { children: React.ReactNode }) => {
  ******************************************************************************/
 export const CardDetailLink = (props: { url: string }) => {
   return (
-    <div className="game-dialog__card-link">
+    <div className="card-detail__link">
       <a href={props.url}>source</a>
     </div>
   );
@@ -67,7 +67,7 @@ export const CardDetailLink = (props: { url: string }) => {
  * ### CardDetailActions
  ******************************************************************************/
 export const CardDetailActions = (props: { children?: React.ReactNode }) => {
-  return <div className="game-dialog__card-actions">{props.children}</div>;
+  return <div className="card-detail__actions">{props.children}</div>;
 };
 
 /******************************************************************************
@@ -77,24 +77,16 @@ export const CardDetailTriggerInstructions = (props: {
   children?: React.ReactNode;
 }) => {
   return (
-    <div className="game-dialog__card-trigger-instructions">
-      {props.children}
-    </div>
+    <div className="card-detail__trigger-instructions">{props.children}</div>
   );
 };
 
 /******************************************************************************
  * ### CardDetailTextBox
+ *
+ * A box for text printed on the card, e.g. an action's instructions when there
+ * is no game in which to take the action.
  ******************************************************************************/
 export const CardDetailTextBox = (props: { children?: React.ReactNode }) => {
-  return <div className="game-dialog__card-textbox">{props.children}</div>;
-};
-
-/******************************************************************************
- * ### CardDetailMenuContainer
- ******************************************************************************/
-export const CardDetailMenuContainer = (props: {
-  children?: React.ReactNode;
-}) => {
-  return <div className="game-dialog__menu">{props.children}</div>;
+  return <div className="card-detail__textbox">{props.children}</div>;
 };

@@ -1,0 +1,19 @@
+/***************************************************************************
+  Card Catalog
+***************************************************************************/
+
+.card-catalog-grid {
+  display: grid;
+  /* 
+    Use as many columns as the viewport allows. Cards are a fixed size, so track
+    size is card's own width.
+  */
+  grid-template-columns: repeat(
+      auto-fill,
+      minmax(var(--card-width-lg), max-content)
+    );
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background-color: var(--color-darkbrown);
+}

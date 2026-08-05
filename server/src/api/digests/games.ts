@@ -10,17 +10,11 @@ import type {
   inPlayCardDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
-import { actionTypes } from "@common/game/enums";
 import { anonymizeId } from "@server/api/anonymization";
+import { actionTypeMessage, cardDefDigest } from "@server/api/digests/cards";
 import { getCardDefinition } from "@server/game/cards/registry";
 import { msg } from "@server/text/messages";
-import type {
-  ActionType,
-  CardData,
-  GameData,
-  Id,
-  Message,
-} from "@server/types";
+import type { CardData, GameData, Id, Message } from "@server/types";
 import type z from "zod";
 
 type GameDigest = z.infer<typeof gameDigestSchema>;
@@ -28,22 +22,6 @@ type GameDigest = z.infer<typeof gameDigestSchema>;
 type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
 type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type ChoiceValuesDigest = z.infer<typeof choiceValueDigestSchema>;
-
-/**
- * Simple switch to get the message corresponding to the given action type.
- */
-function actionTypeMessage(actionType?: ActionType): Message {
-  switch (actionType) {
-    case "play":
-      return msg("action.type.play");
-    case "ability":
-      return msg("action.type.ability");
-    case "discard":
-      return msg("action.type.discard");
-    default:
-      throw new Error(`Unexpected action type: ${actionType}`);
-  }
-}
 
 /**
  * Generate a message that explains the current activity.
@@ -148,42 +126,30 @@ export function digestGameData({
    * Use to create digests for any visible card.
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   function visibleCardDigest(cardData: CardData): VisibleCardDigest {
-    const cardDef = getCardDefinition(cardData.name);
-    // Actions should be displayed in order.
+    const definitionDigest = cardDefDigest(getCardDefinition(cardData.name));
+
+    // A printed action is only playable if the game has an action for this
+    // particular copy of the card. Order is inherited from the definition.
     const cardActions = gameData.actions.filter(
       (a) => a.card.id === cardData.id,
     );
     const actions: VisibleCardDigest["actions"] = [];
-    for (const type of actionTypes) {
-      const matchDef = cardDef.actions[type];
-      const matchData = cardActions.find((a) => a.type === type);
-      if (matchDef && matchData) {
-        const actionMessage = actionTypeMessage(matchData.type);
-        actions.push({
-          id: matchData.id,
-          type,
-          // If no instructions, just serve the action type.
-          instructions: matchDef.instructions
-            ? msg("label.action.instructions", {
-                actionType: actionMessage,
-                instructions: matchDef.instructions ?? "",
-              })
-            : actionMessage,
-          annotations: annotationMap[matchData.id] ?? [],
-        });
-      }
+    for (const action of definitionDigest.actions) {
+      const matchData = cardActions.find((a) => a.type === action.type);
+      if (!matchData) continue;
+      actions.push({
+        ...action,
+        id: matchData.id,
+        annotations: annotationMap[matchData.id] ?? [],
+      });
     }
 
-    const imageSourceLink = cardDef.links?.find((l) => l.type === "imgsrc");
-
     return {
-      id: cardData.id,
-      name: cardData.name,
-      display: cardDef.display ?? { key: cardData.name },
-      triggerInstructions: cardDef.trigger?.instructions ?? null,
-      imageSourceUrl: imageSourceLink?.url ?? "",
+      ...definitionDigest,
+      // The stored type takes precedence over the definition's, so that the
+      // card is displayed as whatever the engine is treating it as.
       type: cardData.type,
-      subtype: cardDef.subtype ?? null,
+      id: cardData.id,
       lastMovedOnTurn: cardData.lastMovedOnTurn,
       lastMovedOnTick: cardData.lastMovedOnTick,
       actions,

@@ -1,4 +1,8 @@
-import { gameDigestSchema, roomDigestSchema } from "@common/api/digests";
+import {
+  cardDefDigestSchema,
+  gameDigestSchema,
+  roomDigestSchema,
+} from "@common/api/digests";
 import type { Routes } from "@common/api/types";
 import z from "zod";
 
@@ -144,11 +148,24 @@ export const ROUTES = {
     },
   },
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * Cards (images)
+   * Cards (definitions, images)
    ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   cards: {
     path: "/api/cards",
-    methods: {},
+    methods: {
+      getMany: {
+        path: "/",
+        schemas: {
+          responseBody: z.strictObject({
+            cards: z.array(cardDefDigestSchema),
+          }),
+        },
+      },
+      images: {
+        path: "/images",
+        schemas: {},
+      },
+    },
   },
   /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Copy (rules, about)

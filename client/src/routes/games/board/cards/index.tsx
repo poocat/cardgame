@@ -1,6 +1,8 @@
 import { Button, ButtonBase, SelectButton } from "@client/components";
 import { Edge, Stack } from "@client/components/layout";
 import type { Size } from "@client/components/types";
+import { CardFace } from "@client/features/cards/face";
+import { CardImage } from "@client/features/cards/image";
 import { memo, useCallback } from "react";
 import {
   ChipCounter,
@@ -17,32 +19,23 @@ import type {
   SelectorProps,
   VisibleCardDigest,
 } from "../types";
-import {
-  CardDetailActions,
-  CardDetailBackground,
-  CardDetailBody,
-  CardDetailContainer,
-  CardDetailForeground,
-  CardDetailHeader,
-  CardDetailLink,
-  CardDetailMenuContainer,
-  CardDetailName,
-  CardDetailTriggerInstructions,
-} from "./detail";
-import { CardImage } from "./image";
+import "@client/features/cards/styles.css";
 import "./styles.css";
+import { Msg } from "@client/components/msg";
 import { Tooltip } from "@client/components/tooltips";
-import { Msg } from "../msg";
+import { Mini } from "@client/features/cards/mini";
+import type { ThumbnailEmphasis } from "@client/features/cards/thumbnail";
+import {
+  Thumbnail,
+  ThumbnailContainer,
+} from "@client/features/cards/thumbnail";
 import type { Message } from "../types";
-import { Mini } from "./mini";
 import {
   CardPile,
   CardPileLabel,
   CardPileStack,
   CardPileStackItem,
 } from "./pile";
-import type { ThumbnailEmphasis } from "./thumbnail";
-import { Thumbnail, ThumbnailContainer } from "./thumbnail";
 
 /******************************************************************************
  * ### CardSelector
@@ -324,6 +317,16 @@ const DetailCardAction = (props: {
 };
 
 /******************************************************************************
+ * ### DetailCardMenu
+ *
+ * The controls beneath an enlarged card, for taking the choice that is
+ * available on it.
+ ******************************************************************************/
+const DetailCardMenu = (props: { children?: React.ReactNode }) => {
+  return <div className="card-detail-menu">{props.children}</div>;
+};
+
+/******************************************************************************
  * ### DetailCardChipSelect
  ******************************************************************************/
 const DetailCardChipSelect = (props: {
@@ -393,58 +396,29 @@ export const DetailCard = (props: {
     props.submitDisabled || selectedValuesOnCard.length < 1;
 
   return (
-    <CardDetailContainer>
-      <CardDetailHeader>
-        <CardDetailName>
-          <Msg value={props.card.display} />
-        </CardDetailName>
-        {props.card.imageSourceUrl && (
-          <CardDetailLink url={props.card.imageSourceUrl} />
-        )}
-      </CardDetailHeader>
-      <CardDetailBody type={props.card.type}>
-        <CardDetailBackground>
-          <CardImage
-            variant="fullsize"
-            name={props.card.name}
-            type={props.card.type}
-            subtype={props.card.subtype?.key}
+    <CardFace
+      card={props.card}
+      actions={props.card.actions.map((action) => {
+        const selected =
+          props.selectorProps?.checkValueSelected(action.id) ?? false;
+        const selectable = props.choiceProps.checkValue(action.id);
+        const toggleable = props.selectorProps?.moreValuesAllowed || selected;
+        const toggle = () => props.selectorProps?.toggleValue(action.id);
+        return (
+          <DetailCardAction
+            key={action.id}
+            actionId={action.id}
+            actionType={action.type}
+            instructions={action.instructions ?? null}
+            annotations={action.annotations}
+            disabled={!cardHasSelectableActions || !selectable || !toggleable}
+            submitting={props.submitting}
+            selected={selected}
+            onChange={toggle}
           />
-        </CardDetailBackground>
-        <CardDetailForeground>
-          <div />
-          <CardDetailActions>
-            {props.card.triggerInstructions && (
-              <CardDetailTriggerInstructions>
-                <Msg value={props.card.triggerInstructions} />
-              </CardDetailTriggerInstructions>
-            )}
-            {props.card.actions.map((action) => {
-              const selected =
-                props.selectorProps?.checkValueSelected(action.id) ?? false;
-              const selectable = props.choiceProps.checkValue(action.id);
-              const toggleable =
-                props.selectorProps?.moreValuesAllowed || selected;
-              const toggle = () => props.selectorProps?.toggleValue(action.id);
-              return (
-                <DetailCardAction
-                  key={action.id}
-                  actionId={action.id}
-                  actionType={action.type}
-                  instructions={action.instructions ?? null}
-                  annotations={action.annotations}
-                  disabled={
-                    !cardHasSelectableActions || !selectable || !toggleable
-                  }
-                  submitting={props.submitting}
-                  selected={selected}
-                  onChange={toggle}
-                />
-              );
-            })}
-          </CardDetailActions>
-        </CardDetailForeground>
-      </CardDetailBody>
+        );
+      })}
+    >
       {chipIds.length > 0 && (
         <ChipCounterEdge size="md">
           <ChipCounter
@@ -457,7 +431,7 @@ export const DetailCard = (props: {
         </ChipCounterEdge>
       )}
       {cardHasChoice && (
-        <CardDetailMenuContainer>
+        <DetailCardMenu>
           {cardHasSelectableChips && (
             <DetailCardChipSelect
               chips={props.card.chips}
@@ -510,8 +484,8 @@ export const DetailCard = (props: {
               </Button>
             </Stack>
           )}
-        </CardDetailMenuContainer>
+        </DetailCardMenu>
       )}
-    </CardDetailContainer>
+    </CardFace>
   );
 };

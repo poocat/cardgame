@@ -1,35 +1,47 @@
 import type {
-  chipDigestSchema,
+  CardDefDigest,
+  CardType,
+  ChipDigest,
+  FaceUpCardDigest,
+  InPlayCardDigest,
+  VisibleCardDigest,
+} from "@client/features/cards/types";
+import type { Message } from "@client/utils/messages";
+import type {
   choiceValueDigestSchema,
   gameDigestSchema,
-  inPlayCardDigestSchema,
-  messageSchema,
   observingPlayerDigestSchema,
   otherPlayerDigestSchema,
-  visibleCardDigestSchema,
 } from "@common/api/digests";
-import type { cardTypes, choiceTypes } from "@common/game/enums";
+import type { choiceTypes } from "@common/game/enums";
 import type z from "zod";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Digests
 ////////////////////////////////////////////////////////////////////////////////
-export type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
-export type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
-export type FaceUpCardDigest = VisibleCardDigest & Partial<InPlayCardDigest>;
+
+// Card-shaped types are defined with the card components, since they are not
+// specific to a game. Re-exported here for convenience within the board.
+export type {
+  CardDefDigest,
+  CardType,
+  ChipDigest,
+  FaceUpCardDigest,
+  InPlayCardDigest,
+  Message,
+  VisibleCardDigest,
+};
+
 export type GameDigest = z.infer<typeof gameDigestSchema>;
 export type ChoiceValueDigest = z.infer<typeof choiceValueDigestSchema>;
-export type ChipDigest = z.infer<typeof chipDigestSchema>;
 export type ObserverPlayerDigest = z.infer<typeof observingPlayerDigestSchema>;
 export type OtherPlayerDigest = z.infer<typeof otherPlayerDigestSchema>;
-export type Message = z.infer<typeof messageSchema>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Choice
 ////////////////////////////////////////////////////////////////////////////////
 
 export type ChoiceType = (typeof choiceTypes)[number];
-export type CardType = (typeof cardTypes)[number];
 
 export type ChoiceProps = {
   choiceType: ChoiceType | null;
