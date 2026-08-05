@@ -25,19 +25,6 @@
   outline: 1px solid var(--color-lowlight);
 }
 
-.game-player-center .game-card-container--emphasis-animated {
-  background-color: var(--color-highlight);
-  animation: pulse-highlight 1500ms ease-in-out infinite;
-}
-
-.game-player-center .game-card-container--emphasis-solid {
-  background-color: var(--color-highlight);
-}
-
-.game-player-center .game-card-container--emphasis-outlined {
-  outline: 1px solid var(--color-highlight);
-}
-
 .game-card {
   width: var(--card-width-md);
   height: var(--card-width-md);
@@ -160,90 +147,17 @@
   height: 60%;
 }
 
-.game-card-edge {
-  display: flex;
-  position: relative;
-  right: var(--space-sm);
-}
-
-.game-card-selector {
-  display: flex;
-  flex-direction: row;
-}
-
-.game-card-selector__button {
-  margin-left: 1px;
-  background-color: var(--color-card);
-  border: 1px solid var(--color-black);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-sm);
-  color: var(--color-black);
-  padding-top: 3px; /* Optical alignment for text */
-}
-
-.game-card-selector__button--size-sm {
-  width: var(--control-size-sm);
-  height: var(--control-size-sm);
-  font-size: var(--font-size-sm);
-}
-
-.game-card-selector__button--size-md {
-  width: var(--control-size-md);
-  height: var(--control-size-md);
-  font-size: var(--font-size-md);
-}
-
-.game-card-selector__button--size-lg {
-  width: var(--control-size-lg);
-  height: var(--control-size-lg);
-  font-size: var(--font-size-lg);
-}
-
 /***************************************************************************
-  Card Piles
+  Card Detail Form Factor
 ***************************************************************************/
 
-.game-card-pile {
-  padding: var(--space-sm);
-  display: flex;
-  flex-direction: column;
-}
-
-.game-card-pile__label {
-  font-size: var(--font-size-sm);
-}
-
-.game-card-pile__stack {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.game-card-pile__item {
-  position: relative;
-  transform: translateY(
-    calc(var(--game-card-pile-item-index, 0) * var(--space-sm))
-  );
-}
-
-.game-card-pile__item + .game-card-pile__item {
-  margin-left: calc(var(--card-width-sm) * -0.66);
-}
-
-/***************************************************************************
-  Card Dialog
-***************************************************************************/
-
-.game-dialog__card-container {
+.card-detail-container {
   position: relative;
   display: flex;
   flex-direction: column;
 }
 
-.game-dialog__card {
+.card-detail {
   position: relative;
   width: var(--card-width-lg);
   height: var(--card-height-lg);
@@ -256,17 +170,17 @@
   border: 2px solid black;
 }
 
-.game-dialog__card--producer {
+.card-detail--producer {
   background: var(--color-white);
   color: var(--color-black);
 }
 
-.game-dialog__card--consumer {
+.card-detail--consumer {
   background: var(--color-white);
   color: var(--color-black);
 }
 
-.game-dialog__card-background {
+.card-detail__background {
   position: absolute;
   top: 0;
   left: 0;
@@ -275,7 +189,7 @@
   overflow: hidden;
 }
 
-.game-dialog__card-foreground {
+.card-detail__foreground {
   position: absolute;
   top: 0;
   left: 0;
@@ -287,7 +201,7 @@
   justify-content: space-between;
 }
 
-.game-dialog__card-header {
+.card-detail__header {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -295,34 +209,34 @@
   padding: var(--space-xs);
 }
 
-.game-dialog__card-name {
+.card-detail__name {
   color: var(--color-white);
   font-size: var(--font-size-lg);
 }
 
-.game-dialog__card-link {
+.card-detail__link {
   font-size: var(--font-size-xs);
   padding: var(--space-sm);
   background-color: var(--color-white-translucent);
   border-radius: 9999px;
 }
 
-.game-dialog__card-actions {
+.card-detail__actions {
   display: flex;
   flex-direction: column;
   padding: var(--card-inner-border-width-lg);
   gap: var(--space-xs);
 }
 
-.game-dialog__card-trigger-instructions {
+.card-detail__trigger-instructions {
   padding: var(--space-sm);
   font-size: var(--font-size-sm);
   background-color: var(--color-white-translucent);
 }
 
-.game-dialog__menu {
-  width: 100%;
+/* A printed action, shown as text because there is no game to take it in. */
+.card-detail__textbox {
   padding: var(--space-sm);
-  display: flex;
-  justify-content: end;
+  font-size: var(--font-size-sm);
+  background-color: var(--color-white-translucent);
 }
