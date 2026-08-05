@@ -87,33 +87,36 @@
 }
 
 /***************************************************************************
-  Form-factor Specific Styles
+  Thumbnail Form Factor
+
+  Used for card presentations that are meant to be clicked to open an
+  expanded, "fullsize" presentation of the card.
 ***************************************************************************/
 
-.game-card-container {
+.thumbnail-card-container {
   padding: 3px; /* Padding is necessary to ensure that any emphasis is visible. */
   border-radius: 5px;
   transition: transform 0.5s;
 }
 
-.game-card-container--exhausted {
+.thumbnail-card-container--exhausted {
   transform: rotate(5deg);
 }
 
-.game-card-container--emphasis-animated {
+.thumbnail-card-container--emphasis-animated {
   background-color: var(--color-lowlight);
   animation: pulse-lowlight 1500ms ease-in-out infinite;
 }
 
-.game-card-container--emphasis-solid {
+.thumbnail-card-container--emphasis-solid {
   background-color: var(--color-lowlight);
 }
 
-.game-card-container--emphasis-outlined {
+.thumbnail-card-container--emphasis-outlined {
   outline: 1px solid var(--color-lowlight);
 }
 
-.game-card {
+.thumbnail-card {
   width: var(--card-width-md);
   height: var(--card-width-md);
   border: 1px solid;
@@ -131,7 +134,7 @@
   color: var(--color-black);
 }
 
-.game-card--mini {
+.thumbnail-card--mini {
   width: var(--card-width-sm);
   height: var(--card-height-sm);
   padding: 1px;
@@ -139,16 +142,16 @@
   border-radius: 3px;
 }
 
-.game-card--clickable {
+.thumbnail-card--clickable {
   cursor: pointer;
 }
 
-.game-card-container--exhausted .game-card {
+.thumbnail-card-container--exhausted .thumbnail-card {
   background-color: var(--color-white-translucent);
   color: var(--color-black-translucent);
 }
 
-.game-card--placeholder {
+.thumbnail-card--placeholder {
   background: none;
   border-color: var(--color-black);
   color: var(--color-black);

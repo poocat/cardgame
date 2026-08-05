@@ -17,10 +17,10 @@ export const ThumbnailContainer = (props: {
   exhausted?: boolean;
   children?: React.ReactNode;
 }) => {
-  const classNames = ["game-card-container"];
+  const classNames = ["thumbnail-card-container"];
   if (props.emphasis)
-    classNames.push(`game-card-container--emphasis-${props.emphasis}`);
-  if (props.exhausted) classNames.push(`game-card-container--exhausted`);
+    classNames.push(`thumbnail-card-container--emphasis-${props.emphasis}`);
+  if (props.exhausted) classNames.push(`thumbnail-card-container--exhausted`);
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;
 };
@@ -36,9 +36,9 @@ export const Thumbnail = (props: {
   placeholder?: boolean;
   children?: React.ReactNode;
 }) => {
-  const classNames = ["game-card"];
-  if (props.onClick) classNames.push("game-card--clickable");
-  if (props.placeholder) classNames.push("game-card--placeholder");
+  const classNames = ["thumbnail-card"];
+  if (props.onClick) classNames.push("thumbnail-card--clickable");
+  if (props.placeholder) classNames.push("thumbnail-card--placeholder");
   const className = classNames.join(" ");
 
   const content = <div className={className}>{props.children}</div>;

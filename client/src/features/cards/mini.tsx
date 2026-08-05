@@ -6,9 +6,9 @@ export const Mini = (props: {
   placeholder?: boolean;
   children?: React.ReactNode;
 }) => {
-  const classNames = ["game-card", "game-card--mini"];
-  if (props.onClick) classNames.push("game-card--clickable");
-  if (props.placeholder) classNames.push("game-card--placeholder");
+  const classNames = ["thumbnail-card", "thumbnail-card--mini"];
+  if (props.onClick) classNames.push("thumbnail-card--clickable");
+  if (props.placeholder) classNames.push("thumbnail-card--placeholder");
   const className = classNames.join(" ");
 
   const content = <div className={className}>{props.children}</div>;
