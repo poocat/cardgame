@@ -1,6 +1,19 @@
 import { Button, ButtonBase, SelectButton } from "@client/components";
 import { Edge, Stack } from "@client/components/layout";
 import type { Size } from "@client/components/types";
+import {
+  CardDetailActions,
+  CardDetailBackground,
+  CardDetailBody,
+  CardDetailContainer,
+  CardDetailForeground,
+  CardDetailHeader,
+  CardDetailLink,
+  CardDetailMenuContainer,
+  CardDetailName,
+  CardDetailTriggerInstructions,
+} from "@client/features/cards/detail";
+import { CardImage } from "@client/features/cards/image";
 import { memo, useCallback } from "react";
 import {
   ChipCounter,
@@ -17,32 +30,22 @@ import type {
   SelectorProps,
   VisibleCardDigest,
 } from "../types";
-import {
-  CardDetailActions,
-  CardDetailBackground,
-  CardDetailBody,
-  CardDetailContainer,
-  CardDetailForeground,
-  CardDetailHeader,
-  CardDetailLink,
-  CardDetailMenuContainer,
-  CardDetailName,
-  CardDetailTriggerInstructions,
-} from "./detail";
-import { CardImage } from "./image";
-import "./styles.css";
+import "@client/features/cards/styles.css";
+import { Msg } from "@client/components/msg";
 import { Tooltip } from "@client/components/tooltips";
-import { Msg } from "../msg";
+import { Mini } from "@client/features/cards/mini";
+import type { ThumbnailEmphasis } from "@client/features/cards/thumbnail";
+import {
+  Thumbnail,
+  ThumbnailContainer,
+} from "@client/features/cards/thumbnail";
 import type { Message } from "../types";
-import { Mini } from "./mini";
 import {
   CardPile,
   CardPileLabel,
   CardPileStack,
   CardPileStackItem,
 } from "./pile";
-import type { ThumbnailEmphasis } from "./thumbnail";
-import { Thumbnail, ThumbnailContainer } from "./thumbnail";
 
 /******************************************************************************
  * ### CardSelector

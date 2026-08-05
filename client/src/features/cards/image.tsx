@@ -2,7 +2,7 @@ import { apiUrl } from "@client/utils/api";
 import { useMessages } from "@client/utils/messages";
 import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
-import type { CardType } from "../types";
+import type { CardType } from "./types";
 import "./styles.css";
 
 function slugify(name: string): string {
@@ -57,7 +57,6 @@ const CardSubtypeIcon = (props: {
   placement: CardTypeIconPlacement;
 }) => {
   const { lookup } = useMessages();
-  console.log(props.subtype);
   const match = lookup(props.subtype);
   if (match.type !== "icon") return null;
 
@@ -90,7 +89,6 @@ export const CardImage = (props: {
   subtype: string | null | undefined;
   variant: "thumbnail" | "fullsize";
 }) => {
-  console.log(props);
   const [failed, setFailed] = useState(false);
 
   if (failed) return <CardTypeIcon type={props.type} placement="fallback" />;
@@ -104,7 +102,7 @@ export const CardImage = (props: {
       <img
         className="game-card__image"
         src={apiUrl(
-          `${ROUTES.cards.path}/images/${slugify(props.name)}.${props.variant}.png`,
+          `${ROUTES.cards.path}${ROUTES.cards.methods.images.path}/${slugify(props.name)}.${props.variant}.png`,
         )}
         onError={() => setFailed(true)}
         alt={props.name}

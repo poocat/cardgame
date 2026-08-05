@@ -1,12 +1,12 @@
 import { Box, Divider, Stack, TooltipProvider } from "@client/components";
+import { Msg } from "@client/components/msg";
+import { About } from "@client/routes/about/About";
 import { Game } from "@client/routes/games/Game";
 import { GameList } from "@client/routes/games/GameList";
 import { NewRoom } from "@client/routes/rooms/NewRoom";
 import { Room } from "@client/routes/rooms/Room";
 import { Rulebook } from "@client/routes/rulebook/Rulebook";
 import { Link, Outlet, Route, Routes } from "react-router";
-import { About } from "./routes/about/About";
-import { Msg } from "./routes/games/board/msg";
 import { MessageProvider } from "./utils/messages";
 
 const Providers = (props: { children: React.ReactNode }) => {

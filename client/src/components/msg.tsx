@@ -1,7 +1,6 @@
-import type { Match } from "@client/utils/messages";
+import type { Match, Message } from "@client/utils/messages";
 import { useMessages } from "@client/utils/messages";
 import { useCallback, useMemo } from "react";
-import type { Message } from "./types";
 
 const SPLIT_PATTERN = /\{([a-zA-Z0-9.]+)\}/g;
 const TEST_PATTERN = /\{([a-zA-Z0-9.]+)\}/;

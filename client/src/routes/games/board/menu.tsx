@@ -1,8 +1,8 @@
 import { Button, SelectButton } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
+import { Msg } from "@client/components/msg";
 import type { Color } from "@client/components/types";
 import { memo, useCallback } from "react";
-import { Msg } from "./msg";
 import type { RematchProps } from "./rematch";
 import type {
   ChoiceType,

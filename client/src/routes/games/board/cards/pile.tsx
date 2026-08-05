@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import "./styles.css";
+import "@client/features/cards/styles.css";
 
 export const CardPile = (props: { children?: React.ReactNode }) => {
   return <div className="game-card-pile">{props.children}</div>;
