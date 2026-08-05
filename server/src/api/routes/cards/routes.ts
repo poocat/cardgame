@@ -23,7 +23,6 @@ import { burstLimiter } from "@server/api/middleware";
 import { STATUS } from "@server/api/status";
 import { validated } from "@server/api/wrappers";
 import { allRegisteredCards } from "@server/game/cards/registry";
-import type { CardDef } from "@server/game/types";
 import { logger } from "@server/logger";
 import type { RequestHandler } from "express";
 import { Router, static as staticFileHandler } from "express";
@@ -36,8 +35,6 @@ type CatalogBody = z.infer<
 
 type Dependencies = {
   cardImagesPath: string | null;
-  /** Override the source of card definitions. */
-  getCards?: () => CardDef[];
   /** Override the default rate-limit middleware. */
   rateLimiters?: RequestHandler[];
 };
@@ -72,9 +69,9 @@ export const cardsRouter = {
     // resolved by the client, so the payload is the same for every caller.
     //
     // Note that this assumes a single response. Should this endpoint ever take
-    // parameters that vary the payload, the etag has to vary with them too.
+    // parameters that vary the payload, the etag has to vary with them.
     const catalog: CatalogBody = {
-      cards: (deps.getCards ?? allRegisteredCards)().map(cardDefDigest),
+      cards: allRegisteredCards().map(cardDefDigest),
     };
     const etag = makeContentHash(JSON.stringify(catalog));
     logger.info({ count: catalog.cards.length }, "built card catalog");
@@ -93,14 +90,14 @@ export const cardsRouter = {
       validated({
         schemas: ROUTES.cards.methods.getMany.schemas,
         handler: (req, res) => {
-          if (matchesHeader(req.get("If-None-Match"), etag)) {
-            return res.status(STATUS.notModified).end();
-          }
           res.set("ETag", etag);
           res.set(
             "Cache-Control",
             `public, max-age=${CATALOG_MAX_AGE_SECONDS}`,
           );
+          if (matchesHeader(req.get("If-None-Match"), etag)) {
+            return res.status(STATUS.notModified).end();
+          }
           res.status(STATUS.ok).json(catalog);
         },
       }),
