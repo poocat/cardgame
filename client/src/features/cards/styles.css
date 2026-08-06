@@ -118,7 +118,7 @@
 
 .card-thumbnail {
   width: var(--card-width-md);
-  height: var(--card-width-md);
+  height: var(--card-height-md);
   border: 1px solid;
   border-radius: 4px;
   padding: var(--space-xs);
