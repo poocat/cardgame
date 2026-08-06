@@ -10,7 +10,7 @@
   */
   grid-template-columns: repeat(
       auto-fill,
-      minmax(var(--card-width-lg), max-content)
+      minmax(var(--card-width-fullsize), max-content)
     );
   justify-content: center;
   gap: var(--space-lg);

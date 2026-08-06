@@ -60,7 +60,7 @@ export const CardSelector = (props: {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// Thumbnail Form Factor
+// Thumbnail Cards
 ////////////////////////////////////////////////////////////////////////////////
 
 /******************************************************************************
@@ -85,7 +85,9 @@ export const ThumbnailCardPlaceholder = (props: {
 }) => {
   return (
     <ThumbnailCardContainer emphasis={props.emphasis}>
-      <ThumbnailCard placeholder>{props.children}</ThumbnailCard>
+      <ThumbnailCard size="lg" placeholder>
+        {props.children}
+      </ThumbnailCard>
     </ThumbnailCardContainer>
   );
 };
@@ -93,9 +95,9 @@ export const ThumbnailCardPlaceholder = (props: {
 /******************************************************************************
  * ### ThumbnailCardFaceUp
  *
- * A complete component for displaying a card in play in the "thumbnail" form
- * factor, within its own container, which takes on different styles depending
- * on:
+ * A complete component for displaying a card in play in the large "thumbnail"
+ * form factor, within its own container, which takes on different styles
+ * depending on:
  * - which player is currently choosing
  * - whether or not the card or one of its actions or chips can be chosen
  * - whether or not the card or one of its actions or chips were chosen
@@ -156,7 +158,7 @@ export const ThumbnailCardFaceUp = memo(
 
     return (
       <ThumbnailCardContainer emphasis={emphasis} exhausted={cardIsExhausted}>
-        <ThumbnailCard onClick={expand}>
+        <ThumbnailCard size="lg" onClick={expand}>
           <CardImage
             formFactor="thumbnail"
             name={props.card.name}
@@ -196,7 +198,7 @@ export const ThumbnailCardFaceUp = memo(
 );
 
 ////////////////////////////////////////////////////////////////////////////////
-// Mini Form Factor
+// Mini Cards
 ////////////////////////////////////////////////////////////////////////////////
 
 /******************************************************************************
@@ -204,7 +206,7 @@ export const ThumbnailCardFaceUp = memo(
  ******************************************************************************/
 export const MiniCardPlaceholder = (props: { children?: React.ReactNode }) => {
   return (
-    <ThumbnailCard mini placeholder>
+    <ThumbnailCard size="sm" placeholder>
       {props.children}
     </ThumbnailCard>
   );
@@ -213,8 +215,9 @@ export const MiniCardPlaceholder = (props: { children?: React.ReactNode }) => {
 /******************************************************************************
  * ### MiniCardFaceUp
  *
- * A face-up card rendered in the "mini" form factor. Clicking opens the full
- * card dialog.
+ * A face-up card in the small "thumbnail" for factor. No decoration or styling
+ * to indicate state, and thus should only be used for cards that are not in
+ * play and cannot be selected.
  ******************************************************************************/
 export const MiniCardFaceUp = memo(
   (props: { card: VisibleCardDigest; setDialog: DialogProps["set"] }) => {
@@ -223,7 +226,7 @@ export const MiniCardFaceUp = memo(
     }, [props.card, props.setDialog]);
 
     return (
-      <ThumbnailCard mini onClick={expand}>
+      <ThumbnailCard size="sm" onClick={expand}>
         <CardImage
           formFactor="thumbnail"
           name={props.card.name}
@@ -281,7 +284,7 @@ export const HandPile = (props: { count: number }) => {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// Fullsize Form Factor
+// Fullsize Cards
 ////////////////////////////////////////////////////////////////////////////////
 
 const FullsizeCardAction = (props: {

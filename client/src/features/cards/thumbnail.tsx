@@ -45,12 +45,11 @@ export const ThumbnailCardContainer = (props: {
  ******************************************************************************/
 export const ThumbnailCard = (props: {
   onClick?: () => void;
-  mini?: boolean;
+  size: "sm" | "lg";
   placeholder?: boolean;
   children?: React.ReactNode;
 }) => {
-  const classNames = ["card-thumbnail"];
-  if (props.mini) classNames.push("card-thumbnail--mini");
+  const classNames = ["card-thumbnail", `card-thumbnail--size-${props.size}`];
   if (props.onClick) classNames.push("card-thumbnail--clickable");
   if (props.placeholder) classNames.push("card-thumbnail--placeholder");
   const className = classNames.join(" ");

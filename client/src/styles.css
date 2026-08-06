@@ -79,14 +79,14 @@
 
   --footer-menu-max-height: 200px;
 
-  --card-width-sm: 44px;
-  --card-height-sm: 44px;
-  --card-width-md: 70px;
-  --card-height-md: 70px;
-  --card-width-lg: 250px;
-  --card-height-lg: 350px;
-  --card-outer-border-width-lg: 9px;
-  --card-inner-border-width-lg: 20px;
+  --card-width-thumbnail-sm: 44px;
+  --card-height-thumbnail-sm: 44px;
+  --card-width-thumbnail-lg: 70px;
+  --card-height-thumbnail-lg: 70px;
+  --card-width-fullsize: 250px;
+  --card-height-fullsize: 350px;
+  --card-outer-border-width-fullsize: 9px;
+  --card-inner-border-width-fullsize: 20px;
 }
 
 /***************************************************************************

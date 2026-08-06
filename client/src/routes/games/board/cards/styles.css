@@ -89,7 +89,7 @@
 }
 
 .game-card-pile__item + .game-card-pile__item {
-  margin-left: calc(var(--card-width-sm) * -0.66);
+  margin-left: calc(var(--card-width-thumbnail-sm) * -0.66);
 }
 
 /***************************************************************************
