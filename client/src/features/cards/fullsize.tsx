@@ -85,9 +85,9 @@ const FullsizeCardBody = (props: { children?: React.ReactNode }) => {
 };
 
 /******************************************************************************
- * ### FullsizeCardTriggerInstructions
+ * ### FullsizeCardBodyTriggerInstructions
  ******************************************************************************/
-const FullsizeCardTriggerInstructions = (props: {
+const FullsizeCardBodyTriggerInstructions = (props: {
   children?: React.ReactNode;
 }) => {
   return (
@@ -98,12 +98,12 @@ const FullsizeCardTriggerInstructions = (props: {
 };
 
 /******************************************************************************
- * ### FullsizeCardActionText
+ * ### FullsizeCardBodyActionText
  *
  * A box for text printed on the card, e.g. an action's instructions when there
  * is no game in which to take the action.
  ******************************************************************************/
-const FullsizeCardActionText = (props: { children?: React.ReactNode }) => {
+const FullsizeCardBodyActionText = (props: { children?: React.ReactNode }) => {
   return (
     <div className="card-fullsize-body__action-text">{props.children}</div>
   );
@@ -112,16 +112,18 @@ const FullsizeCardActionText = (props: { children?: React.ReactNode }) => {
 /******************************************************************************
  * ### FullsizeCardDisplay
  *
- * A card as it is printed, in the fullsize form factor: everything that comes
- * from the card's definition, and nothing that can be interacted with.
+ * A complete presentation of a fullsize card from a digest of the card's
+ * definition.
  *
- * Shown on its own to display a card outside of a game. Within a game,
- * `FullsizeCardFaceUp` composes this with the interactive layer, replacing the
- * printed actions with selectable ones and adding controls beneath the card.
+ * Includes the card art, title, link to the image source, trigger instructions
+ * (if applicable), and a text-only representation of the card's actions (which
+ * can be overridden).
+ *
+ * Children are rendered beneath the card.
  ******************************************************************************/
 export const FullsizeCardDisplay = (props: {
   card: CardDefDigest;
-  /** Replaces the printed actions, e.g. with selectable ones during a game. */
+  /** Use to override the text-only representations of actions, e.g. with select buttons. */
   actions?: React.ReactNode;
   /** Rendered beneath the card, e.g. counters and menus during a game. */
   children?: React.ReactNode;
@@ -149,17 +151,16 @@ export const FullsizeCardDisplay = (props: {
           <div />
           <FullsizeCardBody>
             {props.card.triggerInstructions && (
-              <FullsizeCardTriggerInstructions>
+              <FullsizeCardBodyTriggerInstructions>
                 <Msg value={props.card.triggerInstructions} />
-              </FullsizeCardTriggerInstructions>
+              </FullsizeCardBodyTriggerInstructions>
             )}
-            {/* A card has at most one action of each type, so the type is a
-                stable key. */}
             {props.actions ??
               props.card.actions.map((action) => (
-                <FullsizeCardActionText key={action.type}>
+                // action type is stable key, as cards can only have one of each
+                <FullsizeCardBodyActionText key={action.type}>
                   <Msg value={action.instructions ?? null} />
-                </FullsizeCardActionText>
+                </FullsizeCardBodyActionText>
               ))}
           </FullsizeCardBody>
         </FullsizeCardForeground>
