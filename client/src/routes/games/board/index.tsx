@@ -3,11 +3,11 @@ import { CONSTANTS } from "@common/game/constants";
 import type React from "react";
 import { Fragment, memo, useCallback, useMemo } from "react";
 import {
-  DetailCard,
   DiscardPile,
-  FaceUpThumbnail,
+  FullsizeCardFaceUp,
   HandPile,
-  ThumbnailPlaceholder,
+  ThumbnailCardFaceUp,
+  ThumbnailCardPlaceholder,
 } from "./cards";
 import {
   ChipCounter,
@@ -289,7 +289,7 @@ export const GameBoard = memo(
                   />
                   <PlayerTabletCardArea>
                     {producersInPlay.map((card) => (
-                      <FaceUpThumbnail
+                      <ThumbnailCardFaceUp
                         key={card.id}
                         variant="inPlay"
                         card={card}
@@ -304,7 +304,7 @@ export const GameBoard = memo(
                       />
                     ))}
                     {range(numProducerPlaceholders).map((i) => (
-                      <ThumbnailPlaceholder key={i} />
+                      <ThumbnailCardPlaceholder key={i} />
                     ))}
                   </PlayerTabletCardArea>
                   <PlayerTabletFooter>
@@ -328,7 +328,7 @@ export const GameBoard = memo(
                 <PlayerCenter side={side}>
                   <PlayerCenterCardArea side={side}>
                     {consumersInPlay.map((card) => (
-                      <FaceUpThumbnail
+                      <ThumbnailCardFaceUp
                         key={card.id}
                         variant="inPlay"
                         card={card}
@@ -364,7 +364,7 @@ export const GameBoard = memo(
                 <PlayerDashboard side={side}>
                   <PlayerHand>
                     {player.cardsInHand.map((card) => (
-                      <FaceUpThumbnail
+                      <ThumbnailCardFaceUp
                         key={card.id}
                         variant="inHand"
                         card={card}
@@ -429,7 +429,7 @@ export const GameBoard = memo(
           onClose={props.dialogProps.close}
         >
           {props.dialogProps.value?.type === "card" && (
-            <DetailCard
+            <FullsizeCardFaceUp
               card={props.dialogProps.value.card}
               onSubmitChoice={props.onSubmitChoice}
               submitDisabled={submitDisabled}

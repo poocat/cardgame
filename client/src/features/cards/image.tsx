@@ -2,7 +2,7 @@ import { apiUrl } from "@client/utils/api";
 import { useMessages } from "@client/utils/messages";
 import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
-import type { CardType } from "./types";
+import type { CardFormFactor, CardType } from "./types";
 import "./styles.css";
 
 function slugify(name: string): string {
@@ -15,7 +15,7 @@ function slugify(name: string): string {
  *   transparent circle in that variant's border.
  * - `fallback`: no art available, so the icon is larger and centered.
  */
-export type CardTypeIconPlacement = "thumbnail" | "fullsize" | "fallback";
+export type CardTypeIconPlacement = CardFormFactor | "fallback";
 
 /******************************************************************************
  * ### CardTypeIcon
@@ -35,7 +35,7 @@ const CardTypeIcon = (props: {
 
   return (
     <span
-      className={`game-card__type-icon game-card__type-icon--${props.placement}`}
+      className={`card-type-icon card-type-icon--${props.placement}`}
       role="img"
       aria-label={props.type}
       // biome-ignore lint/security/noDangerouslySetInnerHtml: content is server-sanitized at bundle load via DOMPurify (svg profile).
@@ -62,7 +62,7 @@ const CardSubtypeIcon = (props: {
 
   return (
     <span
-      className={`game-card__subtype-icon game-card__subtype-icon--${props.placement}`}
+      className={`card-subtype-icon card-subtype-icon--${props.placement}`}
       role="img"
       aria-label={props.subtype}
       // biome-ignore lint/security/noDangerouslySetInnerHtml: content is server-sanitized at bundle load via DOMPurify (svg profile).
@@ -87,22 +87,22 @@ export const CardImage = (props: {
   name: string;
   type: CardType;
   subtype: string | null | undefined;
-  variant: "thumbnail" | "fullsize";
+  formFactor: CardFormFactor;
 }) => {
   const [failed, setFailed] = useState(false);
 
   if (failed) return <CardTypeIcon type={props.type} placement="fallback" />;
 
   return (
-    <div className="game-card__image-frame">
-      <CardTypeIcon type={props.type} placement={props.variant} />
+    <div className="card-image-container">
+      <CardTypeIcon type={props.type} placement={props.formFactor} />
       {props.subtype && (
-        <CardSubtypeIcon subtype={props.subtype} placement={props.variant} />
+        <CardSubtypeIcon subtype={props.subtype} placement={props.formFactor} />
       )}
       <img
-        className="game-card__image"
+        className="card-image"
         src={apiUrl(
-          `${ROUTES.cards.path}${ROUTES.cards.methods.images.path}/${slugify(props.name)}.${props.variant}.png`,
+          `${ROUTES.cards.path}${ROUTES.cards.methods.images.path}/${slugify(props.name)}.${props.formFactor}.png`,
         )}
         onError={() => setFailed(true)}
         alt={props.name}
