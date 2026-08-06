@@ -2,7 +2,7 @@ import { apiUrl } from "@client/utils/api";
 import { useMessages } from "@client/utils/messages";
 import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
-import type { CardType } from "./types";
+import type { CardFormFactor, CardType } from "./types";
 import "./styles.css";
 
 function slugify(name: string): string {
@@ -15,7 +15,7 @@ function slugify(name: string): string {
  *   transparent circle in that variant's border.
  * - `fallback`: no art available, so the icon is larger and centered.
  */
-export type CardTypeIconPlacement = "thumbnail" | "fullsize" | "fallback";
+export type CardTypeIconPlacement = CardFormFactor | "fallback";
 
 /******************************************************************************
  * ### CardTypeIcon
@@ -87,7 +87,7 @@ export const CardImage = (props: {
   name: string;
   type: CardType;
   subtype: string | null | undefined;
-  variant: "thumbnail" | "fullsize";
+  formFactor: CardFormFactor;
 }) => {
   const [failed, setFailed] = useState(false);
 
@@ -95,14 +95,14 @@ export const CardImage = (props: {
 
   return (
     <div className="card-image-container">
-      <CardTypeIcon type={props.type} placement={props.variant} />
+      <CardTypeIcon type={props.type} placement={props.formFactor} />
       {props.subtype && (
-        <CardSubtypeIcon subtype={props.subtype} placement={props.variant} />
+        <CardSubtypeIcon subtype={props.subtype} placement={props.formFactor} />
       )}
       <img
         className="card-image"
         src={apiUrl(
-          `${ROUTES.cards.path}${ROUTES.cards.methods.images.path}/${slugify(props.name)}.${props.variant}.png`,
+          `${ROUTES.cards.path}${ROUTES.cards.methods.images.path}/${slugify(props.name)}.${props.formFactor}.png`,
         )}
         onError={() => setFailed(true)}
         alt={props.name}

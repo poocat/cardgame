@@ -158,7 +158,7 @@ export const ThumbnailCardFaceUp = memo(
       <ThumbnailCardContainer emphasis={emphasis} exhausted={cardIsExhausted}>
         <ThumbnailCard onClick={expand}>
           <CardImage
-            variant="thumbnail"
+            formFactor="thumbnail"
             name={props.card.name}
             type={props.card.type}
             subtype={props.card.subtype?.key}
@@ -225,7 +225,7 @@ export const MiniCardFaceUp = memo(
     return (
       <ThumbnailCard mini onClick={expand}>
         <CardImage
-          variant="thumbnail"
+          formFactor="thumbnail"
           name={props.card.name}
           type={props.card.type}
           subtype={props.card.subtype?.key}

@@ -141,7 +141,7 @@ export const FullsizeCardDisplay = (props: {
       <FullsizeCard type={props.card.type}>
         <FullsizeCardBackground>
           <CardImage
-            variant="fullsize"
+            formFactor="fullsize"
             name={props.card.name}
             type={props.card.type}
             subtype={props.card.subtype?.key}

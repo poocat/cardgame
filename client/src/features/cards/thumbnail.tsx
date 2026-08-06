@@ -4,8 +4,8 @@
  * A thumbnail card uses card art that omits various details, such as action
  * instructions or triggers.
  *
- * Thumbnail cards are clickable, and clicking on one should result in the
- * presentation of an expanded "fullsize" representation of the card.
+ * Thumbnail cards are typically clickable, and clicking on one should result
+ * in the presentation of an expanded "fullsize" version of the card.
  *
  * They are typically presented inside of a container. Styles applied to this
  * container will indicate various aspects of the card's state in a game.
