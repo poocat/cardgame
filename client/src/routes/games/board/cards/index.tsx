@@ -1,7 +1,7 @@
 import { Button, ButtonBase, SelectButton } from "@client/components";
 import { Edge, Stack } from "@client/components/layout";
 import type { Size } from "@client/components/types";
-import { CardFace } from "@client/features/cards/face";
+import { FullsizeCardDisplay } from "@client/features/cards/fullsize";
 import { CardImage } from "@client/features/cards/image";
 import { memo, useCallback } from "react";
 import {
@@ -23,11 +23,10 @@ import "@client/features/cards/styles.css";
 import "./styles.css";
 import { Msg } from "@client/components/msg";
 import { Tooltip } from "@client/components/tooltips";
-import { Mini } from "@client/features/cards/mini";
 import type { ThumbnailEmphasis } from "@client/features/cards/thumbnail";
 import {
-  Thumbnail,
-  ThumbnailContainer,
+  ThumbnailCard,
+  ThumbnailCardContainer,
 } from "@client/features/cards/thumbnail";
 import type { Message } from "../types";
 import {
@@ -78,21 +77,21 @@ const CardSelectorEdge = (props: { children?: React.ReactNode }) => {
 };
 
 /******************************************************************************
- * ### ThumbnailPlaceholder
+ * ### ThumbnailCardPlaceholder
  ******************************************************************************/
-export const ThumbnailPlaceholder = (props: {
+export const ThumbnailCardPlaceholder = (props: {
   children?: React.ReactNode;
   emphasis?: ThumbnailEmphasis;
 }) => {
   return (
-    <ThumbnailContainer emphasis={props.emphasis}>
-      <Thumbnail placeholder>{props.children}</Thumbnail>
-    </ThumbnailContainer>
+    <ThumbnailCardContainer emphasis={props.emphasis}>
+      <ThumbnailCard placeholder>{props.children}</ThumbnailCard>
+    </ThumbnailCardContainer>
   );
 };
 
 /******************************************************************************
- * ### FaceUpThumbnail
+ * ### ThumbnailCardFaceUp
  *
  * A complete component for displaying a card in play in the "thumbnail" form
  * factor, within its own container, which takes on different styles depending
@@ -102,7 +101,7 @@ export const ThumbnailPlaceholder = (props: {
  * - whether or not the card or one of its actions or chips were chosen
  *   previously in the current activity
  ******************************************************************************/
-export const FaceUpThumbnail = memo(
+export const ThumbnailCardFaceUp = memo(
   (
     props: {
       setDialog: DialogProps["set"];
@@ -156,15 +155,15 @@ export const FaceUpThumbnail = memo(
             : undefined;
 
     return (
-      <ThumbnailContainer emphasis={emphasis} exhausted={cardIsExhausted}>
-        <Thumbnail onClick={expand}>
+      <ThumbnailCardContainer emphasis={emphasis} exhausted={cardIsExhausted}>
+        <ThumbnailCard onClick={expand}>
           <CardImage
             variant="thumbnail"
             name={props.card.name}
             type={props.card.type}
             subtype={props.card.subtype?.key}
           />
-        </Thumbnail>
+        </ThumbnailCard>
         {props.card.chips.length > 0 && (
           <ChipCounterEdge size="sm">
             <ChipCounter
@@ -191,7 +190,7 @@ export const FaceUpThumbnail = memo(
             />
           </CardSelectorEdge>
         )}
-      </ThumbnailContainer>
+      </ThumbnailCardContainer>
     );
   },
 );
@@ -201,33 +200,37 @@ export const FaceUpThumbnail = memo(
 ////////////////////////////////////////////////////////////////////////////////
 
 /******************************************************************************
- * ### MiniPlaceholder
+ * ### MiniCardPlaceholder
  ******************************************************************************/
-export const MiniPlaceholder = (props: { children?: React.ReactNode }) => {
-  return <Mini placeholder>{props.children}</Mini>;
+export const MiniCardPlaceholder = (props: { children?: React.ReactNode }) => {
+  return (
+    <ThumbnailCard mini placeholder>
+      {props.children}
+    </ThumbnailCard>
+  );
 };
 
 /******************************************************************************
- * ### FaceUpMini
+ * ### MiniCardFaceUp
  *
- * A face-up card rendered in the "mini" form factor. Clicking opens the card
- * detail dialog.
+ * A face-up card rendered in the "mini" form factor. Clicking opens the full
+ * card dialog.
  ******************************************************************************/
-export const FaceUpMini = memo(
+export const MiniCardFaceUp = memo(
   (props: { card: VisibleCardDigest; setDialog: DialogProps["set"] }) => {
     const expand = useCallback(() => {
       props.setDialog({ type: "card", card: props.card });
     }, [props.card, props.setDialog]);
 
     return (
-      <Mini onClick={expand}>
+      <ThumbnailCard mini onClick={expand}>
         <CardImage
           variant="thumbnail"
           name={props.card.name}
           type={props.card.type}
           subtype={props.card.subtype?.key}
         />
-      </Mini>
+      </ThumbnailCard>
     );
   },
 );
@@ -247,11 +250,11 @@ export const DiscardPile = (props: {
       <CardPileLabel>Discard ({props.totalCount})</CardPileLabel>
       <CardPileStack>
         <CardPileStackItem>
-          <MiniPlaceholder />
+          <MiniCardPlaceholder />
         </CardPileStackItem>
         {props.cardsVisible.map((c, i) => (
           <CardPileStackItem key={c.id} index={i + 1}>
-            <FaceUpMini card={c} setDialog={props.setDialog} />
+            <MiniCardFaceUp card={c} setDialog={props.setDialog} />
           </CardPileStackItem>
         ))}
       </CardPileStack>
@@ -270,7 +273,7 @@ export const HandPile = (props: { count: number }) => {
       <CardPileLabel>Hand ({props.count})</CardPileLabel>
       <CardPileStack>
         <CardPileStackItem>
-          <MiniPlaceholder />
+          <MiniCardPlaceholder />
         </CardPileStackItem>
       </CardPileStack>
     </CardPile>
@@ -278,10 +281,10 @@ export const HandPile = (props: { count: number }) => {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// Details Form Factor
+// Fullsize Form Factor
 ////////////////////////////////////////////////////////////////////////////////
 
-const DetailCardAction = (props: {
+const FullsizeCardAction = (props: {
   selected: boolean;
   disabled: boolean;
   submitting: boolean;
@@ -317,19 +320,19 @@ const DetailCardAction = (props: {
 };
 
 /******************************************************************************
- * ### DetailCardMenu
+ * ### FullsizeCardMenu
  *
  * The controls beneath an enlarged card, for taking the choice that is
  * available on it.
  ******************************************************************************/
-const DetailCardMenu = (props: { children?: React.ReactNode }) => {
-  return <div className="card-detail-menu">{props.children}</div>;
+const FullsizeCardMenu = (props: { children?: React.ReactNode }) => {
+  return <div className="game-card-fullsize-menu">{props.children}</div>;
 };
 
 /******************************************************************************
- * ### DetailCardChipSelect
+ * ### FullsizeCardChipSelect
  ******************************************************************************/
-const DetailCardChipSelect = (props: {
+const FullsizeCardChipSelect = (props: {
   chips: ChipDigest[];
   onSubmitChoice: () => void;
   submitDisabled: boolean;
@@ -357,11 +360,11 @@ const DetailCardChipSelect = (props: {
 };
 
 /******************************************************************************
- * ### DetailCard
+ * ### FullsizeCardFaceUp
  *
- * Complete composition of a card in the detail form-factor.
+ * Complete composition of a card in the fullsize form-factor.
  ******************************************************************************/
-export const DetailCard = (props: {
+export const FullsizeCardFaceUp = (props: {
   card: FaceUpCardDigest;
   onSubmitChoice: () => void;
   submitDisabled: boolean;
@@ -396,7 +399,7 @@ export const DetailCard = (props: {
     props.submitDisabled || selectedValuesOnCard.length < 1;
 
   return (
-    <CardFace
+    <FullsizeCardDisplay
       card={props.card}
       actions={props.card.actions.map((action) => {
         const selected =
@@ -405,7 +408,7 @@ export const DetailCard = (props: {
         const toggleable = props.selectorProps?.moreValuesAllowed || selected;
         const toggle = () => props.selectorProps?.toggleValue(action.id);
         return (
-          <DetailCardAction
+          <FullsizeCardAction
             key={action.id}
             actionId={action.id}
             actionType={action.type}
@@ -431,9 +434,9 @@ export const DetailCard = (props: {
         </ChipCounterEdge>
       )}
       {cardHasChoice && (
-        <DetailCardMenu>
+        <FullsizeCardMenu>
           {cardHasSelectableChips && (
-            <DetailCardChipSelect
+            <FullsizeCardChipSelect
               chips={props.card.chips}
               onSubmitChoice={props.onSubmitChoice}
               submitDisabled={submitDisabled}
@@ -484,8 +487,8 @@ export const DetailCard = (props: {
               </Button>
             </Stack>
           )}
-        </DetailCardMenu>
+        </FullsizeCardMenu>
       )}
-    </CardFace>
+    </FullsizeCardDisplay>
   );
 };

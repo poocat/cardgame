@@ -1,5 +1,5 @@
 import { Box } from "@client/components/layout";
-import { CardFace } from "@client/features/cards/face";
+import { FullsizeCardDisplay } from "@client/features/cards/fullsize";
 import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import type { Message } from "@client/utils/messages";
 import { useMessages } from "@client/utils/messages";
@@ -54,7 +54,7 @@ export const Cards = () => {
   return (
     <div className="card-catalog-grid">
       {cards.map((card) => (
-        <CardFace key={card.name} card={card} />
+        <FullsizeCardDisplay key={card.name} card={card} />
       ))}
     </div>
   );

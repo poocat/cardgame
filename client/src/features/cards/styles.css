@@ -93,30 +93,30 @@
   expanded, "fullsize" presentation of the card.
 ***************************************************************************/
 
-.thumbnail-card-container {
+.card-thumbnail-container {
   padding: 3px; /* Padding is necessary to ensure that any emphasis is visible. */
   border-radius: 5px;
   transition: transform 0.5s;
 }
 
-.thumbnail-card-container--exhausted {
+.card-thumbnail-container--exhausted {
   transform: rotate(5deg);
 }
 
-.thumbnail-card-container--emphasis-animated {
+.card-thumbnail-container--emphasis-animated {
   background-color: var(--color-lowlight);
   animation: pulse-lowlight 1500ms ease-in-out infinite;
 }
 
-.thumbnail-card-container--emphasis-solid {
+.card-thumbnail-container--emphasis-solid {
   background-color: var(--color-lowlight);
 }
 
-.thumbnail-card-container--emphasis-outlined {
+.card-thumbnail-container--emphasis-outlined {
   outline: 1px solid var(--color-lowlight);
 }
 
-.thumbnail-card {
+.card-thumbnail {
   width: var(--card-width-md);
   height: var(--card-width-md);
   border: 1px solid;
@@ -134,7 +134,7 @@
   color: var(--color-black);
 }
 
-.thumbnail-card--mini {
+.card-thumbnail--mini {
   width: var(--card-width-sm);
   height: var(--card-height-sm);
   padding: 1px;
@@ -142,32 +142,52 @@
   border-radius: 3px;
 }
 
-.thumbnail-card--clickable {
+.card-thumbnail--clickable {
   cursor: pointer;
 }
 
-.thumbnail-card-container--exhausted .thumbnail-card {
+.card-thumbnail-container--exhausted .card-thumbnail {
   background-color: var(--color-white-translucent);
   color: var(--color-black-translucent);
 }
 
-.thumbnail-card--placeholder {
+.card-thumbnail--placeholder {
   background: none;
   border-color: var(--color-black);
   color: var(--color-black);
 }
 
 /***************************************************************************
-  Card Detail Form Factor
+  Card Fullsize Form Factor
 ***************************************************************************/
 
-.card-detail-container {
+.card-fullsize-container {
   position: relative;
   display: flex;
   flex-direction: column;
 }
 
-.card-detail {
+.card-fullsize-container__header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-xs);
+}
+
+.card-fullsize-container__name {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+}
+
+.card-fullsize-container__link {
+  font-size: var(--font-size-xs);
+  padding: var(--space-sm);
+  background-color: var(--color-white-translucent);
+  border-radius: 9999px;
+}
+
+.card-fullsize {
   position: relative;
   width: var(--card-width-lg);
   height: var(--card-height-lg);
@@ -180,17 +200,17 @@
   border: 2px solid black;
 }
 
-.card-detail--producer {
+.card-fullsize--producer {
   background: var(--color-white);
   color: var(--color-black);
 }
 
-.card-detail--consumer {
+.card-fullsize--consumer {
   background: var(--color-white);
   color: var(--color-black);
 }
 
-.card-detail__background {
+.card-fullsize__background {
   position: absolute;
   top: 0;
   left: 0;
@@ -199,7 +219,7 @@
   overflow: hidden;
 }
 
-.card-detail__foreground {
+.card-fullsize__foreground {
   position: absolute;
   top: 0;
   left: 0;
@@ -211,41 +231,21 @@
   justify-content: space-between;
 }
 
-.card-detail__header {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: var(--space-sm);
-  padding: var(--space-xs);
-}
-
-.card-detail__name {
-  color: var(--color-white);
-  font-size: var(--font-size-lg);
-}
-
-.card-detail__link {
-  font-size: var(--font-size-xs);
-  padding: var(--space-sm);
-  background-color: var(--color-white-translucent);
-  border-radius: 9999px;
-}
-
-.card-detail__actions {
+.card-fullsize-body {
   display: flex;
   flex-direction: column;
   padding: var(--card-inner-border-width-lg);
   gap: var(--space-xs);
 }
 
-.card-detail__trigger-instructions {
+.card-fullsize-body__trigger-instructions {
   padding: var(--space-sm);
   font-size: var(--font-size-sm);
   background-color: var(--color-white-translucent);
 }
 
 /* A printed action, shown as text because there is no game to take it in. */
-.card-detail__textbox {
+.card-fullsize-body__action-text {
   padding: var(--space-sm);
   font-size: var(--font-size-sm);
   background-color: var(--color-white-translucent);

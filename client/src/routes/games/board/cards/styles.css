@@ -6,16 +6,16 @@
   The card itself is styled with the card components
 ***************************************************************************/
 
-.game-player-center .thumbnail-card-container--emphasis-animated {
+.game-player-center .card-thumbnail-container--emphasis-animated {
   background-color: var(--color-highlight);
   animation: pulse-highlight 1500ms ease-in-out infinite;
 }
 
-.game-player-center .thumbnail-card-container--emphasis-solid {
+.game-player-center .card-thumbnail-container--emphasis-solid {
   background-color: var(--color-highlight);
 }
 
-.game-player-center .thumbnail-card-container--emphasis-outlined {
+.game-player-center .card-thumbnail-container--emphasis-outlined {
   outline: 1px solid var(--color-highlight);
 }
 
@@ -98,7 +98,7 @@
   The controls below a card enlarged in a dialog.
 ***************************************************************************/
 
-.card-detail-menu {
+.game-card-fullsize-menu {
   width: 100%;
   padding: var(--space-sm);
   display: flex;
