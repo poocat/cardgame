@@ -1,3 +1,4 @@
+import { Icon } from "@client/components/icon";
 import type { Match, Message } from "@client/utils/messages";
 import { useMessages } from "@client/utils/messages";
 import { useCallback, useMemo } from "react";
@@ -54,14 +55,7 @@ export const Msg = (props: { value: Message | null; textOnly?: boolean }) => {
     <span>
       {segments.map((s, i) =>
         s.type === "icon" ? (
-          <span
-            key={`${i}-${s.type}`}
-            className="icon"
-            role="img"
-            aria-label={s.alt}
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: content is server-sanitized at bundle load via DOMPurify (svg profile).
-            dangerouslySetInnerHTML={{ __html: s.value }}
-          />
+          <Icon key={`${i}-${s.type}`} msgKey={s.key} />
         ) : (
           <span key={`${i}-${s.type}`}>{s.value}</span>
         ),
