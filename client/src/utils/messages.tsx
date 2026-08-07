@@ -99,7 +99,8 @@ export const MessageProvider = (props: {
           if (matchingIcon) return { type: "icon", value: matchingIcon, key };
         }
         const matchingText = localeBundle.data?.bundle[key];
-        if (matchingText) return { type: "text", value: matchingText, key };
+        if (matchingText !== undefined)
+          return { type: "text", value: matchingText, key };
         if (opts?.def) return { type: "text", value: opts.def, key };
         return { type: "text", value: key, key };
       })();
