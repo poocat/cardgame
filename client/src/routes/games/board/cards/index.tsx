@@ -28,6 +28,7 @@ import {
   ThumbnailCard,
   ThumbnailCardContainer,
 } from "@client/features/cards/thumbnail";
+import type { ActionType } from "@client/features/cards/types";
 import type { Message } from "../types";
 import {
   CardPile,
@@ -291,7 +292,7 @@ const FullsizeCardAction = (props: {
   selected: boolean;
   disabled: boolean;
   submitting: boolean;
-  actionType: string;
+  actionType: ActionType;
   actionId: string;
   instructions: Message | null;
   annotations: Message[];

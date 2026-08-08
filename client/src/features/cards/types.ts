@@ -4,7 +4,7 @@ import type {
   inPlayCardDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
-import type { cardTypes } from "@common/game/enums";
+import type { actionTypes, cardTypes } from "@common/game/enums";
 import type z from "zod";
 
 /**
@@ -20,6 +20,7 @@ import type z from "zod";
 export type CardFormFactor = "thumbnail" | "fullsize";
 
 export type CardType = (typeof cardTypes)[number];
+export type ActionType = (typeof actionTypes)[number];
 
 /** Digests of a card as it is defined, outside of the game context. */
 export type CardDefDigest = z.infer<typeof cardDefDigestSchema>;
