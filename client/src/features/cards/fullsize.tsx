@@ -104,10 +104,12 @@ const FullsizeCardBodyText = (props: { children?: React.ReactNode }) => {
  * ### ActionTypeLabel
  ******************************************************************************/
 const ActionTypeLabel = (props: { actionType: ActionType }) => {
+  // TODO: would love a way to compose this key without template literals
+  const key = `action.type.${props.actionType}`;
   return (
     <span className="action-type-label">
-      <Icon msgKey={`action.type.${props.actionType}`} decorative />
-      <Msg value={{ key: `action.type.${props.actionType}` }} textOnly />
+      <Icon msgKey={key} decorative />
+      <Msg value={{ key }} textOnly />
     </span>
   );
 };
