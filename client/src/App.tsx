@@ -1,4 +1,5 @@
 import { Box, Divider, Stack, TooltipProvider } from "@client/components";
+import { Icon } from "@client/components/icon";
 import { Msg } from "@client/components/msg";
 import { About } from "@client/routes/about/About";
 import { Cards } from "@client/routes/cards/Cards";
@@ -23,7 +24,7 @@ const Layout = () => {
     <div className="layout">
       <Box spacing="md" color="secondary">
         <Stack spacing="md" orientation="horizontal">
-          <Msg value={{ key: "logo" }} />
+          <Icon msgKey="logo" decorative />
           <strong>
             <Msg value={{ key: "title" }} />
           </strong>

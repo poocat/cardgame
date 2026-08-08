@@ -12,8 +12,8 @@ import { apiUrl, assertHttpSuccess, useApiQuery } from "./api";
 
 export type Message = z.infer<typeof messageSchema>;
 export type Match =
-  | { type: "icon"; value: string; alt: string }
-  | { type: "text"; value: string };
+  | { type: "icon"; key: string; value: string }
+  | { type: "text"; key?: string; value: string };
 
 type MessageContextValue = {
   /** Look up the text or icon associated with the given key. Stable. */
@@ -27,7 +27,7 @@ type MessageContextValue = {
 const MessageContext = createContext<MessageContextValue>({
   // Default resolver returns the fallback if it exists, else the key itself, as
   // text.
-  lookup: (k, opts) => ({ type: "text", value: opts?.def ?? k }),
+  lookup: (k, opts) => ({ type: "text", value: opts?.def ?? k, key: k }),
   setLocale: () => {},
   errors: [],
 });
@@ -96,13 +96,13 @@ export const MessageProvider = (props: {
       const match: Match = (() => {
         if (!opts?.textOnly) {
           const matchingIcon = iconBundle.data?.icons[key];
-          if (matchingIcon)
-            return { type: "icon", value: matchingIcon, alt: key };
+          if (matchingIcon) return { type: "icon", value: matchingIcon, key };
         }
         const matchingText = localeBundle.data?.bundle[key];
-        if (matchingText) return { type: "text", value: matchingText };
-        if (opts?.def) return { type: "text", value: opts.def };
-        return { type: "text", value: key };
+        if (matchingText !== undefined)
+          return { type: "text", value: matchingText, key };
+        if (opts?.def) return { type: "text", value: opts.def, key };
+        return { type: "text", value: key, key };
       })();
       return match;
     },

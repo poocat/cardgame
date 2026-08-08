@@ -1,5 +1,5 @@
+import { Icon } from "@client/components/icon";
 import { apiUrl } from "@client/utils/api";
-import { useMessages } from "@client/utils/messages";
 import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
 import type { CardFormFactor, CardType } from "./types";
@@ -28,21 +28,12 @@ export type CardTypeIconPlacement = CardFormFactor | "fallback";
 const CardTypeIcon = (props: {
   type: CardType;
   placement: CardTypeIconPlacement;
-}) => {
-  const { lookup } = useMessages();
-  const match = lookup(`term.${props.type}`);
-  if (match.type !== "icon") return null;
-
-  return (
-    <span
-      className={`card-type-icon card-type-icon--${props.placement}`}
-      role="img"
-      aria-label={props.type}
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: content is server-sanitized at bundle load via DOMPurify (svg profile).
-      dangerouslySetInnerHTML={{ __html: match.value }}
-    />
-  );
-};
+}) => (
+  <Icon
+    msgKey={`term.${props.type}`}
+    className={`card-type-icon card-type-icon--${props.placement}`}
+  />
+);
 
 /******************************************************************************
  * ### CardSubtypeIcon
@@ -55,21 +46,12 @@ const CardTypeIcon = (props: {
 const CardSubtypeIcon = (props: {
   subtype: string;
   placement: CardTypeIconPlacement;
-}) => {
-  const { lookup } = useMessages();
-  const match = lookup(props.subtype);
-  if (match.type !== "icon") return null;
-
-  return (
-    <span
-      className={`card-subtype-icon card-subtype-icon--${props.placement}`}
-      role="img"
-      aria-label={props.subtype}
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: content is server-sanitized at bundle load via DOMPurify (svg profile).
-      dangerouslySetInnerHTML={{ __html: match.value }}
-    />
-  );
-};
+}) => (
+  <Icon
+    msgKey={props.subtype}
+    className={`card-subtype-icon card-subtype-icon--${props.placement}`}
+  />
+);
 
 /******************************************************************************
  * ### CardImage
