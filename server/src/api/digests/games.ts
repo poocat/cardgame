@@ -11,10 +11,16 @@ import type {
   visibleCardDigestSchema,
 } from "@common/api/digests";
 import { anonymizeId } from "@server/api/anonymization";
-import { actionTypeMessage, cardDefDigest } from "@server/api/digests/cards";
+import { cardDefDigest } from "@server/api/digests/cards";
 import { getCardDefinition } from "@server/game/cards/registry";
 import { msg } from "@server/text/messages";
-import type { CardData, GameData, Id, Message } from "@server/types";
+import type {
+  ActionType,
+  CardData,
+  GameData,
+  Id,
+  Message,
+} from "@server/types";
 import type z from "zod";
 
 type GameDigest = z.infer<typeof gameDigestSchema>;
@@ -22,6 +28,22 @@ type GameDigest = z.infer<typeof gameDigestSchema>;
 type VisibleCardDigest = z.infer<typeof visibleCardDigestSchema>;
 type InPlayCardDigest = z.infer<typeof inPlayCardDigestSchema>;
 type ChoiceValuesDigest = z.infer<typeof choiceValueDigestSchema>;
+
+/**
+ * Simple switch to get the message corresponding to the given action type.
+ */
+function actionTypeMessage(actionType?: ActionType): Message {
+  switch (actionType) {
+    case "play":
+      return msg("action.type.play");
+    case "ability":
+      return msg("action.type.ability");
+    case "discard":
+      return msg("action.type.discard");
+    default:
+      throw new Error(`Unexpected action type: ${actionType}`);
+  }
+}
 
 /**
  * Generate a message that explains the current activity.
