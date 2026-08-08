@@ -30,6 +30,7 @@ const CardTypeIcon = (props: {
   placement: CardTypeIconPlacement;
 }) => (
   <Icon
+    // TODO: would love a way to compose this key without template literals
     msgKey={`term.${props.type}`}
     className={`card-type-icon card-type-icon--${props.placement}`}
   />

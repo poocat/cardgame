@@ -241,15 +241,18 @@
   gap: var(--space-xs);
 }
 
-.card-fullsize-body__trigger-instructions {
+.card-fullsize-body__item {
   padding: var(--space-sm);
-  font-size: var(--font-size-sm);
   background-color: var(--color-white-translucent);
 }
 
-/* A printed action, shown as text because there is no game to take it in. */
-.card-fullsize-body__action-text {
-  padding: var(--space-sm);
-  font-size: var(--font-size-sm);
-  background-color: var(--color-white-translucent);
+.card-fullsize-body__text {
+  font-size: var(--font-size-xs);
+}
+
+.action-type-label {
+  text-transform: uppercase;
+}
+.action-type-label > * {
+  margin-inline-end: 0.4em;
 }

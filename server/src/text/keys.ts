@@ -19,8 +19,6 @@ export const messageKeys = [
   "activity.takingAction.explanation",
   // Use to generate a label for a choice of a given action type for a given card:
   "label.action.choice",
-  // Use to generate a label the given instructions with the given action type:
-  "label.action.instructions",
   // Annotations:
   "reason.cardAlreadyInPlay",
   "reason.cardNotInGame",
