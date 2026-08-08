@@ -1,7 +1,10 @@
 import { Button, ButtonBase, SelectButton } from "@client/components";
 import { Edge, Stack } from "@client/components/layout";
 import type { Size } from "@client/components/types";
-import { FullsizeCardDisplay } from "@client/features/cards/fullsize";
+import {
+  FullsizeCardBodyActionText,
+  FullsizeCardDisplay,
+} from "@client/features/cards/fullsize";
 import { CardImage } from "@client/features/cards/image";
 import { memo, useCallback } from "react";
 import {
@@ -307,7 +310,12 @@ const FullsizeCardAction = (props: {
       size="sm"
       color="action"
       disabled={props.disabled || props.submitting}
-      label={<Msg value={props.instructions} />}
+      label={
+        <FullsizeCardBodyActionText
+          actionType={props.actionType}
+          instructions={props.instructions}
+        />
+      }
     />
   );
   if (props.annotations.length > 0) {

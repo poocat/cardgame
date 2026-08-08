@@ -9,8 +9,10 @@
  */
 import { Msg } from "@client/components/msg";
 import { CardImage } from "./image";
-import type { CardDefDigest, CardType } from "./types";
+import type { ActionType, CardDefDigest, CardType } from "./types";
 import "./styles.css";
+import { Icon } from "@client/components/icon";
+import type { Message } from "@client/utils/messages";
 
 /******************************************************************************
  * ### FullsizeCardContainer
@@ -85,27 +87,45 @@ const FullsizeCardBody = (props: { children?: React.ReactNode }) => {
 };
 
 /******************************************************************************
- * ### FullsizeCardBodyTriggerInstructions
+ * ### FullsizeCardBodyItem
  ******************************************************************************/
-const FullsizeCardBodyTriggerInstructions = (props: {
-  children?: React.ReactNode;
-}) => {
+const FullsizeCardBodyItem = (props: { children?: React.ReactNode }) => {
+  return <div className="card-fullsize-body__item">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### FullsizeCardBodyText
+ ******************************************************************************/
+const FullsizeCardBodyText = (props: { children?: React.ReactNode }) => {
+  return <div className="card-fullsize-body__text">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### ActionTypeLabel
+ ******************************************************************************/
+const ActionTypeLabel = (props: { actionType: ActionType }) => {
   return (
-    <div className="card-fullsize-body__trigger-instructions">
-      {props.children}
-    </div>
+    <span className="action-type-label">
+      <Icon msgKey={`action.type.${props.actionType}`} decorative />
+      <Msg value={{ key: `action.type.${props.actionType}` }} textOnly />
+    </span>
   );
 };
 
 /******************************************************************************
  * ### FullsizeCardBodyActionText
  *
- * A box for text printed on the card, e.g. an action's instructions when there
- * is no game in which to take the action.
+ * A box for text for a single action on a card.
  ******************************************************************************/
-const FullsizeCardBodyActionText = (props: { children?: React.ReactNode }) => {
+export const FullsizeCardBodyActionText = (props: {
+  actionType: ActionType;
+  instructions: Message | null;
+}) => {
   return (
-    <div className="card-fullsize-body__action-text">{props.children}</div>
+    <FullsizeCardBodyText>
+      <ActionTypeLabel actionType={props.actionType} />
+      <Msg value={props.instructions} />
+    </FullsizeCardBodyText>
   );
 };
 
@@ -151,16 +171,21 @@ export const FullsizeCardDisplay = (props: {
           <div />
           <FullsizeCardBody>
             {props.card.triggerInstructions && (
-              <FullsizeCardBodyTriggerInstructions>
-                <Msg value={props.card.triggerInstructions} />
-              </FullsizeCardBodyTriggerInstructions>
+              <FullsizeCardBodyItem>
+                <FullsizeCardBodyText>
+                  <Msg value={props.card.triggerInstructions} />
+                </FullsizeCardBodyText>
+              </FullsizeCardBodyItem>
             )}
             {props.actions ??
               props.card.actions.map((action) => (
                 // action type is stable key, as cards can only have one of each
-                <FullsizeCardBodyActionText key={action.type}>
-                  <Msg value={action.instructions ?? null} />
-                </FullsizeCardBodyActionText>
+                <FullsizeCardBodyItem key={action.type}>
+                  <FullsizeCardBodyActionText
+                    actionType={action.type}
+                    instructions={action.instructions ?? null}
+                  />
+                </FullsizeCardBodyItem>
               ))}
           </FullsizeCardBody>
         </FullsizeCardForeground>
