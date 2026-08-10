@@ -150,17 +150,13 @@ export const Room = () => {
             </Box>
           </Box>
           Host:
-          <Box size="md" border="dark" spacing="md">
+          <Box border="dark" spacing="md">
             {poller.data?.digest.host.name ?? "..."}
           </Box>
           Guests:
-          {playerIsHost && guests.length < 1 && (
-            <Box size="md" spacing="lg">
-              ...
-            </Box>
-          )}
+          {playerIsHost && guests.length < 1 && <Box spacing="lg">...</Box>}
           {poller.data?.digest.guests.map((guest) => (
-            <Box size="md" border="dark" key={guest.id} spacing="lg">
+            <Box border="dark" key={guest.id} spacing="lg">
               {guest.name}
             </Box>
           ))}

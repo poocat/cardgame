@@ -30,7 +30,7 @@ export const GameList = () => {
     <Box spacing="lg">
       <Stack orientation="vertical" spacing="md">
         {data?.games?.map((g) => (
-          <Box key={g.gameId} spacing="sm" size="md" border="dark">
+          <Box key={g.gameId} spacing="sm" border="dark">
             <Link to={`/games/${g.gameId}`}>{g.gameId}</Link>
             <div>Last updated at: {g.updatedAt}</div>
           </Box>

@@ -7,18 +7,6 @@
   width: 100%;
 }
 
-.box--size-sm {
-  width: 100px;
-}
-
-.box--size-md {
-  width: 400px;
-}
-
-.box--size-lg {
-  width: 800px;
-}
-
 .box--spacing-sm {
   padding: var(--space-sm);
 }
@@ -62,6 +50,10 @@
 .stack {
   display: flex;
   align-items: flex-start;
+}
+
+.stack--wrap {
+  flex-wrap: wrap;
 }
 
 .stack--orient-horizontal {

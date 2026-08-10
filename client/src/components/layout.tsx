@@ -1,4 +1,4 @@
-import type { Border, Color, EdgeVariant, Size, Spacing } from "./types";
+import type { Border, Color, EdgeVariant, Spacing } from "./types";
 
 type Orientation = "horizontal" | "vertical";
 
@@ -6,15 +6,21 @@ export const Stack = (props: {
   orientation: Orientation;
   spacing: Spacing;
   children: React.ReactNode;
+  wrap?: boolean;
 }) => {
-  const className = `stack stack--spacing-${props.spacing} stack--orient-${props.orientation}`;
+  const classNames = [
+    "stack",
+    `stack--spacing-${props.spacing}`,
+    `stack--orient-${props.orientation}`,
+  ];
+  if (props.wrap) classNames.push(`stack--wrap`);
+  const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;
 };
 
 export const Box = (props: {
   spacing?: Spacing;
   color?: Color;
-  size?: Size;
   border?: Border;
   fullWidth?: boolean;
   children?: React.ReactNode;
@@ -23,7 +29,6 @@ export const Box = (props: {
   if (props.spacing) classNames.push(`box--spacing-${props.spacing}`);
   if (props.color) classNames.push(`box--color-${props.color}`);
   if (props.border) classNames.push(`box--border-${props.border}`);
-  if (props.size) classNames.push(`box--size-${props.size}`);
   if (props.fullWidth) classNames.push(`box--fullwidth`);
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;
