@@ -1,4 +1,5 @@
 import type { Border, Color, EdgeVariant, Spacing } from "./types";
+import "./styles.css";
 
 type Orientation = "horizontal" | "vertical";
 

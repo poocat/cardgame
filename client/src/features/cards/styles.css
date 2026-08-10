@@ -94,8 +94,8 @@
 ***************************************************************************/
 
 .card-thumbnail-container {
-  padding: 3px; /* Padding is necessary to ensure that any emphasis is visible. */
-  border-radius: 5px;
+  padding: 0.3rem; /* Padding is necessary to ensure that any emphasis is visible. */
+  border-radius: 5%;
   transition: transform 0.5s;
 }
 
@@ -105,7 +105,7 @@
 
 .card-thumbnail-container--emphasis-animated {
   background-color: var(--color-lowlight);
-  animation: pulse-lowlight 1500ms ease-in-out infinite;
+  animation: var(--default-lowlight-animation);
 }
 
 .card-thumbnail-container--emphasis-solid {
@@ -113,26 +113,26 @@
 }
 
 .card-thumbnail-container--emphasis-outlined {
-  outline: 1px solid var(--color-lowlight);
+  outline: var(--border-sm) solid var(--color-lowlight);
 }
 
 .card-thumbnail {
-  border: 1px solid;
-  border-radius: 4px;
-  padding: var(--space-xs);
+  border: var(--border-sm) solid var(--color-black);
+  border-radius: 4%;
+  padding: var(--spacing-xs);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: var(--font-size-xs);
   /* Default */
-  background-color: var(--color-white);
+  background-color: var(--color-paper);
   border-color: var(--color-black);
   color: var(--color-black);
 }
 
 .card-thumbnail--size-lg {
+  font-size: var(--font-size-md);
   width: var(--card-width-thumbnail-lg);
   height: var(--card-height-thumbnail-lg);
 }
@@ -140,9 +140,7 @@
 .card-thumbnail--size-sm {
   width: var(--card-width-thumbnail-sm);
   height: var(--card-height-thumbnail-sm);
-  padding: 1px;
-  font-size: var(--font-size-xs);
-  border-radius: 3px;
+  font-size: var(--font-size-sm);
 }
 
 .card-thumbnail--clickable {
@@ -150,7 +148,7 @@
 }
 
 .card-thumbnail-container--exhausted .card-thumbnail {
-  background-color: var(--color-white-translucent);
+  background-color: var(--color-paper-translucent);
   color: var(--color-black-translucent);
 }
 
@@ -174,8 +172,8 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: var(--space-sm);
-  padding: var(--space-xs);
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs);
 }
 
 .card-fullsize-container__name {
@@ -185,7 +183,7 @@
 
 .card-fullsize-container__link {
   font-size: var(--font-size-xs);
-  padding: var(--space-sm);
+  padding: var(--spacing-sm);
   background-color: var(--color-white-translucent);
   border-radius: 9999px;
 }
@@ -194,13 +192,14 @@
   position: relative;
   width: var(--card-width-fullsize);
   height: var(--card-height-fullsize);
-  border-radius: 12px;
+  border-radius: calc(var(--card-width-fullsize) * 0.04);
   cursor: default;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  border: 2px solid black;
+  border: var(--border-lg) solid var(--color-black);
+  background-color: var(--color-paper);
 }
 
 .card-fullsize--producer {
@@ -228,7 +227,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: var(--card-outer-border-width-fullsize);
+  padding: var(--card-art-border-width-fullsize);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -237,17 +236,17 @@
 .card-fullsize-body {
   display: flex;
   flex-direction: column;
-  padding: var(--card-inner-border-width-fullsize);
-  gap: var(--space-xs);
+  gap: var(--spacing-xs);
 }
 
 .card-fullsize-body__item {
-  padding: var(--space-sm);
+  padding: var(--spacing-sm);
   background-color: var(--color-white-translucent);
 }
 
 .card-fullsize-body__text {
-  font-size: var(--font-size-xs);
+  font-size: var(--card-font-size-fullsize);
+  line-height: 1em;
 }
 
 .action-type-label {

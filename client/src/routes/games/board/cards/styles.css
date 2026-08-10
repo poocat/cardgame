@@ -1,28 +1,63 @@
-/***************************************************************************
-  Styles for the parts of a card that only exist while a game is being
-  played: emphasis when the observing player is choosing, the selector, the
-  piles, and the menu below an enlarged card.
+/* Game Card Styles */
 
-  The card itself is styled with the card components
+/***************************************************************************
+  Overrides
 ***************************************************************************/
 
-.game-player-center .card-thumbnail-container--emphasis-animated {
-  background-color: var(--color-highlight);
-  animation: pulse-highlight 1500ms ease-in-out infinite;
+/* Cards in Tablet */
+
+.game-player-tablet .card-thumbnail {
+  color: var(--tablet-label-color);
 }
 
-.game-player-center .card-thumbnail-container--emphasis-solid {
+.game-player-tablet .card-thumbnail-container--emphasis-animated {
+  background-color: var(--color-highlight);
+  animation: var(--tablet-emphasis-animation);
+}
+
+.game-player-tablet .card-thumbnail-container--emphasis-solid {
   background-color: var(--color-highlight);
 }
 
-.game-player-center .card-thumbnail-container--emphasis-outlined {
-  outline: 1px solid var(--color-highlight);
+.game-player-tablet .card-thumbnail-container--emphasis-outlined {
+  outline: var(--border-sm) solid var(--color-highlight);
 }
+
+.game-player-tablet .card-thumbnail--placeholder {
+  border-color: var(--tablet-inner-border-color);
+}
+
+/* Cards in Mind */
+
+.game-player-mind .card-thumbnail {
+  color: var(--mind-label-color);
+}
+
+.game-player-mind .card-thumbnail-container--emphasis-animated {
+  background-color: var(--color-highlight);
+  animation: pulse-lowlight 1500ms ease-in-out infinite;
+}
+
+.game-player-mind .card-thumbnail-container--emphasis-solid {
+  background-color: var(--color-highlight);
+}
+
+.game-player-mind .card-thumbnail-container--emphasis-outlined {
+  outline: var(--border-sm) solid var(--color-highlight);
+}
+
+.game-player-mind .card-thumbnail--placeholder {
+  border-color: var(--mind-inner-border-color);
+}
+
+/***************************************************************************
+  Card Edge
+***************************************************************************/
 
 .game-card-edge {
   display: flex;
   position: relative;
-  right: var(--space-sm);
+  right: var(--spacing-sm);
 }
 
 .game-card-selector {
@@ -31,34 +66,31 @@
 }
 
 .game-card-selector__button {
-  margin-left: 1px;
   background-color: var(--color-card);
-  border: 1px solid var(--color-black);
+  border: var(--border-sm) solid var(--color-black);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-sm);
   color: var(--color-black);
-  padding-top: 3px; /* Optical alignment for text */
 }
 
 .game-card-selector__button--size-sm {
-  width: var(--control-size-sm);
-  height: var(--control-size-sm);
-  font-size: var(--font-size-sm);
+  width: var(--card-select-diameter-sm);
+  height: var(--card-select-diameter-sm);
+  font-size: var(--card-select-font-size-sm);
 }
 
 .game-card-selector__button--size-md {
-  width: var(--control-size-md);
-  height: var(--control-size-md);
-  font-size: var(--font-size-md);
+  width: var(--card-select-diameter-md);
+  height: var(--card-select-diameter-md);
+  font-size: var(--card-select-font-size-md);
 }
 
 .game-card-selector__button--size-lg {
-  width: var(--control-size-lg);
-  height: var(--control-size-lg);
-  font-size: var(--font-size-lg);
+  width: var(--card-select-diameter-lg);
+  height: var(--card-select-diameter-lg);
+  font-size: var(--card-select-font-size-lg);
 }
 
 /***************************************************************************
@@ -66,7 +98,7 @@
 ***************************************************************************/
 
 .game-card-pile {
-  padding: var(--space-sm);
+  padding: var(--spacing-sm);
   display: flex;
   flex-direction: column;
 }
@@ -84,7 +116,7 @@
 .game-card-pile__item {
   position: relative;
   transform: translateY(
-    calc(var(--game-card-pile-item-index, 0) * var(--space-sm))
+    calc(var(--game-card-pile-item-index, 0) * var(--spacing-sm))
   );
 }
 
@@ -100,7 +132,7 @@
 
 .game-card-fullsize-menu {
   width: 100%;
-  padding: var(--space-sm);
+  padding: var(--spacing-sm);
   display: flex;
   justify-content: end;
 }

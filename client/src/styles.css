@@ -20,6 +20,8 @@
   /* Colors: Core */
   --color-white: #ffffee;
   --color-white-translucent: #ffffeebb;
+  --color-paper: var(--color-white);
+  --color-paper-translucent: var(--color-white-translucent);
   --color-gray: #444444;
   --color-brown: #ddccbb;
   --color-darkbrown: #aa9988;
@@ -29,6 +31,7 @@
   --color-highlight: #ffffee88;
   --color-lowlight: #22222288;
   --color-error: #ff4444;
+  --color-background: var(--color-white);
 
   /* Colors: */
   --color-chip: #ffff00;
@@ -42,51 +45,73 @@
   --color-player-green: #71d989;
   --color-player-blue: #8888ff;
 
-  /* Spacing */
-  --space-xs: 1px;
-  --space-sm: 5px;
-  --space-md: 15px;
-  --space-lg: 18px;
+  /* Sizes: */
+  --spacing-xs: 0.2rem;
+  --spacing-sm: 0.4rem;
+  --spacing-md: 0.8rem;
+  --spacing-lg: 1.2rem;
 
-  /* Sizing */
-  --control-size-sm: 20px;
-  --control-size-md: 28px;
-  --control-size-lg: 40px;
+  --border-sm: 0.1rem;
+  --border-lg: 0.2rem;
+
+  --control-size-sm: 2rem;
+  --control-size-md: 3rem;
+  --control-size-lg: 4rem;
 
   /* Typography */
   --font-family: "Rokkitt", serif;
-  --font-size-xs: 11px;
-  --font-size-sm: 12px;
-  --font-size-md: 14px;
-  --font-size-lg: 20px;
+  --font-size-xs: 0.6rem;
+  --font-size-sm: 1.1rem;
+  --font-size-md: 1.4rem;
+  --font-size-lg: 1.8rem;
 
-  /* Game styling */
-  --total-width: 1000px;
+  /* Animations */
+  --default-highlight-animation: pulse-highlight 1500ms ease-in-out infinite;
+  --default-lowlight-animation: pulse-lowlight 1500ms ease-in-out infinite;
 
-  --cutout-width: 375px;
-  --cutout-hradius: calc(var(--cutout-width) / 2);
-  --cutout-vradius: var(--cutout-hradius);
-  --vertical-padding-top: var(--cutout-vradius);
+  /* Elements... */
 
-  --player-area-height: 250px;
+  --footer-menu-max-height: min(15rem, 40vh);
 
-  --tablet-width: 325px;
+  --card-select-diameter-sm: var(--control-size-sm);
+  --card-select-font-size-sm: var(--font-size-sm);
+  --card-select-diameter-md: var(--control-size-md);
+  --card-select-font-size-md: var(--font-size-md);
+  --card-select-diameter-lg: var(--control-size-lg);
+  --card-select-font-size-lg: var(--font-size-lg);
 
-  --center-area-width: 350px;
+  --card-height-thumbnail-lg: 8rem;
+  --card-width-thumbnail-lg: 8rem;
+  --card-height-thumbnail-sm: 4rem;
+  --card-width-thumbnail-sm: 4rem;
+  --card-spacing-thumbnail-vertical: var(--spacing-sm);
+  --card-spacing-thumbnail-horizontal: var(--spacing-sm);
 
-  --hand-area-width: 300px;
-  --hand-area-height: 200px;
+  --card-height-fullsize: 30rem;
+  --card-width-fullsize: calc(var(--card-height-fullsize) * 5 / 7);
+  --card-art-border-width-fullsize: calc(var(--card-height-fullsize) * 0.09);
+  --card-font-size-fullsize: var(--font-size-sm);
 
-  --footer-menu-max-height: 200px;
+  --chip-diam-sm: 1.8rem;
+  --chip-font-size-sm: 1.1rem;
+  --chip-diam-md: 2.5rem;
+  --chip-font-size-md: 1.3rem;
+  --chip-diam-lg: 3rem;
+  --chip-font-size-lg: 2rem;
 
-  --card-width-thumbnail-sm: 44px;
-  --card-height-thumbnail-sm: 44px;
-  --card-width-thumbnail-lg: 70px;
-  --card-height-thumbnail-lg: 70px;
-  --card-width-fullsize: 250px;
-  --card-height-fullsize: 350px;
-  --card-outer-border-width-fullsize: 9px;
-  --card-inner-border-width-fullsize: 20px;
+  /* Context-specific */
+
+  --tablet-outer-border-color: var(--color-black);
+  --tablet-inner-border-color: var(--color-black-translucent);
+  --tablet-label-color: var(--color-black-translucent);
+  --tablet-text-color: var(--color-black);
+  --tablet-shadow-width: var(--spacing-lg);
+  --tablet-emphasis-animation: var(--default-lowlight-animation);
+
+  --mind-inner-border-color: var(--color-black-translucent);
+  --mind-label-color: var(--color-black-translucent);
+  --mind-text-color: var(--color-black-translucent);
+  --mind-emphasis-animation: var(--default-lowlight-animation);
 }
 
 /***************************************************************************
@@ -99,7 +124,11 @@ body {
   font-family: var(--font-family);
   font-size: var(--font-size-md);
   color: var(--color-black);
-  background: var(--color-white);
+  background: var(--color-background);
+}
+
+h2 {
+  font-size: var(--font-size-lg);
 }
 
 /***************************************************************************

@@ -20,9 +20,8 @@ const Chip = (props: { count: number; size: Size; selected?: boolean }) => {
 /******************************************************************************
  * ### Arrow
  ******************************************************************************/
-const Arrow = (props: { size: Size; reverse?: boolean; light?: boolean }) => {
+const Arrow = (props: { size: Size; reverse?: boolean }) => {
   const classNames = ["game-arrow", `game-arrow--size-${props.size}`];
-  if (props.light) classNames.push("game-arrow--light");
   if (props.reverse) classNames.push("game-arrow--reverse");
   const className = classNames.join(" ");
   return <div className={className} />;
@@ -37,7 +36,6 @@ const Arrow = (props: { size: Size; reverse?: boolean; light?: boolean }) => {
 export const ChipCounter = (props: {
   size: Size;
   side: PlayerSide;
-  light: boolean;
   baseCount: number;
   selectedCount: number;
 }) => {
@@ -51,41 +49,12 @@ export const ChipCounter = (props: {
       <Chip count={props.baseCount} size={props.size} />
       {props.selectedCount > 0 && (
         <>
-          <Arrow
-            size={props.size}
-            light={props.light}
-            reverse={props.side === "right"}
-          />
+          <Arrow size={props.size} reverse={props.side === "right"} />
           <Chip selected count={props.selectedCount} size={props.size} />
         </>
       )}
     </div>
   );
-};
-
-/******************************************************************************
- * ### ChipPoolContainer
- *
- * A container with a border used to display a named chip pool (e.g. "reserve").
- ******************************************************************************/
-export const ChipPoolContainer = (props: {
-  light: boolean;
-  side: PlayerSide;
-  children?: React.ReactNode;
-}) => {
-  const classNames = ["game-chip-pool", `game-chip-pool--side-${props.side}`];
-  if (props.light) classNames.push("game-chip-pool--light");
-  const className = classNames.join(" ");
-  return <div className={className}>{props.children}</div>;
-};
-
-/******************************************************************************
- * ### ChipPoolLabel
- *
- * A wrapper around the text used to name the chip pool.
- ******************************************************************************/
-export const ChipPoolLabel = (props: { children?: React.ReactNode }) => {
-  return <div className="game-chip-pool__label">{props.children}</div>;
 };
 
 /******************************************************************************
@@ -96,16 +65,11 @@ export const ChipPoolLabel = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 export const ChipPoolDisplay = (props: {
   side: PlayerSide;
-  light: boolean;
-  fullWidth?: boolean;
+  selecting?: boolean;
   children?: React.ReactNode;
 }) => {
-  const classNames = [
-    "game-chip-pool__display",
-    `game-chip-pool__display--side-${props.side}`,
-  ];
-  if (props.light) classNames.push(`game-chip-pool__display--light`);
-  if (props.fullWidth) classNames.push("game-chip-pool__display--fullwidth");
+  const classNames = ["game-chip-pool", `game-chip-pool--side-${props.side}`];
+  if (props.selecting) classNames.push("game-chip-pool--emphasis");
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;
 };
@@ -118,7 +82,6 @@ export const ChipPoolDisplay = (props: {
  ******************************************************************************/
 export const ChipSelector = (props: {
   size: Size;
-  light: boolean;
   numSelected: number;
   onIncrement: () => void;
   onDecrement: () => void;
@@ -145,7 +108,7 @@ export const ChipSelector = (props: {
       </ButtonBase>
       {props.onSubmit && (
         <>
-          <Arrow size={props.size} light={props.light} />
+          <Arrow size={props.size} />
           <ButtonBase
             disabled={allDisabled || !!props.disableSubmit}
             onClick={props.onSubmit}

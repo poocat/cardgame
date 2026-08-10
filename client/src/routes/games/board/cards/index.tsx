@@ -33,12 +33,7 @@ import {
 } from "@client/features/cards/thumbnail";
 import type { ActionType } from "@client/features/cards/types";
 import type { Message } from "../types";
-import {
-  CardPile,
-  CardPileLabel,
-  CardPileStack,
-  CardPileStackItem,
-} from "./pile";
+import { CardPileStack, CardPileStackItem } from "./pile";
 
 /******************************************************************************
  * ### CardSelector
@@ -171,11 +166,10 @@ export const ThumbnailCardFaceUp = memo(
           />
         </ThumbnailCard>
         {props.card.chips.length > 0 && (
-          <ChipCounterEdge size="sm">
+          <ChipCounterEdge size="md">
             <ChipCounter
               size="sm"
               side="left"
-              light={props.card.type === "consumer"}
               baseCount={props.card.chips.length}
               selectedCount={numSelected}
             />
@@ -184,7 +178,7 @@ export const ThumbnailCardFaceUp = memo(
         {cardIsSelectable && props.selectorProps && (
           <CardSelectorEdge>
             <CardSelector
-              size="md"
+              size="sm"
               selected={cardIsSelected}
               selectDisabled={
                 props.submitting ||
@@ -253,19 +247,16 @@ export const DiscardPile = (props: {
   setDialog: DialogProps["set"];
 }) => {
   return (
-    <CardPile>
-      <CardPileLabel>Discard ({props.totalCount})</CardPileLabel>
-      <CardPileStack>
-        <CardPileStackItem>
-          <MiniCardPlaceholder />
+    <CardPileStack>
+      <CardPileStackItem>
+        <MiniCardPlaceholder />
+      </CardPileStackItem>
+      {props.cardsVisible.map((c, i) => (
+        <CardPileStackItem key={c.id} index={i + 1}>
+          <MiniCardFaceUp card={c} setDialog={props.setDialog} />
         </CardPileStackItem>
-        {props.cardsVisible.map((c, i) => (
-          <CardPileStackItem key={c.id} index={i + 1}>
-            <MiniCardFaceUp card={c} setDialog={props.setDialog} />
-          </CardPileStackItem>
-        ))}
-      </CardPileStack>
-    </CardPile>
+      ))}
+    </CardPileStack>
   );
 };
 
@@ -276,14 +267,11 @@ export const DiscardPile = (props: {
  ******************************************************************************/
 export const HandPile = (props: { count: number }) => {
   return (
-    <CardPile>
-      <CardPileLabel>Hand ({props.count})</CardPileLabel>
-      <CardPileStack>
-        <CardPileStackItem>
-          <MiniCardPlaceholder />
-        </CardPileStackItem>
-      </CardPileStack>
-    </CardPile>
+    <CardPileStack>
+      <CardPileStackItem>
+        <MiniCardPlaceholder>{props.count}</MiniCardPlaceholder>
+      </CardPileStackItem>
+    </CardPileStack>
   );
 };
 
@@ -359,7 +347,6 @@ const FullsizeCardChipSelect = (props: {
   return (
     <ChipSelector
       size="lg"
-      light={true}
       numSelected={numSelected}
       submitting={props.submitting}
       disableIncrement={!props.selectorProps?.moreValuesAllowed}
@@ -435,11 +422,10 @@ export const FullsizeCardFaceUp = (props: {
       })}
     >
       {chipIds.length > 0 && (
-        <ChipCounterEdge size="md">
+        <ChipCounterEdge size="lg">
           <ChipCounter
             size="md"
             side="left"
-            light={true}
             baseCount={chipIds.length}
             selectedCount={numSelectedChips}
           />

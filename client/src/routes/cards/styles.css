@@ -13,7 +13,7 @@
       minmax(var(--card-width-fullsize), max-content)
     );
   justify-content: center;
-  gap: var(--space-lg);
-  padding: var(--space-lg);
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
   background-color: var(--color-darkbrown);
 }
