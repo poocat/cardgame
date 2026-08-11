@@ -127,7 +127,7 @@
   text-align: start;
 }
 
-@media screen and (width < 70rem) {
+@media (width < 75rem) {
   .game-player-tablet__header {
     flex-direction: column;
     /*
@@ -168,7 +168,7 @@
   gap: var(--spacing-sm);
 }
 
-@media screen and (width < 70rem) {
+@media (width < 75rem) {
   .game-player-tablet-piles {
     flex-direction: column;
   }
@@ -185,7 +185,7 @@
   gap: var(--card-spacing-thumbnail-horizontal);
 }
 
-@media screen and (width < 70rem) {
+@media (width < 75rem) {
   .game-player-tablet__producers {
     flex-direction: column;
     /* When the stack runs vertically, leave room for controls aligned to the bottom edge of the card. */
@@ -225,18 +225,12 @@
   margin-bottom: var(--card-spacing-thumbnail-vertical);
   grid-row-gap: var(--card-spacing-thumbnail-vertical);
   grid-column-gap: var(--card-spacing-thumbnail-horizontal);
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, auto);
+  grid-auto-flow: row;
 }
 
-@media screen and (width >= 70rem) {
-  /* Wrap to a new row after the 4th card */
-  .game-player-mind__consumers {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, auto);
-    grid-auto-flow: row;
-  }
-}
-
-@media screen and (width < 70rem) {
+@media (width < 75rem) {
   /* Wrap to a new column after the 4th card */
   .game-player-mind__consumers {
     grid-template-columns: repeat(2, 1fr);
