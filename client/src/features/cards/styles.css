@@ -127,7 +127,8 @@
 }
 
 .card-thumbnail-container {
-  padding: 0.3rem; /* Padding is necessary to ensure that any emphasis is visible. */
+  /* Padding is necessary to ensure that any emphasis is visible. */
+  padding: var(--card-thumbnail-emphasis-padding);
   border-radius: 5%;
   transition: transform 0.5s;
 }
