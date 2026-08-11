@@ -23,9 +23,14 @@
   object-fit: cover;
 }
 
-/* 
+/*
   The placement of the card type and subtype icons are dialed-in to the card
   art. If the card art changes, the icons will not line up!
+
+  These offsets are deliberately physical (`left`/`right`, not `inset-inline-*`)
+  so they never mirror: a card face is the same object whichever side of the
+  board its owner sits on. The `direction: ltr` pin further down keeps the rest
+  of the card consistent with them.
  */
 
 .card-type-icon {
@@ -92,6 +97,34 @@
   Used for card presentations that are meant to be clicked to open an
   expanded, "fullsize" presentation of the card.
 ***************************************************************************/
+
+.card-thumbnail-container,
+.card-thumbnail {
+  /*
+    LAYOUT pin. A card and every badge positioned around it is pinned to `ltr`,
+    so a card presents identically no matter which side of the board its owner
+    sits on.
+
+    This is deliberate, not incidental. Players act on other players' cards, so
+    the select badge has to land in the same spot on every card — a player should
+    be able to aim at it without re-reading the layout for each owner. It also
+    keeps the type/subtype icons aligned to the artwork (see the note further up).
+
+    Both selectors are needed: the container covers cards rendered with badges,
+    and `.card-thumbnail` covers the bare thumbnails (placeholders, pile items)
+    that are rendered without a container.
+  */
+  direction: ltr;
+}
+
+/*
+  TEXT, as opposed to the layout pin above: a card's name resolves its own
+  direction from its content, so a localized name in an RTL script reads
+  correctly even though the card's box stays pinned to `ltr`.
+*/
+.card-thumbnail {
+  unicode-bidi: plaintext;
+}
 
 .card-thumbnail-container {
   padding: 0.3rem; /* Padding is necessary to ensure that any emphasis is visible. */

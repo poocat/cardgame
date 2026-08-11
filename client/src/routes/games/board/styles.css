@@ -5,11 +5,39 @@
 
   The orientation of each player's area alternates between right-to-left
   and left-to-right.
+
+  A section is one of only two mirroring roots on the board (the other is
+  the dashboard, which is not a section descendant). Right-side players get
+  `direction: rtl`, which flips the inline axis for the whole subtree, so
+  every descendant can be written once with flow-relative values:
+
+    - `flex-direction: row`  runs right-to-left
+    - `flex-start` / `flex-end` in flexbox are already flow-relative
+    - `text-align: start` resolves to the right
+    - `margin-inline-*`, `inset-inline-*`, `border-inline-*` all follow
+
+  Two consequences to keep in mind when editing anything inside a section:
+
+  1. Do NOT combine this with `row-reverse`. Two flips cancel out, and the
+     symptom looks exactly like the rule not applying at all.
+  2. `direction` also drives Unicode directionality, which moves neutral
+     characters (punctuation, brackets) to the opposite end of a text run.
+     E.g. "Player 1:" would render as ":Player 1". Text-bearing leaves
+     therefore carry `unicode-bidi: plaintext`, which resolves each run from
+     its own first strong character instead — so text reads correctly whether
+     it is English or, once localized, an RTL language. Use that rather than
+     `direction: ltr` for anything holding localizable text; `direction` is
+     reserved here for LAYOUT mirroring.
+
+  Physical properties are unaffected by `direction`, so anything that must
+  mirror has to be written with the logical equivalent. `box-shadow` is the
+  one property with no logical form; see the tablet rules below.
 ***************************************************************************/
 
 .game-player-section {
   width: 100%;
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   row-gap: var(--tablet-shadow-width);
   justify-content: flex-start;
@@ -17,12 +45,25 @@
   padding-inline: var(--spacing-lg);
 }
 
+/*
+  BOTH sides declare `direction` rather than letting the left side inherit it.
+
+  The board is a seating arrangement, not a text flow: player 1 sits on the
+  left whatever language the UI is in. Declaring only the right side would make
+  the mirror relative to the ambient direction, so setting `dir="rtl"` on the
+  document for an RTL locale would resolve BOTH sides to `rtl` and silently
+  collapse the alternation the whole layout is built on.
+
+  (If the board should instead flip with the locale, this is the place to
+  change it: compute the section's direction as
+  `localeIsRtl !== (side === "right")` and set it as a `dir` attribute.)
+*/
 .game-player-section--side-left {
-  flex-direction: row;
+  direction: ltr;
 }
 
 .game-player-section--side-right {
-  flex-direction: row-reverse;
+  direction: rtl;
 }
 
 /***************************************************************************
@@ -37,20 +78,25 @@
 ***************************************************************************/
 
 .game-player-tablet {
-  /* Uses an outline instead of border so that the vertical limits of the adjacent "mind" block are the same */
+  /* 
+    Uses an outline instead of border so that the vertical limits of the
+    adjacent "mind" block are the same
+  */
   outline: var(--border-lg) solid var(--tablet-outer-border-color);
   padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
   color: var(--tablet-text-color);
-}
-
-.game-player-tablet--side-left {
   box-shadow: var(--tablet-outer-border-color) var(--tablet-shadow-width)
     var(--tablet-shadow-width);
 }
 
-.game-player-tablet--side-right {
+.game-player-section--side-right .game-player-tablet {
+  /*
+    `box-shadow` offsets are physical and have no logical equivalent, so this is
+    the only part of the board that still has to be told which side it is on.
+    Keying it off the section's modifier keeps the tablet itself side-agnostic.
+  */
   box-shadow: var(--tablet-outer-border-color)
     calc(-1 * var(--tablet-shadow-width)) var(--tablet-shadow-width);
 }
@@ -75,46 +121,34 @@
 
 .game-player-tablet__header {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   margin-bottom: var(--spacing-md);
-}
-
-.game-player-tablet__header--side-left {
-  text-align: left;
-}
-
-.game-player-tablet__header--side-right {
-  text-align: right;
-}
-
-@media screen and (width >= 70rem) {
-  .game-player-tablet__header--side-left {
-    flex-direction: row;
-  }
-
-  .game-player-tablet__header--side-right {
-    flex-direction: row-reverse;
-  }
+  text-align: start;
 }
 
 @media screen and (width < 70rem) {
   .game-player-tablet__header {
     flex-direction: column;
-  }
-
-  .game-player-tablet__header--side-left {
+    /*
+      In a column flex container the cross axis is the inline axis, and
+      `flex-start` is flow-relative, so this resolves to the right edge for
+      right-side players without a second rule.
+    */
     align-items: flex-start;
-  }
-
-  .game-player-tablet__header--side-right {
-    align-items: flex-end;
   }
 }
 
 /* Tablet: Identity */
 
 .game-player-tablet-identity {
+  /*
+    A player-supplied name resolves its own direction from its first strong
+    character, so the surrounding mirror never reorders it, and a name written
+    in an RTL script still reads correctly.
+  */
   display: block;
+  unicode-bidi: plaintext;
 }
 
 .game-player-tablet-identity__on-turn-indicator {
@@ -130,17 +164,8 @@
 
 .game-player-tablet-piles {
   display: flex;
+  flex-direction: row;
   gap: var(--spacing-sm);
-}
-
-@media screen and (width >= 70rem) {
-  .game-player-tablet-piles--side-left {
-    flex-direction: row;
-  }
-
-  .game-player-tablet-piles--side-right {
-    flex-direction: row-reverse;
-  }
 }
 
 @media screen and (width < 70rem) {
@@ -153,22 +178,11 @@
 
 .game-player-tablet__producers {
   display: flex;
+  flex-direction: row;
   justify-content: flex-start;
-}
-
-@media screen and (width >= 70rem) {
-  .game-player-tablet__producers {
-    /* When the stack runs horizontally, leave room for controls aligned to the bottom edge of the card. */
-    margin-bottom: var(--card-spacing-thumbnail-vertical);
-    gap: var(--card-spacing-thumbnail-horizontal);
-  }
-  .game-player-tablet__producers--side-left {
-    flex-direction: row;
-  }
-
-  .game-player-tablet__producers--side-right {
-    flex-direction: row-reverse;
-  }
+  /* When the stack runs horizontally, leave room for controls aligned to the bottom edge of the card. */
+  margin-bottom: var(--card-spacing-thumbnail-vertical);
+  gap: var(--card-spacing-thumbnail-horizontal);
 }
 
 @media screen and (width < 70rem) {
@@ -201,20 +215,16 @@
 /* Mind: Consumers */
 
 .game-player-mind__consumers {
+  /*
+    Fill order is inherited from the section, so `grid-auto-flow: row` fills
+    right-to-left and `column` wraps toward the left for right-side players.
+    The card faces pin themselves back to `ltr`
+    (see `features/cards/styles.css`).
+  */
   display: grid;
   margin-bottom: var(--card-spacing-thumbnail-vertical);
   grid-row-gap: var(--card-spacing-thumbnail-vertical);
   grid-column-gap: var(--card-spacing-thumbnail-horizontal);
-}
-
-/* Mirroring is orthogonal to breakpoint: one rule covers cases 2 and 4. */
-.game-player-mind__consumers--side-right {
-  direction: rtl;
-}
-
-/* `direction` inherits — reset it so card content isn't reordered. */
-.game-player-mind__consumers > * {
-  direction: ltr;
 }
 
 @media screen and (width >= 70rem) {
@@ -241,37 +251,38 @@
   Only the currently observing player's hand is visible, below their player
   area.
   
-  Note, since it is not a child of a player area, it cannot inherit from
-  `game-player-area--side-left` or `game-player-area--side-right`.
+  Note, since it is not a child of a player section, it cannot inherit that
+  section's `direction`, and so is the board's second mirroring root.
 ***************************************************************************/
 .game-player-dashboard {
   width: 100%;
   display: flex;
   flex-direction: column;
   padding: var(--spacing-md);
-}
-
-.game-player-dashboard--side-left {
+  /* Cross axis is the inline axis here, so this follows `direction`. */
   align-items: flex-start;
 }
 
+.game-player-dashboard--side-left {
+  /*
+    The second mirroring root. The dashboard sits outside the player section
+    (see the note above), so it cannot inherit the section's `direction` and has
+    to declare its own — on both sides, for the reason given at the top of this
+    file.
+  */
+  direction: ltr;
+}
+
 .game-player-dashboard--side-right {
-  align-items: flex-end;
+  direction: rtl;
 }
 
 .game-player-dashboard__hand {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   column-gap: var(--card-spacing-thumbnail-horizontal);
   row-gap: var(--card-spacing-thumbnail-vertical);
-}
-
-.game-player-dashboard__hand--side-left {
-  flex-direction: row;
-}
-
-.game-player-dashboard__hand--side-right {
-  flex-direction: row-reverse;
 }
 
 /***************************************************************************
@@ -307,21 +318,28 @@
 
 .game-label {
   font-size: var(--font-size-sm);
+  text-align: start;
 }
 
-.game-label--side-left {
-  text-align: left;
-}
-
-.game-label--side-right {
-  text-align: right;
-}
-
+/*
+  An inline flex row so the icon and text swap ends with `direction` — this
+  replaces the JS that used to reorder them per side.
+*/
 .game-label__content {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4em;
   text-transform: capitalize;
 }
+
+/*
+  Flex item ORDER still comes from this container's direction (so the icon
+  follows the player's side), while the text INSIDE each item resolves its own
+  direction. Without this, a label's trailing punctuation jumps to the wrong
+  end inside a mirrored section.
+*/
 .game-label__content > * {
-  margin-inline-end: 0.4em;
+  unicode-bidi: plaintext;
 }
 
 .game-player-tablet .game-label {

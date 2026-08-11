@@ -2,7 +2,7 @@ import { ButtonBase } from "@client/components";
 import { Edge } from "@client/components/layout";
 import type { Size } from "@client/components/types";
 import { useCallback, useMemo } from "react";
-import type { ChipDigest, PlayerSide, SelectorProps } from "../types";
+import type { ChipDigest, SelectorProps } from "../types";
 import "./styles.css";
 
 /******************************************************************************
@@ -20,11 +20,8 @@ const Chip = (props: { count: number; size: Size; selected?: boolean }) => {
 /******************************************************************************
  * ### Arrow
  ******************************************************************************/
-const Arrow = (props: { size: Size; reverse?: boolean }) => {
-  const classNames = ["game-arrow", `game-arrow--size-${props.size}`];
-  if (props.reverse) classNames.push("game-arrow--reverse");
-  const className = classNames.join(" ");
-  return <div className={className} />;
+const Arrow = (props: { size: Size }) => {
+  return <div className={`game-arrow game-arrow--size-${props.size}`} />;
 };
 
 /******************************************************************************
@@ -35,7 +32,6 @@ const Arrow = (props: { size: Size; reverse?: boolean }) => {
  ******************************************************************************/
 export const ChipCounter = (props: {
   size: Size;
-  side: PlayerSide;
   baseCount: number;
   selectedCount: number;
 }) => {
@@ -43,13 +39,13 @@ export const ChipCounter = (props: {
    * TODO!!! Add a `prevSelectedCount` prop to account for multi-choice
    * activities where chips are selected from the same pool.
    */
-  const direction = props.side === "left" ? "forward" : "reverse";
+  // Stack order and arrow direction follow the inherited `direction`.
   return (
-    <div className={`game-chip-stack game-chip-stack--${direction}`}>
+    <div className="game-chip-stack">
       <Chip count={props.baseCount} size={props.size} />
       {props.selectedCount > 0 && (
         <>
-          <Arrow size={props.size} reverse={props.side === "right"} />
+          <Arrow size={props.size} />
           <Chip selected count={props.selectedCount} size={props.size} />
         </>
       )}
@@ -64,11 +60,10 @@ export const ChipCounter = (props: {
  * any menus for selecting chips.
  ******************************************************************************/
 export const ChipPoolDisplay = (props: {
-  side: PlayerSide;
   selecting?: boolean;
   children?: React.ReactNode;
 }) => {
-  const classNames = ["game-chip-pool", `game-chip-pool--side-${props.side}`];
+  const classNames = ["game-chip-pool"];
   if (props.selecting) classNames.push("game-chip-pool--emphasis");
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;
@@ -93,7 +88,8 @@ export const ChipSelector = (props: {
 }) => {
   const allDisabled = props.disabled || props.submitting;
   return (
-    <div className={`game-chip-stack game-chip-stack--forward`}>
+    // A control, not board furniture: its button order must not mirror.
+    <div className="game-chip-stack game-chip-stack--ltr">
       <ButtonBase
         disabled={allDisabled || props.numSelected < 1}
         onClick={props.onDecrement}

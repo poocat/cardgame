@@ -169,7 +169,6 @@ export const ThumbnailCardFaceUp = memo(
           <ChipCounterEdge size="md">
             <ChipCounter
               size="sm"
-              side="left"
               baseCount={props.card.chips.length}
               selectedCount={numSelected}
             />
@@ -425,7 +424,6 @@ export const FullsizeCardFaceUp = (props: {
         <ChipCounterEdge size="lg">
           <ChipCounter
             size="md"
-            side="left"
             baseCount={chipIds.length}
             selectedCount={numSelectedChips}
           />

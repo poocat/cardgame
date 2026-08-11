@@ -7,17 +7,10 @@
   border-style: solid;
   border-width: var(--border-sm);
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-}
-
-.game-chip-pool--side-left {
-  flex-direction: row;
-}
-
-.game-chip-pool--side-right {
-  flex-direction: row-reverse;
 }
 
 .game-player-tablet .game-chip-pool {
@@ -48,6 +41,8 @@
   align-items: center;
   justify-content: center;
   color: var(--color-black);
+  /* Chip counts are text: resolve them independently of the surrounding mirror. */
+  unicode-bidi: plaintext;
 }
 
 /* Variant of a chip, used to indicate how many chips have been selected from the given pool. */
@@ -82,15 +77,15 @@
 }
 
 .game-chip-edge--size-sm {
-  left: var(--spacing-sm);
+  inset-inline-start: var(--spacing-sm);
 }
 
 .game-chip-edge--size-md {
-  left: var(--spacing-md);
+  inset-inline-start: var(--spacing-md);
 }
 
 .game-chip-edge--size-lg {
-  left: var(--spacing-lg);
+  inset-inline-start: var(--spacing-lg);
 }
 
 /***************************************************************************
@@ -103,12 +98,14 @@
   gap: var(--spacing-xs);
 }
 
-.game-chip-stack--forward {
-  flex-direction: row;
-}
-
-.game-chip-stack--reverse {
-  flex-direction: row-reverse;
+.game-chip-stack--ltr {
+  /*
+    Opts a stack out of mirroring. Counters on the board should read in the
+    player's own direction, but the chip SELECTOR is a control — its
+    decrement/increment/confirm order must not depend on which side the player
+    sits on, so it pins itself back to `ltr`.
+  */
+  direction: ltr;
 }
 
 /***************************************************************************
@@ -125,34 +122,24 @@
 }
 
 .game-arrow--size-sm {
-  border-top: 0.4rem solid transparent;
-  border-bottom: 0.4rem solid transparent;
-  border-left: 0.5rem solid var(--color-black);
+  /*
+    Built from `border-inline-start` rather than `border-left`, so the triangle
+    points along the inline axis and flips itself under `direction: rtl`. That
+    replaces the explicit `--reverse` variants this rule used to need.
+  */
+  border-block-start: 0.4rem solid transparent;
+  border-block-end: 0.4rem solid transparent;
+  border-inline-start: 0.5rem solid var(--color-black);
 }
 
 .game-arrow--size-md {
-  border-top: 0.5rem solid transparent;
-  border-bottom: 0.5rem solid transparent;
-  border-left: 0.6rem solid var(--color-black);
+  border-block-start: 0.5rem solid transparent;
+  border-block-end: 0.5rem solid transparent;
+  border-inline-start: 0.6rem solid var(--color-black);
 }
 
 .game-arrow--size-lg {
-  border-top: 0.6rem solid transparent;
-  border-bottom: 0.6rem solid transparent;
-  border-left: 0.7rem solid var(--color-black);
-}
-
-.game-arrow--reverse.game-arrow--size-sm {
-  border-right: 0.4rem solid var(--color-black);
-  border-left: none;
-}
-
-.game-arrow--reverse.game-arrow--size-md {
-  border-right: 0.5rem solid var(--color-black);
-  border-left: none;
-}
-
-.game-arrow--reverse.game-arrow--size-lg {
-  border-right: 0.6rem solid var(--color-black);
-  border-left: none;
+  border-block-start: 0.6rem solid transparent;
+  border-block-end: 0.6rem solid transparent;
+  border-inline-start: 0.7rem solid var(--color-black);
 }

@@ -352,11 +352,13 @@
 }
 
 .edge--horizontal-start {
-  left: 0;
+  /* Uses `inset-inline-start` to honor the inherited direction. */
+  inset-inline-start: 0;
 }
 
 .edge--horizontal-end {
-  right: 0;
+  /* Uses `inset-inline-end` to honor the inherited direction. */
+  inset-inline-end: 0;
 }
 
 /***************************************************************************
@@ -402,5 +404,5 @@
 
 .copy ul,
 .copy ol {
-  padding-left: var(--spacing-lg);
+  padding-inline-start: var(--spacing-lg);
 }

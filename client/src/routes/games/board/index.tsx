@@ -117,7 +117,6 @@ const GameBoardContainer = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 const ChipPool = memo(
   (props: {
-    side: PlayerSide;
     chips: ChipDigest[];
     submitDisabled: boolean;
     submitting: boolean;
@@ -142,10 +141,9 @@ const ChipPool = memo(
       props.selectorProps !== null && selectableChipIds.length > 0;
 
     return (
-      <ChipPoolDisplay side={props.side} selecting={selecting}>
+      <ChipPoolDisplay selecting={selecting}>
         <ChipCounter
           size="md"
-          side={props.side}
           baseCount={props.chips.length}
           selectedCount={numSelected}
         />
@@ -251,19 +249,19 @@ export const GameBoard = memo(
           return (
             <Fragment key={player.id}>
               <PlayerSection side={side}>
-                <PlayerTablet side={side} playerIndex={index}>
-                  <PlayerTabletHeader side={side}>
+                <PlayerTablet playerIndex={index}>
+                  <PlayerTabletHeader>
                     <PlayerTabletIdentity
                       playerTitle={player.name}
                       playerOnTurn={onTurn}
                     />
-                    <PlayerTabletPiles side={side}>
+                    <PlayerTabletPiles>
                       {!isObserver && (
-                        <Labeled side={side} msgKey="location.card.inHand">
+                        <Labeled msgKey="location.card.inHand">
                           <HandPile count={player.cardsInHand.length} />
                         </Labeled>
                       )}
-                      <Labeled side={side} msgKey="location.card.inDiscard">
+                      <Labeled msgKey="location.card.inDiscard">
                         <DiscardPile
                           cardsVisible={player.cardsInDiscardVisible}
                           totalCount={player.cardsInDiscard.length}
@@ -272,7 +270,7 @@ export const GameBoard = memo(
                       </Labeled>
                     </PlayerTabletPiles>
                   </PlayerTabletHeader>
-                  <PlayerTabletProducers side={side}>
+                  <PlayerTabletProducers>
                     {producersInPlay.map((card) => (
                       <ThumbnailCardFaceUp
                         key={card.id}
@@ -293,9 +291,8 @@ export const GameBoard = memo(
                     ))}
                   </PlayerTabletProducers>
                   <div style={{ flexGrow: 1 }} />
-                  <Labeled side={side} msgKey="term.reserve">
+                  <Labeled msgKey="term.reserve">
                     <ChipPool
-                      side={side}
                       chips={player.chipsInReserve}
                       choiceProps={props.choiceProps}
                       onSubmitChoice={props.onSubmitChoice}
@@ -310,7 +307,7 @@ export const GameBoard = memo(
                   </Labeled>
                 </PlayerTablet>
                 <PlayerMind>
-                  <PlayerMindConsumers side={side}>
+                  <PlayerMindConsumers>
                     {consumersInPlay.map((card) => (
                       <ThumbnailCardFaceUp
                         key={card.id}
@@ -331,9 +328,8 @@ export const GameBoard = memo(
                     ))}
                   </PlayerMindConsumers>
                   <div style={{ flexGrow: 1 }} />
-                  <Labeled side={side} msgKey="term.channel">
+                  <Labeled msgKey="term.channel">
                     <ChipPool
-                      side={side}
                       chips={player.chipsinChannel}
                       choiceProps={props.choiceProps}
                       onSubmitChoice={props.onSubmitChoice}
@@ -349,8 +345,8 @@ export const GameBoard = memo(
                 </PlayerMind>
                 {isObserver && (
                   <PlayerDashboard side={side}>
-                    <Labeled side={side} msgKey="location.card.inHand">
-                      <PlayerDashboardHand side={side}>
+                    <Labeled msgKey="location.card.inHand">
+                      <PlayerDashboardHand>
                         {player.cardsInHand.map((card) => (
                           <ThumbnailCardFaceUp
                             key={card.id}

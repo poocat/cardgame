@@ -57,7 +57,7 @@
 .game-card-edge {
   display: flex;
   position: relative;
-  right: var(--spacing-sm);
+  inset-inline-end: var(--spacing-sm);
 }
 
 .game-card-selector {
@@ -120,8 +120,9 @@
   );
 }
 
+/* Logical, so the overlap fans the correct way for right-side players. */
 .game-card-pile__item + .game-card-pile__item {
-  margin-left: calc(var(--card-width-thumbnail-sm) * -0.66);
+  margin-inline-start: calc(var(--card-width-thumbnail-sm) * -0.66);
 }
 
 /***************************************************************************
