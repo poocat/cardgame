@@ -231,7 +231,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  border: var(--border-lg) solid var(--color-black);
+  border: var(--border-md) solid var(--color-black);
   background-color: var(--color-paper);
 }
 

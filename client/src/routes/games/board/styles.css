@@ -82,7 +82,7 @@
     Uses an outline instead of border so that the vertical limits of the
     adjacent "mind" block are the same
   */
-  outline: var(--border-lg) solid var(--tablet-outer-border-color);
+  outline: var(--border-md) solid var(--tablet-outer-border-color);
   padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
