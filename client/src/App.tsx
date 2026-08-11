@@ -22,24 +22,31 @@ const Providers = (props: { children: React.ReactNode }) => {
 const Layout = () => {
   return (
     <div className="layout">
-      <Box spacing="lg" color="secondary">
-        <Stack wrap orientation="horizontal" spacing="lg">
-          <Stack spacing="lg" orientation="horizontal">
-            <Icon msgKey="logo" decorative />
-            <strong>
-              <Msg value={{ key: "title" }} />
-            </strong>
+      <header>
+        <Box spacing="lg" color="secondary">
+          <Stack wrap orientation="horizontal" spacing="lg">
+            <Stack orientation="horizontal" spacing="md">
+              <Icon msgKey="logo" decorative />
+              <span className="app-title">
+                <Msg value={{ key: "title" }} />
+              </span>
+            </Stack>
+            <nav>
+              <Stack wrap orientation="horizontal" spacing="lg">
+                {/* TODO!!! Labels should be messages!!! */}
+                <Link to="/">Play</Link>
+                <Link to="/rulebook">Rulebook</Link>
+                <Link to="/cards">Cards</Link>
+                <Link to="/about">About</Link>
+              </Stack>
+            </nav>
           </Stack>
-          <Stack wrap spacing="lg" orientation="horizontal">
-            <Link to="/">Play</Link>
-            <Link to="/rulebook">Rulebook</Link>
-            <Link to="/cards">Cards</Link>
-            <Link to="/about">About</Link>
-          </Stack>
-        </Stack>
-      </Box>
-      <Divider />
-      <Outlet />
+        </Box>
+        <Divider />
+      </header>
+      <main>
+        <Outlet />
+      </main>
     </div>
   );
 };
