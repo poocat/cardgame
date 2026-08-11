@@ -180,9 +180,23 @@ h2 {
 /***************************************************************************
   Layout
 
-  Shrink-wraps to the widest child (e.g. the fixed-width game board) so the
-  toolbar's auto width spans the full scrollable document on mobile, while
-  never going narrower than the viewport on board-less pages.
+  Two rules doing two jobs. Both are load-bearing; neither is a tidy-up
+  candidate.
+
+  `width: fit-content` shrink-wraps to the widest child. This serves the game
+  board, which never wraps its player sections (see
+  `routes/games/board/styles.css`) and so can be wider than the viewport once
+  the smallest token tier still isn't small enough. Sizing the document to the
+  board rather than the viewport is what:
+
+    - produces the horizontal scroll that is the board's intended floor
+      behaviour, instead of clipping the overflow, and
+    - keeps the header's background spanning the full scrollable width, so it
+      doesn't end mid-page when scrolled right.
+
+  `min-width: 100%` stops the document collapsing to its content on pages that
+  have no board, where `fit-content` would otherwise leave the header narrower
+  than the viewport.
 ***************************************************************************/
 
 .layout {

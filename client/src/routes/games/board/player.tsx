@@ -137,12 +137,8 @@ export const PlayerMindConsumers = (props: { children?: React.ReactNode }) => {
  *
  * A container for the face-up cards in the observing player's hand.
  ******************************************************************************/
-export const PlayerDashboard = (props: {
-  side: PlayerSide;
-  children?: React.ReactNode;
-}) => {
-  const className = `game-player-dashboard game-player-dashboard--side-${props.side}`;
-  return <div className={className}>{props.children}</div>;
+export const PlayerDashboard = (props: { children?: React.ReactNode }) => {
+  return <div className="game-player-dashboard">{props.children}</div>;
 };
 
 /******************************************************************************

@@ -344,7 +344,7 @@ export const GameBoard = memo(
                   </Labeled>
                 </PlayerMind>
                 {isObserver && (
-                  <PlayerDashboard side={side}>
+                  <PlayerDashboard>
                     <Labeled msgKey="location.card.inHand">
                       <PlayerDashboardHand>
                         {player.cardsInHand.map((card) => (

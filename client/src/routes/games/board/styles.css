@@ -32,15 +32,30 @@
   Physical properties are unaffected by `direction`, so anything that must
   mirror has to be written with the logical equivalent. `box-shadow` is the
   one property with no logical form; see the tablet rules below.
+
+  A grid rather than a flex row, because a grid row cannot wrap. The tablet
+  and mind stay side by side because the tracks say so, not because their
+  content happens to fit — when the board cannot shrink any further it
+  overflows and the page scrolls horizontally instead, which `.layout` in
+  `client/src/styles.css` provides.
+
+  That distinction matters: with `display: flex` this needed `flex-wrap` to be
+  absent, and adding it back — which is tempting, since it is how the
+  dashboard used to reach its own row — turns a sizing regression into a
+  silent relayout rather than a visible overflow.
+
+    row 1:  [ tablet ][ mind ][ slack ]
+    row 2:  [ dashboard, spanning all three ]
+
+  The third track exists so the dashboard can span to the section's edge. With
+  only two content-sized tracks, `grid-column: 1 / -1` would reach no further
+  than the tablet and mind themselves.
 ***************************************************************************/
 
 .game-player-section {
   width: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  row-gap: var(--tablet-shadow-width);
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
   align-items: stretch;
   padding-inline: var(--spacing-lg);
 }
@@ -251,33 +266,22 @@
 /***************************************************************************
   Hand
 
-  Only the currently observing player's hand is visible, below their player
-  area.
-  
-  Note, since it is not a child of a player section, it cannot inherit that
-  section's `direction`, and so is the board's second mirroring root.
+  Only the currently observing player's hand is visible, below the rest of
+  their player section.
+
+  It is the section's third child, and spans every column so that it occupies
+  a row of its own beneath both the tablet and the mind.
+
+  Being inside the section, it inherits that section's `direction` and needs
+  no side modifier of its own.
 ***************************************************************************/
 .game-player-dashboard {
-  width: 100%;
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   padding: var(--spacing-md);
   /* Cross axis is the inline axis here, so this follows `direction`. */
   align-items: flex-start;
-}
-
-.game-player-dashboard--side-left {
-  /*
-    The second mirroring root. The dashboard sits outside the player section
-    (see the note above), so it cannot inherit the section's `direction` and has
-    to declare its own — on both sides, for the reason given at the top of this
-    file.
-  */
-  direction: ltr;
-}
-
-.game-player-dashboard--side-right {
-  direction: rtl;
 }
 
 .game-player-dashboard__hand {
