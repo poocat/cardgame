@@ -149,6 +149,15 @@
   */
   display: block;
   unicode-bidi: plaintext;
+  /* Break-up long names */
+  inline-size: calc(1.5 * var(--card-width-thumbnail-lg));
+  overflow-wrap: break-word;
+}
+
+@media (width < 75rem) {
+  .game-player-tablet-identity {
+    inline-size: var(--card-width-thumbnail-lg);
+  }
 }
 
 .game-player-tablet-identity__on-turn-indicator {
