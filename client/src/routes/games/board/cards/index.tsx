@@ -238,19 +238,26 @@ export const MiniCardFaceUp = memo(
 /******************************************************************************
  * ### DiscardPile
  *
- * Displays the most recently discarded cards at the top of a "pile".
+ * Displays some of the most recently discarded cards as a staggered,
+ * overlapping "fan" of clickable thumbnails.
+ *
+ * `getLatestDiscards` returns every card discarded on the same tick, which is
+ * unbounded, and each card in the pile makes the visual element larger.
+ * Therefore, the number of cards displayed in the pile is capped.
  ******************************************************************************/
 export const DiscardPile = (props: {
   cardsVisible: VisibleCardDigest[];
   totalCount: number;
   setDialog: DialogProps["set"];
 }) => {
+  const MAX_VISIBLE_DISCARDS = 3;
+  const visibleDiscards = props.cardsVisible.slice(0, MAX_VISIBLE_DISCARDS);
   return (
     <CardPileStack>
       <CardPileStackItem>
         <MiniCardPlaceholder />
       </CardPileStackItem>
-      {props.cardsVisible.map((c, i) => (
+      {visibleDiscards.map((c, i) => (
         <CardPileStackItem key={c.id} index={i + 1}>
           <MiniCardFaceUp card={c} setDialog={props.setDialog} />
         </CardPileStackItem>
