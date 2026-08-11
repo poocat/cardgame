@@ -58,6 +58,7 @@
   grid-template-columns: auto auto 1fr;
   align-items: stretch;
   padding-inline: var(--spacing-lg);
+  row-gap: var(--tablet-shadow-width);
 }
 
 /*
