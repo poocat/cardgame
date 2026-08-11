@@ -99,8 +99,8 @@
   */
   --card-thumbnail-emphasis-padding: 0.3rem;
 
-  --card-height-fullsize: 30rem;
-  --card-width-fullsize: calc(var(--card-height-fullsize) * 5 / 7);
+  --card-width-fullsize: 20rem;
+  --card-height-fullsize: calc(var(--card-width-fullsize) * 7 / 5);
   --card-art-border-width-fullsize: calc(var(--card-height-fullsize) * 0.09);
   --card-font-size-fullsize: var(--font-size-sm);
 
@@ -151,8 +151,6 @@
     --card-width-thumbnail-sm: 2.75rem;
     /* Recovers 0.6rem of board width at the tier where it is scarcest. */
     --card-thumbnail-emphasis-padding: 0.2rem;
-
-    --card-height-fullsize: 25rem;
   }
 }
 

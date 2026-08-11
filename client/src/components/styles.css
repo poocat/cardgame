@@ -319,6 +319,22 @@
   Modal overlay and content container.
 ***************************************************************************/
 
+/*
+  The overlay is both the scroll container and the centering context, which is
+  why it aligns to the start rather than the centre.
+
+  A scroll container's scrollable region only extends in the end direction —
+  down and right. Scroll position 0 is its start edge, so anything centring
+  pushes ABOVE that edge is clipped with no scroll range that reaches it. With
+  `align-items: center`, content taller than the viewport overflows equally at
+  both ends and the top half becomes permanently unreachable.
+
+  Aligning to the start and centring with `margin: auto` on the content avoids
+  that: auto margins absorb positive free space (so it still centres when it
+  fits) but resolve to zero when free space is negative (so nothing is ever
+  pushed past the start edge). `align-items: safe center` is the purpose-built
+  equivalent; this idiom is used instead because it needs no support caveat.
+*/
 .dialog-overlay {
   background-color: var(--color-black-translucent);
   position: fixed;
@@ -327,12 +343,16 @@
   right: 0;
   bottom: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   z-index: 1000;
+  overflow: auto;
 }
 
-/* .dialog-content {} */
+.dialog-content {
+  /* Centres within the overlay without creating unreachable overflow. */
+  margin: auto;
+}
 
 /***************************************************************************
   Abutment/Edge
