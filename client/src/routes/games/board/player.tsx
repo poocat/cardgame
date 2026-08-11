@@ -75,7 +75,7 @@ export const PlayerTabletIdentity = (props: {
 }) => {
   return (
     <div className="game-player-tablet-identity">
-      <h2 aria-label={props.playerTitle}>
+      <h2>
         {props.playerTitle}
         {props.playerOnTurn && (
           <span className="game-player-tablet-identity__on-turn-indicator"></span>

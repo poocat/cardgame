@@ -1,3 +1,4 @@
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { Border, Color, EdgeVariant, Spacing } from "./types";
 import "./styles.css";
 
@@ -37,6 +38,28 @@ export const Box = (props: {
 
 export const Divider = () => {
   return <div className="divider" />;
+};
+
+/******************************************************************************
+ * ### PageTitle
+ *
+ * The page's `<h1>`. Every route should render exactly one, so that headings
+ * inside the route (e.g. player names) have a level-one ancestor to nest
+ * under, and so heading navigation has somewhere to land.
+ *
+ * Hidden by default: still in the accessibility tree, but taking up no space.
+ * Pass `visible` where the design has room for a real title.
+ ******************************************************************************/
+export const PageTitle = (props: {
+  children: React.ReactNode;
+  visible?: boolean;
+}) => {
+  if (props.visible) return <h1>{props.children}</h1>;
+  return (
+    <VisuallyHidden asChild>
+      <h1>{props.children}</h1>
+    </VisuallyHidden>
+  );
 };
 
 /******************************************************************************

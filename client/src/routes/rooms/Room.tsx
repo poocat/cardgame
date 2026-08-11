@@ -1,5 +1,5 @@
 import { Button, Input } from "@client/components";
-import { Box, Stack } from "@client/components/layout";
+import { Box, PageTitle, Stack } from "@client/components/layout";
 import { apiUrl } from "@client/utils/api";
 import { usePoller } from "@client/utils/usePoller";
 import { useSubmission } from "@client/utils/useSubmission";
@@ -132,6 +132,7 @@ export const Room = () => {
 
   return (
     <div>
+      <PageTitle>Room</PageTitle>
       {poller.error && (
         <Box fullWidth spacing="md" color="error">
           {poller.error}
