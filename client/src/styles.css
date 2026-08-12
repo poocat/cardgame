@@ -59,7 +59,7 @@
   --border-lg: 0.2rem;
 
   --control-size-sm: 2rem;
-  --control-size-md: 3rem;
+  --control-size-md: 2.8rem; /* ~45px for 16px font; minimum recommended for clickable controls */
   --control-size-lg: 4rem;
 
   --font-size-xs: 0.8rem;
@@ -78,12 +78,8 @@
 
   --footer-menu-max-height: min(15rem, 40vh);
 
-  --card-select-diameter-sm: var(--control-size-sm);
-  --card-select-diameter-md: var(--control-size-md);
-  --card-select-diameter-lg: var(--control-size-lg);
-  --card-select-font-size-sm: var(--font-size-sm);
-  --card-select-font-size-md: var(--font-size-md);
-  --card-select-font-size-lg: var(--font-size-lg);
+  --card-select-diameter: var(--control-size-md);
+  --card-select-font-size: var(--font-size-md);
 
   --card-height-thumbnail-lg: 8rem;
   --card-width-thumbnail-lg: 8rem;

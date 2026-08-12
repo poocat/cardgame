@@ -92,24 +92,9 @@
   align-items: center;
   justify-content: center;
   color: var(--color-black);
-}
-
-.game-card-selector__button--size-sm {
-  width: var(--card-select-diameter-sm);
-  height: var(--card-select-diameter-sm);
-  font-size: var(--card-select-font-size-sm);
-}
-
-.game-card-selector__button--size-md {
-  width: var(--card-select-diameter-md);
-  height: var(--card-select-diameter-md);
-  font-size: var(--card-select-font-size-md);
-}
-
-.game-card-selector__button--size-lg {
-  width: var(--card-select-diameter-lg);
-  height: var(--card-select-diameter-lg);
-  font-size: var(--card-select-font-size-lg);
+  width: var(--card-select-diameter);
+  height: var(--card-select-diameter);
+  font-size: var(--card-select-font-size);
 }
 
 /***************************************************************************

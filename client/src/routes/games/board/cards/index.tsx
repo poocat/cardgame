@@ -1,6 +1,5 @@
 import { Button, ButtonBase, SelectButton } from "@client/components";
 import { Edge, Stack } from "@client/components/layout";
-import type { Size } from "@client/components/types";
 import {
   FullsizeCardBodyActionText,
   FullsizeCardDisplay,
@@ -39,7 +38,6 @@ import { CardPileStack, CardPileStackItem } from "./pile";
  * ### CardSelector
  ******************************************************************************/
 export const CardSelector = (props: {
-  size: Size;
   selectDisabled: boolean;
   selected: boolean;
   onToggle: () => void;
@@ -48,11 +46,7 @@ export const CardSelector = (props: {
   return (
     <div className="game-card-selector">
       <ButtonBase disabled={props.selectDisabled} onClick={props.onToggle}>
-        <div
-          className={`game-card-selector__button game-card-selector__button--size-${props.size}`}
-        >
-          {symbol}
-        </div>
+        <div className={`game-card-selector__button`}>{symbol}</div>
       </ButtonBase>
     </div>
   );
@@ -177,7 +171,6 @@ export const ThumbnailCardFaceUp = memo(
         {cardIsSelectable && props.selectorProps && (
           <CardSelectorEdge>
             <CardSelector
-              size="sm"
               selected={cardIsSelected}
               selectDisabled={
                 props.submitting ||
