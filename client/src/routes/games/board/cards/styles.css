@@ -11,16 +11,16 @@
 }
 
 .game-player-tablet .card-thumbnail-container--emphasis-animated {
-  background-color: var(--color-highlight);
+  background-color: var(--tablet-emphasis-color);
   animation: var(--tablet-emphasis-animation);
 }
 
 .game-player-tablet .card-thumbnail-container--emphasis-solid {
-  background-color: var(--color-highlight);
+  background-color: var(--tablet-emphasis-color);
 }
 
 .game-player-tablet .card-thumbnail-container--emphasis-outlined {
-  outline: var(--border-sm) solid var(--color-highlight);
+  outline: var(--border-sm) solid var(--tablet-emphasis-color);
 }
 
 .game-player-tablet .card-thumbnail--placeholder {
@@ -34,20 +34,39 @@
 }
 
 .game-player-mind .card-thumbnail-container--emphasis-animated {
-  background-color: var(--color-highlight);
-  animation: pulse-lowlight 1500ms ease-in-out infinite;
+  background-color: var(--mind-emphasis-color);
+  animation: var(--mind-emphasis-animation);
 }
 
 .game-player-mind .card-thumbnail-container--emphasis-solid {
-  background-color: var(--color-highlight);
+  background-color: var(--mind-emphasis-color);
 }
 
 .game-player-mind .card-thumbnail-container--emphasis-outlined {
-  outline: var(--border-sm) solid var(--color-highlight);
+  outline: var(--border-sm) solid var(--mind-emphasis-color);
 }
 
 .game-player-mind .card-thumbnail--placeholder {
   border-color: var(--mind-inner-border-color);
+}
+
+/* Cards in Dashboard */
+
+.game-player-dashboard .card-thumbnail-container--emphasis-animated {
+  background-color: var(--dashboard-emphasis-color);
+  animation: var(--dashboard-emphasis-animation);
+}
+
+.game-player-dashboard .card-thumbnail-container--emphasis-solid {
+  background-color: var(--dashboard-emphasis-color);
+}
+
+.game-player-dashboard .card-thumbnail-container--emphasis-outlined {
+  outline: var(--border-sm) solid var(--dashboard-emphasis-color);
+}
+
+.game-player-dashboard .card-thumbnail--placeholder {
+  border-color: var(--dashboard-inner-border-color);
 }
 
 /***************************************************************************

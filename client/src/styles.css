@@ -120,11 +120,17 @@
   --tablet-text-color: var(--color-black);
   --tablet-shadow-width: var(--spacing-lg);
   --tablet-emphasis-animation: var(--default-lowlight-animation);
+  --tablet-emphasis-color: var(--color-lowlight);
 
   --mind-inner-border-color: var(--color-black-translucent);
   --mind-label-color: var(--color-black-translucent);
   --mind-text-color: var(--color-black-translucent);
   --mind-emphasis-animation: var(--default-lowlight-animation);
+  --mind-emphasis-color: var(--color-lowlight);
+
+  --dashboard-emphasis-animation: var(--default-lowlight-animation);
+  --dashboard-emphasis-color: var(--color-night);
+  --dashboard-inner-border-color: var(--color-black-translucent);
 }
 
 @media (width < 36rem) {
@@ -137,7 +143,7 @@
 
     /* Smaller elements are left as is, to avoid dropping too far below user's chosen font size */
     /* --control-size-sm: 2rem; */
-    --control-size-md: 2.5rem;
+    --control-size-md: 2.8rem;
     --control-size-lg: 3rem;
 
     /* --font-size-xs: 0.6rem; */
