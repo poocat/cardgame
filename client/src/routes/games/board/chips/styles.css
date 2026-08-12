@@ -11,6 +11,8 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  row-gap: var(--spacing-sm);
+  column-gap: var(--spacing-lg);
 }
 
 .game-player-tablet .game-chip-pool {
