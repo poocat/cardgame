@@ -9,6 +9,7 @@ export const Stack = (props: {
   spacing: Spacing;
   children: React.ReactNode;
   wrap?: boolean;
+  stretch?: boolean;
 }) => {
   const classNames = [
     "stack",
@@ -16,6 +17,7 @@ export const Stack = (props: {
     `stack--orient-${props.orientation}`,
   ];
   if (props.wrap) classNames.push(`stack--wrap`);
+  if (props.stretch) classNames.push(`stack--stretch`);
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;
 };
