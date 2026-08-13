@@ -1,5 +1,5 @@
 import { Button, Copy, Input } from "@client/components";
-import { Box, Stack } from "@client/components/layout";
+import { Box, PageTitle, Stack } from "@client/components/layout";
 import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import { useSubmission } from "@client/utils/useSubmission";
 import { ROUTES } from "@common/api/routes";
@@ -52,6 +52,7 @@ export const NewRoom = () => {
 
   return (
     <div style={{ minHeight: "100vh" }}>
+      <PageTitle>Play</PageTitle>
       <Box spacing="lg">
         <Stack spacing="lg" orientation="vertical">
           {welcomeNote && (

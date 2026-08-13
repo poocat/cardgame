@@ -1,56 +1,297 @@
 /***************************************************************************
-  Layout
+  Player Section
+
+  Sections span the entire width of the game board.
+
+  The orientation of each player's area alternates between right-to-left
+  and left-to-right.
+
+  A section is one of only two mirroring roots on the board (the other is
+  the dashboard, which is not a section descendant). Right-side players get
+  `direction: rtl`, which flips the inline axis for the whole subtree, so
+  every descendant can be written once with flow-relative values:
+
+    - `flex-direction: row`  runs right-to-left
+    - `flex-start` / `flex-end` in flexbox are already flow-relative
+    - `text-align: start` resolves to the right
+    - `margin-inline-*`, `inset-inline-*`, `border-inline-*` all follow
+
+  Two consequences to keep in mind when editing anything inside a section:
+
+  1. Do NOT combine this with `row-reverse`. Two flips cancel out, and the
+     symptom looks exactly like the rule not applying at all.
+  2. `direction` also drives Unicode directionality, which moves neutral
+     characters (punctuation, brackets) to the opposite end of a text run.
+     E.g. "Player 1:" would render as ":Player 1". Text-bearing leaves
+     therefore carry `unicode-bidi: plaintext`, which resolves each run from
+     its own first strong character instead — so text reads correctly whether
+     it is English or, once localized, an RTL language. Use that rather than
+     `direction: ltr` for anything holding localizable text; `direction` is
+     reserved here for LAYOUT mirroring.
+
+  Physical properties are unaffected by `direction`, so anything that must
+  mirror has to be written with the logical equivalent. `box-shadow` is the
+  one property with no logical form; see the tablet rules below.
+
+  A grid rather than a flex row, because a grid row cannot wrap. The tablet
+  and mind stay side by side because the tracks say so, not because their
+  content happens to fit — when the board cannot shrink any further it
+  overflows and the page scrolls horizontally instead, which `.layout` in
+  `client/src/styles.css` provides.
+
+  That distinction matters: with `display: flex` this needed `flex-wrap` to be
+  absent, and adding it back — which is tempting, since it is how the
+  dashboard used to reach its own row — turns a sizing regression into a
+  silent relayout rather than a visible overflow.
+
+    row 1:  [ tablet ][ mind ][ slack ]
+    row 2:  [ dashboard, spanning all three ]
+
+  The third track exists so the dashboard can span to the section's edge. With
+  only two content-sized tracks, `grid-column: 1 / -1` would reach no further
+  than the tablet and mind themselves.
 ***************************************************************************/
-.game-container {
-  position: relative;
-  width: var(--total-width);
-  min-width: var(--total-width);
-  min-height: 100vh;
-  margin: 0 auto;
-  padding: var(--space-md);
-  display: flex;
-  justify-content: center;
-  align-items: start;
-  overflow: hidden;
-}
 
-.game-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  z-index: -1;
-  pointer-events: none;
-  overflow-y: hidden;
-}
-
-/* The "cutout" is the dark area in the middle where consumer cards are played. */
-.game-background__cutout {
-  position: relative;
-  width: var(--cutout-width);
-  height: 9999px; /* Large enough to be cropped when used in the game background */
-  top: 3px; /* To account for the outline width */
-  outline: 3px double var(--color-black);
-  border: 2px solid var(--color-black);
-  border-radius:
-    var(--cutout-hradius) var(--cutout-hradius) 0 0 / var(--cutout-vradius)
-    var(--cutout-vradius) 0 0;
-  background: var(--color-night);
-}
-
-.game-foreground {
-  position: relative;
-  top: 0;
+.game-player-section {
   width: 100%;
-  z-index: 1;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: stretch;
+  padding-inline: var(--spacing-lg);
+  row-gap: var(--tablet-shadow-width);
 }
 
-.game-foreground__headspace {
-  position: relative;
-  height: var(--vertical-padding-top);
+/*
+  BOTH sides declare `direction` rather than letting the left side inherit it.
+
+  The board is a seating arrangement, not a text flow: player 1 sits on the
+  left whatever language the UI is in. Declaring only the right side would make
+  the mirror relative to the ambient direction, so setting `dir="rtl"` on the
+  document for an RTL locale would resolve BOTH sides to `rtl` and silently
+  collapse the alternation the whole layout is built on.
+
+  (If the board should instead flip with the locale, this is the place to
+  change it: compute the section's direction as
+  `localeIsRtl !== (side === "right")` and set it as a `dir` attribute.)
+*/
+.game-player-section--side-left {
+  direction: ltr;
+}
+
+.game-player-section--side-right {
+  direction: rtl;
+}
+
+/***************************************************************************
+  Tablet
+
+  Represents a "physical" realm on the board. Color coded to each player,
+  it is used to display the player's name, their producers, and their
+  chip reserve.
+
+  Justified to the right or left side of the board, alternating for each
+  each successive player (between 2-5).
+***************************************************************************/
+
+.game-player-tablet {
+  /* 
+    Uses an outline instead of border so that the vertical limits of the
+    adjacent "mind" block are the same
+  */
+  outline: var(--border-md) solid var(--tablet-outer-border-color);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  color: var(--tablet-text-color);
+  box-shadow: var(--tablet-outer-border-color) var(--tablet-shadow-width)
+    var(--tablet-shadow-width);
+  gap: var(--spacing-sm);
+}
+
+.game-player-section--side-right .game-player-tablet {
+  /*
+    `box-shadow` offsets are physical and have no logical equivalent, so this is
+    the only part of the board that still has to be told which side it is on.
+    Keying it off the section's modifier keeps the tablet itself side-agnostic.
+  */
+  box-shadow: var(--tablet-outer-border-color)
+    calc(-1 * var(--tablet-shadow-width)) var(--tablet-shadow-width);
+}
+
+.game-player-tablet--player-0 {
+  background: var(--color-player-red);
+}
+.game-player-tablet--player-1 {
+  background: var(--color-player-yellow);
+}
+.game-player-tablet--player-2 {
+  background: var(--color-player-green);
+}
+.game-player-tablet--player-3 {
+  background: var(--color-player-orange);
+}
+.game-player-tablet--player-4 {
+  background: var(--color-player-blue);
+}
+
+/* Tablet Header */
+
+.game-player-tablet__header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  text-align: start;
+}
+
+@media (width < 75rem) {
+  .game-player-tablet__header {
+    flex-direction: column;
+    /*
+      In a column flex container the cross axis is the inline axis, and
+      `flex-start` is flow-relative, so this resolves to the right edge for
+      right-side players without a second rule.
+    */
+    align-items: flex-start;
+  }
+}
+
+/* Tablet: Identity */
+
+.game-player-tablet-identity {
+  /*
+    A player-supplied name resolves its own direction from its first strong
+    character, so the surrounding mirror never reorders it, and a name written
+    in an RTL script still reads correctly.
+  */
+  display: block;
+  unicode-bidi: plaintext;
+  /* Break-up long names */
+  inline-size: calc(1.5 * var(--card-width-thumbnail-lg));
+  overflow-wrap: break-word;
+}
+
+@media (width < 75rem) {
+  .game-player-tablet-identity {
+    inline-size: var(--card-width-thumbnail-lg);
+  }
+}
+
+.game-player-tablet-identity__on-turn-indicator {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  background-color: red;
+  border-radius: 50%;
+  margin-inline-start: 0.2rem;
+}
+
+/* Tablet: Piles */
+
+.game-player-tablet-piles {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-sm);
+}
+
+@media (width < 75rem) {
+  .game-player-tablet-piles {
+    flex-direction: column;
+  }
+}
+
+/* Tablet: Producers */
+
+.game-player-tablet__producers {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  /* When the stack runs horizontally, leave room for controls aligned to the bottom edge of the card. */
+  margin-bottom: var(--card-spacing-thumbnail-vertical);
+  gap: var(--card-spacing-thumbnail-horizontal);
+}
+
+@media (width < 75rem) {
+  .game-player-tablet__producers {
+    flex-direction: column;
+    /* When the stack runs vertically, leave room for controls aligned to the bottom edge of the card. */
+    gap: var(--card-spacing-thumbnail-vertical);
+    margin-bottom: var(--card-spacing-thumbnail-vertical);
+  }
+}
+
+/***************************************************************************
+  Mind
+
+  Represents a "metaphysical" realm on the board. Used to display a player's
+  consumer cards and chip channel.
+***************************************************************************/
+
+.game-player-mind {
+  margin-inline: var(--spacing-lg);
+  /* Align block with tablet drop shadow */
+  margin-top: var(--tablet-shadow-width);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-between; */
+  color: var(--mind-text-color);
+}
+
+/* Mind: Consumers */
+
+.game-player-mind__consumers {
+  /*
+    Fill order is inherited from the section, so `grid-auto-flow: row` fills
+    right-to-left and `column` wraps toward the left for right-side players.
+    The card faces pin themselves back to `ltr`
+    (see `features/cards/styles.css`).
+  */
+  display: grid;
+  margin-bottom: var(--card-spacing-thumbnail-vertical);
+  grid-row-gap: var(--card-spacing-thumbnail-vertical);
+  grid-column-gap: var(--card-spacing-thumbnail-horizontal);
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, auto);
+  grid-auto-flow: row;
+}
+
+@media (width < 75rem) {
+  /* Wrap to a new column after the 4th card */
+  .game-player-mind__consumers {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, auto);
+    grid-auto-flow: column;
+  }
+}
+
+/***************************************************************************
+  Hand
+
+  Only the currently observing player's hand is visible, below the rest of
+  their player section.
+
+  It is the section's third child, and spans every column so that it occupies
+  a row of its own beneath both the tablet and the mind.
+
+  Being inside the section, it inherits that section's `direction` and needs
+  no side modifier of its own.
+***************************************************************************/
+.game-player-dashboard {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md);
+  /* Cross axis is the inline axis here, so this follows `direction`. */
+  align-items: flex-start;
+}
+
+.game-player-dashboard__hand {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--card-spacing-thumbnail-horizontal);
+  row-gap: var(--card-spacing-thumbnail-vertical);
 }
 
 /***************************************************************************
@@ -72,230 +313,48 @@
   bottom: 0;
   right: 0;
   left: 0;
-  border-top: 1px solid var(--color-black);
+  border-top: var(--border-lg) solid var(--color-black);
   background-color: var(--color-white-translucent);
   overflow-y: auto;
 }
 
 /***************************************************************************
-  Player Area
+  Label
 
-  The player area is a row that spans the entire width of the game
-  container.
-
-  The orientation of each player's area alternates between right-to-left
-  and left-to-right.
+  Used to align text (and optionally, an icon) above an element on the game
+  board.
 ***************************************************************************/
 
-.game-player-area {
-  width: 100%;
-  height: var(--player-area-height);
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+.game-label {
+  font-size: var(--font-size-sm);
+  text-align: start;
 }
 
-.game-player-area--side-left {
-  flex-direction: row;
+/*
+  An inline flex row so the icon and text swap ends with `direction` — this
+  replaces the JS that used to reorder them per side.
+*/
+.game-label__content {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4em;
+  text-transform: capitalize;
 }
 
-.game-player-area--side-right {
-  flex-direction: row-reverse;
+/*
+  Flex item ORDER still comes from this container's direction (so the icon
+  follows the player's side), while the text INSIDE each item resolves its own
+  direction. Without this, a label's trailing punctuation jumps to the wrong
+  end inside a mirrored section.
+*/
+.game-label__content > * {
+  unicode-bidi: plaintext;
 }
 
-/***************************************************************************
-  Tablet
-
-  The tablet is a container that is color coded to the player, used to 
-  display the player's name, and their producer cards (up to 3).
-
-  Justified to the right or left side of the game container, alternating
-  for each successive player (2-4).
-***************************************************************************/
-
-.game-player-tablet {
-  width: var(--tablet-width);
-  height: 100%;
-  padding: var(--space-md);
-  border: 3px double var(--color-black);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.game-player-tablet .game-label {
+  color: var(--tablet-label-color);
 }
 
-.game-player-area--side-left .game-player-tablet {
-  box-shadow: var(--color-black) 2px 2px;
-}
-.game-player-area--side-right .game-player-tablet {
-  box-shadow: var(--color-black) -2px 2px;
-}
-
-.game-player-tablet--player-0 {
-  background: var(--color-player-red);
-}
-.game-player-tablet--player-1 {
-  background: var(--color-player-yellow);
-}
-.game-player-tablet--player-2 {
-  background: var(--color-player-green);
-}
-.game-player-tablet--player-3 {
-  background: var(--color-player-orange);
-}
-.game-player-tablet--player-4 {
-  background: var(--color-player-blue);
-}
-
-.game-player-tablet__header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-.game-player-tablet__name {
-  font-size: var(--font-size-lg);
-}
-
-.game-player-tablet__indicator {
-  width: 12px;
-  height: 12px;
-  background-color: red;
-  border: 2px double var(--color-black);
-  outline: 1px solid var(--color-black);
-  border-radius: 50%;
-}
-
-.game-player-tablet__body {
-  width: 100%;
-  display: flex;
-}
-
-.game-player-tablet__footer {
-  width: 100%;
-  display: flex;
-}
-
-.game-player-tablet__card-stack {
-  display: flex;
-  gap: var(--space-xs);
-}
-
-/* Flex direction for tablet internals based on player orientation */
-.game-player-area--side-right .game-player-tablet__body,
-.game-player-area--side-left .game-player-tablet__header,
-.game-player-area--side-left .game-player-tablet__footer,
-.game-player-area--side-left .game-player-tablet__card-stack {
-  flex-direction: row;
-}
-
-.game-player-area--side-left .game-player-tablet__body,
-.game-player-area--side-right .game-player-tablet__header,
-.game-player-area--side-right .game-player-tablet__footer,
-.game-player-area--side-right .game-player-tablet__card-stack {
-  flex-direction: row-reverse;
-}
-
-/***************************************************************************
-  Central Area
-
-  The central area of the game board appears over the background "cutout"
-  and represents a common area where consumer cards are played.
-***************************************************************************/
-
-.game-player-center {
-  width: var(--center-area-width);
-  height: 100%;
-  padding: var(--space-lg);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.game-player-center__card-stack {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: var(--space-xs);
-}
-
-.game-player-area--side-left .game-player-center__card-stack {
-  flex-direction: row;
-}
-
-.game-player-area--side-right .game-player-center__card-stack {
-  flex-direction: row-reverse;
-}
-
-/***************************************************************************
-  Player Abutment
-
-  Some of a player's indicators/controls lie outside of the player area,
-  and thus overlap the next player's area somewhat. To position these
-  elements, an abutment is used.
-***************************************************************************/
-
-.game-player-abutment {
-  position: relative;
-  width: var(--hand-area-width);
-  top: 100%;
-  padding: var(--space-sm);
-  display: flex;
-}
-
-.game-player-area--side-left .game-player-abutment {
-  margin-right: calc(-1 * var(--hand-area-width));
-  flex-direction: row;
-}
-
-.game-player-area--side-right .game-player-abutment {
-  margin-left: calc(-1 * var(--hand-area-width));
-  flex-direction: row-reverse;
-}
-
-.game-player-abutment-spacer {
-  width: 100%;
-  height: var(--hand-area-height);
-}
-
-/***************************************************************************
-  Hand
-
-  Only the currently observing player's hand is visible, below their player
-  area.
-  
-  Note, since it is not a child of a player area, it cannot inherit from
-  `game-player-area--side-left` or `game-player-area--side-right`.
-***************************************************************************/
-.game-player-dashboard {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-sm);
-}
-
-.game-player-dashboard--side-left {
-  align-items: flex-start;
-}
-
-.game-player-dashboard--side-right {
-  align-items: flex-end;
-}
-
-.game-player-dashboard__card-stack {
-  width: var(--hand-area-width);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  justify-content: flex-start;
-  align-content: flex-start;
-  align-items: flex-start;
-}
-
-.game-player-dashboard--side-left .game-player-dashboard__card-stack {
-  flex-direction: row;
-}
-
-.game-player-dashboard--side-right .game-player-dashboard__card-stack {
-  flex-direction: row-reverse;
+.game-player-mind .game-label {
+  color: var(--mind-label-color);
 }

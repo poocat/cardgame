@@ -11,6 +11,10 @@ export const messageKeys = [
   "action.type.play",
   "action.type.ability",
   "action.type.discard",
+  "location.card.inDeck",
+  "location.card.inHand",
+  "location.card.inPlay",
+  "location.card.inDiscard",
   // Use to generate instructions for non-action activities:
   "activity.drawingCards.choice.instructions",
   "activity.drawingCards.explanation",

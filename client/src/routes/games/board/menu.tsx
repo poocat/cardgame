@@ -117,7 +117,7 @@ export const ChoiceMenu = memo(
             </Button>
           </Box>
           <Box spacing="sm">
-            <Stack spacing="sm" orientation="horizontal">
+            <Stack spacing="sm" orientation="horizontal" stretch>
               {props.values.map(({ value, label }) => {
                 const selected = props.checkValueSelected(value);
                 const disabled =

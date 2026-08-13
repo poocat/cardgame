@@ -1,131 +1,134 @@
+import { Icon } from "@client/components/icon";
+import { Msg } from "@client/components/msg";
 import type { PlayerSide } from "./types";
 
 /******************************************************************************
- * ### PlayerArea
+ * ### Labeled
+ *
+ * The icon/text order and the text alignment both follow the inherited
+ * `direction` of the enclosing player section, so this does not need to know
+ * which side of the board it is on.
+ ******************************************************************************/
+export const Labeled = (props: {
+  msgKey: string;
+  iconKey?: string;
+  children: React.ReactNode;
+}) => {
+  return (
+    <div className="game-label">
+      <span className="game-label__content">
+        {props.iconKey && <Icon msgKey={props.iconKey} decorative />}
+        <Msg value={{ key: props.msgKey }} textOnly />
+      </span>
+      {props.children}
+    </div>
+  );
+};
+
+/******************************************************************************
+ * ### PlayerSection
  *
  * A row spanning the width of the UI, used to lay out all of a player's cards,
  * chips, et cetera.
  ******************************************************************************/
-export const PlayerArea = (props: {
+export const PlayerSection = (props: {
   side: PlayerSide;
   children: React.ReactNode;
 }) => {
-  const className = `game-player-area game-player-area--side-${props.side}`;
-  return <div className={className}>{props.children}</div>;
-};
-
-/******************************************************************************
- * ### PlayerAbutment
- *
- * Used as a child of `<PlayerArea/>` to display information about other
- * players e.g. how many cards are in their hand.
- ******************************************************************************/
-export const PlayerAbutment = (props: { children?: React.ReactNode }) => {
-  return <div className={`game-player-abutment`}>{props.children}</div>;
+  const className = `game-player-section game-player-section--side-${props.side}`;
+  return <section className={className}>{props.children}</section>;
 };
 
 /******************************************************************************
  * ### PlayerTablet
  *
- * A color-coded box used to lay out the player's name, producer cards, and
- * reserve chips.
+ * A color-coded box used to lay out the player's name, producer cards, reserve
+ * chips, et cetera.
  ******************************************************************************/
 export const PlayerTablet = (props: {
-  index: number;
+  /** Player color is mapped to their index. */
+  playerIndex: number;
   children: React.ReactNode;
 }) => {
-  const className = `game-player-tablet game-player-tablet--player-${props.index}`;
+  const className = `game-player-tablet game-player-tablet--player-${props.playerIndex}`;
   return <div className={className}>{props.children}</div>;
 };
 
 /******************************************************************************
  * ### PlayerTabletHeader
  *
- * Used as a child of `<PlayerTablet/>` to display the player's name, and an
- * indicator of whether or not the player is currently taking their turn.
+ * Used as a child of `<PlayerTablet/>` to display data and controls at the
+ * top of the tablet.
  ******************************************************************************/
-export const PlayerTabletHeader = (props: {
-  playerName: string;
+export const PlayerTabletHeader = (props: { children: React.ReactNode }) => {
+  return <div className="game-player-tablet__header">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### PlayerTabletIdentity
+ *
+ * Used to display the player's name and optional subtitles indi.
+ ******************************************************************************/
+export const PlayerTabletIdentity = (props: {
+  playerTitle: string;
   playerOnTurn: boolean;
 }) => {
   return (
-    <div className="game-player-tablet__header">
-      <div className="game-player-tablet__name">{props.playerName}</div>
-      {props.playerOnTurn && <div className="game-player-tablet__indicator" />}
+    <div className="game-player-tablet-identity">
+      <h2>
+        {props.playerTitle}
+        {props.playerOnTurn && (
+          <span className="game-player-tablet-identity__on-turn-indicator"></span>
+        )}
+      </h2>
     </div>
   );
 };
 
 /******************************************************************************
- * ### PlayerTabletCardArea
+ * ### PlayerTabletPiles
  *
- * Used as a child of `<PlayerTablet/>` to display a player's producer cards.
+ * Use as a child of `<PlayerTabletHeader/>` to display the player's discard
+ * pile and (if not the observing player) their hand.
  ******************************************************************************/
-export const PlayerTabletCardArea = (props: { children: React.ReactNode }) => {
+export const PlayerTabletPiles = (props: { children: React.ReactNode }) => {
+  return <div className="game-player-tablet-piles">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### PlayerTabletProducers
+ *
+ * Used as a child of `<PlayerTablet/>` to display an array the player's
+ * producer cards.
+ ******************************************************************************/
+export const PlayerTabletProducers = (props: { children: React.ReactNode }) => {
   return (
-    <div className="game-player-tablet__body">
-      <div className="game-player-tablet__card-stack">{props.children}</div>
-    </div>
+    <Labeled msgKey="term.producers" iconKey="term.producer">
+      <div className="game-player-tablet__producers">{props.children}</div>
+    </Labeled>
   );
 };
 
 /******************************************************************************
- * ### PlayerTabletFooter
+ * ### PlayerMind
  *
- * Used as a child of `<PlayerTablet/>` to display a player's reserve chips.
- ******************************************************************************/
-export const PlayerTabletFooter = (props: { children: React.ReactNode }) => {
-  return <div className="game-player-tablet__footer">{props.children}</div>;
-};
-
-/******************************************************************************
- * ### PlayerCenter
- *
- * Used as the second child of `<PlayerArea/>` after `<PlayerTablet/>` to
+ * Used as the second child of `<PlayerSection/>` after `<PlayerTablet/>` to
  * display a player's consumer cards and chips in their channel.
  ******************************************************************************/
-export const PlayerCenter = (props: {
-  side: PlayerSide;
-  children?: React.ReactNode;
-}) => {
-  return (
-    <div
-      className={`game-player-center game-player-center--side-${props.side}`}
-    >
-      {props.children}
-    </div>
-  );
+export const PlayerMind = (props: { children?: React.ReactNode }) => {
+  return <div className={`game-player-mind`}>{props.children}</div>;
 };
 
 /******************************************************************************
- * ### PlayerCenterCardArea
+ * ### PlayerMindConsumers
  *
- * Used as a child of `<PlayerCenter/>` to display a player's consumer cards.
+ * Used as a child of `<PlayerMind/>` to display a player's consumer cards.
  ******************************************************************************/
-export const PlayerCenterCardArea = (props: {
-  side: PlayerSide;
-  children?: React.ReactNode;
-}) => {
-  return <div className="game-player-center__card-stack">{props.children}</div>;
-};
-
-/******************************************************************************
- * ### PlayerDashboard
- *
- * The area underneath the observing player's "tablet", used to display the
- * player's discard pile, and all the cards in the observing player's hand,
- * face up.
- ******************************************************************************/
-export const PlayerDashboard = (props: {
-  side: PlayerSide;
-  children?: React.ReactNode;
-}) => {
+export const PlayerMindConsumers = (props: { children?: React.ReactNode }) => {
   return (
-    <div
-      className={`game-player-dashboard game-player-dashboard--side-${props.side}`}
-    >
-      {props.children}
-    </div>
+    <Labeled msgKey="term.consumers" iconKey="term.consumer">
+      <div className="game-player-mind__consumers">{props.children}</div>
+    </Labeled>
   );
 };
 
@@ -134,8 +137,15 @@ export const PlayerDashboard = (props: {
  *
  * A container for the face-up cards in the observing player's hand.
  ******************************************************************************/
-export const PlayerHand = (props: { children?: React.ReactNode }) => {
-  return (
-    <div className="game-player-dashboard__card-stack">{props.children}</div>
-  );
+export const PlayerDashboard = (props: { children?: React.ReactNode }) => {
+  return <div className="game-player-dashboard">{props.children}</div>;
+};
+
+/******************************************************************************
+ * ### PlayerHand
+ *
+ * A container for the face-up cards in the observing player's hand.
+ ******************************************************************************/
+export const PlayerDashboardHand = (props: { children?: React.ReactNode }) => {
+  return <div className="game-player-dashboard__hand">{props.children}</div>;
 };

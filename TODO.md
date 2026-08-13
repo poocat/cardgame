@@ -1,5 +1,8 @@
 # TODO:
 
+- [ ] Add a dialog to observe all visible "discards" (currently capped).
+- [ ] Move bare minimum message key list to `/common`, with utils for generating message keys.
+- [ ] Replace all literal English text in app with messages.
 - [ ] Give `common/` its own `package.json`, or adopt npm workspaces to resolve shared dependencies in ci/cd.
 - [ ] Add (comprehensive) unit tests for API.
 - [ ] Add unit tests for client app (especially for recursive message resolution)
@@ -8,6 +11,7 @@
 - [ ] Add "recent mutations" log in UI.
 - [ ] Mutate game state on each step of sequence.
 - [ ] Allow activity resets, e.g. "cancel action".
+- [x] Create responsive layout for smaller screens.
 - [x] Cache game hashes to avoid hitting database on every poll.
 - [x] Resolve "messages" in the front end instead of the digest.
 - [x] Allow room to be "reset", to make it easier to play consecutive games.

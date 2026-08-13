@@ -1,5 +1,5 @@
 import { Button, Input } from "@client/components";
-import { Box, Stack } from "@client/components/layout";
+import { Box, PageTitle, Stack } from "@client/components/layout";
 import { apiUrl } from "@client/utils/api";
 import { usePoller } from "@client/utils/usePoller";
 import { useSubmission } from "@client/utils/useSubmission";
@@ -132,6 +132,7 @@ export const Room = () => {
 
   return (
     <div>
+      <PageTitle>Room</PageTitle>
       {poller.error && (
         <Box fullWidth spacing="md" color="error">
           {poller.error}
@@ -150,17 +151,13 @@ export const Room = () => {
             </Box>
           </Box>
           Host:
-          <Box size="md" border="dark" spacing="md">
+          <Box border="dark" spacing="md">
             {poller.data?.digest.host.name ?? "..."}
           </Box>
           Guests:
-          {playerIsHost && guests.length < 1 && (
-            <Box size="md" spacing="lg">
-              ...
-            </Box>
-          )}
+          {playerIsHost && guests.length < 1 && <Box spacing="lg">...</Box>}
           {poller.data?.digest.guests.map((guest) => (
-            <Box size="md" border="dark" key={guest.id} spacing="lg">
+            <Box border="dark" key={guest.id} spacing="lg">
               {guest.name}
             </Box>
           ))}

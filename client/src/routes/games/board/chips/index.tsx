@@ -2,7 +2,7 @@ import { ButtonBase } from "@client/components";
 import { Edge } from "@client/components/layout";
 import type { Size } from "@client/components/types";
 import { useCallback, useMemo } from "react";
-import type { ChipDigest, PlayerSide, SelectorProps } from "../types";
+import type { ChipDigest, SelectorProps } from "../types";
 import "./styles.css";
 
 /******************************************************************************
@@ -20,12 +20,8 @@ const Chip = (props: { count: number; size: Size; selected?: boolean }) => {
 /******************************************************************************
  * ### Arrow
  ******************************************************************************/
-const Arrow = (props: { size: Size; reverse?: boolean; light?: boolean }) => {
-  const classNames = ["game-arrow", `game-arrow--size-${props.size}`];
-  if (props.light) classNames.push("game-arrow--light");
-  if (props.reverse) classNames.push("game-arrow--reverse");
-  const className = classNames.join(" ");
-  return <div className={className} />;
+const Arrow = (props: { size: Size }) => {
+  return <div className={`game-arrow game-arrow--size-${props.size}`} />;
 };
 
 /******************************************************************************
@@ -36,8 +32,6 @@ const Arrow = (props: { size: Size; reverse?: boolean; light?: boolean }) => {
  ******************************************************************************/
 export const ChipCounter = (props: {
   size: Size;
-  side: PlayerSide;
-  light: boolean;
   baseCount: number;
   selectedCount: number;
 }) => {
@@ -45,47 +39,18 @@ export const ChipCounter = (props: {
    * TODO!!! Add a `prevSelectedCount` prop to account for multi-choice
    * activities where chips are selected from the same pool.
    */
-  const direction = props.side === "left" ? "forward" : "reverse";
+  // Stack order and arrow direction follow the inherited `direction`.
   return (
-    <div className={`game-chip-stack game-chip-stack--${direction}`}>
+    <div className="game-chip-stack">
       <Chip count={props.baseCount} size={props.size} />
       {props.selectedCount > 0 && (
         <>
-          <Arrow
-            size={props.size}
-            light={props.light}
-            reverse={props.side === "right"}
-          />
+          <Arrow size={props.size} />
           <Chip selected count={props.selectedCount} size={props.size} />
         </>
       )}
     </div>
   );
-};
-
-/******************************************************************************
- * ### ChipPoolContainer
- *
- * A container with a border used to display a named chip pool (e.g. "reserve").
- ******************************************************************************/
-export const ChipPoolContainer = (props: {
-  light: boolean;
-  side: PlayerSide;
-  children?: React.ReactNode;
-}) => {
-  const classNames = ["game-chip-pool", `game-chip-pool--side-${props.side}`];
-  if (props.light) classNames.push("game-chip-pool--light");
-  const className = classNames.join(" ");
-  return <div className={className}>{props.children}</div>;
-};
-
-/******************************************************************************
- * ### ChipPoolLabel
- *
- * A wrapper around the text used to name the chip pool.
- ******************************************************************************/
-export const ChipPoolLabel = (props: { children?: React.ReactNode }) => {
-  return <div className="game-chip-pool__label">{props.children}</div>;
 };
 
 /******************************************************************************
@@ -95,17 +60,11 @@ export const ChipPoolLabel = (props: { children?: React.ReactNode }) => {
  * any menus for selecting chips.
  ******************************************************************************/
 export const ChipPoolDisplay = (props: {
-  side: PlayerSide;
-  light: boolean;
-  fullWidth?: boolean;
+  selecting?: boolean;
   children?: React.ReactNode;
 }) => {
-  const classNames = [
-    "game-chip-pool__display",
-    `game-chip-pool__display--side-${props.side}`,
-  ];
-  if (props.light) classNames.push(`game-chip-pool__display--light`);
-  if (props.fullWidth) classNames.push("game-chip-pool__display--fullwidth");
+  const classNames = ["game-chip-pool"];
+  if (props.selecting) classNames.push("game-chip-pool--emphasis");
   const className = classNames.join(" ");
   return <div className={className}>{props.children}</div>;
 };
@@ -118,7 +77,6 @@ export const ChipPoolDisplay = (props: {
  ******************************************************************************/
 export const ChipSelector = (props: {
   size: Size;
-  light: boolean;
   numSelected: number;
   onIncrement: () => void;
   onDecrement: () => void;
@@ -130,7 +88,8 @@ export const ChipSelector = (props: {
 }) => {
   const allDisabled = props.disabled || props.submitting;
   return (
-    <div className={`game-chip-stack game-chip-stack--forward`}>
+    // A control, not board furniture: its button order must not mirror.
+    <div className="game-chip-stack game-chip-stack--ltr">
       <ButtonBase
         disabled={allDisabled || props.numSelected < 1}
         onClick={props.onDecrement}
@@ -145,7 +104,7 @@ export const ChipSelector = (props: {
       </ButtonBase>
       {props.onSubmit && (
         <>
-          <Arrow size={props.size} light={props.light} />
+          <Arrow size={props.size} />
           <ButtonBase
             disabled={allDisabled || !!props.disableSubmit}
             onClick={props.onSubmit}

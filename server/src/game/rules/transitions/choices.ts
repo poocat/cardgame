@@ -92,7 +92,7 @@ export function createActionChoice(args: {
     9999;
   const optionals =
     args.choiceDef.type === "arbitrary"
-      ? { labelMap: args.choiceDef.labels }
+      ? { labels: args.choiceDef.labels }
       : {};
   return {
     name: args.choiceDef.name,

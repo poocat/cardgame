@@ -1,4 +1,4 @@
-import { Box } from "@client/components/layout";
+import { Box, PageTitle } from "@client/components/layout";
 import { FullsizeCardDisplay } from "@client/features/cards/fullsize";
 import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import type { Message } from "@client/utils/messages";
@@ -47,15 +47,18 @@ export const Cards = () => {
     );
   }, [data, lookup]);
 
-  if (loading) return <Box spacing="lg">Loading...</Box>;
-  if (error) return <Box spacing="lg">Cards are not available.</Box>;
-  if (!data) return null;
-
   return (
-    <div className="card-catalog-grid">
-      {cards.map((card) => (
-        <FullsizeCardDisplay key={card.name} card={card} />
-      ))}
-    </div>
+    <>
+      <PageTitle>Cards</PageTitle>
+      {loading && <Box spacing="lg">Loading...</Box>}
+      {error && <Box spacing="lg">Cards are not available.</Box>}
+      {data && (
+        <div className="card-catalog-grid">
+          {cards.map((card) => (
+            <FullsizeCardDisplay key={card.name} card={card} />
+          ))}
+        </div>
+      )}
+    </>
   );
 };

@@ -1,4 +1,4 @@
-import { Box } from "@client/components/layout";
+import { Box, PageTitle } from "@client/components/layout";
 import { apiUrl } from "@client/utils/api";
 import { useAttention } from "@client/utils/useAttention";
 import { usePoller } from "@client/utils/usePoller";
@@ -158,9 +158,12 @@ export const Game = () => {
   if (poller.error) errors.push(poller.error);
   if (submission.error) errors.push(submission.error);
 
+  const pageTitle = <PageTitle>Game</PageTitle>;
+
   return game ? (
     // If there is a game to render, let it render errors.
     <div>
+      {pageTitle}
       <Box spacing="md" />
       <GameBoard
         game={game}
@@ -176,6 +179,7 @@ export const Game = () => {
   ) : (
     // Otherwise render errors here, if there are any.
     <div>
+      {pageTitle}
       {errors.map((e, i) => (
         <Box
           key={`${i}-${e}`}

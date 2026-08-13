@@ -1,3 +1,5 @@
+/* Global Stylesheet */
+
 /***************************************************************************
   Reset
 
@@ -17,11 +19,14 @@
 ***************************************************************************/
 
 :root {
-  /* Colors: Core */
+  /* Colors */
   --color-white: #ffffee;
   --color-white-translucent: #ffffeebb;
+  --color-paper: var(--color-white);
+  --color-paper-translucent: var(--color-white-translucent);
   --color-gray: #444444;
   --color-brown: #ddccbb;
+  /* --color-brown: #dabea0; */
   --color-darkbrown: #aa9988;
   --color-black: #222222;
   --color-black-translucent: #22222288;
@@ -29,8 +34,8 @@
   --color-highlight: #ffffee88;
   --color-lowlight: #22222288;
   --color-error: #ff4444;
+  --color-background: var(--color-white);
 
-  /* Colors: */
   --color-chip: #ffff00;
   --color-chip-buffer: #ffffaa;
   --color-action: #9696c8;
@@ -42,51 +47,113 @@
   --color-player-green: #71d989;
   --color-player-blue: #8888ff;
 
-  /* Spacing */
-  --space-xs: 1px;
-  --space-sm: 5px;
-  --space-md: 15px;
-  --space-lg: 18px;
+  /* Sizes ( */
 
-  /* Sizing */
-  --control-size-sm: 20px;
-  --control-size-md: 28px;
-  --control-size-lg: 40px;
+  --spacing-xs: 0.2rem;
+  --spacing-sm: 0.4rem;
+  --spacing-md: 0.8rem;
+  --spacing-lg: 1.2rem;
+
+  --border-sm: 0.1rem;
+  --border-md: 0.15rem;
+  --border-lg: 0.2rem;
+
+  --control-size-sm: 2rem;
+  --control-size-md: 2.8rem; /* ~45px for 16px font; minimum recommended for clickable controls */
+  --control-size-lg: 4rem;
+
+  --font-size-xs: 0.8rem;
+  --font-size-sm: 1rem;
+  --font-size-md: 1.4rem;
+  --font-size-lg: 1.8rem;
 
   /* Typography */
   --font-family: "Rokkitt", serif;
-  --font-size-xs: 11px;
-  --font-size-sm: 12px;
-  --font-size-md: 14px;
-  --font-size-lg: 20px;
 
-  /* Game styling */
-  --total-width: 1000px;
+  /* Animations */
+  --default-highlight-animation: pulse-highlight 1500ms ease-in-out infinite;
+  --default-lowlight-animation: pulse-lowlight 1500ms ease-in-out infinite;
 
-  --cutout-width: 375px;
-  --cutout-hradius: calc(var(--cutout-width) / 2);
-  --cutout-vradius: var(--cutout-hradius);
-  --vertical-padding-top: var(--cutout-vradius);
+  /* Elements... */
 
-  --player-area-height: 250px;
+  --footer-menu-max-height: min(15rem, 40vh);
 
-  --tablet-width: 325px;
+  --card-select-diameter: var(--control-size-md);
+  --card-select-font-size: var(--font-size-md);
 
-  --center-area-width: 350px;
+  --card-height-thumbnail-lg: 8rem;
+  --card-width-thumbnail-lg: 8rem;
+  --card-height-thumbnail-sm: 4rem;
+  --card-width-thumbnail-sm: 4rem;
+  --card-spacing-thumbnail-vertical: var(--spacing-sm);
+  --card-spacing-thumbnail-horizontal: var(--spacing-xs);
+  /*
+    Breathing room around a thumbnail so its emphasis outline/fill is visible.
+    This is a term in the board's horizontal budget six times over (three
+    tablet cells and, at their widest, four mind cells), so it has to rescale
+    with the tier or the narrow layout stops fitting.
+  */
+  --card-thumbnail-emphasis-padding: 0.3rem;
 
-  --hand-area-width: 300px;
-  --hand-area-height: 200px;
+  --card-width-fullsize: 20rem;
+  --card-height-fullsize: calc(var(--card-width-fullsize) * 7 / 5);
+  --card-art-border-width-fullsize: calc(var(--card-height-fullsize) * 0.09);
+  --card-font-size-fullsize: var(--font-size-sm);
 
-  --footer-menu-max-height: 200px;
+  --chip-diam-adj: 0.8;
+  --chip-diam-sm: calc(var(--control-size-sm) * var(--chip-diam-adj));
+  --chip-diam-md: calc(var(--control-size-md) * var(--chip-diam-adj));
+  --chip-diam-lg: calc(var(--control-size-lg) * var(--chip-diam-adj));
+  --chip-font-size-sm: var(--font-size-sm);
+  --chip-font-size-md: var(--font-size-md);
+  --chip-font-size-lg: var(--font-size-lg);
 
-  --card-width-thumbnail-sm: 44px;
-  --card-height-thumbnail-sm: 44px;
-  --card-width-thumbnail-lg: 70px;
-  --card-height-thumbnail-lg: 70px;
-  --card-width-fullsize: 250px;
-  --card-height-fullsize: 350px;
-  --card-outer-border-width-fullsize: 9px;
-  --card-inner-border-width-fullsize: 20px;
+  /* Context-specific */
+
+  --tablet-outer-border-color: var(--color-black);
+  --tablet-inner-border-color: var(--color-black-translucent);
+  --tablet-label-color: var(--color-black-translucent);
+  --tablet-text-color: var(--color-black);
+  --tablet-shadow-width: var(--spacing-lg);
+  --tablet-emphasis-animation: var(--default-lowlight-animation);
+  --tablet-emphasis-color: var(--color-lowlight);
+
+  --mind-inner-border-color: var(--color-black-translucent);
+  --mind-label-color: var(--color-black-translucent);
+  --mind-text-color: var(--color-black-translucent);
+  --mind-emphasis-animation: var(--default-lowlight-animation);
+  --mind-emphasis-color: var(--color-lowlight);
+
+  --dashboard-emphasis-animation: var(--default-lowlight-animation);
+  --dashboard-emphasis-color: var(--color-lowlight);
+  --dashboard-inner-border-color: var(--color-black-translucent);
+}
+
+@media (width < 36rem) {
+  :root {
+    /* Design tokens scaled for small screens */
+    --spacing-xs: 0.1rem;
+    --spacing-sm: 0.2rem;
+    --spacing-md: 0.4rem;
+    --spacing-lg: 0.8rem;
+
+    /* Smaller elements are left as is, to avoid dropping too far below user's chosen font size */
+    /* --control-size-sm: 2rem; */
+    --control-size-md: 2.8rem;
+    --control-size-lg: 3rem;
+
+    /* --font-size-xs: 0.6rem; */
+    /* --font-size-sm: 1rem; */
+    --font-size-md: 1.2rem;
+    --font-size-lg: 1.4rem;
+
+    --card-height-thumbnail-lg: 5.5rem;
+    --card-width-thumbnail-lg: 5.5rem;
+    --card-height-thumbnail-sm: 2.75rem;
+    --card-width-thumbnail-sm: 2.75rem;
+    /* Recovers 0.6rem of board width at the tier where it is scarcest. */
+    --card-thumbnail-emphasis-padding: 0.2rem;
+  }
 }
 
 /***************************************************************************
@@ -99,15 +166,37 @@ body {
   font-family: var(--font-family);
   font-size: var(--font-size-md);
   color: var(--color-black);
-  background: var(--color-white);
+  background: var(--color-background);
+}
+
+h2 {
+  font-size: var(--font-size-lg);
+}
+
+.app-title {
+  font-weight: bold;
 }
 
 /***************************************************************************
   Layout
 
-  Shrink-wraps to the widest child (e.g. the fixed-width game board) so the
-  toolbar's auto width spans the full scrollable document on mobile, while
-  never going narrower than the viewport on board-less pages.
+  Two rules doing two jobs. Both are load-bearing; neither is a tidy-up
+  candidate.
+
+  `width: fit-content` shrink-wraps to the widest child. This serves the game
+  board, which never wraps its player sections (see
+  `routes/games/board/styles.css`) and so can be wider than the viewport once
+  the smallest token tier still isn't small enough. Sizing the document to the
+  board rather than the viewport is what:
+
+    - produces the horizontal scroll that is the board's intended floor
+      behaviour, instead of clipping the overflow, and
+    - keeps the header's background spanning the full scrollable width, so it
+      doesn't end mid-page when scrolled right.
+
+  `min-width: 100%` stops the document collapsing to its content on pages that
+  have no board, where `fit-content` would otherwise leave the header narrower
+  than the viewport.
 ***************************************************************************/
 
 .layout {

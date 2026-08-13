@@ -1,55 +1,34 @@
 /***************************************************************************
   Chip Layout
 ***************************************************************************/
+
 .game-chip-pool {
-  width: 100%;
+  padding: var(--spacing-xs);
+  border-style: solid;
+  border-width: var(--border-sm);
   display: flex;
-  flex-direction: column;
-}
-
-.game-chip-pool--light {
-  color: var(--color-white);
-}
-.game-chip-pool--side-left {
-  align-items: flex-start;
-}
-.game-chip-pool--side-right {
-  align-items: flex-end;
-}
-
-.game-chip-pool__label {
-  font-size: var(--font-size-sm);
-}
-
-.game-chip-pool--light .game-chip-pool__label {
-  color: var(--color-white);
-}
-
-.game-chip-pool__display {
-  width: 70px;
-  padding: var(--space-xs);
-  border: 1px solid var(--color-black);
-  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  row-gap: var(--spacing-sm);
+  column-gap: var(--spacing-lg);
 }
 
-.game-chip-pool__display--light {
-  border-color: var(--color-white);
+.game-player-tablet .game-chip-pool {
+  border-color: var(--tablet-inner-border-color);
 }
 
-.game-chip-pool__display--side-right {
-  flex-direction: row-reverse;
+.game-player-tablet .game-chip-pool--emphasis {
+  animation: var(--tablet-emphasis-animation);
 }
 
-/* Expanded width when selector buttons are shown */
-.game-chip-pool__display--fullwidth {
-  width: 100%;
-  animation: pulse-lowlight 2000ms ease-in-out infinite;
+.game-player-mind .game-chip-pool {
+  border-color: var(--mind-inner-border-color);
 }
 
-.game-chip-pool__display--light.game-chip-pool__display--fullwidth {
-  animation: pulse-highlight 2000ms ease-in-out infinite;
+.game-player-mind .game-chip-pool--emphasis {
+  animation: var(--mind-emphasis-animation);
 }
 
 /***************************************************************************
@@ -58,13 +37,14 @@
 
 .game-chip {
   background-color: var(--color-chip);
-  border: 1px solid var(--color-black);
+  border: var(--border-sm) solid var(--color-black);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-sm);
   color: var(--color-black);
+  /* Chip counts are text: resolve them independently of the surrounding mirror. */
+  unicode-bidi: plaintext;
 }
 
 /* Variant of a chip, used to indicate how many chips have been selected from the given pool. */
@@ -73,21 +53,21 @@
 }
 
 .game-chip--size-sm {
-  width: var(--control-size-sm);
-  height: var(--control-size-sm);
-  font-size: var(--font-size-sm);
+  width: var(--chip-diam-sm);
+  height: var(--chip-diam-sm);
+  font-size: var(--chip-font-size-sm);
 }
 
 .game-chip--size-md {
-  width: var(--control-size-md);
-  height: var(--control-size-md);
-  font-size: var(--font-size-md);
+  width: var(--chip-diam-md);
+  height: var(--chip-diam-md);
+  font-size: var(--chip-font-size-md);
 }
 
 .game-chip--size-lg {
-  width: var(--control-size-lg);
-  height: var(--control-size-lg);
-  font-size: var(--font-size-lg);
+  width: var(--chip-diam-lg);
+  height: var(--chip-diam-lg);
+  font-size: var(--chip-font-size-lg);
 }
 
 /***************************************************************************
@@ -99,15 +79,15 @@
 }
 
 .game-chip-edge--size-sm {
-  left: var(--space-sm);
+  inset-inline-start: var(--spacing-sm);
 }
 
 .game-chip-edge--size-md {
-  left: var(--space-md);
+  inset-inline-start: var(--spacing-md);
 }
 
 .game-chip-edge--size-lg {
-  left: var(--space-lg);
+  inset-inline-start: var(--spacing-lg);
 }
 
 /***************************************************************************
@@ -117,62 +97,51 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--spacing-xs);
 }
 
-.game-chip-stack--forward {
-  flex-direction: row;
-}
-
-.game-chip-stack--reverse {
-  flex-direction: row-reverse;
+.game-chip-stack--ltr {
+  /*
+    Opts a stack out of mirroring. Counters on the board should read in the
+    player's own direction, but the chip SELECTOR is a control — its
+    decrement/increment/confirm order must not depend on which side the player
+    sits on, so it pins itself back to `ltr`.
+  */
+  direction: ltr;
 }
 
 /***************************************************************************
   Arrow
+
+  A simple indicator made only with CSS that indicates the direction of
+  chip movement.
 ***************************************************************************/
 
-/*
-  A simple CSS arrow used to indicate direction of chip movement.
-*/
 .game-arrow {
   width: 0;
   height: 0;
-  margin-inline: var(--space-xs);
+  margin-inline: var(--spacing-xs);
 }
 
 .game-arrow--size-sm {
-  border-top: 3px solid transparent;
-  border-bottom: 3px solid transparent;
-  border-left: 4px solid var(--color-black);
+  /*
+    Built from `border-inline-start` rather than `border-left`, so the triangle
+    points along the inline axis and flips itself under `direction: rtl`. That
+    replaces the explicit `--reverse` variants this rule used to need.
+  */
+  border-block-start: 0.4rem solid transparent;
+  border-block-end: 0.4rem solid transparent;
+  border-inline-start: 0.5rem solid var(--color-black);
 }
 
 .game-arrow--size-md {
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 6px solid var(--color-black);
+  border-block-start: 0.5rem solid transparent;
+  border-block-end: 0.5rem solid transparent;
+  border-inline-start: 0.6rem solid var(--color-black);
 }
 
 .game-arrow--size-lg {
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-left: 8px solid var(--color-black);
-}
-
-.game-arrow--reverse.game-arrow--size-sm {
-  border-right: 4px solid var(--color-black);
-  border-left: none;
-}
-.game-arrow--reverse.game-arrow--size-md {
-  border-right: 6px solid var(--color-black);
-  border-left: none;
-}
-.game-arrow--reverse.game-arrow--size-lg {
-  border-right: 8px solid var(--color-black);
-  border-left: none;
-}
-
-.game-arrow--light {
-  border-left-color: var(--color-white);
-  border-right-color: var(--color-white);
+  border-block-start: 0.6rem solid transparent;
+  border-block-end: 0.6rem solid transparent;
+  border-inline-start: 0.7rem solid var(--color-black);
 }

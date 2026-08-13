@@ -1,6 +1,5 @@
 import { Button, ButtonBase, SelectButton } from "@client/components";
 import { Edge, Stack } from "@client/components/layout";
-import type { Size } from "@client/components/types";
 import {
   FullsizeCardBodyActionText,
   FullsizeCardDisplay,
@@ -33,18 +32,12 @@ import {
 } from "@client/features/cards/thumbnail";
 import type { ActionType } from "@client/features/cards/types";
 import type { Message } from "../types";
-import {
-  CardPile,
-  CardPileLabel,
-  CardPileStack,
-  CardPileStackItem,
-} from "./pile";
+import { CardPile, CardPileItem } from "./pile";
 
 /******************************************************************************
  * ### CardSelector
  ******************************************************************************/
 export const CardSelector = (props: {
-  size: Size;
   selectDisabled: boolean;
   selected: boolean;
   onToggle: () => void;
@@ -53,11 +46,7 @@ export const CardSelector = (props: {
   return (
     <div className="game-card-selector">
       <ButtonBase disabled={props.selectDisabled} onClick={props.onToggle}>
-        <div
-          className={`game-card-selector__button game-card-selector__button--size-${props.size}`}
-        >
-          {symbol}
-        </div>
+        <div className={`game-card-selector__button`}>{symbol}</div>
       </ButtonBase>
     </div>
   );
@@ -171,11 +160,9 @@ export const ThumbnailCardFaceUp = memo(
           />
         </ThumbnailCard>
         {props.card.chips.length > 0 && (
-          <ChipCounterEdge size="sm">
+          <ChipCounterEdge size="md">
             <ChipCounter
               size="sm"
-              side="left"
-              light={props.card.type === "consumer"}
               baseCount={props.card.chips.length}
               selectedCount={numSelected}
             />
@@ -184,7 +171,6 @@ export const ThumbnailCardFaceUp = memo(
         {cardIsSelectable && props.selectorProps && (
           <CardSelectorEdge>
             <CardSelector
-              size="md"
               selected={cardIsSelected}
               selectDisabled={
                 props.submitting ||
@@ -245,26 +231,30 @@ export const MiniCardFaceUp = memo(
 /******************************************************************************
  * ### DiscardPile
  *
- * Displays the most recently discarded cards at the top of a "pile".
+ * Displays some of the most recently discarded cards as a staggered,
+ * overlapping "fan" of clickable thumbnails.
+ *
+ * `getLatestDiscards` returns every card discarded on the same tick, which is
+ * unbounded, and each card in the pile makes the visual element larger.
+ * Therefore, the number of cards displayed in the pile is capped.
  ******************************************************************************/
 export const DiscardPile = (props: {
   cardsVisible: VisibleCardDigest[];
   totalCount: number;
   setDialog: DialogProps["set"];
 }) => {
+  const MAX_VISIBLE_DISCARDS = 3;
+  const visibleDiscards = props.cardsVisible.slice(0, MAX_VISIBLE_DISCARDS);
   return (
     <CardPile>
-      <CardPileLabel>Discard ({props.totalCount})</CardPileLabel>
-      <CardPileStack>
-        <CardPileStackItem>
-          <MiniCardPlaceholder />
-        </CardPileStackItem>
-        {props.cardsVisible.map((c, i) => (
-          <CardPileStackItem key={c.id} index={i + 1}>
-            <MiniCardFaceUp card={c} setDialog={props.setDialog} />
-          </CardPileStackItem>
-        ))}
-      </CardPileStack>
+      <CardPileItem>
+        <MiniCardPlaceholder />
+      </CardPileItem>
+      {visibleDiscards.map((c, i) => (
+        <CardPileItem key={c.id} index={i + 1}>
+          <MiniCardFaceUp card={c} setDialog={props.setDialog} />
+        </CardPileItem>
+      ))}
     </CardPile>
   );
 };
@@ -277,12 +267,9 @@ export const DiscardPile = (props: {
 export const HandPile = (props: { count: number }) => {
   return (
     <CardPile>
-      <CardPileLabel>Hand ({props.count})</CardPileLabel>
-      <CardPileStack>
-        <CardPileStackItem>
-          <MiniCardPlaceholder />
-        </CardPileStackItem>
-      </CardPileStack>
+      <CardPileItem>
+        <MiniCardPlaceholder>{props.count}</MiniCardPlaceholder>
+      </CardPileItem>
     </CardPile>
   );
 };
@@ -359,7 +346,6 @@ const FullsizeCardChipSelect = (props: {
   return (
     <ChipSelector
       size="lg"
-      light={true}
       numSelected={numSelected}
       submitting={props.submitting}
       disableIncrement={!props.selectorProps?.moreValuesAllowed}
@@ -435,11 +421,9 @@ export const FullsizeCardFaceUp = (props: {
       })}
     >
       {chipIds.length > 0 && (
-        <ChipCounterEdge size="md">
+        <ChipCounterEdge size="lg">
           <ChipCounter
             size="md"
-            side="left"
-            light={true}
             baseCount={chipIds.length}
             selectedCount={numSelectedChips}
           />

@@ -1,5 +1,5 @@
 import { Copy } from "@client/components";
-import { Box } from "@client/components/layout";
+import { Box, PageTitle } from "@client/components/layout";
 import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import { ROUTES } from "@common/api/routes";
 
@@ -18,13 +18,16 @@ export const About = () => {
     },
   });
 
-  if (loading) return <Box spacing="lg">Loading...</Box>;
-  if (error) return <Box spacing="lg">"About" not available.</Box>;
-  if (!data) return null;
-
   return (
-    <Box spacing="lg">
-      <Copy>{data}</Copy>
-    </Box>
+    <>
+      <PageTitle>About</PageTitle>
+      {loading && <Box spacing="lg">Loading...</Box>}
+      {error && <Box spacing="lg">"About" not available.</Box>}
+      {data && (
+        <Box spacing="lg">
+          <Copy>{data}</Copy>
+        </Box>
+      )}
+    </>
   );
 };

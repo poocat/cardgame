@@ -1,4 +1,4 @@
-import { Box, Stack } from "@client/components";
+import { Box, PageTitle, Stack } from "@client/components";
 import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
 import { ROUTES } from "@common/api/routes";
 import { Link } from "react-router";
@@ -19,18 +19,24 @@ export const GameList = () => {
     },
   });
 
+  const pageTitle = <PageTitle>Games</PageTitle>;
+
   if (error) {
     return (
-      <Box spacing="md" color="error">
-        {error.message}
-      </Box>
+      <>
+        {pageTitle}
+        <Box spacing="md" color="error">
+          {error.message}
+        </Box>
+      </>
     );
   }
   return (
     <Box spacing="lg">
+      {pageTitle}
       <Stack orientation="vertical" spacing="md">
         {data?.games?.map((g) => (
-          <Box key={g.gameId} spacing="sm" size="md" border="dark">
+          <Box key={g.gameId} spacing="sm" border="dark">
             <Link to={`/games/${g.gameId}`}>{g.gameId}</Link>
             <div>Last updated at: {g.updatedAt}</div>
           </Box>
