@@ -32,7 +32,7 @@ import {
 } from "@client/features/cards/thumbnail";
 import type { ActionType } from "@client/features/cards/types";
 import type { Message } from "../types";
-import { CardPileStack, CardPileStackItem } from "./pile";
+import { CardPile, CardPileItem } from "./pile";
 
 /******************************************************************************
  * ### CardSelector
@@ -246,16 +246,16 @@ export const DiscardPile = (props: {
   const MAX_VISIBLE_DISCARDS = 3;
   const visibleDiscards = props.cardsVisible.slice(0, MAX_VISIBLE_DISCARDS);
   return (
-    <CardPileStack>
-      <CardPileStackItem>
+    <CardPile>
+      <CardPileItem>
         <MiniCardPlaceholder />
-      </CardPileStackItem>
+      </CardPileItem>
       {visibleDiscards.map((c, i) => (
-        <CardPileStackItem key={c.id} index={i + 1}>
+        <CardPileItem key={c.id} index={i + 1}>
           <MiniCardFaceUp card={c} setDialog={props.setDialog} />
-        </CardPileStackItem>
+        </CardPileItem>
       ))}
-    </CardPileStack>
+    </CardPile>
   );
 };
 
@@ -266,11 +266,11 @@ export const DiscardPile = (props: {
  ******************************************************************************/
 export const HandPile = (props: { count: number }) => {
   return (
-    <CardPileStack>
-      <CardPileStackItem>
+    <CardPile>
+      <CardPileItem>
         <MiniCardPlaceholder>{props.count}</MiniCardPlaceholder>
-      </CardPileStackItem>
-    </CardPileStack>
+      </CardPileItem>
+    </CardPile>
   );
 };
 

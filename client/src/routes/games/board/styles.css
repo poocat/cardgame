@@ -105,6 +105,7 @@
   color: var(--tablet-text-color);
   box-shadow: var(--tablet-outer-border-color) var(--tablet-shadow-width)
     var(--tablet-shadow-width);
+  gap: var(--spacing-sm);
 }
 
 .game-player-section--side-right .game-player-tablet {
