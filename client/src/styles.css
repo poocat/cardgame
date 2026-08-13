@@ -125,7 +125,7 @@
   --mind-emphasis-color: var(--color-lowlight);
 
   --dashboard-emphasis-animation: var(--default-lowlight-animation);
-  --dashboard-emphasis-color: var(--color-night);
+  --dashboard-emphasis-color: var(--color-lowlight);
   --dashboard-inner-border-color: var(--color-black-translucent);
 }
 
