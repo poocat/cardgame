@@ -1,88 +1,19 @@
 /**
  * "Attention" alerts result in a flashed message in the page title, and
  * optionally, a sound, when the app changes state while not visible.
+ *
+ * The flash itself is owned by the title utility, which composes it with the
+ * active route's title. This module only registers the message and plays the
+ * audio cue.
  */
 
 import { useEffect, useRef } from "react";
+import { addFlashMessage, clearFlashMessage, hasFlashMessage } from "./title";
 
 ////////////////////////////////////////////////////////////////////////////////
-// Utils for reading and updating document state.
+// Utils for reading document state.
 ////////////////////////////////////////////////////////////////////////////////
-let originalTitle = document.title;
-const setTitle = (title: string) => {
-  document.title = title;
-};
-const resetTitle = () => {
-  document.title = originalTitle;
-};
 const pageVisible = () => document.visibilityState === "visible";
-
-////////////////////////////////////////////////////////////////////////////////
-// Message registration
-////////////////////////////////////////////////////////////////////////////////
-const messages = new Map<symbol, string>();
-
-function getActiveMessage(): string | null {
-  return [...messages.values()].at(-1) ?? null;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Flashing interval
-////////////////////////////////////////////////////////////////////////////////
-const interval = 1000;
-let flashIntervalId: number | null = null;
-let flashToggle = false;
-
-function startFlashing() {
-  if (flashIntervalId !== null) return;
-  originalTitle = document.title;
-  flashIntervalId = setInterval(() => {
-    const msg = getActiveMessage();
-    if (msg === null) {
-      stopFlashing();
-      return;
-    }
-    flashToggle = !flashToggle;
-    if (flashToggle) setTitle(msg);
-    else resetTitle();
-  }, interval);
-}
-
-function stopFlashing() {
-  if (flashIntervalId !== null) {
-    clearInterval(flashIntervalId);
-    flashIntervalId = null;
-    flashToggle = false;
-    resetTitle();
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Handlers for registering and unregistering messages.
-////////////////////////////////////////////////////////////////////////////////
-function addMessage(id: symbol, msg: string) {
-  messages.set(id, msg);
-  startFlashing();
-}
-
-function clearMessage(id: symbol) {
-  messages.delete(id);
-  if (messages.size === 0) {
-    stopFlashing();
-  }
-}
-
-function clearAllMessages() {
-  messages.clear();
-  stopFlashing();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Global event listener for visibility changes.
-////////////////////////////////////////////////////////////////////////////////
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") clearAllMessages();
-});
 
 ////////////////////////////////////////////////////////////////////////////////
 // Audio cues
@@ -151,21 +82,21 @@ export function useAttention(opts: {
     const active = message !== null;
 
     if (active && !wasActive.current) {
-      if (!pageVisible()) addMessage(id.current, message);
+      if (!pageVisible()) addFlashMessage(id.current, message);
       if (opts.audio) playAudioCue(opts.audio);
     } else if (active && wasActive.current) {
       // Message changed while still active. Update the message.
-      if (messages.has(id.current)) {
-        addMessage(id.current, message);
+      if (hasFlashMessage(id.current)) {
+        addFlashMessage(id.current, message);
       }
     } else if (!active) {
-      clearMessage(id.current);
+      clearFlashMessage(id.current);
     }
 
     wasActive.current = active;
 
     return () => {
-      clearMessage(id.current);
+      clearFlashMessage(id.current);
     };
   }, [opts.message, opts.audio]);
 }
