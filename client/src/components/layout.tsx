@@ -1,3 +1,4 @@
+import { useDocumentTitle } from "@client/utils/title";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { Border, Color, EdgeVariant, Spacing } from "./types";
 import "./styles.css";
@@ -51,11 +52,13 @@ export const Divider = () => {
  *
  * Hidden by default: still in the accessibility tree, but taking up no space.
  * Pass `visible` where the design has room for a real title.
+ *
+ * Also sets the document title, so that the heading and the browser tab cannot
+ * drift apart.
  ******************************************************************************/
-export const PageTitle = (props: {
-  children: React.ReactNode;
-  visible?: boolean;
-}) => {
+export const PageTitle = (props: { children: string; visible?: boolean }) => {
+  useDocumentTitle(props.children);
+
   if (props.visible) return <h1>{props.children}</h1>;
   return (
     <VisuallyHidden asChild>
