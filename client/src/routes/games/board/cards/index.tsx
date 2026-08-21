@@ -31,7 +31,7 @@ import {
   ThumbnailCardContainer,
 } from "@client/features/cards/thumbnail";
 import type { ActionType } from "@client/features/cards/types";
-import type { Message } from "../types";
+import type { Message } from "@common/text/types";
 import { CardPile, CardPileItem } from "./pile";
 
 /******************************************************************************

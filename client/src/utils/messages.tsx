@@ -1,4 +1,3 @@
-import type { messageSchema } from "@common/api/digests";
 import { ROUTES } from "@common/api/routes";
 import {
   createContext,
@@ -7,10 +6,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import type z from "zod";
 import { apiUrl, assertHttpSuccess, useApiQuery } from "./api";
 
-export type Message = z.infer<typeof messageSchema>;
 export type Match =
   | { type: "icon"; key: string; value: string }
   | { type: "text"; key?: string; value: string };

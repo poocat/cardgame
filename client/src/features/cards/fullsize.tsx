@@ -12,8 +12,8 @@ import { CardImage } from "./image";
 import type { ActionType, CardDefDigest, CardType } from "./types";
 import "./styles.css";
 import { Icon } from "@client/components/icon";
-import type { Message } from "@client/utils/messages";
 import { msg } from "@common/text/messages";
+import type { Message } from "@common/text/types";
 
 /******************************************************************************
  * ### FullsizeCardContainer
@@ -105,12 +105,11 @@ const FullsizeCardBodyText = (props: { children?: React.ReactNode }) => {
  * ### ActionTypeLabel
  ******************************************************************************/
 const ActionTypeLabel = (props: { actionType: ActionType }) => {
-  // TODO: would love a way to compose this key without template literals
-  const message = msg(`action.type.${props.actionType}`);
+  const key = `action.type.${props.actionType}` as const;
   return (
     <span className="action-type-label">
-      <Icon msg={message} decorative />
-      <Msg value={message} textOnly />
+      <Icon msgKey={key} decorative />
+      <Msg value={msg(key)} textOnly />
     </span>
   );
 };

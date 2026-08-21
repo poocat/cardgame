@@ -8,7 +8,6 @@ import { GameList } from "@client/routes/games/GameList";
 import { NewRoom } from "@client/routes/rooms/NewRoom";
 import { Room } from "@client/routes/rooms/Room";
 import { Rulebook } from "@client/routes/rulebook/Rulebook";
-import { msg } from "@common/text/messages";
 import { Link, Outlet, Route, Routes } from "react-router";
 import { MessageProvider } from "./utils/messages";
 
@@ -27,7 +26,7 @@ const Layout = () => {
         <Box spacing="lg" color="secondary">
           <Stack wrap orientation="horizontal" spacing="lg">
             <Stack orientation="horizontal" spacing="md">
-              <Icon msg={msg("logo")} decorative />
+              <Icon msgKey="logo" decorative />
               <span className="app-title">
                 <Msg value={{ key: "title" }} />
               </span>

@@ -1,9 +1,4 @@
-import type { messageSchema } from "@common/api/digests";
-import type { messageKeys } from "@common/text/keys";
-import type z from "zod";
-
-type Message = z.infer<typeof messageSchema>;
-type Key = (typeof messageKeys)[number];
+import type { Message, MessageKey } from "@common/text/types";
 
 /******************************************************************************
  * ### msg
@@ -12,6 +7,6 @@ type Key = (typeof messageKeys)[number];
  * messages emitted from the game engine, not from the card definitions
  * themselves.
  ******************************************************************************/
-export function msg(key: Key, params?: Message["params"]): Message {
+export function msg(key: MessageKey, params?: Message["params"]): Message {
   return params ? { key, params } : { key };
 }

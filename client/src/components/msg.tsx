@@ -1,6 +1,7 @@
 import { Icon } from "@client/components/icon";
-import type { Match, Message } from "@client/utils/messages";
+import type { Match } from "@client/utils/messages";
 import { useMessages } from "@client/utils/messages";
+import type { Message, MessageKey } from "@common/text/types";
 import { useCallback, useMemo } from "react";
 
 const SPLIT_PATTERN = /\{([a-zA-Z0-9.]+)\}/g;
@@ -55,7 +56,9 @@ export const Msg = (props: { value: Message | null; textOnly?: boolean }) => {
     <span>
       {segments.map((s, i) =>
         s.type === "icon" ? (
-          <Icon key={`${i}-${s.type}`} msg={{ key: s.key }} />
+          // Segment keys come from card definitions, so they are not part of
+          // `MessageKey` and cannot be validated at compile time.
+          <Icon key={`${i}-${s.type}`} msgKey={s.key as MessageKey} />
         ) : (
           <span key={`${i}-${s.type}`}>{s.value}</span>
         ),

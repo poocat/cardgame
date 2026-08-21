@@ -1,7 +1,8 @@
 import { Icon } from "@client/components/icon";
 import { Msg } from "@client/components/msg";
 import { msg } from "@common/text/messages";
-import type { Message, PlayerSide } from "./types";
+import type { Message, MessageKey } from "@common/text/types";
+import type { PlayerSide } from "./types";
 
 /******************************************************************************
  * ### Labeled
@@ -12,13 +13,13 @@ import type { Message, PlayerSide } from "./types";
  ******************************************************************************/
 export const Labeled = (props: {
   text: Message;
-  icon?: Message;
+  iconKey?: MessageKey;
   children: React.ReactNode;
 }) => {
   return (
     <div className="game-label">
       <span className="game-label__content">
-        {props.icon && <Icon msg={props.icon} decorative />}
+        {props.iconKey && <Icon msgKey={props.iconKey} decorative />}
         <Msg value={props.text} textOnly />
       </span>
       {props.children}
@@ -104,10 +105,7 @@ export const PlayerTabletPiles = (props: { children: React.ReactNode }) => {
  ******************************************************************************/
 export const PlayerTabletProducers = (props: { children: React.ReactNode }) => {
   return (
-    <Labeled
-      text={msg("card.group.producers")}
-      icon={msg("card.type.producer")}
-    >
+    <Labeled text={msg("card.group.producers")} iconKey="card.type.producer">
       <div className="game-player-tablet__producers">{props.children}</div>
     </Labeled>
   );
@@ -130,10 +128,7 @@ export const PlayerMind = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 export const PlayerMindConsumers = (props: { children?: React.ReactNode }) => {
   return (
-    <Labeled
-      text={msg("card.group.consumers")}
-      icon={msg("card.type.consumer")}
-    >
+    <Labeled text={msg("card.group.consumers")} iconKey="card.type.consumer">
       <div className="game-player-mind__consumers">{props.children}</div>
     </Labeled>
   );
