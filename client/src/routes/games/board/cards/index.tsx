@@ -156,7 +156,7 @@ export const ThumbnailCardFaceUp = memo(
             formFactor="thumbnail"
             name={props.card.name}
             type={props.card.type}
-            subtype={props.card.subtype?.key}
+            subtype={props.card.subtype}
           />
         </ThumbnailCard>
         {props.card.chips.length > 0 && (
@@ -221,7 +221,7 @@ export const MiniCardFaceUp = memo(
           formFactor="thumbnail"
           name={props.card.name}
           type={props.card.type}
-          subtype={props.card.subtype?.key}
+          subtype={props.card.subtype}
         />
       </ThumbnailCard>
     );

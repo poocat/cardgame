@@ -1,5 +1,5 @@
+import { msg } from "@common/text/messages";
 import type { CheckResult, IAccessor } from "@server/game/types";
-import { msg } from "@server/text/messages";
 import type { ActionData, ActionTypeMap, Message } from "@server/types";
 import { cardPlayChecks } from "./cardChecks";
 

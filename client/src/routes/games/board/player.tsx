@@ -1,6 +1,7 @@
 import { Icon } from "@client/components/icon";
 import { Msg } from "@client/components/msg";
-import type { PlayerSide } from "./types";
+import { msg } from "@common/text/messages";
+import type { Message, PlayerSide } from "./types";
 
 /******************************************************************************
  * ### Labeled
@@ -10,15 +11,15 @@ import type { PlayerSide } from "./types";
  * which side of the board it is on.
  ******************************************************************************/
 export const Labeled = (props: {
-  msgKey: string;
-  iconKey?: string;
+  text: Message;
+  icon?: Message;
   children: React.ReactNode;
 }) => {
   return (
     <div className="game-label">
       <span className="game-label__content">
-        {props.iconKey && <Icon msgKey={props.iconKey} decorative />}
-        <Msg value={{ key: props.msgKey }} textOnly />
+        {props.icon && <Icon msg={props.icon} decorative />}
+        <Msg value={props.text} textOnly />
       </span>
       {props.children}
     </div>
@@ -103,7 +104,10 @@ export const PlayerTabletPiles = (props: { children: React.ReactNode }) => {
  ******************************************************************************/
 export const PlayerTabletProducers = (props: { children: React.ReactNode }) => {
   return (
-    <Labeled msgKey="term.producers" iconKey="term.producer">
+    <Labeled
+      text={msg("card.group.producers")}
+      icon={msg("card.type.producer")}
+    >
       <div className="game-player-tablet__producers">{props.children}</div>
     </Labeled>
   );
@@ -126,7 +130,10 @@ export const PlayerMind = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 export const PlayerMindConsumers = (props: { children?: React.ReactNode }) => {
   return (
-    <Labeled msgKey="term.consumers" iconKey="term.consumer">
+    <Labeled
+      text={msg("card.group.consumers")}
+      icon={msg("card.type.consumer")}
+    >
       <div className="game-player-mind__consumers">{props.children}</div>
     </Labeled>
   );

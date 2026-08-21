@@ -55,7 +55,7 @@ export const Msg = (props: { value: Message | null; textOnly?: boolean }) => {
     <span>
       {segments.map((s, i) =>
         s.type === "icon" ? (
-          <Icon key={`${i}-${s.type}`} msgKey={s.key} />
+          <Icon key={`${i}-${s.type}`} msg={{ key: s.key }} />
         ) : (
           <span key={`${i}-${s.type}`}>{s.value}</span>
         ),

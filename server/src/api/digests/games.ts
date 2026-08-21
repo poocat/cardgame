@@ -10,10 +10,10 @@ import type {
   inPlayCardDigestSchema,
   visibleCardDigestSchema,
 } from "@common/api/digests";
+import { msg } from "@common/text/messages";
 import { anonymizeId } from "@server/api/anonymization";
 import { cardDefDigest } from "@server/api/digests/cards";
 import { getCardDefinition } from "@server/game/cards/registry";
-import { msg } from "@server/text/messages";
 import type {
   ActionType,
   CardData,

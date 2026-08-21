@@ -13,6 +13,7 @@ import type { ActionType, CardDefDigest, CardType } from "./types";
 import "./styles.css";
 import { Icon } from "@client/components/icon";
 import type { Message } from "@client/utils/messages";
+import { msg } from "@common/text/messages";
 
 /******************************************************************************
  * ### FullsizeCardContainer
@@ -105,11 +106,11 @@ const FullsizeCardBodyText = (props: { children?: React.ReactNode }) => {
  ******************************************************************************/
 const ActionTypeLabel = (props: { actionType: ActionType }) => {
   // TODO: would love a way to compose this key without template literals
-  const key = `action.type.${props.actionType}`;
+  const message = msg(`action.type.${props.actionType}`);
   return (
     <span className="action-type-label">
-      <Icon msgKey={key} decorative />
-      <Msg value={{ key }} textOnly />
+      <Icon msg={message} decorative />
+      <Msg value={message} textOnly />
     </span>
   );
 };
@@ -166,7 +167,7 @@ export const FullsizeCardDisplay = (props: {
             formFactor="fullsize"
             name={props.card.name}
             type={props.card.type}
-            subtype={props.card.subtype?.key}
+            subtype={props.card.subtype}
           />
         </FullsizeCardBackground>
         <FullsizeCardForeground>

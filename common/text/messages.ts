@@ -1,6 +1,8 @@
-import type { Message } from "@server/types";
-import type { messageKeys } from "./keys";
+import type { messageSchema } from "@common/api/digests";
+import type { messageKeys } from "@common/text/keys";
+import type z from "zod";
 
+type Message = z.infer<typeof messageSchema>;
 type Key = (typeof messageKeys)[number];
 
 /******************************************************************************

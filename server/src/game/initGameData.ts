@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { CONSTANTS } from "@common/game/constants";
+import { msg } from "@common/text/messages";
 import {
   allRegisteredCards,
   getCardDefinition,
 } from "@server/game/cards/registry";
 import { logger } from "@server/logger";
-import { msg } from "@server/text/messages";
 import type { ActionType, GameData } from "@server/types";
 
 function makeId(): string {

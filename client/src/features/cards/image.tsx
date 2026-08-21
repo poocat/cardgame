@@ -1,9 +1,11 @@
 import { Icon } from "@client/components/icon";
 import { apiUrl } from "@client/utils/api";
+import type { Message } from "@client/utils/messages";
 import { ROUTES } from "@common/api/routes";
 import { useState } from "react";
 import type { CardFormFactor, CardType } from "./types";
 import "./styles.css";
+import { msg } from "@common/text/messages";
 
 function slugify(name: string): string {
   return name.toLowerCase().replace(/\s+/g, "-");
@@ -31,7 +33,7 @@ const CardTypeIcon = (props: {
 }) => (
   <Icon
     // TODO: would love a way to compose this key without template literals
-    msgKey={`term.${props.type}`}
+    msg={msg(`card.type.${props.type}`)}
     className={`card-type-icon card-type-icon--${props.placement}`}
   />
 );
@@ -45,11 +47,11 @@ const CardTypeIcon = (props: {
  * part of the card image. (The upper right hand corner.)
  ******************************************************************************/
 const CardSubtypeIcon = (props: {
-  subtype: string;
+  subtype: Message;
   placement: CardTypeIconPlacement;
 }) => (
   <Icon
-    msgKey={props.subtype}
+    msg={props.subtype}
     className={`card-subtype-icon card-subtype-icon--${props.placement}`}
   />
 );
@@ -69,7 +71,7 @@ const CardSubtypeIcon = (props: {
 export const CardImage = (props: {
   name: string;
   type: CardType;
-  subtype: string | null | undefined;
+  subtype: Message | null | undefined;
   formFactor: CardFormFactor;
 }) => {
   const [failed, setFailed] = useState(false);

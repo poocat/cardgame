@@ -1,3 +1,4 @@
+import type { Message } from "@client/utils/messages";
 import { useMessages } from "@client/utils/messages";
 
 /******************************************************************************
@@ -10,14 +11,14 @@ import { useMessages } from "@client/utils/messages";
  * text around it, rather than letting `<Msg/>` splice it into a template.
  ******************************************************************************/
 export const Icon = (props: {
-  msgKey: string;
+  msg: Message;
   /** Use to render the icon as a purely visual element; will be skipped by screen readers. */
   decorative?: boolean;
   /** Defaults to the shared inline `icon` class, sized to the inherited font. */
   className?: string;
 }) => {
   const { lookup } = useMessages();
-  const match = lookup(props.msgKey);
+  const match = lookup(props.msg.key);
   if (match.type !== "icon") return null;
 
   const className = props.className ?? "icon";
@@ -37,12 +38,12 @@ export const Icon = (props: {
      * recursively. If the message has any tokens, those tokens will pass
      * through verbatim to the alt text.
      */
-    const altMatch = lookup(props.msgKey, { textOnly: true });
+    const altMatch = lookup(props.msg.key, { textOnly: true });
     return (
       <span
         className={className}
         role="img"
-        aria-label={altMatch.value || props.msgKey}
+        aria-label={altMatch.value || props.msg.key}
         // biome-ignore lint/security/noDangerouslySetInnerHtml: content is server-sanitized at bundle load via DOMPurify (svg profile).
         dangerouslySetInnerHTML={{ __html: match.value }}
       />
