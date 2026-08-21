@@ -1,4 +1,4 @@
-import { messageKeys } from "@server/text/keys";
+import { messageKeys } from "@common/text/keys";
 import defaultEn from "@server/text/locales/en.json";
 import { missingBundleKeys } from "@server/text/registry";
 import { describe, expect, it } from "vitest";

@@ -1,4 +1,5 @@
 import { CONSTANTS } from "@common/game/constants";
+import { msg } from "@common/text/messages";
 import { getActionDefinition } from "@server/game/cards/registry";
 import type {
   ActionContext,
@@ -7,7 +8,6 @@ import type {
   IAnnotator,
   IDecisions,
 } from "@server/game/types";
-import { msg } from "@server/text/messages";
 import type {
   ActionData,
   ActivityData,

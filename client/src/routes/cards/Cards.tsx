@@ -1,10 +1,10 @@
 import { Box, PageTitle } from "@client/components/layout";
 import { FullsizeCardDisplay } from "@client/features/cards/fullsize";
 import { apiUrl, assertHttpSuccess, useApiQuery } from "@client/utils/api";
-import type { Message } from "@client/utils/messages";
 import { useMessages } from "@client/utils/messages";
 import { ROUTES } from "@common/api/routes";
 import { cardTypes } from "@common/game/enums";
+import type { Message } from "@common/text/types";
 import { useMemo } from "react";
 import "./styles.css";
 

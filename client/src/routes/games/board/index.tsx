@@ -36,6 +36,7 @@ import {
 } from "./player";
 import type { RematchProps } from "./rematch";
 import "./styles.css";
+import { msg } from "@common/text/messages";
 import type {
   ChipDigest,
   ChoiceProps,
@@ -257,11 +258,11 @@ export const GameBoard = memo(
                     />
                     <PlayerTabletPiles>
                       {!isObserver && (
-                        <Labeled msgKey="location.card.inHand">
+                        <Labeled text={msg("card.group.hand")}>
                           <HandPile count={player.cardsInHand.length} />
                         </Labeled>
                       )}
-                      <Labeled msgKey="location.card.inDiscard">
+                      <Labeled text={msg("card.group.discard")}>
                         <DiscardPile
                           cardsVisible={player.cardsInDiscardVisible}
                           totalCount={player.cardsInDiscard.length}
@@ -291,7 +292,7 @@ export const GameBoard = memo(
                     ))}
                   </PlayerTabletProducers>
                   <div style={{ flexGrow: 1 }} />
-                  <Labeled msgKey="term.reserve">
+                  <Labeled text={msg("chip.group.reserve")}>
                     <ChipPool
                       chips={player.chipsInReserve}
                       choiceProps={props.choiceProps}
@@ -328,7 +329,7 @@ export const GameBoard = memo(
                     ))}
                   </PlayerMindConsumers>
                   <div style={{ flexGrow: 1 }} />
-                  <Labeled msgKey="term.channel">
+                  <Labeled text={msg("chip.group.channel")}>
                     <ChipPool
                       chips={player.chipsinChannel}
                       choiceProps={props.choiceProps}
@@ -345,7 +346,7 @@ export const GameBoard = memo(
                 </PlayerMind>
                 {isObserver && (
                   <PlayerDashboard>
-                    <Labeled msgKey="location.card.inHand">
+                    <Labeled text={msg("card.group.hand")}>
                       <PlayerDashboardHand>
                         {player.cardsInHand.map((card) => (
                           <ThumbnailCardFaceUp

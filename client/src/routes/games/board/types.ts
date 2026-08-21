@@ -6,7 +6,6 @@ import type {
   InPlayCardDigest,
   VisibleCardDigest,
 } from "@client/features/cards/types";
-import type { Message } from "@client/utils/messages";
 import type {
   choiceValueDigestSchema,
   gameDigestSchema,
@@ -28,7 +27,6 @@ export type {
   ChipDigest,
   FaceUpCardDigest,
   InPlayCardDigest,
-  Message,
   VisibleCardDigest,
 };
 

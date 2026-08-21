@@ -1,7 +1,7 @@
+import { messageKeys as publicKeys } from "@common/text/keys";
 import { messageKeys as privateKeys } from "@private/text/keys";
 import { CONFIG } from "@server/config";
 import { createPrivatePaths } from "@server/paths";
-import { messageKeys as publicKeys } from "@server/text/keys";
 import {
   getLocaleBundle,
   missingBundleKeys,

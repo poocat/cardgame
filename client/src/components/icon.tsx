@@ -1,4 +1,5 @@
 import { useMessages } from "@client/utils/messages";
+import type { MessageKey } from "@common/text/types";
 
 /******************************************************************************
  * ### Icon
@@ -10,7 +11,7 @@ import { useMessages } from "@client/utils/messages";
  * text around it, rather than letting `<Msg/>` splice it into a template.
  ******************************************************************************/
 export const Icon = (props: {
-  msgKey: string;
+  msgKey: MessageKey;
   /** Use to render the icon as a purely visual element; will be skipped by screen readers. */
   decorative?: boolean;
   /** Defaults to the shared inline `icon` class, sized to the inherited font. */

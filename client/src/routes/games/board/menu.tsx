@@ -2,14 +2,10 @@ import { Button, SelectButton } from "@client/components";
 import { Box, Stack } from "@client/components/layout";
 import { Msg } from "@client/components/msg";
 import type { Color } from "@client/components/types";
+import type { Message } from "@common/text/types";
 import { memo, useCallback } from "react";
 import type { RematchProps } from "./rematch";
-import type {
-  ChoiceType,
-  ChoiceValueDigest,
-  Message,
-  SelectorProps,
-} from "./types";
+import type { ChoiceType, ChoiceValueDigest, SelectorProps } from "./types";
 
 /******************************************************************************
  * ### ChoiceSelectButton
