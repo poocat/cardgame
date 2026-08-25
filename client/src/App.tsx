@@ -5,9 +5,11 @@ import { About } from "@client/routes/about/About";
 import { Cards } from "@client/routes/cards/Cards";
 import { Game } from "@client/routes/games/Game";
 import { GameList } from "@client/routes/games/GameList";
+import { useRouteMeta } from "@client/routes/meta";
 import { NewRoom } from "@client/routes/rooms/NewRoom";
 import { Room } from "@client/routes/rooms/Room";
 import { Rulebook } from "@client/routes/rulebook/Rulebook";
+import { msg } from "@common/text/messages";
 import { Link, Outlet, Route, Routes } from "react-router";
 import { MessageProvider } from "./utils/messages";
 
@@ -20,6 +22,8 @@ const Providers = (props: { children: React.ReactNode }) => {
 };
 
 const Layout = () => {
+  useRouteMeta();
+
   return (
     <div className="layout">
       <header>
@@ -33,11 +37,18 @@ const Layout = () => {
             </Stack>
             <nav>
               <Stack wrap orientation="horizontal" spacing="lg">
-                {/* TODO!!! Labels should be messages!!! */}
-                <Link to="/">Play</Link>
-                <Link to="/rulebook">Rulebook</Link>
-                <Link to="/cards">Cards</Link>
-                <Link to="/about">About</Link>
+                <Link to="/">
+                  <Msg value={msg("page.home.title")} />
+                </Link>
+                <Link to="/rulebook">
+                  <Msg value={msg("page.rulebook.title")} />
+                </Link>
+                <Link to="/cards">
+                  <Msg value={msg("page.cards.title")} />
+                </Link>
+                <Link to="/about">
+                  <Msg value={msg("page.about.title")} />
+                </Link>
               </Stack>
             </nav>
           </Stack>

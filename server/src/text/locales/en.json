@@ -16,17 +16,29 @@
   "card.group.discard": "Discard",
   "chip.group.reserve": "Reserve",
   "chip.group.channel": "Channel",
+
   "activity.drawingCards.choice.instructions": "Choose a deck to draw from.",
   "activity.drawingCards.explanation": "{choosingPlayerName} is choosing which deck to draw from.",
   "activity.choosingAction.choice.instructions": "Choose an action to take, or pass your turn.",
   "activity.choosingAction.explanation": "{choosingPlayerName} is choosing which action to take, or whether or not to pass their turn.",
   "activity.takingAction.explanation": "{currentPlayerName} has chosen the {actionType} action from {cardName}. {choosingPlayerName} is currently choosing values.",
+
   "label.action.choice": "{cardName} {actionType}",
+
   "reason.cardAlreadyInPlay": "This card is already in play.",
   "reason.cardExhausted": "This card is {card.state.exhausted}.",
   "reason.cardNotInPlay": "This card is not in play.",
   "reason.cardNotInGame": "This card is not in the game.",
   "reason.maxProducersInPlay": "There are already {n} producers in play.",
   "reason.maxConsumersInPlay": "There are already {n} consumers in play.",
-  "reason.notOwner": "This is not your card."
+  "reason.notOwner": "This is not your card.",
+
+  "page.home.title": "Play",
+  "page.home.meta.description": "Create a room, invite players, and start a game.",
+  "page.rulebook.title": "Rulebook",
+  "page.rulebook.meta.description": "How to play the game.",
+  "page.cards.title": "Cards",
+  "page.cards.meta.description": "Browse all cards in the game.",
+  "page.about.title": "About",
+  "page.about.meta.description": "What the game is, how it came about, and how it was built."
 }

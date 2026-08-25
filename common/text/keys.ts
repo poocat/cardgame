@@ -39,4 +39,14 @@ export const messageKeys = [
   "reason.notOwner",
   "reason.maxProducersInPlay",
   "reason.maxConsumersInPlay",
+  // Public pages:
+  // (Note, meta descriptions cannot contain token placeholders)
+  "page.home.title",
+  "page.home.meta.description",
+  "page.rulebook.title",
+  "page.rulebook.meta.description",
+  "page.cards.title",
+  "page.cards.meta.description",
+  "page.about.title",
+  "page.about.meta.description",
 ] as const;
